@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindShift - Perspective Mapping Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 50px;
+            display: none;
+        }
+
+        .container.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+
+        h2 {
+            color: #4a5568;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+
+        h3 {
+            color: #667eea;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        p {
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .question-group {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            color: #2d3748;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1.05em;
+        }
+
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .mindmap {
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .node-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 15px 0;
+        }
+
+        .node {
+            background: #f7fafc;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .node h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .node-content {
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        .connector {
+            text-align: center;
+            color: #a0aec0;
+            font-size: 1.5em;
+            margin: 10px 0;
+        }
+
+        .accordion {
+            margin-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 15px;
+        }
+
+        .accordion-header {
+            cursor: pointer;
+            color: #667eea;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.2s;
+        }
+
+        .accordion-header:hover {
+            color: #764ba2;
+        }
+
+        .accordion-icon {
+            transition: transform 0.3s;
+        }
+
+        .accordion-icon.open {
+            transform: rotate(90deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding-left: 25px;
+            margin-top: 10px;
+        }
+
+        .accordion-content.open {
+            max-height: 500px;
+        }
+
+        .timeline-item {
+            margin: 10px 0;
+            color: #4a5568;
+        }
+
+        .start-over {
+            cursor: pointer;
+            color: #718096;
+            font-size: 0.9em;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.2s;
+            float: right;
+        }
+
+        .start-over:hover {
+            color: #667eea;
+        }
+
+        .ai-helper {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .ai-helper:hover {
+            transform: scale(1.02);
+        }
+
+        .ai-helper h3 {
+            color: white;
+            margin: 0 0 10px 0;
+        }
+
+        .persona-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .persona-card {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .persona-card:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .persona-card h4 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .persona-card p {
+            color: #718096;
+            font-size: 0.95em;
+            margin: 0;
+        }
+
+        .persona-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .historical-selector {
+            margin-top: 20px;
+            padding: 25px;
+            background: #fff5f5;
+            border-radius: 12px;
+            border: 2px solid #fc8181;
+        }
+
+        .historical-selector h4 {
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+
+        .historical-selector select {
+            width: 100%;
+            padding: 12px;
+            font-size: 1em;
+            border: 2px solid #fc8181;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .historical-selector select:focus {
+            outline: none;
+            border-color: #f56565;
+        }
+
+        .full-width-card {
+            grid-column: 1 / -1;
+        }
+
+        .deep-dive {
+            margin-top: 30px;
+        }
+
+        .deep-dive-section {
+            background: #f7fafc;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .deep-dive-section h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .deep-dive-section ul {
+            margin-left: 20px;
+            color: #4a5568;
+            line-height: 1.8;
+        }
+
+        .back-button {
+            background: #e2e8f0;
+            color: #2d3748;
+            margin-right: 10px;
+        }
+
+        .back-button:hover {
+            background: #cbd5e0;
+            box-shadow: none;
+        }
+
+        .custom-persona {
+            margin-top: 20px;
+            padding: 20px;
+            background: #fff5f5;
+            border-radius: 12px;
+            border: 2px dashed #fc8181;
+        }
+
+        .custom-persona input {
+            margin-top: 10px;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(102, 126, 234, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            flex-direction: column;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .loading-content {
+            text-align: center;
+            color: white;
+        }
+
+        .loading-content h2 {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .loading-dots {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .dot {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: white;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: scale(0);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .loading-text {
+            margin-top: 30px;
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container active" id="page1">
+        <div style="text-align: center;">
+            <h1>🧠 MindShift</h1>
+            <p style="font-size: 1.3em; color: #667eea; margin-bottom: 30px;">Mind mapping with intention, through a variety of lenses.</p>
+            
+            <h3>This is not life advice.</h3>
+            <p>This is a tool to shift your perspective. We all get stuck in our own thinking patterns, and sometimes the breakthrough isn't in finding the "right" answer—it's in asking better questions.</p>
+            
+            <h3>Here's how it works:</h3>
+            <p>First, you'll map where you are and where you want to be. Then, you'll explore your path forward through different mental lenses—Socrates questioning your assumptions, your future self looking back, a ruthless strategist cutting through noise, and more.</p>
+            
+            <p>Same situation. Different minds. New possibilities.</p>
+        </div>
+        
+        <button onclick="navigateToPage(2)" style="margin-top: 30px;">Let's Start →</button>
+    </div>
+
+    <div class="container" id="page2">
+        <h2 style="text-align: center;">Let's understand where you are</h2>
+        <p style="text-align: center;">Answer these questions honestly. They're the foundation of your map.</p>
+        
+        <div class="question-group">
+            <label>Where are you now?</label>
+            <textarea id="q1" placeholder="Think about your career, life situation, relationships, energy levels..."></textarea>
+        </div>
+
+        <div class="question-group">
+            <label>Where do you want to be in 5-10 years?</label>
+            <textarea id="q2" placeholder="Paint the picture. What does your ideal future look like?"></textarea>
+        </div>
+
+        <div class="question-group">
+            <label>What feels stuck, foggy, or scary right now?</label>
+            <textarea id="q3" placeholder="What's the thing you keep circling back to but can't quite figure out?"></textarea>
+        </div>
+
+        <div class="question-group">
+            <label>What area do you most want to level up?</label>
+            <select id="q4">
+                <option value="">Choose one...</option>
+                <option value="career">Career</option>
+                <option value="money">Money</option>
+                <option value="relationships">Relationships / Dating</option>
+                <option value="confidence">Confidence</option>
+                <option value="creative">Creative Output</option>
+                <option value="health">Health / Routines</option>
+            </select>
+        </div>
+
+        <button onclick="createMindMap()">Create My Map →</button>
+    </div>
+
+    <div class="container" id="page3">
+        <h2 style="text-align: center;">
+            Your Mind Map
+            <span class="start-over" onclick="navigateToPage(1)">
+                <span>↻</span> Start Over
+            </span>
+        </h2>
+        <p style="text-align: center;">Here's your current situation laid out. This is your baseline reality.</p>
+
+        <div class="mindmap">
+            <div class="node-row">
+                <div class="node">
+                    <h4>🎯 You Now</h4>
+                    <div class="node-content" id="now-content"></div>
+                </div>
+
+                <div class="node">
+                    <h4>🌟 Future You</h4>
+                    <div class="node-content" id="future-content"></div>
+                </div>
+            </div>
+
+            <div class="connector">↓</div>
+
+            <div class="node-row">
+                <div class="node">
+                    <h4>🚧 Key Gaps</h4>
+                    <div class="node-content" id="gaps-content"></div>
+                </div>
+
+                <div class="node">
+                    <h4>🎮 Levers & Actions</h4>
+                    <div class="node-content" id="levers-content"></div>
+                </div>
+            </div>
+
+            <div class="connector">↓</div>
+
+            <div class="node">
+                <h4>👣 First Small Moves</h4>
+                <div class="node-content" id="moves-content"></div>
+                
+                <div class="accordion">
+                    <div class="accordion-header" onclick="toggleAccordion()">
+                        <span class="accordion-icon" id="accordionIcon">▶</span>
+                        <span>In 3 months, 6 months, a year you could...</span>
+                    </div>
+                    <div class="accordion-content" id="accordionContent">
+                        <div class="timeline-item"><strong>3 months:</strong> <span id="timeline-3m"></span></div>
+                        <div class="timeline-item"><strong>6 months:</strong> <span id="timeline-6m"></span></div>
+                        <div class="timeline-item"><strong>1 year:</strong> <span id="timeline-1y"></span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ai-helper" onclick="navigateToPage(4)">
+            <h3>✨ Try Different Perspectives</h3>
+            <p>See how different minds would approach your path forward</p>
+        </div>
+    </div>
+
+    <div class="container" id="page4">
+        <h2 style="text-align: center;">Choose Your Lens</h2>
+        <p style="text-align: center;">Each persona will reinterpret your map with different priorities, framing, and first steps.</p>
+
+        <div class="persona-grid">
+            <div class="persona-card" onclick="viewPersona('future-gentle')">
+                <div class="persona-icon">🔮🌱</div>
+                <h4>Future You + Gentle Realist</h4>
+                <p>Looking back with wisdom while honoring sustainable pacing and nervous-system awareness</p>
+            </div>
+
+            <div class="persona-card" onclick="viewPersona('alter')">
+                <div class="persona-icon">🎭</div>
+                <h4>Alter Ego</h4>
+                <p>Acts without overthinking, chooses visibility, takes bold risks</p>
+            </div>
+
+            <div class="historical-selector full-width-card">
+                <h4>🎩 Historical Figure Perspective</h4>
+                <p style="margin-bottom: 15px; color: #718096;">Choose a historical figure to reframe your situation through their unique lens</p>
+                <select id="historicalFigure" onchange="handleHistoricalSelection()">
+                    <option value="">Select a figure...</option>
+                    <option value="socrates">🧙‍♂️ Socrates - Questions assumptions, surfaces unconscious beliefs</option>
+                    <option value="lincoln">🎩 Abraham Lincoln - Persistence through failure, humility in leadership</option>
+                    <option value="marcus">🏛️ Marcus Aurelius - Stoic wisdom, control what you can</option>
+                    <option value="maya">✍️ Maya Angelou - Resilience, finding voice, authentic expression</option>
+                    <option value="jobs">💡 Steve Jobs - Simplicity, vision, connecting dots backwards</option>
+                    <option value="curie">🔬 Marie Curie - Persistence, breaking barriers, curiosity</option>
+                    <option value="mandela">🕊️ Nelson Mandela - Long-term vision, forgiveness, patience</option>
+                    <option value="earhart">✈️ Amelia Earhart - Courage, adventure, breaking boundaries</option>
+                    <option value="parks">🌹 Rosa Parks - Quiet strength, standing firm, dignity</option>
+                    <option value="einstein">🌌 Albert Einstein - Curiosity, imagination over knowledge</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="back-button" onclick="navigateToPage(3)">← Back to Map</button>
+    </div>
+
+    <div class="container" id="page5">
+        <h2 id="personaTitle"></h2>
+        <p id="personaIntro"></p>
+
+        <div class="deep-dive" id="deepDiveContent"></div>
+
+        <button class="back-button" onclick="navigateToPage(4)">← Try Another Lens</button>
+        <button onclick="navigateToPage(3)">Back to Map</button>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <h2 id="loadingTitle">Generating your mind map...</h2>
+            <div class="loading-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+            <p class="loading-text" id="loadingText">Analyzing your current state and future vision</p>
+        </div>
+    </div>
+
+    <script>
+        let userData = {};
+
+        function navigateToPage(pageNum) {
+            document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
+            document.getElementById('page' + pageNum).classList.add('active');
+        }
+
+        function showLoading(title, text) {
+            document.getElementById('loadingTitle').textContent = title;
+            document.getElementById('loadingText').textContent = text;
+            document.getElementById('loadingOverlay').classList.add('active');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+
+        function createMindMap() {
+            userData = {
+                now: document.getElementById('q1').value,
+                future: document.getElementById('q2').value,
+                stuck: document.getElementById('q3').value,
+                area: document.getElementById('q4').value
+            };
+
+            if (!userData.now || !userData.future || !userData.stuck || !userData.area) {
+                alert('Please answer all questions to create your map.');
+                return;
+            }
+
+            showLoading('Generating your mind map...', 'Analyzing your current state and future vision');
+
+            setTimeout(() => {
+                document.getElementById('now-content').innerHTML = userData.now;
+                document.getElementById('future-content').innerHTML = userData.future;
+                document.getElementById('gaps-content').innerHTML = generateGaps();
+                document.getElementById('levers-content').innerHTML = generateLevers();
+                document.getElementById('moves-content').innerHTML = generateMoves();
+                generateTimeline();
+
+                hideLoading();
+                navigateToPage(3);
+            }, 2500);
+        }
+
+        function toggleAccordion() {
+            const content = document.getElementById('accordionContent');
+            const icon = document.getElementById('accordionIcon');
+            
+            if (content.classList.contains('open')) {
+                content.classList.remove('open');
+                icon.classList.remove('open');
+            } else {
+                content.classList.add('open');
+                icon.classList.add('open');
+            }
+        }
+
+        function generateTimeline() {
+            const isCareerWoman = userData.area === 'career' && userData.stuck.toLowerCase().includes('analysis paralysis');
+            const isDatingMan = userData.area === 'relationships' && userData.stuck.toLowerCase().includes('stay in this exact spot');
+
+            if (isCareerWoman) {
+                document.getElementById('timeline-3m').textContent = 'Have delivered 10+ presentations, built relationships with 5 director-level contacts, started sharing work publicly';
+                document.getElementById('timeline-6m').textContent = 'Be known in your org for a specific expertise, have a mentor/sponsor advocating for you, comfortable leading strategic discussions';
+                document.getElementById('timeline-1y').textContent = 'Be in serious consideration for director role, have a portfolio of public work, dating someone who values your thoughtful nature';
+            } else if (isDatingMan) {
+                document.getElementById('timeline-3m').textContent = 'Have gone on 15+ dates, joined 2 new social activities, feel comfortable starting conversations with strangers';
+                document.getElementById('timeline-6m').textContent = 'Be dating someone consistently, have expanded social circle significantly, balance work/hobbies/dating naturally';
+                document.getElementById('timeline-1y').textContent = 'Be in a relationship heading toward partnership, have habits that support both personal growth and connection';
+            } else {
+                const timelines = {
+                    career: {
+                        '3m': 'Expanded network significantly, developed one new key skill, increased visibility in your field',
+                        '6m': 'Built reputation for expertise, mentoring others, leading projects autonomously',
+                        '1y': 'Achieved promotion or role change, recognized as go-to person, expanded influence'
+                    },
+                    money: {
+                        '3m': 'Consistent savings habit, financial education started, first investment made',
+                        '6m': 'Emergency fund established, clear budget system, side income explored',
+                        '1y': 'Diversified income streams, investment portfolio growing, financial confidence built'
+                    },
+                    relationships: {
+                        '3m': 'Expanded social circle, regular meaningful connections, comfort with vulnerability',
+                        '6m': 'Deep friendships established, dating with intention, authentic self-expression',
+                        '1y': 'Strong relationship network, partnership potential, emotional availability'
+                    },
+                    confidence: {
+                        '3m': 'Regular bold actions, public sharing normalized, reframed 10+ "failures"',
+                        '6m': 'Visible presence established, comfort with imperfection, self-worth independent',
+                        '1y': 'Confidence as default, inspiring others, failure as learning fully integrated'
+                    },
+                    creative: {
+                        '3m': 'Consistent daily practice, 20+ works shared, audience started',
+                        '6m': 'Portfolio built, feedback loops established, creative confidence grown',
+                        '1y': 'Known for your creative work, consistent output, community built'
+                    },
+                    health: {
+                        '3m': 'Sustainable routines established, energy managed, recovery prioritized',
+                        '6m': 'Health as foundation, habits stacked, vitality improved',
+                        '1y': 'Transformed relationship with body, sustainable lifestyle, energy abundant'
+                    }
+                };
+                
+                const timeline = timelines[userData.area] || timelines.career;
+                document.getElementById('timeline-3m').textContent = timeline['3m'];
+                document.getElementById('timeline-6m').textContent = timeline['6m'];
+                document.getElementById('timeline-1y').textContent = timeline['1y'];
+            }
+        }
+
+        function generateGaps() {
+            const isCareerWoman = userData.area === 'career' && userData.stuck.toLowerCase().includes('analysis paralysis');
+            const isDatingMan = userData.area === 'relationships' && userData.stuck.toLowerCase().includes('stay in this exact spot');
+
+            if (isCareerWoman) {
+                return '• <strong>Visibility gap:</strong> You have the skills but aren\'t putting yourself out there enough<br>• <strong>Perfectionism paralysis:</strong> Overanalyzing instead of taking imperfect action<br>• <strong>Public speaking anxiety:</strong> Need comfort with high-stakes presentations<br>• <strong>Confidence in ambiguity:</strong> Learning to lead without having all the answers<br>• <strong>Social energy management:</strong> Building relationships despite introversion';
+            }
+
+            if (isDatingMan) {
+                return '• <strong>Time allocation:</strong> Work and hobbies are filling the space that dating should occupy<br>• <strong>Intentionality:</strong> Not actively creating opportunities to meet potential partners<br>• <strong>Dating muscle atrophy:</strong> Skills get rusty when not practiced regularly<br>• <strong>Comfort zone:</strong> Bio-hacking and running club are safe, dating feels vulnerable<br>• <strong>Future urgency:</strong> Fear of drift without concrete action';
+            }
+
+            const gaps = {
+                career: '• Skills or network gap<br>• Clarity on next role<br>• ' + userData.stuck,
+                money: '• Income ceiling<br>• Investment knowledge<br>• ' + userData.stuck,
+                relationships: '• Vulnerability and authenticity<br>• Meeting new people<br>• ' + userData.stuck,
+                confidence: '• Self-worth independent of achievement<br>• Taking social risks<br>• ' + userData.stuck,
+                creative: '• Consistency and output volume<br>• Sharing work publicly<br>• ' + userData.stuck,
+                health: '• Sustainable routines<br>• Energy management<br>• ' + userData.stuck
+            };
+            return gaps[userData.area] || userData.stuck;
+        }
+
+        function generateLevers() {
+            const isCareerWoman = userData.area === 'career' && userData.stuck.toLowerCase().includes('analysis paralysis');
+            const isDatingMan = userData.area === 'relationships' && userData.stuck.toLowerCase().includes('stay in this exact spot');
+
+            if (isCareerWoman) {
+                return '• <strong>Reps over perfection:</strong> Do more presentations, even small ones, to build comfort<br>• <strong>Strategic visibility:</strong> Share work/ideas before they feel "ready"<br>• <strong>Micro-socializing:</strong> Brief authentic interactions vs. perfect conversations<br>• <strong>Senior sponsorship:</strong> Find someone who advocates for you to leadership<br>• <strong>Public portfolio:</strong> Make your work visible (blog, talks, case studies)';
+            }
+
+            if (isDatingMan) {
+                return '• <strong>Volume over optimization:</strong> Meet more people, worry less about "the one"<br>• <strong>Structured exposure:</strong> Join activities designed for meeting people (not just hobbies)<br>• <strong>Weekly dating discipline:</strong> Treat it like running club—consistent practice<br>• <strong>Social spillover:</strong> Let friends know you\'re actually looking<br>• <strong>Conversation starter system:</strong> Lower friction for initiating vs. waiting for perfect moment';
+            }
+
+            const levers = {
+                career: '• Network expansion<br>• Skill development<br>• Visibility in your field',
+                money: '• Income streams diversification<br>• Financial education<br>• Investment strategy',
+                relationships: '• Social surface area<br>• Authentic expression<br>• Consistent engagement',
+                confidence: '• Small bold actions<br>• Public sharing<br>• Reframing failure',
+                creative: '• Daily practice<br>• Public accountability<br>• Feedback loops',
+                health: '• Habit stacking<br>• Environment design<br>• Recovery protocols'
+            };
+            return levers[userData.area] || '• Identify key leverage points<br>• Build support systems<br>• Take consistent action';
+        }
+
+        function generateMoves() {
+            const isCareerWoman = userData.area === 'career' && userData.stuck.toLowerCase().includes('analysis paralysis');
+            const isDatingMan = userData.area === 'relationships' && userData.stuck.toLowerCase().includes('stay in this exact spot');
+
+            if (isCareerWoman) {
+                return '• <strong>This week:</strong> Volunteer to present in your next team meeting (even just 5 min update)<br>• <strong>Today:</strong> Message one person at director level and ask one question about their path<br>• <strong>Tomorrow:</strong> Share one work insight on LinkedIn or team Slack—unpolished is fine<br>• <strong>This month:</strong> Attend one industry meetup and talk to 3 people (not perfectly, just genuinely)<br>• <strong>Mindset shift:</strong> Done and imperfect beats perfect and invisible';
+            }
+
+            if (isDatingMan) {
+                return '• <strong>This week:</strong> Go to one social event specifically to meet new people (not just your running club)<br>• <strong>Today:</strong> Text 2 friends that you\'re actively dating and ask if they know anyone single<br>• <strong>This weekend:</strong> Try one new activity where meeting people is natural (dance class, climbing gym, book club)<br>• <strong>Dating app action:</strong> Spend 30 min on apps Sunday evening—treat it like a weekly habit<br>• <strong>Conversation practice:</strong> Start 3 brief chats this week with strangers (coffee shop, gym, anywhere)';
+            }
+
+            const moves = {
+                career: '• Reach out to 3 people in your target field this week<br>• Update your LinkedIn/portfolio<br>• Sign up for one relevant course or event',
+                money: '• Track spending for one week<br>• Read one book on personal finance<br>• Set up automatic savings',
+                relationships: '• Say yes to one social invitation this week<br>• Start one authentic conversation<br>• Join one community aligned with your interests',
+                confidence: '• Share one thing publicly (social media, group chat)<br>• Say "yes" to something slightly uncomfortable<br>• Compliment 3 people genuinely',
+                creative: '• Create for 15 minutes today<br>• Share one piece of work<br>• Commit to a weekly output schedule',
+                health: '• Move your body for 10 minutes today<br>• Prep one healthy meal<br>• Set a consistent sleep time for this week'
+            };
+            return moves[userData.area] || '• Choose one small action<br>• Do it today<br>• Repeat tomorrow';
+        }
+
+        function viewPersona(persona) {
+            showLoading('Shifting perspective...', 'Reframing your situation through a new lens');
+
+            setTimeout(() => {
+                const content = getPersonaContent(persona);
+                document.getElementById('personaTitle').textContent = content.title;
+                document.getElementById('personaIntro').textContent = content.intro;
+                document.getElementById('deepDiveContent').innerHTML = content.content;
+                
+                hideLoading();
+                navigateToPage(5);
+            }, 2000);
+        }
+
+        function handleHistoricalSelection() {
+            const selection = document.getElementById('historicalFigure').value;
+            if (!selection) return;
+
+            const isCareerWoman = userData.area === 'career' && userData.stuck.toLowerCase().includes('analysis paralysis');
+            
+            showLoading('Channeling wisdom...', 'Generating their unique perspective on your situation');
+
+            setTimeout(() => {
+                if (selection === 'socrates') {
+                    const content = getSocratesContent(isCareerWoman);
+                    document.getElementById('personaTitle').textContent = content.title;
+                    document.getElementById('personaIntro').textContent = content.intro;
+                    document.getElementById('deepDiveContent').innerHTML = content.content;
+                } else if (selection === 'lincoln' && isCareerWoman) {
+                    document.getElementById('personaTitle').textContent = '🎩 Abraham Lincoln\'s Perspective';
+                    document.getElementById('personaIntro').textContent = 'A man who failed repeatedly before leading a nation speaks to your journey.';
+                    document.getElementById('deepDiveContent').innerHTML = getLincolnContent();
+                } else {
+                    const figures = {
+                        lincoln: 'Abraham Lincoln',
+                        marcus: 'Marcus Aurelius',
+                        maya: 'Maya Angelou',
+                        jobs: 'Steve Jobs',
+                        curie: 'Marie Curie',
+                        mandela: 'Nelson Mandela',
+                        earhart: 'Amelia Earhart',
+                        parks: 'Rosa Parks',
+                        einstein: 'Albert Einstein'
+                    };
+                    const figureName = figures[selection];
+                    document.getElementById('personaTitle').textContent = '✨ ' + figureName + '\'s Perspective';
+                    document.getElementById('personaIntro').textContent = 'Here\'s how ' + figureName + ' might approach your situation.';
+                    document.getElementById('deepDiveContent').innerHTML = '<div class="deep-dive-section"><h4>Core Philosophy</h4><p>In the full version with AI integration, ' + figureName + ' would provide their unique perspective based on their known philosophies, writings, and approach to life.</p></div><div class="deep-dive-section"><h4>How They\'d Reframe Your Challenge</h4><p>Their specific lens on your current situation would appear here, with insights drawn from their life experience and teachings.</p></div><div class="deep-dive-section"><h4>Their Advice for First Steps</h4><p>Concrete, actionable guidance in their voice and style.</p></div><div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-top: 20px;"><strong>💡 This is a preview.</strong> In the full version, the Anthropic API will generate authentic, personalized insights from any historical figure you choose.</div>';
+                }
+                
+                hideLoading();
+                navigateToPage(5);
+            }, 2500);
+        }
+
+        function getSocratesContent(isCareerWoman) {
+            const isDatingMan = userData.area === 'relationships' && userData.stuck.toLowerCase().includes('stay in this exact spot');
+
+            if (isCareerWoman) {
+                return {
+                    title: '🧙‍♂️ Socrates\' Lens',
+                    intro: 'Let\'s examine what "perfect" actually means to you.',
+                    content: '<div class="deep-dive-section"><h4>Questions That Cut Through</h4><ul><li><strong>You say you want to be a UX Director—but do you want the role itself, or the proof that you\'re "good enough"?</strong> What would happen if you already felt worthy?</li><li><strong>What does a "flawless" presentation actually look like?</strong> Have you ever seen one? Or are you comparing yourself to an impossible standard?</li><li><strong>You\'re analyzing every detail—but which details actually matter to the outcome vs. your anxiety?</strong></li><li><strong>If public speaking feels scary because people might judge you, what\'s the belief underneath?</strong> That you\'re not already enough? That one bad talk defines you?</li></ul></div><div class="deep-dive-section"><h4>Reframed Priorities</h4><ul><li><strong>Practice presence over perfection:</strong> Being genuinely yourself > performing a flawless self</li><li><strong>Questions over answers:</strong> Leaders who ask better questions beat those with all the answers</li><li><strong>Examined beliefs:</strong> "I need to be perfect" is a belief, not a fact—interrogate it</li></ul></div><div class="deep-dive-section"><h4>First Steps</h4><ul><li><strong>Journal this:</strong> "What would I do if I already believed I was good enough?" Write for 10 minutes.</li><li><strong>Before your next presentation:</strong> Ask yourself, "What outcome actually matters here?"</li><li><strong>In conversations:</strong> Stop optimizing what you\'ll say. Ask one genuine question instead.</li></ul></div>'
+                };
+            } else if (isDatingMan) {
+                return {
+                    title: '🧙‍♂️ Socrates\' Lens',
+                    intro: 'Let\'s interrogate what you actually want and what\'s stopping you.',
+                    content: '<div class="deep-dive-section"><h4>The Real Questions</h4><ul><li><strong>You say dating feels "weird and harder than it should be"—but compared to what?</strong> When was it easy? Or are you comparing reality to an imagined ideal?</li><li><strong>You want a long-term partner for "couple stuff"—dancing, camping trips. But do you actually do those things now?</strong> Or are you waiting for a partner to give you permission?</li><li><strong>Is the scary part being alone, or confronting what it means if you stay in this exact spot?</strong></li><li><strong>Bio-hacking and running club are great. But are they filling the space where dating should be?</strong> Are you optimizing your life instead of living it?</li></ul></div><div class="deep-dive-section"><h4>Reframed Priorities</h4><ul><li><strong>Examine the fear, not just the symptom:</strong> You\'re scared of staying alone. But why? What does that mean about you?</li><li><strong>Intentionality over drift:</strong> Relationships don\'t "just happen" at this stage—you create them</li><li><strong>Alignment check:</strong> Are your daily actions aligned with what you say you want?</li></ul></div><div class="deep-dive-section"><h4>First Steps</h4><ul><li><strong>Journal:</strong> "If I never met a partner, what would I regret not doing with my life?" Write for 15 minutes.</li><li><strong>Time audit:</strong> Track your week. How many hours go to dating? Does it match your priorities?</li><li><strong>Belief audit:</strong> Write down every reason dating is "hard right now." Which are facts vs. stories?</li></ul></div>'
+                };
+            } else {
+                return {
+                    title: '🧙‍♂️ Socrates\' Lens',
+                    intro: 'Let\'s examine the assumptions behind your situation.',
+                    content: '<div class="deep-dive-section"><h4>Questions to Consider</h4><ul><li>What does success actually mean to you in this area? Not what you think it should mean—what genuinely matters?</li><li>Are you stuck because you don\'t know what to do, or because you\'re afraid of what might happen if you do it?</li><li>What belief about yourself would you need to let go of to move forward?</li><li>If this problem vanished tomorrow, what would you actually be left pursuing?</li></ul></div><div class="deep-dive-section"><h4>Reframed Priorities</h4><ul><li>Self-knowledge before action</li><li>Alignment with values over achievement</li><li>Question the question itself</li></ul></div><div class="deep-dive-section"><h4>First Steps</h4><ul><li>Journal: "What am I really seeking here?"</li><li>Identify one belief you\'re operating from that might not be true</li><li>Talk to someone who sees you clearly</li></ul></div>'
+                };
+            }
+        }
+
+        function getLincolnContent() {
+            return '<div class="deep-dive-section"><h4>On Perfectionism and Public Speaking</h4><ul><li><strong>"I have been driven many times upon my knees by the overwhelming conviction that I had nowhere else to go."</strong> Your nervousness before presentations isn\'t weakness—it\'s evidence you care about doing meaningful work.</li><li><strong>Lincoln lost elections for Congress, Senate (twice), and Vice President before becoming President.</strong> Each "imperfect" attempt taught him something. Your first presentations won\'t be flawless. Give them anyway.</li><li><strong>The Gettysburg Address was 272 words.</strong> It wasn\'t perfect—critics at the time said it was "too short" and "forgettable." Clarity beats perfection. Always.</li><li><strong>Lincoln educated himself while working manual labor.</strong> You have a senior UX role. You\'re already further than you think. The director title is recognition of work you\'re already capable of doing.</li></ul></div><div class="deep-dive-section"><h4>On Introversion and Leadership</h4><ul><li><strong>Lincoln was known for deep melancholy and solitary reflection.</strong> He didn\'t lead by being the loudest in the room—he led by thinking clearly and speaking with purpose.</li><li><strong>"I am a slow walker, but I never walk back."</strong> Your introversion isn\'t a deficit. Thoughtful, deliberate leadership often beats charismatic performance.</li><li><strong>He wrote letters he never sent—processing his thoughts privately before speaking publicly.</strong> Use your analytical nature as a strength, not a barrier. Think deeply, then share decisively.</li></ul></div><div class="deep-dive-section"><h4>On Failure and Persistence</h4><ul><li><strong>1831:</strong> Failed in business</li><li><strong>1832:</strong> Defeated for state legislature</li><li><strong>1833:</strong> Second business failed</li><li><strong>1835:</strong> Sweetheart died</li><li><strong>1836:</strong> Nervous breakdown</li><li><strong>1838-1858:</strong> Various electoral defeats</li><li><strong>1860:</strong> Elected President</li><li>Your analysis paralysis? His was clinical depression. Your fear of imperfect presentations? He gave speeches that were mocked in newspapers. The difference wasn\'t that he stopped failing—it\'s that he kept showing up.</li></ul></div><div class="deep-dive-section"><h4>What Lincoln Would Tell You to Do This Week</h4><ul><li><strong>Monday:</strong> Volunteer for one presentation, no matter how small. "The best way to predict your future is to create it."</li><li><strong>Tuesday:</strong> Write down your worst fear about public speaking. Then ask: "If Lincoln could survive national humiliation and still become great, can I survive one awkward meeting?"</li><li><strong>Wednesday:</strong> Have one conversation where you don\'t rehearse—just speak from genuine thought. Practice presence over polish.</li><li><strong>Weekend:</strong> Attend one social thing. Don\'t perform—just show up as yourself, tired and imperfect and real.</li></ul></div><div class="deep-dive-section"><h4>His Final Words to You</h4><p><strong>"I am not bound to win, but I am bound to be true. I am not bound to succeed, but I am bound to live up to what light I have."</strong></p><p>You\'re not bound to give perfect presentations, have a flawless career trajectory, or be a social butterfly. You\'re bound to show up with what you have right now—your skills, your introversion, your analysis, your fear—and build from there.</p><p>The director title will come. The partner will come. But only if you stop waiting for the perfect version of yourself and start building with the real one.</p></div>';
+        }
+
+        function getPersonaContent(persona) {
+            const isCareerWoman = userData.area === 'career' && userData.stuck.toLowerCase().includes('analysis paralysis');
+            const isDatingMan = userData.area === 'relationships' && userData.stuck.toLowerCase().includes('stay in this exact spot');
+
+            if (persona === 'future-gentle') {
+                if (isCareerWoman) {
+                    return {
+                        title: '🔮🌱 Future You + Gentle Realist',
+                        intro: 'Looking back from 10 years ahead with sustainable wisdom.',
+                        content: '<div class="deep-dive-section"><h4>What Mattered Way Less (Future You Speaks)</h4><ul><li><strong>That one awkward presentation:</strong> Nobody remembers it. You gave 200 more after that.</li><li><strong>Being the smartest person in the room:</strong> Being the most curious mattered more</li><li><strong>Waiting until you felt "ready":</strong> You did your best work while nervous</li><li><strong>Having perfect social skills:</strong> Authenticity beat polish every single time</li></ul></div><div class="deep-dive-section"><h4>But Also... (Gentle Realist Adds)</h4><ul><li><strong>You didn\'t need to burn out to prove yourself:</strong> The sustainable path got you here just as effectively</li><li><strong>Rest wasn\'t wasted time:</strong> Your best ideas came after recovery, not during grinding</li><li><strong>Your introversion was always a strength:</strong> Deep thinking beats constant networking</li></ul></div><div class="deep-dive-section"><h4>What You Wish You Started Earlier</h4><ul><li><strong>Presenting badly, often:</strong> Your 50th presentation was great because you did 49 mediocre ones first</li><li><strong>But pacing yourself between big efforts:</strong> You learned that recovery time isn\'t optional—it\'s strategic</li><li><strong>Dating intentionally but gently:</strong> One quality date every two weeks > dating burnout</li></ul></div><div class="deep-dive-section"><h4>Sustainable First Steps</h4><ul><li><strong>This week:</strong> Do ONE visible thing (presentation, post, conversation). Then rest. Don\'t stack five scary things.</li><li><strong>Monthly rhythm:</strong> One networking event, one skills workshop, one rest week. Repeat.</li><li><strong>Dating pace:</strong> One new person every 2-3 weeks is enough. You\'re building a life, not racing.</li><li><strong>Permission slip:</strong> You\'re allowed to move slower than the hustle narrative says you should</li></ul></div>'
+                    };
+                } else if (isDatingMan) {
+                    return {
+                        title: '🔮🌱 Future You + Gentle Realist',
+                        intro: 'Looking back with the wisdom that sustainable beats intense.',
+                        content: '<div class="deep-dive-section"><h4>What Future You Knows</h4><ul><li><strong>Your dating "strategy":</strong> You met your partner at a random book club, not because you optimized perfectly</li><li><strong>Being "ready":</strong> You weren\'t. You were still figuring things out. She liked you anyway.</li><li><strong>Bio-hacking routines:</strong> Health matters. But you spent 2 years optimizing supplements when you should\'ve been meeting people.</li></ul></div><div class="deep-dive-section"><h4>But Sustainably (Gentle Realist Adds)</h4><ul><li><strong>You\'re not failing at dating—you\'re in a life phase where it\'s genuinely harder.</strong> Most people are paired up, apps feel shallow. You\'re not broken.</li><li><strong>Bio-hacking and running club aren\'t distractions—they\'re self-care.</strong> You just need to balance them with connection.</li><li><strong>Dating doesn\'t have to be exhausting.</strong> You can approach it with intention without burning out.</li></ul></div><div class="deep-dive-section"><h4>Gentle, Realistic Steps</h4><ul><li><strong>This month:</strong> Add ONE new social activity. Just one. Dance class, trivia night—something recurring.</li><li><strong>Weekly rhythm:</strong> Dedicate Sunday evening to dating. 30 minutes. That\'s it.</li><li><strong>Energy budget:</strong> If running club takes energy, balance it with one low-key social thing per week.</li><li><strong>Permission slip:</strong> You\'re allowed to want partnership without being desperate. Move at your own pace.</li></ul></div>'
+                    };
+                } else {
+                    return {
+                        title: '🔮🌱 Future You + Gentle Realist',
+                        intro: 'Wisdom from the future, paced for humans.',
+                        content: '<div class="deep-dive-section"><h4>What Future You Knows</h4><ul><li>Other people\'s opinions mattered way less than you thought</li><li>Having everything figured out wasn\'t necessary</li><li>The perfect timing you were waiting for never came—you just started</li></ul></div><div class="deep-dive-section"><h4>But Sustainably</h4><ul><li>You didn\'t need to burn out to succeed</li><li>Rest was productive work, not procrastination</li><li>Slow progress was still progress—and it lasted</li></ul></div><div class="deep-dive-section"><h4>Sustainable Steps</h4><ul><li>One small action today. That\'s enough.</li><li>Build systems that support your energy</li><li>Recovery time is part of the plan, not a failure</li></ul></div>'
+                    };
+                }
+            } else if (persona === 'alter') {
+                if (isCareerWoman) {
+                    return {
+                        title: '🎭 Your Alter Ego (Confident Director)',
+                        intro: 'This is you without the overthinking. Let me show you how I operate.',
+                        content: '<div class="deep-dive-section"><h4>How I Actually Think</h4><ul><li><strong>"Good enough" is my standard:</strong> I ship work at 80% because I know iteration beats perfection</li><li><strong>Presentations are conversations:</strong> I don\'t perform, I share what I know and adjust based on the room</li><li><strong>Social energy is finite, so I\'m strategic:</strong> Coffee chats > big networking events. Quality over quantity.</li><li><strong>Romance requires showing up:</strong> I don\'t wait to feel confident—I show up nervous and see what happens</li></ul></div><div class="deep-dive-section"><h4>Ruthless Reframe</h4><ul><li><strong>You\'re not "stuck in analysis paralysis"—you\'re avoiding action by calling it thinking.</strong></li><li><strong>C-suite presentations feel scary? Do 10 of them this quarter. Reps beat meditation.</strong></li><li><strong>You say you\'re shy, but you lead design workshops fine.</strong> You\'re not shy—you\'re selective about when you perform.</li><li><strong>Your partner isn\'t going to appear while you\'re optimizing your intro.</strong> Meet 20 people. Date 5. Repeat.</li></ul></div><div class="deep-dive-section"><h4>What I\'d Do This Week</h4><ul><li><strong>Monday:</strong> Slack my VP with a half-baked idea and ask for 15 min to talk it through</li><li><strong>Tuesday:</strong> Present something to the team without rehearsing it to death—just go</li><li><strong>Wednesday:</strong> Message 3 people on LinkedIn I want to learn from. No perfect intro needed.</li><li><strong>Weekend:</strong> Go on one date, even if the vibe feels "uncertain." Data > analysis.</li></ul></div>'
+                    };
+                } else if (isDatingMan) {
+                    return {
+                        title: '🎭 Your Alter Ego (The Guy Who Just Goes For It)',
+                        intro: 'This is you without hesitation.',
+                        content: '<div class="deep-dive-section"><h4>How I Operate</h4><ul><li><strong>Sunday evenings = dating time:</strong> Non-negotiable. 30-60 minutes on apps or planning social things.</li><li><strong>I say yes to social invitations by default:</strong> Friend\'s party? Random meetup? Yes. I can always leave.</li><li><strong>I start conversations without a script:</strong> "Hey, what are you reading?" Doesn\'t have to be smooth.</li><li><strong>I go on dates even when I\'m not sure:</strong> 45 minutes of coffee > 3 weeks of "should I ask her out?"</li></ul></div><div class="deep-dive-section"><h4>Ruthless Reframe</h4><ul><li><strong>You\'re not "stable but not going anywhere"—you\'re comfortable and avoiding risk.</strong></li><li><strong>Bio-hacking and running club are safe.</strong> Dating requires vulnerability, and you\'re optimizing everything else instead.</li><li><strong>You say dating feels hard? You\'re not actually trying.</strong> When\'s the last time you went on 3 dates in one month?</li><li><strong>You want a partner for camping trips? Start going on camping trips.</strong> Meet people doing things you\'d actually do together.</li></ul></div><div class="deep-dive-section"><h4>What I\'d Do This Week</h4><ul><li><strong>Monday:</strong> Text 3 friends: "I\'m looking to meet someone. Know anyone single?"</li><li><strong>Tuesday:</strong> Join one new activity designed for socializing—salsa, trivia night, climbing gym social hour</li><li><strong>Thursday:</strong> Swipe for 20 minutes, message everyone I match with (no overthinking)</li><li><strong>Weekend:</strong> Go on at least one date OR attend one social event with new people</li></ul></div>'
+                    };
+                } else {
+                    return {
+                        title: '🎭 Your Alter Ego (Confident Version)',
+                        intro: 'This is you without overthinking.',
+                        content: '<div class="deep-dive-section"><h4>How This Version Acts</h4><ul><li>Decides quickly, adjusts later</li><li>Chooses visibility over perfection</li><li>Takes social risks without rehearsing</li><li>Views rejection as data, not verdict</li></ul></div><div class="deep-dive-section"><h4>Ruthless Reframe</h4><ul><li>Your "stuck" feeling is just a decision you haven\'t made yet</li><li>You\'re not "not ready"—you\'re scared and calling it strategy</li><li>Most of what you\'re optimizing doesn\'t matter</li></ul></div><div class="deep-dive-section"><h4>Bold First Steps</h4><ul><li>Send that message today, not "when you\'re ready"</li><li>Post something imperfect and watch nothing bad happen</li><li>Say yes to the uncomfortable thing</li></ul></div>'
+                    };
+                }
+            }
+
+            return {
+                title: 'Perspective',
+                intro: 'Choose a lens to explore.',
+                content: '<p>Select a persona to see your situation through their eyes.</p>'
+            };
+        }
+    </script>
+</body>
+</html>
