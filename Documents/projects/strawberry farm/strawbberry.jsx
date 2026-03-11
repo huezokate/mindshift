@@ -109,11 +109,13 @@ export default function StrawberrySolitaire() {
       }
       setSelected(null);
     } else {
-      // NO MATCH — flip second card back after 900ms, first card stays selected+open
+      // NO MATCH — flip back all open unmatched cards except the selected one
       setLocked(true);
-      const secondUid = uid;
+      const selectedUid = selected.uid;
       setTimeout(() => {
-        setDeck(d => d.map(c => c.uid === secondUid ? { ...c, flipped: false } : c));
+        setDeck(d => d.map(c =>
+          (!c.matched && c.flipped && c.uid !== selectedUid) ? { ...c, flipped: false } : c
+        ));
         setLocked(false);
       }, 900);
       setMessage("❌ Not a match! Keep looking for " + selected.id);
