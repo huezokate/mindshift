@@ -88,10 +88,9 @@ export default function StrawberrySolitaire() {
 
   const flipCard = (uid) => {
     const card = deck.find(c => c.uid === uid);
-    if (locked || !card || card.flipped || card.matched || flipsLeft <= 0) return;
+    if (locked || !card || card.flipped || card.matched) return;
 
-    const newDeck = deck.map(c => c.uid === uid ? { ...c, flipped: true } : c);
-    setDeck(newDeck);
+    setDeck(d => d.map(c => c.uid === uid ? { ...c, flipped: true } : c));
     setFlipsLeft(f => f - 1);
 
     if (card.id === "rain") {
@@ -137,19 +136,24 @@ export default function StrawberrySolitaire() {
         setRainActive(false);
         setSparkle(uid);
         setTimeout(() => setSparkle(null), 600);
+        setSelected(null);
       } else {
-        setLocked(true);
         setMessage("❌ No match! Look carefully...");
         setShake(uid);
         setTimeout(() => setShake(null), 400);
+        setLocked(true);
+        const prevSelected = selected;
+        setSelected(null);
         setTimeout(() => {
           setDeck(d => d.map(c =>
-            (c.uid === uid || c.uid === selected.uid) ? { ...c, flipped: false } : c
+            (c.uid === uid || c.uid === prevSelected.uid)
+              ? { ...c, flipped: false }
+              : c
           ));
           setLocked(false);
         }, 900);
+        return;
       }
-      setSelected(null);
     }
   };
 
@@ -270,7 +274,7 @@ export default function StrawberrySolitaire() {
                       borderRadius: "16px",
                       cursor: card.matched || card.flipped ? "default" : "pointer",
                       overflow: "hidden",
-                      opacity: card.matched ? 0.15 : 1,
+                      opacity: card.matched ? 0 : 1,
                       pointerEvents: card.matched ? "none" : "auto",
                       boxShadow: isSelected
                         ? "0 0 0 3px #f5c842, 0 0 16px rgba(245,200,66,0.6)"
