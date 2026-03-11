@@ -99,6 +99,9 @@ export default function StrawberrySolitaire() {
       setSparkle(uid);
       setTimeout(() => setSparkle(null), 600);
       setSelected(null);
+      setTimeout(() => {
+        setDeck(d => d.map(c => c.uid === uid ? { ...c, flipped: false } : c));
+      }, 900);
       return;
     }
 
@@ -109,6 +112,9 @@ export default function StrawberrySolitaire() {
       setShake(uid);
       setTimeout(() => setShake(null), 400);
       setSelected(null);
+      setTimeout(() => {
+        setDeck(d => d.map(c => c.uid === uid ? { ...c, flipped: false } : c));
+      }, 900);
       return;
     }
 
@@ -119,6 +125,9 @@ export default function StrawberrySolitaire() {
       setShake(uid);
       setTimeout(() => setShake(null), 400);
       setSelected(null);
+      setTimeout(() => {
+        setDeck(d => d.map(c => c.uid === uid ? { ...c, flipped: false } : c));
+      }, 900);
       return;
     }
 
@@ -143,6 +152,7 @@ export default function StrawberrySolitaire() {
         setTimeout(() => setShake(null), 400);
         setLocked(true);
         const prevSelected = selected;
+        console.log("[no-match] flipping back uid:", uid, "prevSelected.uid:", prevSelected?.uid);
         setTimeout(() => {
           setDeck(d => d.map(c =>
             (c.uid === uid || c.uid === prevSelected.uid)
