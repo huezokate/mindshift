@@ -143,13 +143,13 @@ export default function StrawberrySolitaire() {
         setTimeout(() => setShake(null), 400);
         setLocked(true);
         const prevSelected = selected;
-        setSelected(null);
         setTimeout(() => {
           setDeck(d => d.map(c =>
             (c.uid === uid || c.uid === prevSelected.uid)
               ? { ...c, flipped: false }
               : c
           ));
+          setSelected(null);
           setLocked(false);
         }, 900);
         return;
