@@ -545,7 +545,7 @@
             clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%) !important;
             border-radius: 18px !important;
             width: 280px !important;
-            height: 340px !important;
+            height: 460px !important;
             overflow: visible;
             z-index: 100;
             align-items: flex-start;
@@ -595,6 +595,93 @@
         }
         .cn-expanded .cn-close-btn {
             display: block;
+        }
+
+        /* === Mood Image Upload (T-001-06) === */
+        .cn-image-badge {
+            display: none;
+            position: absolute;
+            bottom: 6px;
+            right: 8px;
+            background: rgba(0,0,0,0.22);
+            color: #fff;
+            font-size: 0.58em;
+            font-weight: 700;
+            border-radius: 8px;
+            padding: 1px 5px;
+            line-height: 1.4;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .canvas-node.has-images .cn-image-badge {
+            display: block;
+        }
+        .cn-image-grid {
+            display: none;
+            flex-wrap: wrap;
+            gap: 4px;
+            width: 100%;
+            margin-top: 6px;
+            flex-shrink: 0;
+        }
+        .cn-expanded .cn-image-grid {
+            display: flex;
+        }
+        .cn-image-thumb {
+            position: relative;
+            width: 64px;
+            height: 58px;
+            border-radius: 6px;
+            background-size: cover;
+            background-position: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .cn-image-remove {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 16px;
+            height: 16px;
+            background: rgba(0,0,0,0.55);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            font-size: 0.55em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            line-height: 1;
+            opacity: 0;
+            transition: opacity 0.15s;
+        }
+        .cn-image-thumb:hover .cn-image-remove {
+            opacity: 1;
+        }
+        .cn-add-img-btn {
+            display: none;
+            margin-top: 6px;
+            background: rgba(0,0,0,0.10);
+            border: 1.5px dashed rgba(0,0,0,0.25);
+            border-radius: 8px;
+            padding: 5px 10px;
+            font-size: 0.66em;
+            font-weight: 600;
+            cursor: pointer;
+            color: inherit;
+            width: 100%;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .cn-expanded .cn-add-img-btn {
+            display: block;
+        }
+        .cn-add-img-btn:hover {
+            background: rgba(0,0,0,0.18);
+            transform: none;
+            box-shadow: none;
         }
     </style>
 </head>
@@ -1255,6 +1342,27 @@
                 });
                 el.appendChild(closeBtn);
 
+                // T-001-06: image grid
+                const imgGrid = document.createElement('div');
+                imgGrid.className = 'cn-image-grid';
+                el.appendChild(imgGrid);
+
+                // T-001-06: add image button
+                const addImgBtn = document.createElement('button');
+                addImgBtn.className = 'cn-add-img-btn';
+                addImgBtn.textContent = '\uD83D\uDCF7 Add image +';
+                addImgBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    openImagePicker(cat.id);
+                });
+                addImgBtn.addEventListener('mousedown', function(e) { e.stopPropagation(); });
+                el.appendChild(addImgBtn);
+
+                // T-001-06: image count badge (collapsed state)
+                const imgBadge = document.createElement('span');
+                imgBadge.className = 'cn-image-badge';
+                el.appendChild(imgBadge);
+
                 // Stop canvas pan when interacting with expanded node (T-001-05)
                 el.addEventListener('mousedown', function(e) {
                     if (_expandedId === cat.id) e.stopPropagation();
@@ -1262,6 +1370,10 @@
 
                 el.addEventListener('click', function() { onNodeClick(cat.id); });
                 world.appendChild(el);
+
+                // T-001-06: restore image state on re-render
+                refreshImageGrid(cat.id);
+                refreshImageBadge(cat.id);
             });
         }
 
@@ -1269,6 +1381,79 @@
         const nodeEdits = new Map();   // categoryId → textarea value (session persistence)
         let _expandedId = null;
         let _collapseListenerAdded = false;
+
+        // T-001-06: image state
+        const nodeImages = new Map();  // categoryId → string[] (data URLs, max 6)
+
+        function refreshImageBadge(categoryId) {
+            const el = document.getElementById('cn-' + categoryId);
+            if (!el) return;
+            const imgs = nodeImages.get(categoryId) || [];
+            const badge = el.querySelector('.cn-image-badge');
+            if (badge) badge.textContent = imgs.length + (imgs.length === 1 ? ' img' : ' imgs');
+            el.classList.toggle('has-images', imgs.length > 0);
+        }
+
+        function refreshImageGrid(categoryId) {
+            const el = document.getElementById('cn-' + categoryId);
+            if (!el) return;
+            const grid = el.querySelector('.cn-image-grid');
+            if (!grid) return;
+            const imgs = nodeImages.get(categoryId) || [];
+            grid.innerHTML = '';
+            imgs.forEach(function(url, i) {
+                const thumb = document.createElement('div');
+                thumb.className = 'cn-image-thumb';
+                thumb.style.backgroundImage = 'url(' + url + ')';
+                const rmBtn = document.createElement('button');
+                rmBtn.className = 'cn-image-remove';
+                rmBtn.textContent = '\u00d7';
+                rmBtn.title = 'Remove image';
+                rmBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    removeImage(categoryId, i);
+                });
+                rmBtn.addEventListener('mousedown', function(e) { e.stopPropagation(); });
+                thumb.appendChild(rmBtn);
+                grid.appendChild(thumb);
+            });
+        }
+
+        function removeImage(categoryId, index) {
+            const imgs = nodeImages.get(categoryId);
+            if (!imgs) return;
+            imgs.splice(index, 1);
+            refreshImageGrid(categoryId);
+            refreshImageBadge(categoryId);
+        }
+
+        function addImages(categoryId, files) {
+            if (!files || !files.length) return;
+            if (!nodeImages.has(categoryId)) nodeImages.set(categoryId, []);
+            const imgs = nodeImages.get(categoryId);
+            Array.from(files).forEach(function(file) {
+                if (!file.type.startsWith('image/')) return;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    if (imgs.length >= 6) imgs.shift();
+                    imgs.push(e.target.result);
+                    refreshImageGrid(categoryId);
+                    refreshImageBadge(categoryId);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function openImagePicker(categoryId) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.multiple = true;
+            input.addEventListener('change', function() {
+                addImages(categoryId, this.files);
+            });
+            input.click();
+        }
 
         function collapseNode() {
             if (!_expandedId) return;
