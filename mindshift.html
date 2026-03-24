@@ -1406,6 +1406,7 @@
                 initCanvas();
                 renderHubNode();
                 renderCategoryNodes(userData);
+                renderArrows();
                 // T-001-05: click-outside to collapse expanded node (register once)
                 if (!_collapseListenerAdded) {
                     document.getElementById('canvas-root').addEventListener('click', function(e) {
