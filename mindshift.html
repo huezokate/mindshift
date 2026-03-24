@@ -478,7 +478,10 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 14px 16px;
+            gap: var(--cn-gap);
+            padding: var(--cn-pad-y) var(--cn-pad-x);
+            font-size: var(--cn-font-base);
+            line-height: var(--cn-lh-base);
             cursor: pointer;
             transition: transform 0.15s ease, filter 0.15s ease,
                         width 0.25s ease, height 0.25s ease,
@@ -492,24 +495,22 @@
             filter: brightness(1.06) drop-shadow(0 4px 16px rgba(0,0,0,0.22));
         }
         .canvas-node .cn-label {
-            font-size: 0.62em;
+            font-size: var(--cn-font-label);
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.09em;
             opacity: 0.65;
-            margin-bottom: 5px;
             flex-shrink: 0;
         }
         .canvas-node .cn-header {
-            font-size: 0.76em;
+            font-size: var(--cn-font-header);
             font-weight: 700;
             line-height: 1.3;
-            margin-bottom: 6px;
             flex-shrink: 0;
         }
         .canvas-node .cn-goals {
-            font-size: 0.68em;
-            line-height: 1.5;
+            font-size: var(--cn-font-goals);
+            line-height: var(--cn-lh-goals);
             list-style: none;
             text-align: left;
             padding: 0;
@@ -521,21 +522,21 @@
             opacity: 0.55;
         }
         /* Per-category colors */
-        .cn-career       { background: #ffd6e0; color: #7c2d52; }
-        .cn-creativity   { background: #fde68a; color: #78350f; }
-        .cn-health       { background: #bbf7d0; color: #166534; }
-        .cn-relationships{ background: #fecaca; color: #7f1d1d; }
-        .cn-travel       { background: #bfdbfe; color: #1e3a5f; }
-        .cn-finances     { background: #d1fae5; color: #065f46; }
-        .cn-living       { background: #e0e7ff; color: #312e81; }
+        .cn-career        { background: var(--cn-career-bg);        color: var(--cn-career-fg);        }
+        .cn-creativity    { background: var(--cn-creativity-bg);    color: var(--cn-creativity-fg);    }
+        .cn-health        { background: var(--cn-health-bg);        color: var(--cn-health-fg);        }
+        .cn-relationships { background: var(--cn-relationships-bg); color: var(--cn-relationships-fg); }
+        .cn-travel        { background: var(--cn-travel-bg);        color: var(--cn-travel-fg);        }
+        .cn-finances      { background: var(--cn-finances-bg);      color: var(--cn-finances-fg);      }
+        .cn-living        { background: var(--cn-living-bg);        color: var(--cn-living-fg);        }
         /* Per-category shapes */
         .cn-shape-ellipse   { clip-path: ellipse(50% 42% at 50% 50%); }
         .cn-shape-triangle  { clip-path: polygon(50% 0%, 100% 87%, 0% 87%); padding-top: 30%; }
         .cn-shape-diamond   { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
         .cn-shape-blob      { clip-path: polygon(20% 0%, 82% 8%, 100% 55%, 62% 100%, 0% 82%); }
         .cn-shape-pentagon  { clip-path: polygon(50% 0%, 100% 35%, 82% 100%, 18% 100%, 0% 35%); }
-        .cn-shape-rect      { border-radius: 16px; }
-        .cn-shape-rect-tall { border-radius: 16px; }
+        .cn-shape-rect      { border-radius: var(--cn-radius); }
+        .cn-shape-rect-tall { border-radius: var(--cn-radius); }
 
         /* === Arrow Connectors (T-001-04) === */
         #canvas-arrows {
