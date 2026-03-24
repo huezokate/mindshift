@@ -526,13 +526,26 @@
             padding: var(--cn-pad-y) var(--cn-pad-x);
             font-size: var(--cn-font-base);
             line-height: var(--cn-lh-base);
+            background: transparent;
             cursor: pointer;
             transition: transform 0.15s ease, filter 0.15s ease,
                         width 0.25s ease, height 0.25s ease,
                         border-radius 0.2s ease;
             text-align: center;
-            overflow: hidden;
             box-sizing: border-box;
+        }
+        /* Shape background layer — clipped, never touches text */
+        .canvas-node::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            z-index: 0;
+        }
+        /* Text content always above shape layer */
+        .canvas-node > * {
+            position: relative;
+            z-index: 1;
         }
         .canvas-node:hover {
             transform: scale(1.06);
@@ -565,20 +578,27 @@
             content: "• ";
             opacity: 0.55;
         }
-        /* Per-category colors */
-        .cn-career        { background: var(--cn-career-bg);        color: var(--cn-career-fg);        }
-        .cn-creativity    { background: var(--cn-creativity-bg);    color: var(--cn-creativity-fg);    }
-        .cn-health        { background: var(--cn-health-bg);        color: var(--cn-health-fg);        }
-        .cn-relationships { background: var(--cn-relationships-bg); color: var(--cn-relationships-fg); }
-        .cn-travel        { background: var(--cn-travel-bg);        color: var(--cn-travel-fg);        }
-        .cn-finances      { background: var(--cn-finances-bg);      color: var(--cn-finances-fg);      }
-        .cn-living        { background: var(--cn-living-bg);        color: var(--cn-living-fg);        }
-        /* Per-category shapes */
-        .cn-shape-ellipse   { clip-path: ellipse(50% 42% at 50% 50%); }
-        .cn-shape-triangle  { clip-path: polygon(50% 0%, 100% 87%, 0% 87%); padding-top: 30%; }
-        .cn-shape-diamond   { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
-        .cn-shape-blob      { clip-path: polygon(20% 0%, 82% 8%, 100% 55%, 62% 100%, 0% 82%); }
-        .cn-shape-pentagon  { clip-path: polygon(50% 0%, 100% 35%, 82% 100%, 18% 100%, 0% 35%); }
+        /* Per-category colors — text on node, background on ::before */
+        .cn-career        { color: var(--cn-career-fg);        }
+        .cn-creativity    { color: var(--cn-creativity-fg);    }
+        .cn-health        { color: var(--cn-health-fg);        }
+        .cn-relationships { color: var(--cn-relationships-fg); }
+        .cn-travel        { color: var(--cn-travel-fg);        }
+        .cn-finances      { color: var(--cn-finances-fg);      }
+        .cn-living        { color: var(--cn-living-fg);        }
+        .cn-career::before        { background: var(--cn-career-bg);        }
+        .cn-creativity::before    { background: var(--cn-creativity-bg);    }
+        .cn-health::before        { background: var(--cn-health-bg);        }
+        .cn-relationships::before { background: var(--cn-relationships-bg); }
+        .cn-travel::before        { background: var(--cn-travel-bg);        }
+        .cn-finances::before      { background: var(--cn-finances-bg);      }
+        .cn-living::before        { background: var(--cn-living-bg);        }
+        /* Per-category shapes — clip-path on ::before only */
+        .cn-shape-ellipse::before  { clip-path: ellipse(50% 42% at 50% 50%); }
+        .cn-shape-triangle::before { clip-path: polygon(50% 0%, 100% 87%, 0% 87%); }
+        .cn-shape-diamond::before  { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
+        .cn-shape-blob::before     { clip-path: polygon(20% 0%, 82% 8%, 100% 55%, 62% 100%, 0% 82%); }
+        .cn-shape-pentagon::before { clip-path: polygon(50% 0%, 100% 35%, 82% 100%, 18% 100%, 0% 35%); }
         .cn-shape-rect      { border-radius: var(--cn-radius); }
         .cn-shape-rect-tall { border-radius: var(--cn-radius); }
 
@@ -596,7 +616,6 @@
 
         /* === Node Expand Detail (T-001-05) === */
         .cn-expanded {
-            clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%) !important;
             border-radius: 18px !important;
             width: 280px !important;
             height: 460px !important;
@@ -607,6 +626,10 @@
             padding: 18px 16px;
             cursor: default;
             position: absolute;
+        }
+        .cn-expanded::before {
+            clip-path: none !important;
+            border-radius: 18px;
         }
         .cn-expanded:hover {
             transform: none;
