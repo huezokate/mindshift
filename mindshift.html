@@ -471,7 +471,9 @@
             justify-content: center;
             padding: 14px 16px;
             cursor: pointer;
-            transition: transform 0.15s ease, filter 0.15s ease;
+            transition: transform 0.15s ease, filter 0.15s ease,
+                        width 0.25s ease, height 0.25s ease,
+                        border-radius 0.2s ease;
             text-align: center;
             overflow: hidden;
             box-sizing: border-box;
@@ -525,6 +527,75 @@
         .cn-shape-pentagon  { clip-path: polygon(50% 0%, 100% 35%, 82% 100%, 18% 100%, 0% 35%); }
         .cn-shape-rect      { border-radius: 16px; }
         .cn-shape-rect-tall { border-radius: 16px; }
+
+        /* === Arrow Connectors (T-001-04) === */
+        #canvas-arrows {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 0;
+            height: 0;
+            overflow: visible;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* === Node Expand Detail (T-001-05) === */
+        .cn-expanded {
+            clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%) !important;
+            border-radius: 18px !important;
+            width: 280px !important;
+            height: 340px !important;
+            overflow: visible;
+            z-index: 100;
+            align-items: flex-start;
+            justify-content: flex-start;
+            padding: 18px 16px;
+            cursor: default;
+            position: absolute;
+        }
+        .cn-expanded:hover {
+            transform: none;
+            filter: none;
+        }
+        .cn-edit-area {
+            display: none;
+            width: 100%;
+            margin-top: 10px;
+            padding: 8px;
+            font-size: 0.72em;
+            font-family: inherit;
+            border: 1.5px solid rgba(0,0,0,0.18);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.55);
+            resize: vertical;
+            min-height: 72px;
+            box-sizing: border-box;
+            color: inherit;
+        }
+        .cn-expanded .cn-edit-area {
+            display: block;
+        }
+        .cn-close-btn {
+            display: none;
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0,0,0,0.12);
+            border: none;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-size: 0.7em;
+            cursor: pointer;
+            line-height: 22px;
+            text-align: center;
+            padding: 0;
+            color: inherit;
+        }
+        .cn-expanded .cn-close-btn {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -1163,15 +1234,78 @@
                     goals.map(function(g) { return '<li>' + g + '</li>'; }).join('') +
                     '</ul>';
 
+                // Textarea for goal editing (T-001-05)
+                const ta = document.createElement('textarea');
+                ta.className = 'cn-edit-area';
+                ta.placeholder = 'Add or refine your goals\u2026';
+                if (nodeEdits.has(cat.id)) ta.value = nodeEdits.get(cat.id);
+                ta.addEventListener('input', function() { nodeEdits.set(cat.id, ta.value); });
+                ta.addEventListener('mousedown', function(e) { e.stopPropagation(); });
+                ta.addEventListener('wheel',     function(e) { e.stopPropagation(); });
+                el.appendChild(ta);
+
+                // Close button (T-001-05)
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'cn-close-btn';
+                closeBtn.textContent = '\u2715';
+                closeBtn.title = 'Collapse';
+                closeBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    collapseNode();
+                });
+                el.appendChild(closeBtn);
+
+                // Stop canvas pan when interacting with expanded node (T-001-05)
+                el.addEventListener('mousedown', function(e) {
+                    if (_expandedId === cat.id) e.stopPropagation();
+                });
+
                 el.addEventListener('click', function() { onNodeClick(cat.id); });
                 world.appendChild(el);
             });
         }
 
-        function onNodeClick(categoryId) {
-            // T-001-05: expand node detail panel
-            console.log('node clicked:', categoryId);
+        // T-001-05: expand state
+        const nodeEdits = new Map();   // categoryId → textarea value (session persistence)
+        let _expandedId = null;
+        let _collapseListenerAdded = false;
+
+        function collapseNode() {
+            if (!_expandedId) return;
+            const el = document.getElementById('cn-' + _expandedId);
+            const cat = CATEGORY_NODES.find(function(c) { return c.id === _expandedId; });
+            if (el && cat) {
+                el.classList.remove('cn-expanded');
+                el.style.width  = cat.width  + 'px';
+                el.style.height = cat.height + 'px';
+            }
+            _expandedId = null;
         }
+
+        function expandNode(categoryId) {
+            const el = document.getElementById('cn-' + categoryId);
+            if (!el) return;
+            el.classList.add('cn-expanded');
+            const ta = el.querySelector('.cn-edit-area');
+            if (ta && nodeEdits.has(categoryId)) {
+                ta.value = nodeEdits.get(categoryId);
+            }
+            _expandedId = categoryId;
+        }
+
+        function onNodeClick(categoryId) {
+            if (_expandedId === categoryId) {
+                collapseNode();
+                return;
+            }
+            collapseNode();
+            expandNode(categoryId);
+        }
+
+        // T-001-05: global Escape key — collapse expanded node
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && _expandedId) collapseNode();
+        });
 
         // Patch navigateToPage to toggle canvas-mode, centre view, and render nodes (T-001-01, T-001-02)
         let _canvasCentred = false;
@@ -1190,6 +1324,17 @@
                 initCanvas();
                 renderHubNode();
                 renderCategoryNodes(userData);
+                // T-001-05: click-outside to collapse expanded node (register once)
+                if (!_collapseListenerAdded) {
+                    document.getElementById('canvas-root').addEventListener('click', function(e) {
+                        if (!_expandedId) return;
+                        const expandedEl = document.getElementById('cn-' + _expandedId);
+                        if (expandedEl && !expandedEl.contains(e.target)) {
+                            collapseNode();
+                        }
+                    });
+                    _collapseListenerAdded = true;
+                }
             } else if (document.body.classList.contains('canvas-mode')) {
                 document.body.classList.remove('canvas-mode');
                 CanvasTransform.reset();
