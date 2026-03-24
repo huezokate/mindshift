@@ -5,6 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindShift - Perspective Mapping Tool</title>
     <style>
+        /* === Design Tokens (S-002) === */
+        :root {
+            /* Canvas */
+            --canvas-bg: #1a1a2e;
+
+            /* Hub */
+            --hub-bg: rgba(255, 255, 255, 0.08);
+            --hub-border: rgba(255, 255, 255, 0.15);
+            --hub-accent: #a78bfa;
+            --hub-text: #e2e8f0;
+            --hub-sub: rgba(255, 255, 255, 0.35);
+
+            /* Node palette — bg + fg per category */
+            --cn-career-bg:        #ffd6cc;  --cn-career-fg:        #7c2d12;
+            --cn-creativity-bg:    #fef08a;  --cn-creativity-fg:    #713f12;
+            --cn-health-bg:        #bbf7d0;  --cn-health-fg:        #14532d;
+            --cn-relationships-bg: #fecdd3;  --cn-relationships-fg: #881337;
+            --cn-travel-bg:        #c7d2fe;  --cn-travel-fg:        #312e81;
+            --cn-finances-bg:      #d1fae5;  --cn-finances-fg:      #065f46;
+            --cn-living-bg:        #ede9fe;  --cn-living-fg:        #4c1d95;
+
+            /* Node typography */
+            --cn-font-base:   13px;
+            --cn-lh-base:     1.4;
+            --cn-font-label:  0.62em;
+            --cn-font-header: 0.8em;
+            --cn-font-goals:  0.7em;
+            --cn-lh-goals:    1.55;
+
+            /* Node spacing */
+            --cn-pad-x:  16px;
+            --cn-pad-y:  14px;
+            --cn-radius: 16px;
+            --cn-gap:    5px;
+
+            /* Arrows — reference values (consumed by JS string literals) */
+            --arrow-stroke:  #2d2d2d;
+            --arrow-opacity: 0.65;
+            --arrow-width:   1.5;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -303,7 +344,7 @@
         body.canvas-mode {
             display: block;
             padding: 0;
-            background: #1a1a2e;
+            background: var(--canvas-bg);
         }
         body.canvas-mode #page3.container {
             position: fixed;
@@ -315,7 +356,7 @@
             padding: 0;
             border-radius: 0;
             box-shadow: none;
-            background: #1a1a2e;
+            background: var(--canvas-bg);
             overflow: hidden;
             display: block;
         }
@@ -388,8 +429,8 @@
             width: 280px;
             max-width: 280px;
             padding: 28px 32px;
-            background: rgba(255, 255, 255, 0.07);
-            border: 1.5px solid rgba(255, 255, 255, 0.22);
+            background: var(--hub-bg);
+            border: 1.5px solid var(--hub-border);
             border-radius: 50% / 35%;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
@@ -403,13 +444,13 @@
             font-size: 0.7em;
             letter-spacing: 0.12em;
             text-transform: uppercase;
-            color: #a78bfa;
+            color: var(--hub-accent);
             margin-bottom: 8px;
             font-weight: 600;
         }
         #hub-node .hub-body {
             font-size: 1em;
-            color: #e2e8f0;
+            color: var(--hub-text);
             line-height: 1.5;
             max-height: 120px;
             overflow: hidden;
@@ -420,12 +461,12 @@
         }
         #hub-node .hub-body.placeholder {
             font-style: italic;
-            color: rgba(255, 255, 255, 0.35);
+            color: var(--hub-sub);
         }
         #hub-node .hub-subtitle {
             margin-top: 12px;
             font-size: 0.72em;
-            color: rgba(255, 255, 255, 0.4);
+            color: var(--hub-sub);
             line-height: 1.6;
             letter-spacing: 0.02em;
         }
