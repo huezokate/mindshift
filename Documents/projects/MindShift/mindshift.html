@@ -125,38 +125,6 @@
             transform: translateY(0);
         }
 
-        .mindmap {
-            margin: 30px 0;
-            position: relative;
-        }
-
-        .node {
-            background: #f7fafc;
-            border: 2px solid #667eea;
-            border-radius: 12px;
-            padding: 20px;
-            margin: 15px 0;
-            position: relative;
-        }
-
-        .node h4 {
-            color: #667eea;
-            margin-bottom: 10px;
-            font-size: 1.2em;
-        }
-
-        .node-content {
-            color: #4a5568;
-            line-height: 1.6;
-        }
-
-        .connector {
-            text-align: center;
-            color: #a0aec0;
-            font-size: 1.5em;
-            margin: 10px 0;
-        }
-
         .ai-helper {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             color: white;
@@ -683,6 +651,55 @@
             transform: none;
             box-shadow: none;
         }
+
+        /* === Canvas Nav Buttons (T-001-07) === */
+        #canvas-lens-btn {
+            position: absolute;
+            bottom: 24px;
+            left: 24px;
+            z-index: 10;
+            background: rgba(102, 126, 234, 0.85);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            font-size: 0.9em;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 24px;
+            cursor: pointer;
+            margin: 0;
+            transition: background 0.2s;
+        }
+        #canvas-lens-btn:hover {
+            background: rgba(118, 75, 162, 0.9);
+            transform: none;
+            box-shadow: none;
+        }
+        #canvas-back-btn {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            z-index: 10;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.7);
+            font-size: 0.78em;
+            font-weight: 500;
+            padding: 6px 14px;
+            border-radius: 16px;
+            cursor: pointer;
+            margin: 0;
+            transition: background 0.2s, color 0.2s;
+        }
+        #canvas-back-btn:hover {
+            background: rgba(255,255,255,0.18);
+            color: white;
+            transform: none;
+            box-shadow: none;
+        }
     </style>
 </head>
 <body>
@@ -745,6 +762,8 @@
                 <button id="zoom-out-btn" title="Zoom out">−</button>
                 <button id="zoom-reset-btn" title="Reset view">⊙</button>
             </div>
+            <button id="canvas-back-btn" onclick="onCanvasBackClick()" title="Back to form">← Back</button>
+            <button id="canvas-lens-btn" onclick="navigateToPage(4)">Choose Your Lens →</button>
         </div>
     </div>
 
@@ -862,75 +881,6 @@
                 hideLoading();
                 navigateToPage(3);
             }, 2500);
-        }
-
-        function generateGaps() {
-            const isCareerWoman = userData.area === 'career' && userData.stuck.toLowerCase().includes('analysis paralysis');
-            const isDatingMan = userData.area === 'relationships' && userData.stuck.toLowerCase().includes('stay in this exact spot');
-
-            if (isCareerWoman) {
-                return '• <strong>Visibility gap:</strong> You have the skills but aren\'t putting yourself out there enough<br>• <strong>Perfectionism paralysis:</strong> Overanalyzing instead of taking imperfect action<br>• <strong>Public speaking anxiety:</strong> Need comfort with high-stakes presentations<br>• <strong>Confidence in ambiguity:</strong> Learning to lead without having all the answers<br>• <strong>Social energy management:</strong> Building relationships despite introversion';
-            }
-
-            if (isDatingMan) {
-                return '• <strong>Time allocation:</strong> Work and hobbies are filling the space that dating should occupy<br>• <strong>Intentionality:</strong> Not actively creating opportunities to meet potential partners<br>• <strong>Dating muscle atrophy:</strong> Skills get rusty when not practiced regularly<br>• <strong>Comfort zone:</strong> Bio-hacking and running club are safe, dating feels vulnerable<br>• <strong>Future urgency:</strong> Fear of drift without concrete action';
-            }
-
-            const gaps = {
-                career: '• Skills or network gap<br>• Clarity on next role<br>• ' + userData.stuck,
-                money: '• Income ceiling<br>• Investment knowledge<br>• ' + userData.stuck,
-                relationships: '• Vulnerability and authenticity<br>• Meeting new people<br>• ' + userData.stuck,
-                confidence: '• Self-worth independent of achievement<br>• Taking social risks<br>• ' + userData.stuck,
-                creative: '• Consistency and output volume<br>• Sharing work publicly<br>• ' + userData.stuck,
-                health: '• Sustainable routines<br>• Energy management<br>• ' + userData.stuck
-            };
-            return gaps[userData.area] || userData.stuck;
-        }
-
-        function generateLevers() {
-            const isCareerWoman = userData.area === 'career' && userData.stuck.toLowerCase().includes('analysis paralysis');
-            const isDatingMan = userData.area === 'relationships' && userData.stuck.toLowerCase().includes('stay in this exact spot');
-
-            if (isCareerWoman) {
-                return '• <strong>Reps over perfection:</strong> Do more presentations, even small ones, to build comfort<br>• <strong>Strategic visibility:</strong> Share work/ideas before they feel "ready"<br>• <strong>Micro-socializing:</strong> Brief authentic interactions vs. perfect conversations<br>• <strong>Senior sponsorship:</strong> Find someone who advocates for you to leadership<br>• <strong>Public portfolio:</strong> Make your work visible (blog, talks, case studies)';
-            }
-
-            if (isDatingMan) {
-                return '• <strong>Volume over optimization:</strong> Meet more people, worry less about "the one"<br>• <strong>Structured exposure:</strong> Join activities designed for meeting people (not just hobbies)<br>• <strong>Weekly dating discipline:</strong> Treat it like running club—consistent practice<br>• <strong>Social spillover:</strong> Let friends know you\'re actually looking<br>• <strong>Conversation starter system:</strong> Lower friction for initiating vs. waiting for perfect moment';
-            }
-
-            const levers = {
-                career: '• Network expansion<br>• Skill development<br>• Visibility in your field',
-                money: '• Income streams diversification<br>• Financial education<br>• Investment strategy',
-                relationships: '• Social surface area<br>• Authentic expression<br>• Consistent engagement',
-                confidence: '• Small bold actions<br>• Public sharing<br>• Reframing failure',
-                creative: '• Daily practice<br>• Public accountability<br>• Feedback loops',
-                health: '• Habit stacking<br>• Environment design<br>• Recovery protocols'
-            };
-            return levers[userData.area] || '• Identify key leverage points<br>• Build support systems<br>• Take consistent action';
-        }
-
-        function generateMoves() {
-            const isCareerWoman = userData.area === 'career' && userData.stuck.toLowerCase().includes('analysis paralysis');
-            const isDatingMan = userData.area === 'relationships' && userData.stuck.toLowerCase().includes('stay in this exact spot');
-
-            if (isCareerWoman) {
-                return '• <strong>This week:</strong> Volunteer to present in your next team meeting (even just 5 min update)<br>• <strong>Today:</strong> Message one person at director level and ask one question about their path<br>• <strong>Tomorrow:</strong> Share one work insight on LinkedIn or team Slack—unpolished is fine<br>• <strong>This month:</strong> Attend one industry meetup and talk to 3 people (not perfectly, just genuinely)<br>• <strong>Mindset shift:</strong> Done and imperfect beats perfect and invisible';
-            }
-
-            if (isDatingMan) {
-                return '• <strong>This week:</strong> Go to one social event specifically to meet new people (not just your running club)<br>• <strong>Today:</strong> Text 2 friends that you\'re actively dating and ask if they know anyone single<br>• <strong>This weekend:</strong> Try one new activity where meeting people is natural (dance class, climbing gym, book club)<br>• <strong>Dating app action:</strong> Spend 30 min on apps Sunday evening—treat it like a weekly habit<br>• <strong>Conversation practice:</strong> Start 3 brief chats this week with strangers (coffee shop, gym, anywhere)';
-            }
-
-            const moves = {
-                career: '• Reach out to 3 people in your target field this week<br>• Update your LinkedIn/portfolio<br>• Sign up for one relevant course or event',
-                money: '• Track spending for one week<br>• Read one book on personal finance<br>• Set up automatic savings',
-                relationships: '• Say yes to one social invitation this week<br>• Start one authentic conversation<br>• Join one community aligned with your interests',
-                confidence: '• Share one thing publicly (social media, group chat)<br>• Say "yes" to something slightly uncomfortable<br>• Compliment 3 people genuinely',
-                creative: '• Create for 15 minutes today<br>• Share one piece of work<br>• Commit to a weekly output schedule',
-                health: '• Move your body for 10 minutes today<br>• Prep one healthy meal<br>• Set a consistent sleep time for this week'
-            };
-            return moves[userData.area] || '• Choose one small action<br>• Do it today<br>• Repeat tomorrow';
         }
 
         function viewPersona(persona) {
@@ -1307,16 +1257,14 @@
                 el.style.left   = (cat.wx - cat.width  / 2) + 'px';
                 el.style.top    = (cat.wy - cat.height / 2) + 'px';
 
-                // Build goals list, optionally prepend user future text for matched area
-                const goals = cat.goals.slice();
-                if (cat.areaKey && userData && userData.area === cat.areaKey && userData.future && userData.future.trim()) {
-                    const snippet = userData.future.trim().slice(0, 60);
-                    goals.unshift(snippet + (snippet.length === 60 ? '…' : ''));
-                }
+                // Derive node header + goals from user answers (T-001-07)
+                const derived = deriveNodeContent(cat, userData);
+                const goals = derived.goals;
+                const header = derived.header;
 
                 el.innerHTML =
                     '<span class="cn-label">' + cat.label + '</span>' +
-                    '<span class="cn-header">' + cat.header + '</span>' +
+                    '<span class="cn-header">' + header + '</span>' +
                     '<ul class="cn-goals">' +
                     goals.map(function(g) { return '<li>' + g + '</li>'; }).join('') +
                     '</ul>';
@@ -1574,6 +1522,41 @@
             world.insertBefore(svg, world.firstChild);
         }
 
+        // --- Canvas Flow Wiring (T-001-07) ---
+
+        function onCanvasBackClick() {
+            if (!confirm('Going back will reset your mind map. Continue?')) return;
+            collapseNode();
+            nodeEdits.clear();
+            userData = {};
+            _canvasCentred = false;
+            CanvasTransform.reset();
+            applyTransform();
+            navigateToPage(2);
+        }
+
+        function deriveNodeContent(cat, ud) {
+            let header = cat.header;
+            let goals = cat.goals.slice();
+
+            if (!ud || !ud.area) return { header: header, goals: goals };
+
+            if (cat.areaKey && cat.areaKey === ud.area) {
+                // Career node: use q1 (current situation) for header context
+                if (cat.id === 'career' && ud.now && ud.now.trim()) {
+                    const snippet = ud.now.trim().slice(0, 50);
+                    header = 'From: ' + snippet + (ud.now.trim().length > 50 ? '\u2026' : '');
+                }
+                // Prepend future-vision snippet to goals for the area-matched node
+                if (ud.future && ud.future.trim()) {
+                    const futureSnippet = ud.future.trim().slice(0, 60);
+                    goals.unshift(futureSnippet + (ud.future.trim().length > 60 ? '\u2026' : ''));
+                }
+            }
+
+            return { header: header, goals: goals };
+        }
+
         // Patch navigateToPage to toggle canvas-mode, centre view, and render nodes (T-001-01, T-001-02)
         let _canvasCentred = false;
 
@@ -1603,10 +1586,9 @@
                     });
                     _collapseListenerAdded = true;
                 }
-            } else if (document.body.classList.contains('canvas-mode')) {
+            } else {
+                // Remove canvas-mode when navigating away; preserve CanvasTransform for return trip
                 document.body.classList.remove('canvas-mode');
-                CanvasTransform.reset();
-                applyTransform();
             }
             _navigateToPage_orig(n);
         };
