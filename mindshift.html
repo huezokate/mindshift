@@ -461,6 +461,70 @@
             line-height: 1.6;
             letter-spacing: 0.02em;
         }
+
+        /* === Category Nodes (T-001-03) === */
+        .canvas-node {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 16px;
+            cursor: pointer;
+            transition: transform 0.15s ease, filter 0.15s ease;
+            text-align: center;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+        .canvas-node:hover {
+            transform: scale(1.06);
+            filter: brightness(1.06) drop-shadow(0 4px 16px rgba(0,0,0,0.22));
+        }
+        .canvas-node .cn-label {
+            font-size: 0.62em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.09em;
+            opacity: 0.65;
+            margin-bottom: 5px;
+            flex-shrink: 0;
+        }
+        .canvas-node .cn-header {
+            font-size: 0.76em;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 6px;
+            flex-shrink: 0;
+        }
+        .canvas-node .cn-goals {
+            font-size: 0.68em;
+            line-height: 1.5;
+            list-style: none;
+            text-align: left;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+        }
+        .canvas-node .cn-goals li::before {
+            content: "• ";
+            opacity: 0.55;
+        }
+        /* Per-category colors */
+        .cn-career       { background: #ffd6e0; color: #7c2d52; }
+        .cn-creativity   { background: #fde68a; color: #78350f; }
+        .cn-health       { background: #bbf7d0; color: #166534; }
+        .cn-relationships{ background: #fecaca; color: #7f1d1d; }
+        .cn-travel       { background: #bfdbfe; color: #1e3a5f; }
+        .cn-finances     { background: #d1fae5; color: #065f46; }
+        .cn-living       { background: #e0e7ff; color: #312e81; }
+        /* Per-category shapes */
+        .cn-shape-ellipse   { clip-path: ellipse(50% 42% at 50% 50%); }
+        .cn-shape-triangle  { clip-path: polygon(50% 0%, 100% 87%, 0% 87%); padding-top: 30%; }
+        .cn-shape-diamond   { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
+        .cn-shape-blob      { clip-path: polygon(20% 0%, 82% 8%, 100% 55%, 62% 100%, 0% 82%); }
+        .cn-shape-pentagon  { clip-path: polygon(50% 0%, 100% 35%, 82% 100%, 18% 100%, 0% 35%); }
+        .cn-shape-rect      { border-radius: 16px; }
+        .cn-shape-rect-tall { border-radius: 16px; }
     </style>
 </head>
 <body>
@@ -988,6 +1052,127 @@
             }, 2500);
         }
 
+        // --- Category Nodes (T-001-03) ---
+
+        const CATEGORY_NODES = [
+            {
+                id: 'career',
+                label: 'career',
+                colorClass: 'cn-career',
+                shapeClass: 'cn-shape-ellipse',
+                width: 180, height: 150,
+                wx: 0,    wy: -260,
+                header: 'I work at a company I love',
+                goals: ['Senior IC or lead role', 'Work I\'m proud of', 'Strong team relationships'],
+                areaKey: 'career',
+            },
+            {
+                id: 'creativity',
+                label: 'creativity',
+                colorClass: 'cn-creativity',
+                shapeClass: 'cn-shape-triangle',
+                width: 175, height: 175,
+                wx: 240,  wy: -160,
+                header: 'I publish my novel',
+                goals: ['Write 500 words daily', 'Finish first draft', 'Find a writing group'],
+                areaKey: null,
+            },
+            {
+                id: 'health',
+                label: 'health & wellness',
+                colorClass: 'cn-health',
+                shapeClass: 'cn-shape-diamond',
+                width: 175, height: 175,
+                wx: 290,  wy: 60,
+                header: 'I feel strong & energized',
+                goals: ['Run 3× per week', 'Sleep 7–8 hrs', 'Consistent nutrition'],
+                areaKey: 'health',
+            },
+            {
+                id: 'relationships',
+                label: 'relationships',
+                colorClass: 'cn-relationships',
+                shapeClass: 'cn-shape-blob',
+                width: 180, height: 170,
+                wx: 165,  wy: 270,
+                header: 'I have deep connections',
+                goals: ['Weekly quality time', 'Honest communication', 'New friendships'],
+                areaKey: 'relationships',
+            },
+            {
+                id: 'travel',
+                label: 'travel',
+                colorClass: 'cn-travel',
+                shapeClass: 'cn-shape-pentagon',
+                width: 180, height: 170,
+                wx: -165, wy: 270,
+                header: 'I explore the world',
+                goals: ['2 international trips/yr', 'Learn a new language', 'Live abroad 3 mo'],
+                areaKey: null,
+            },
+            {
+                id: 'finances',
+                label: 'finances',
+                colorClass: 'cn-finances',
+                shapeClass: 'cn-shape-rect',
+                width: 168, height: 135,
+                wx: -290, wy: 60,
+                header: 'I am financially free',
+                goals: ['6-month emergency fund', 'Consistent investing', 'Debt-free'],
+                areaKey: 'money',
+            },
+            {
+                id: 'living',
+                label: 'living situation',
+                colorClass: 'cn-living',
+                shapeClass: 'cn-shape-rect-tall',
+                width: 158, height: 195,
+                wx: -240, wy: -160,
+                header: 'I live where I thrive',
+                goals: ['Own or rent a space I love', 'Intentional neighbourhood', 'Home that feels like me'],
+                areaKey: null,
+            },
+        ];
+
+        function renderCategoryNodes(userData) {
+            const world = document.getElementById('canvas-world');
+            if (!world) return;
+            // Idempotent: remove existing nodes
+            world.querySelectorAll('.canvas-node').forEach(el => el.remove());
+
+            CATEGORY_NODES.forEach(function(cat) {
+                const el = document.createElement('div');
+                el.className = 'canvas-node ' + cat.colorClass + ' ' + cat.shapeClass;
+                el.id = 'cn-' + cat.id;
+                el.style.width  = cat.width  + 'px';
+                el.style.height = cat.height + 'px';
+                el.style.left   = (cat.wx - cat.width  / 2) + 'px';
+                el.style.top    = (cat.wy - cat.height / 2) + 'px';
+
+                // Build goals list, optionally prepend user future text for matched area
+                const goals = cat.goals.slice();
+                if (cat.areaKey && userData && userData.area === cat.areaKey && userData.future && userData.future.trim()) {
+                    const snippet = userData.future.trim().slice(0, 60);
+                    goals.unshift(snippet + (snippet.length === 60 ? '…' : ''));
+                }
+
+                el.innerHTML =
+                    '<span class="cn-label">' + cat.label + '</span>' +
+                    '<span class="cn-header">' + cat.header + '</span>' +
+                    '<ul class="cn-goals">' +
+                    goals.map(function(g) { return '<li>' + g + '</li>'; }).join('') +
+                    '</ul>';
+
+                el.addEventListener('click', function() { onNodeClick(cat.id); });
+                world.appendChild(el);
+            });
+        }
+
+        function onNodeClick(categoryId) {
+            // T-001-05: expand node detail panel
+            console.log('node clicked:', categoryId);
+        }
+
         // Patch navigateToPage to toggle canvas-mode, centre view, and render nodes (T-001-01, T-001-02)
         let _canvasCentred = false;
 
@@ -1004,6 +1189,7 @@
                 }
                 initCanvas();
                 renderHubNode();
+                renderCategoryNodes(userData);
             } else if (document.body.classList.contains('canvas-mode')) {
                 document.body.classList.remove('canvas-mode');
                 CanvasTransform.reset();
