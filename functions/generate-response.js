@@ -1,3 +1,4 @@
+// Cloudflare Pages Function — handles POST /functions/generate-response
 export async function onRequestPost(context) {
   const { systemPrompt, userPrompt } = await context.request.json();
 
