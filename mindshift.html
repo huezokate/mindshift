@@ -761,6 +761,107 @@
             box-shadow: none;
         }
 
+        /* === S-003 Landing Flow Cards (T-003-01) === */
+        .landing-header {
+            text-align: center;
+            margin-bottom: 44px;
+        }
+        .landing-header h1 { margin-bottom: 10px; }
+        .landing-tagline {
+            font-size: 1.1em;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+        .flow-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 600px) { .flow-cards { grid-template-columns: 1fr; } }
+        .flow-card {
+            background: var(--card-bg);
+            border: 1.5px solid var(--card-border);
+            border-radius: 18px;
+            padding: 32px 26px;
+            cursor: pointer;
+            transition: border-color 0.25s, transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .flow-card:hover {
+            border-color: var(--hub-accent);
+            transform: translateY(-4px);
+            box-shadow: 0 16px 40px rgba(167, 139, 250, 0.2);
+        }
+        .flow-card-icon { font-size: 2.2em; line-height: 1; }
+        .flow-card h3 { color: var(--text-primary); font-size: 1.25em; margin: 0; }
+        .flow-card p  { color: var(--text-secondary); font-size: 0.92em; margin: 0; line-height: 1.5; }
+        .flow-card-cta {
+            display: block;
+            margin-top: auto;
+            padding-top: 14px;
+            color: var(--hub-accent);
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        /* === S-003 Aspect Wizard (T-003-02) === */
+        .wizard-progress {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 30px;
+        }
+        .wizard-dot {
+            height: 4px;
+            flex: 1;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.12);
+            transition: background 0.3s;
+        }
+        .wizard-dot.done   { background: var(--hub-accent); opacity: 0.45; }
+        .wizard-dot.active { background: var(--hub-accent); }
+        .wizard-step-icon  { font-size: 2em; margin-bottom: 6px; }
+        .wizard-step-label {
+            font-size: 0.78em;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--hub-accent);
+            margin-bottom: 4px;
+        }
+        .wizard-nav {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .wizard-nav button { margin: 0; }
+
+        /* === S-003 Per-Node Lens Button (T-003-04) === */
+        .cn-lens-btn {
+            display: none;
+            margin-top: 8px;
+            background: rgba(102, 126, 234, 0.15);
+            border: 1.5px solid rgba(167, 139, 250, 0.35);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 0.68em;
+            font-weight: 600;
+            cursor: pointer;
+            color: #a78bfa;
+            width: 100%;
+            text-align: center;
+            flex-shrink: 0;
+            transition: background 0.2s;
+        }
+        .cn-expanded .cn-lens-btn { display: block; }
+        .cn-lens-btn:hover {
+            background: rgba(102, 126, 234, 0.28);
+            transform: none;
+            box-shadow: none;
+        }
+
         /* === Canvas Nav Buttons (T-001-07) === */
         #canvas-lens-btn {
             position: absolute;
@@ -813,53 +914,39 @@
 </head>
 <body>
     <div class="container active" id="page1">
-        <h1>🧠 MindShift</h1>
-        <p style="font-size: 1.3em; color: #667eea; margin-bottom: 30px;">Mind mapping with intention, through a variety of lenses.</p>
-        
-        <h3>This is not life advice.</h3>
-        <p>This is a tool to shift your perspective. We all get stuck in our own thinking patterns, and sometimes the breakthrough isn't in finding the "right" answer—it's in asking better questions.</p>
-        
-        <h3>Here's how it works:</h3>
-        <p>First, you'll map where you are and where you want to be. Then, you'll explore your path forward through different mental lenses—Socrates questioning your assumptions, your future self looking back, a ruthless strategist cutting through noise, and more.</p>
-        
-        <p>Same situation. Different minds. New possibilities.</p>
-        
-        <button onclick="navigateToPage(2)">Let's Start →</button>
+        <div class="landing-header">
+            <h1>🧠 MindShift</h1>
+            <p class="landing-tagline">Same situation. Different minds. New possibilities.</p>
+        </div>
+        <div class="flow-cards">
+            <div class="flow-card" onclick="startFlow1()">
+                <div class="flow-card-icon">🗺️</div>
+                <h3>Map My Future</h3>
+                <p>Build a personalised mind map of your life in 5 years — then explore how to get there through historical lenses.</p>
+                <span class="flow-card-cta">Start mapping →</span>
+            </div>
+            <div class="flow-card" onclick="startFlow2()">
+                <div class="flow-card-icon">🔮</div>
+                <h3>Shift My Perspective</h3>
+                <p>Have something on your mind? Vent it out, then see it through the lens of a historical figure.</p>
+                <span class="flow-card-cta">Try a lens →</span>
+            </div>
+        </div>
     </div>
 
     <div class="container" id="page2">
-        <h2>Let's understand where you are</h2>
-        <p>Answer these questions honestly. They're the foundation of your map.</p>
-        
-        <div class="question-group">
-            <label>Where are you now?</label>
-            <textarea id="q1" placeholder="Think about your career, life situation, relationships, energy levels..."></textarea>
+        <button class="back-button" onclick="navigateToPage(1)">← Back</button>
+        <div id="wizard-progress" class="wizard-progress"></div>
+        <div id="wizard-icon" class="wizard-step-icon"></div>
+        <p id="wizard-step-label" class="wizard-step-label"></p>
+        <h2 id="wizard-question"></h2>
+        <div class="question-group" style="margin-top:18px;">
+            <textarea id="wizard-answer" rows="4" placeholder=""></textarea>
         </div>
-
-        <div class="question-group">
-            <label>Where do you want to be in 5-10 years?</label>
-            <textarea id="q2" placeholder="Paint the picture. What does your ideal future look like?"></textarea>
+        <div class="wizard-nav">
+            <button class="back-button" id="wizard-back-btn" onclick="wizardBack()" style="display:none;">← Previous</button>
+            <button id="wizard-next-btn" onclick="advanceWizard()">Next →</button>
         </div>
-
-        <div class="question-group">
-            <label>What feels stuck, foggy, or scary right now?</label>
-            <textarea id="q3" placeholder="What's the thing you keep circling back to but can't quite figure out?"></textarea>
-        </div>
-
-        <div class="question-group">
-            <label>What area do you most want to level up?</label>
-            <select id="q4">
-                <option value="">Choose one...</option>
-                <option value="career">Career</option>
-                <option value="money">Money</option>
-                <option value="relationships">Relationships / Dating</option>
-                <option value="confidence">Confidence</option>
-                <option value="creative">Creative Output</option>
-                <option value="health">Health / Routines</option>
-            </select>
-        </div>
-
-        <button onclick="createMindMap()">Create My Map →</button>
     </div>
 
     <div class="container" id="page3">
@@ -913,7 +1000,7 @@
             <button onclick="viewCustomPersona()">Explore Their Perspective →</button>
         </div>
 
-        <button class="back-button" onclick="navigateToPage(3)">← Back to Map</button>
+        <button class="back-button" onclick="backFromPage4()">← Back</button>
     </div>
 
     <div class="container" id="page5">
@@ -924,6 +1011,16 @@
 
         <button class="back-button" onclick="navigateToPage(4)">← Try Another Lens</button>
         <button onclick="navigateToPage(3)">Back to Map</button>
+    </div>
+
+    <div class="container" id="page6">
+        <button class="back-button" onclick="navigateToPage(1)">← Back</button>
+        <h2>What's on your mind?</h2>
+        <p>A decision you can't make, a fear you keep circling, a situation weighing on you. No structure needed — just write.</p>
+        <div class="question-group">
+            <textarea id="ventText" rows="6" placeholder="Pour it out here…"></textarea>
+        </div>
+        <button onclick="startVentLens()">Find My Lens →</button>
     </div>
 
     <div class="loading-overlay" id="loadingOverlay">
@@ -951,7 +1048,7 @@
             const params = new URLSearchParams(window.location.search);
             const p = parseInt(params.get('page'), 10);
             const persona = params.get('persona');
-            if (p >= 1 && p <= 5) {
+            if (p >= 1 && p <= 6) {
                 if (p === 5 && persona) {
                     document.getElementById('personaTitle').textContent = '✨ ' + persona + '\'s Perspective';
                     document.getElementById('personaIntro').textContent = 'Here\'s how ' + persona + ' might approach your situation.';
@@ -1415,6 +1512,17 @@
                 addImgBtn.addEventListener('mousedown', function(e) { e.stopPropagation(); });
                 el.appendChild(addImgBtn);
 
+                // T-003-04: apply-a-lens button (expanded state only)
+                const lensBtn = document.createElement('button');
+                lensBtn.className = 'cn-lens-btn';
+                lensBtn.textContent = '🔮 Apply a Lens';
+                lensBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    applyNodeLens(cat.id);
+                });
+                lensBtn.addEventListener('mousedown', function(e) { e.stopPropagation(); });
+                el.appendChild(lensBtn);
+
                 // T-001-06: image count badge (collapsed state)
                 const imgBadge = document.createElement('span');
                 imgBadge.className = 'cn-image-badge';
@@ -1641,7 +1749,7 @@
             _canvasCentred = false;
             CanvasTransform.reset();
             applyTransform();
-            navigateToPage(2);
+            navigateToPage(1);
         }
 
         function deriveNodeContent(cat, ud) {
@@ -1664,6 +1772,112 @@
             }
 
             return { header: header, goals: goals };
+        }
+
+        // --- S-003: Flow routing (T-003-01) ---
+
+        function startFlow1() {
+            userData.flow = 1;
+            wizardStep = 0;
+            wizardAnswers = {};
+            showWizardStep(0);
+            navigateToPage(2);
+        }
+
+        function startFlow2() {
+            userData.flow = 2;
+            navigateToPage(6);
+        }
+
+        // --- S-003: Aspect Wizard (T-003-02) ---
+
+        const WIZARD_STEPS = [
+            { key: 'career',        label: 'Career',           icon: '💼', question: 'In 5 years, where are you professionally?',                     placeholder: 'Your role, company, projects, level of impact…' },
+            { key: 'creativity',    label: 'Creativity',        icon: '🎨', question: 'In 5 years, what creative work is part of your life?',           placeholder: 'Music, writing, art, design, building things…' },
+            { key: 'health',        label: 'Health & Wellness', icon: '🌿', question: 'In 5 years, what does your health and energy feel like?',        placeholder: 'Physical fitness, mental clarity, routines, rest…' },
+            { key: 'relationships', label: 'Relationships',     icon: '❤️', question: 'In 5 years, how do your closest relationships look?',            placeholder: 'Partner, friends, family, community…' },
+            { key: 'travel',        label: 'Travel',            icon: '✈️', question: 'In 5 years, where have you been or where are you living?',       placeholder: 'Places visited, living abroad, home base…' },
+            { key: 'finances',      label: 'Finances',          icon: '💰', question: 'In 5 years, what does your financial situation feel like?',      placeholder: 'Income, savings, freedom, security, investments…' },
+            { key: 'living',        label: 'Living Situation',  icon: '🏡', question: 'In 5 years, where do you live and what does home feel like?',   placeholder: 'City, neighbourhood, apartment, house, vibe…' },
+            { key: 'synthesis',     label: 'Your Vision',       icon: '✨', question: 'In one sentence: what does your ideal life look like in 5 years?', placeholder: 'A single sentence that captures the feeling of it all…' },
+        ];
+        let wizardStep = 0;
+        let wizardAnswers = {};
+
+        function showWizardStep(step) {
+            const s = WIZARD_STEPS[step];
+            document.getElementById('wizard-icon').textContent = s.icon;
+            document.getElementById('wizard-step-label').textContent = s.label;
+            document.getElementById('wizard-question').textContent = s.question;
+            const ta = document.getElementById('wizard-answer');
+            ta.placeholder = s.placeholder;
+            ta.value = wizardAnswers[s.key] || '';
+            ta.focus();
+
+            const prog = document.getElementById('wizard-progress');
+            prog.innerHTML = WIZARD_STEPS.map(function(_, i) {
+                const cls = i < step ? ' done' : i === step ? ' active' : '';
+                return '<div class="wizard-dot' + cls + '"></div>';
+            }).join('');
+
+            document.getElementById('wizard-back-btn').style.display = step > 0 ? 'inline-block' : 'none';
+            document.getElementById('wizard-next-btn').textContent =
+                step === WIZARD_STEPS.length - 1 ? 'Build My Map →' : 'Next →';
+        }
+
+        function advanceWizard() {
+            const s = WIZARD_STEPS[wizardStep];
+            const val = document.getElementById('wizard-answer').value.trim();
+            if (!val) { alert('Share something — even a few words is enough.'); return; }
+            wizardAnswers[s.key] = val;
+            wizardStep++;
+            if (wizardStep >= WIZARD_STEPS.length) {
+                userData.aspects = wizardAnswers;
+                userData.future = wizardAnswers.synthesis;
+                launchCanvas();
+            } else {
+                showWizardStep(wizardStep);
+            }
+        }
+
+        function wizardBack() {
+            const cur = WIZARD_STEPS[wizardStep];
+            wizardAnswers[cur.key] = document.getElementById('wizard-answer').value.trim();
+            wizardStep--;
+            showWizardStep(wizardStep);
+        }
+
+        function launchCanvas() {
+            showLoading('Building your mind map…', 'Visualising your 5-year vision');
+            setTimeout(function() {
+                hideLoading();
+                navigateToPage(3);
+            }, 2200);
+        }
+
+        // --- S-003: Flow 2 vent (T-003-03) ---
+
+        function startVentLens() {
+            const vent = document.getElementById('ventText').value.trim();
+            if (!vent) { alert("Write something — what's on your mind?"); return; }
+            userData.vent = vent;
+            userData.lensContext = 'vent';
+            navigateToPage(4);
+        }
+
+        function backFromPage4() {
+            if (userData.lensContext === 'vent') {
+                navigateToPage(6);
+            } else {
+                navigateToPage(3);
+            }
+        }
+
+        // --- S-003: Per-node lens (T-003-04) ---
+
+        function applyNodeLens(catId) {
+            userData.lensContext = catId;
+            navigateToPage(4);
         }
 
         // Patch navigateToPage to toggle canvas-mode, centre view, and render nodes (T-001-01, T-001-02)
