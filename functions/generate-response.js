@@ -1,5 +1,9 @@
 // Cloudflare Pages Function — handles POST /functions/generate-response
-export async function onRequestPost(context) {
+export async function onRequest(context) {
+  if (context.request.method !== 'POST') {
+    return new Response('Method Not Allowed', { status: 405 });
+  }
+
   const { systemPrompt, userPrompt } = await context.request.json();
 
   const response = await fetch('https://api.anthropic.com/v1/messages', {
