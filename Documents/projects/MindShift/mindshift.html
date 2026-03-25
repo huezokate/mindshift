@@ -57,8 +57,8 @@
             --btn-from:       #667eea;
             --btn-to:         #a78bfa;
             --text-primary:   #f1f5f9;
-            --text-secondary: rgba(255, 255, 255, 0.65);
-            --text-muted:     rgba(255, 255, 255, 0.4);
+            --text-secondary: rgba(255, 255, 255, 0.82);
+            --text-muted:     rgba(255, 255, 255, 0.55);
         }
 
         * {
@@ -947,22 +947,192 @@
             transform: none;
             box-shadow: none;
         }
+
+        /* === S-004 WCAG Foundation (T-004-01) === */
+        .skip-link {
+            position: absolute;
+            top: -100px;
+            left: 16px;
+            z-index: 9999;
+            background: var(--hub-accent);
+            color: #fff;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 600;
+            text-decoration: none;
+            transition: top 0.2s;
+        }
+        .skip-link:focus { top: 16px; outline: 2px solid white; }
+
+        :focus-visible {
+            outline: 2px solid var(--hub-accent);
+            outline-offset: 3px;
+            border-radius: 4px;
+        }
+        button:focus-visible {
+            outline: 2px solid var(--hub-accent);
+            outline-offset: 3px;
+        }
+        [role="button"]:focus-visible {
+            outline: 2px solid var(--hub-accent);
+            outline-offset: 3px;
+            border-radius: 14px;
+        }
+        .field-error {
+            color: #f87171;
+            font-size: 0.85em;
+            margin-top: 6px;
+            margin-bottom: 0;
+            font-weight: 500;
+            min-height: 1.2em;
+        }
+        @media (max-width: 640px) {
+            .container { padding: 28px 20px; }
+            h1 { font-size: 1.9em; }
+            h2 { font-size: 1.4em; }
+            .figure-grid { grid-template-columns: repeat(2, 1fr) !important; }
+            .wizard-nav { flex-direction: column; align-items: flex-start; }
+            .flow-cards { grid-template-columns: 1fr; }
+        }
+
+        /* === S-004 Figure Card Personality (T-004-02) === */
+        .figure-card {
+            background: var(--card-bg);
+            border: 1.5px solid rgba(255,255,255,0.08);
+            border-left: 3px solid var(--figure-accent, var(--card-border));
+            border-radius: 14px;
+            padding: 18px 14px 14px;
+            cursor: pointer;
+            text-align: center;
+            transition: border-color 0.2s, transform 0.18s, box-shadow 0.2s, background 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            position: relative;
+            overflow: hidden;
+        }
+        .figure-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: radial-gradient(ellipse at 50% 0%, var(--figure-accent, var(--hub-accent)) 0%, transparent 65%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .figure-card:hover { transform: translateY(-3px); }
+        .figure-card:hover::after { opacity: 0.12; }
+        .figure-card.selected {
+            transform: scale(1.04);
+            box-shadow: 0 0 0 2px var(--figure-accent, var(--hub-accent)), 0 10px 28px rgba(0,0,0,0.35);
+        }
+        .figure-icon { font-size: 1.8em; line-height: 1; }
+        .figure-name { color: var(--text-primary); font-size: 0.83em; font-weight: 600; line-height: 1.2; }
+        .figure-tag  { color: var(--figure-accent, var(--hub-accent)); font-size: 0.68em; font-weight: 500; line-height: 1.3; }
+        .figure-quote {
+            font-size: 0.63em;
+            color: var(--text-muted);
+            font-style: italic;
+            line-height: 1.4;
+            margin-top: 3px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* === S-004 Two-Step Vent Flow (T-004-03) === */
+        .vent-pick-step { animation: fadeIn 0.35s ease; }
+        .vent-summary {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.10);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 0.88em;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .vent-summary-text { font-style: italic; line-height: 1.5; flex: 1; }
+        .vent-summary-edit {
+            background: transparent;
+            border: none;
+            color: var(--hub-accent);
+            font-size: 0.8em;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+            white-space: nowrap;
+            font-weight: 600;
+        }
+        .vent-summary-edit:hover { transform: none; box-shadow: none; filter: none; text-decoration: underline; }
+        .vent-pick-heading { font-size: 1.3em; font-weight: 700; color: var(--text-primary); margin: 6px 0 3px; }
+        .vent-pick-sub { font-size: 0.9em; color: var(--text-secondary); margin: 0 0 8px; }
+
+        /* === S-004 Perspective Output (T-004-04) === */
+        #persona-context-bar {
+            text-align: center;
+            padding-bottom: 22px;
+            border-bottom: 1px solid var(--card-border);
+            margin-bottom: 24px;
+            display: none;
+        }
+        #persona-context-bar.visible { display: block; animation: fadeIn 0.4s ease; }
+        #persona-context-bar .pcb-icon { font-size: 3em; display: block; margin-bottom: 10px; line-height: 1; }
+        #persona-context-bar .pcb-quote {
+            font-size: 0.88em;
+            color: var(--text-muted);
+            font-style: italic;
+            line-height: 1.5;
+            max-width: 420px;
+            margin: 0 auto;
+        }
+        .deep-dive-section {
+            border-left: 4px solid var(--active-figure-accent, var(--hub-accent));
+        }
+        .deep-dive-section.reveal-ready { opacity: 0; transform: translateY(14px); transition: opacity 0.38s ease, transform 0.38s ease; }
+        .deep-dive-section.revealed    { opacity: 1; transform: translateY(0); }
+        .persona-vent-context {
+            background: rgba(255,255,255,0.04);
+            border-left: 3px solid rgba(255,255,255,0.14);
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 22px;
+        }
+        .persona-vent-context-label {
+            font-size: 0.7em;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 3px;
+        }
+        .persona-vent-context-text { font-size: 0.88em; color: var(--text-secondary); margin: 0; font-style: italic; line-height: 1.5; }
+        #loadingFigureIcon { font-size: 3.2em; line-height: 1; margin-bottom: 12px; display: none; animation: fadeIn 0.3s ease; }
     </style>
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to content</a>
+    <main id="main-content">
     <div class="container active" id="page1">
         <div class="landing-header">
             <h1>🧠 MindShift</h1>
             <p class="landing-tagline">Same situation. Different minds. New possibilities.</p>
         </div>
         <div class="flow-cards">
-            <div class="flow-card" onclick="startFlow1()">
+            <div class="flow-card" role="button" tabindex="0" onclick="startFlow1()" onkeydown="if(event.key==='Enter'||event.key===' ')startFlow1()">
                 <div class="flow-card-icon">🗺️</div>
                 <h3>Map My Future</h3>
                 <p>Build a personalised mind map of your life in 5 years — then explore how to get there through historical lenses.</p>
                 <span class="flow-card-cta">Start mapping →</span>
             </div>
-            <div class="flow-card" onclick="startFlow2()">
+            <div class="flow-card" role="button" tabindex="0" onclick="startFlow2()" onkeydown="if(event.key==='Enter'||event.key===' ')startFlow2()">
                 <div class="flow-card-icon">🔮</div>
                 <h3>Shift My Perspective</h3>
                 <p>Have something on your mind? Vent it out, then see it through the lens of a historical figure.</p>
@@ -1005,25 +1175,25 @@
         <p>Each persona will reinterpret your map with different priorities, framing, and first steps.</p>
 
         <div class="persona-grid">
-            <div class="persona-card" onclick="viewPersona('socrates')">
+            <div class="persona-card" role="button" tabindex="0" onclick="viewPersona('socrates')" onkeydown="if(event.key==='Enter'||event.key===' ')viewPersona('socrates')">
                 <div class="persona-icon">🧙‍♂️</div>
                 <h4>Socrates</h4>
                 <p>Questions your assumptions and surfaces unconscious beliefs</p>
             </div>
 
-            <div class="persona-card" onclick="viewPersona('future')">
+            <div class="persona-card" role="button" tabindex="0" onclick="viewPersona('future')" onkeydown="if(event.key==='Enter'||event.key===' ')viewPersona('future')">
                 <div class="persona-icon">🔮</div>
                 <h4>Future You</h4>
                 <p>Looking back from 10 years ahead with clarity and perspective</p>
             </div>
 
-            <div class="persona-card" onclick="viewPersona('alter')">
+            <div class="persona-card" role="button" tabindex="0" onclick="viewPersona('alter')" onkeydown="if(event.key==='Enter'||event.key===' ')viewPersona('alter')">
                 <div class="persona-icon">🎭</div>
                 <h4>Alter Ego</h4>
                 <p>Acts without overthinking, chooses visibility, takes bold risks</p>
             </div>
 
-            <div class="persona-card" onclick="viewPersona('gentle')">
+            <div class="persona-card" role="button" tabindex="0" onclick="viewPersona('gentle')" onkeydown="if(event.key==='Enter'||event.key===' ')viewPersona('gentle')">
                 <div class="persona-icon">🌱</div>
                 <h4>Gentle Realist</h4>
                 <p>Burnout-aware, sustainable pacing, nervous-system friendly</p>
@@ -1041,81 +1211,53 @@
     </div>
 
     <div class="container" id="page5">
+        <div id="persona-context-bar" aria-hidden="true">
+            <span class="pcb-icon" id="pcbIcon"></span>
+            <p class="pcb-quote" id="pcbQuote"></p>
+        </div>
+        <div class="persona-vent-context" id="personaVentContext" style="display:none;">
+            <span class="persona-vent-context-label">Your question</span>
+            <p class="persona-vent-context-text" id="personaVentText"></p>
+        </div>
         <h2 id="personaTitle"></h2>
         <p id="personaIntro"></p>
 
         <div class="deep-dive" id="deepDiveContent"></div>
 
-        <button class="back-button" onclick="backFromPage5()">← Try Another Lens</button>
-        <button onclick="backFromPage5ToHome()">Back to Map</button>
+        <button class="back-button" id="page5BackBtn" onclick="backFromPage5()">← Try Another Lens</button>
+        <button id="page5HomeBtn" onclick="backFromPage5ToHome()">Back to Map</button>
     </div>
 
     <div class="container" id="page6">
-        <button class="back-button" onclick="navigateToPage(1)">← Back</button>
-        <h2>What's on your mind?</h2>
-        <p>A decision you can't make, a fear you keep circling, a situation weighing on you. No structure needed — just write.</p>
-        <div class="question-group">
-            <textarea id="ventText" rows="4" placeholder="Pour it out here…"></textarea>
+        <!-- Step 1: Write -->
+        <div id="ventWriteStep">
+            <button class="back-button" onclick="navigateToPage(1)">← Back</button>
+            <h2>What's on your mind?</h2>
+            <p>A decision, a fear, a frustration. Write it out honestly — the more you share, the richer the shift.</p>
+            <div class="question-group">
+                <textarea id="ventText" rows="5" placeholder="Pour it out here…" aria-label="What's on your mind"></textarea>
+                <p class="field-error" id="ventError" style="display:none;" role="alert"></p>
+            </div>
+            <button onclick="showFigurePick()">Now pick your lens →</button>
         </div>
-        <h3 style="margin-top:28px; margin-bottom:16px; font-size:1em; letter-spacing:0.04em;">Now pick your lens</h3>
-        <div class="figure-grid">
-            <div class="figure-card" onclick="ventToFigure('Dolly Parton')">
-                <div class="figure-icon">🌟</div>
-                <div class="figure-name">Dolly Parton</div>
-                <div class="figure-tag">Resilience &amp; joy</div>
+        <!-- Step 2: Pick -->
+        <div id="ventPickStep" style="display:none;">
+            <button class="back-button" onclick="showVentWrite()">← Edit my message</button>
+            <div class="vent-summary" id="ventSummary">
+                <span class="vent-summary-text" id="ventSummaryText"></span>
+                <button class="vent-summary-edit" onclick="showVentWrite()" aria-label="Edit your message">✏️ Edit</button>
             </div>
-            <div class="figure-card" onclick="ventToFigure('Socrates')">
-                <div class="figure-icon">🏛️</div>
-                <div class="figure-name">Socrates</div>
-                <div class="figure-tag">Question everything</div>
-            </div>
-            <div class="figure-card" onclick="ventToFigure('Abraham Lincoln')">
-                <div class="figure-icon">🎩</div>
-                <div class="figure-name">Abraham Lincoln</div>
-                <div class="figure-tag">Persist through failure</div>
-            </div>
-            <div class="figure-card" onclick="ventToFigure('Maya Angelou')">
-                <div class="figure-icon">✍️</div>
-                <div class="figure-name">Maya Angelou</div>
-                <div class="figure-tag">Strength &amp; voice</div>
-            </div>
-            <div class="figure-card" onclick="ventToFigure('Marcus Aurelius')">
-                <div class="figure-icon">⚖️</div>
-                <div class="figure-name">Marcus Aurelius</div>
-                <div class="figure-tag">Stoic clarity</div>
-            </div>
-            <div class="figure-card" onclick="ventToFigure('Marie Curie')">
-                <div class="figure-icon">🔬</div>
-                <div class="figure-name">Marie Curie</div>
-                <div class="figure-tag">Break every barrier</div>
-            </div>
-            <div class="figure-card" onclick="ventToFigure('Nelson Mandela')">
-                <div class="figure-icon">✊</div>
-                <div class="figure-name">Nelson Mandela</div>
-                <div class="figure-tag">Long-game &amp; forgiveness</div>
-            </div>
-            <div class="figure-card" onclick="ventToFigure('Frida Kahlo')">
-                <div class="figure-icon">🌺</div>
-                <div class="figure-name">Frida Kahlo</div>
-                <div class="figure-tag">Pain into power</div>
-            </div>
-            <div class="figure-card" onclick="ventToFigure('Steve Jobs')">
-                <div class="figure-icon">💡</div>
-                <div class="figure-name">Steve Jobs</div>
-                <div class="figure-tag">Vision &amp; disruption</div>
-            </div>
-            <div class="figure-card" onclick="ventToFigure('Oprah Winfrey')">
-                <div class="figure-icon">🌊</div>
-                <div class="figure-name">Oprah Winfrey</div>
-                <div class="figure-tag">Vulnerability &amp; reinvention</div>
-            </div>
+            <p class="vent-pick-heading">Who do you want to hear from?</p>
+            <p class="vent-pick-sub">Pick a historical figure — they'll see your situation through their own lens.</p>
+            <div class="figure-grid" id="figureGrid"></div>
         </div>
     </div>
 
-    <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-overlay" id="loadingOverlay" role="status" aria-live="polite" aria-atomic="true">
         <div class="loading-content">
+            <div id="loadingFigureIcon"></div>
             <h2 id="loadingTitle">Generating your mind map...</h2>
-            <div class="loading-dots">
+            <div class="loading-dots" id="loadingDots">
                 <div class="dot"></div>
                 <div class="dot"></div>
                 <div class="dot"></div>
@@ -1179,6 +1321,7 @@
         }
 
         function viewPersona(persona) {
+            userData.figure = null; // generic persona, no FIGURES data
             showLoading('Shifting perspective...', 'Reframing your situation through a new lens');
 
             setTimeout(() => {
@@ -1875,6 +2018,14 @@
 
         function startFlow2() {
             userData.flow = 2;
+            userData.vent = '';
+            userData.figure = null;
+            // Reset to write step
+            document.getElementById('ventWriteStep').style.display = 'block';
+            document.getElementById('ventPickStep').style.display  = 'none';
+            document.getElementById('ventText').value = '';
+            document.getElementById('ventError').style.display = 'none';
+            renderFigureCards();
             navigateToPage(6);
         }
 
@@ -1944,54 +2095,192 @@
             }, 2200);
         }
 
-        // --- S-003: Flow 2 vent (T-003-03) ---
+        // --- S-004: FIGURES data model (T-004-02) ---
+
+        const FIGURES = [
+            { name: 'Dolly Parton',    icon: '🌟', tag: 'Resilience & joy',         accentColor: '#f59e0b', quote: '\u201cIf you want the rainbow, you gotta put up with the rain.\u201d',                    loadingLines: ['Counting your blessings\u2026', 'Finding joy in the struggle\u2026'] },
+            { name: 'Socrates',        icon: '\uD83C\uDFDB\uFE0F', tag: 'Question everything',      accentColor: '#60a5fa', quote: '\u201cThe unexamined life is not worth living.\u201d',                             loadingLines: ['Examining your assumptions\u2026', 'Asking the right questions\u2026'] },
+            { name: 'Abraham Lincoln', icon: '\uD83C\uDFA9', tag: 'Persist through failure',  accentColor: '#d97706', quote: '\u201cGive me six hours to chop a tree \u2014 four to sharpen the axe.\u201d',           loadingLines: ['Drawing from hard-won experience\u2026', 'Finding steadiness in the storm\u2026'] },
+            { name: 'Maya Angelou',    icon: '\u270D\uFE0F', tag: 'Strength & voice',         accentColor: '#c084fc', quote: '\u201cYou may not control events, but you can decide not to be reduced by them.\u201d',   loadingLines: ['Finding the words for what you feel\u2026', 'Turning wounds into wisdom\u2026'] },
+            { name: 'Marcus Aurelius', icon: '\u2696\uFE0F', tag: 'Stoic clarity',            accentColor: '#94a3b8', quote: '\u201cYou have power over your mind \u2014 not outside events.\u201d',                    loadingLines: ['Separating what you control\u2026', 'Finding the inner citadel\u2026'] },
+            { name: 'Marie Curie',     icon: '\uD83D\uDD2C', tag: 'Break every barrier',      accentColor: '#34d399', quote: '\u201cNothing in life is to be feared \u2014 only to be understood.\u201d',               loadingLines: ['Approaching this with curiosity\u2026', 'Finding the method in the chaos\u2026'] },
+            { name: 'Nelson Mandela',  icon: '\u270A', tag: 'Long-game & forgiveness',  accentColor: '#fb923c', quote: '\u201cIt always seems impossible until it\u2019s done.\u201d',                                 loadingLines: ['Playing the long game\u2026', 'Finding strength in patience\u2026'] },
+            { name: 'Frida Kahlo',     icon: '\uD83C\uDF3A', tag: 'Pain into power',          accentColor: '#f43f5e', quote: '\u201cI paint so things will not die \u2014 I paint to feel alive.\u201d',                loadingLines: ['Turning pain into something beautiful\u2026', 'Finding art in the wound\u2026'] },
+            { name: 'Steve Jobs',      icon: '\uD83D\uDCA1', tag: 'Vision & disruption',      accentColor: '#818cf8', quote: '\u201cYour time is limited \u2014 don\u2019t waste it living someone else\u2019s life.\u201d', loadingLines: ['Seeing the bigger picture\u2026', 'Finding the simplicity beneath\u2026'] },
+            { name: 'Oprah Winfrey',   icon: '\uD83C\uDF0A', tag: 'Vulnerability & reinvention', accentColor: '#fb7185', quote: '\u201cTurn your wounds into wisdom.\u201d',                                           loadingLines: ['Sitting with what\u2019s real\u2026', 'Finding the truth that sets you free\u2026'] },
+        ];
+
+        function renderFigureCards() {
+            const grid = document.getElementById('figureGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            FIGURES.forEach(function(fig) {
+                const card = document.createElement('div');
+                card.className = 'figure-card';
+                card.setAttribute('role', 'button');
+                card.setAttribute('tabindex', '0');
+                card.style.setProperty('--figure-accent', fig.accentColor);
+                card.innerHTML =
+                    '<div class="figure-icon">' + fig.icon + '</div>' +
+                    '<div class="figure-name">' + fig.name + '</div>' +
+                    '<div class="figure-tag">' + fig.tag + '</div>' +
+                    '<div class="figure-quote">' + fig.quote + '</div>';
+                card.addEventListener('click', function() { ventToFigure(fig, card); });
+                card.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') ventToFigure(fig, card); });
+                grid.appendChild(card);
+            });
+        }
+
+        // --- S-003/S-004: Flow 2 vent ---
 
         function startVentLens() {
             const vent = document.getElementById('ventText').value.trim();
-            if (!vent) { alert("Write something — what's on your mind?"); return; }
+            if (!vent) {
+                var err = document.getElementById('ventError');
+                err.textContent = "Please write something first — what's on your mind?";
+                err.style.display = 'block';
+                return;
+            }
             userData.vent = vent;
             userData.lensContext = 'vent';
             navigateToPage(4);
         }
 
-        function ventToFigure(name) {
-            userData.vent = (document.getElementById('ventText').value || '').trim();
+        function showFigurePick() {
+            const vent = document.getElementById('ventText').value.trim();
+            const err  = document.getElementById('ventError');
+            if (!vent) {
+                err.textContent = "Write something first — even a few words is enough.";
+                err.style.display = 'block';
+                document.getElementById('ventText').focus();
+                return;
+            }
+            err.style.display = 'none';
+            userData.vent = vent;
+            // Show summary chip
+            const summary = document.getElementById('ventSummaryText');
+            summary.textContent = vent.length > 90 ? vent.slice(0, 90) + '\u2026' : vent;
+            document.getElementById('ventWriteStep').style.display = 'none';
+            document.getElementById('ventPickStep').style.display  = 'block';
+        }
+
+        function showVentWrite() {
+            document.getElementById('ventPickStep').style.display  = 'none';
+            document.getElementById('ventWriteStep').style.display = 'block';
+            document.getElementById('ventText').focus();
+        }
+
+        function ventToFigure(fig, cardEl) {
+            userData.vent = (document.getElementById('ventText').value || userData.vent || '').trim();
             userData.lensContext = 'vent';
-            showLoading('Channeling ' + name + '\u2026', 'Shifting your perspective');
+            userData.figure = fig;
+
+            // Mark selected card
+            document.querySelectorAll('.figure-card').forEach(function(c) { c.classList.remove('selected'); });
+            if (cardEl) cardEl.classList.add('selected');
+
+            // Figure-specific loading overlay
+            var iconEl = document.getElementById('loadingFigureIcon');
+            iconEl.textContent = fig.icon;
+            iconEl.style.display = 'block';
+            var dots = document.querySelectorAll('#loadingDots .dot');
+            dots.forEach(function(d) { d.style.background = fig.accentColor; });
+
+            showLoading(fig.name + '\u2019s Perspective', fig.loadingLines[0]);
+
+            // Rotate loading lines
+            var lineIdx = 0;
+            var lineTimer = setInterval(function() {
+                lineIdx = (lineIdx + 1) % fig.loadingLines.length;
+                var el = document.getElementById('loadingText');
+                if (el) el.textContent = fig.loadingLines[lineIdx];
+            }, 1200);
+
             setTimeout(function() {
-                document.getElementById('personaTitle').textContent = '\u2728 ' + name + '\u2019s Perspective';
-                document.getElementById('personaIntro').textContent = 'Here\u2019s how ' + name + ' might approach what\u2019s on your mind.';
+                clearInterval(lineTimer);
+                iconEl.style.display = 'none';
+                dots.forEach(function(d) { d.style.background = ''; });
+
+                // Set page5 accent colour
+                document.getElementById('page5').style.setProperty('--active-figure-accent', fig.accentColor);
+
+                // Context bar
+                document.getElementById('pcbIcon').textContent  = fig.icon;
+                document.getElementById('pcbQuote').textContent = fig.quote;
+                document.getElementById('persona-context-bar').classList.add('visible');
+
+                // Vent context strip
+                if (userData.vent) {
+                    var vc = document.getElementById('personaVentContext');
+                    document.getElementById('personaVentText').textContent =
+                        userData.vent.length > 120 ? userData.vent.slice(0, 120) + '\u2026' : userData.vent;
+                    vc.style.display = 'block';
+                }
+
+                document.getElementById('personaTitle').textContent = fig.icon + ' ' + fig.name + '\u2019s Perspective';
+                document.getElementById('personaIntro').textContent = 'Here\u2019s how ' + fig.name + ' might see what\u2019s on your mind.';
                 document.getElementById('deepDiveContent').innerHTML =
-                    '<div class="deep-dive-section"><h4>Core Philosophy</h4><p>In the full version with AI integration, ' + name + ' would offer their unique lens on your specific situation.</p></div>' +
-                    '<div style="background:rgba(255,243,205,0.08);border:1px solid rgba(255,243,205,0.2);padding:15px;border-radius:10px;margin-top:20px;color:var(--text-secondary);font-size:0.95em;"><strong style="color:var(--text-primary);">\uD83D\uDCA1 This is a preview.</strong> The full version will use the Anthropic API to generate authentic, personalised insights.</div>';
+                    '<div class="deep-dive-section reveal-ready"><h4>Core Philosophy</h4><p>In the full version with AI integration, ' + fig.name + ' would offer their unique lens \u2014 grounded in their life experience and worldview \u2014 on your specific situation.</p></div>' +
+                    '<div class="deep-dive-section reveal-ready"><h4>What They\u2019d Say to You</h4><p>Authentic, personalised insights from ' + fig.name + ' will be generated here using the Anthropic API.</p></div>' +
+                    '<div class="deep-dive-section reveal-ready" style="border-left-color:rgba(255,243,205,0.5);"><h4>\uD83D\uDCA1 This is a preview</h4><p style="color:var(--text-secondary)">The full version will channel ' + fig.name + '\u2019s perspective based on your specific situation.</p></div>';
+
                 hideLoading();
                 navigateToPage(5);
-            }, 1800);
+                revealDeepDiveSections();
+            }, 2000);
+        }
+
+        function revealDeepDiveSections() {
+            var sections = document.querySelectorAll('#deepDiveContent .deep-dive-section.reveal-ready');
+            var reduced  = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            sections.forEach(function(s, i) {
+                if (reduced) {
+                    s.classList.remove('reveal-ready');
+                } else {
+                    setTimeout(function() {
+                        s.classList.add('revealed');
+                    }, 80 + i * 200);
+                }
+            });
         }
 
         function backFromPage4() {
             if (userData.lensContext === 'vent') {
                 navigateToPage(6);
+                showFigurePickIfVented();
             } else {
                 navigateToPage(3);
             }
         }
 
         function backFromPage5() {
-            // "Try Another Lens" — vent flow goes back to vent page, canvas flow to lens picker
             if (userData.lensContext === 'vent') {
                 navigateToPage(6);
+                showFigurePickIfVented();
             } else {
                 navigateToPage(4);
             }
         }
 
         function backFromPage5ToHome() {
-            // "Back to Map / Back to Start" — vent flow returns to vent, canvas flow to canvas
             if (userData.lensContext === 'vent') {
                 navigateToPage(6);
+                showFigurePickIfVented();
             } else {
                 navigateToPage(3);
+            }
+        }
+
+        function showFigurePickIfVented() {
+            // If user already wrote a vent, restore pick step
+            if (userData.vent) {
+                setTimeout(function() {
+                    var summary = document.getElementById('ventSummaryText');
+                    if (summary) summary.textContent = userData.vent.length > 90 ? userData.vent.slice(0, 90) + '\u2026' : userData.vent;
+                    document.getElementById('ventWriteStep').style.display = 'none';
+                    document.getElementById('ventPickStep').style.display  = 'block';
+                    document.querySelectorAll('.figure-card').forEach(function(c) { c.classList.remove('selected'); });
+                }, 50);
             }
         }
 
@@ -2035,14 +2324,23 @@
                 // Remove canvas-mode when navigating away; preserve CanvasTransform for return trip
                 document.body.classList.remove('canvas-mode');
             }
-            // Update page5 secondary button label based on flow context
+            // Page 5 — set labels + reset context bar when not from figure
             if (n === 5) {
-                const homeBtn = document.querySelector('#page5 button:not(.back-button)');
-                if (homeBtn) homeBtn.textContent = userData.lensContext === 'vent' ? 'Try Another Figure' : 'Back to Map';
+                var isVent = userData.lensContext === 'vent';
+                var backBtn = document.getElementById('page5BackBtn');
+                var homeBtn = document.getElementById('page5HomeBtn');
+                if (backBtn) backBtn.textContent = isVent ? '\u2190 Try Another Figure' : '\u2190 Try Another Lens';
+                if (homeBtn) homeBtn.textContent = isVent ? 'Start Over' : 'Back to Map';
+                // Context bar only for figure picks
+                if (!userData.figure) {
+                    document.getElementById('persona-context-bar').classList.remove('visible');
+                    document.getElementById('personaVentContext').style.display = 'none';
+                }
             }
             _navigateToPage_orig(n);
         };
     </script>
     <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+    </main>
 </body>
 </html>
