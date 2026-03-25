@@ -224,12 +224,6 @@ function ventToFigure(fig, cardEl) {
     userData.lensContext = 'vent';
     userData.figure = fig;
 
-    var apiKey = getMindshiftApiKey();
-    if (!apiKey) {
-        showApiKeyModal(function() { ventToFigure(fig, cardEl); });
-        return;
-    }
-
     // Mark selected card
     document.querySelectorAll('.figure-card').forEach(function(c) { c.classList.remove('selected'); });
     if (cardEl) cardEl.classList.add('selected');
@@ -277,16 +271,22 @@ function ventToFigure(fig, cardEl) {
         revealDeepDiveSections();
     }
 
-    callClaudeAPI(fig, userData.vent, apiKey).then(function(sections) {
+    callClaudeAPI(fig.systemPrompt, userData.vent).then(function(text) {
+        if (!text) {
+            finishAndNavigate('<div class="deep-dive-section reveal-ready" style="border-left-color:#f87171;"><h4>Something went wrong</h4><p style="color:var(--text-secondary)">Could not reach the API. Please try again.</p></div>');
+            return;
+        }
+        var raw = text.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim();
+        var sections;
+        try {
+            var parsed = JSON.parse(raw);
+            sections = (parsed.sections && Array.isArray(parsed.sections)) ? parsed.sections : [{ title: fig.name + '\u2019s Perspective', body: raw }];
+        } catch(e) {
+            sections = [{ title: fig.name + '\u2019s Perspective', body: raw }];
+        }
         finishAndNavigate(buildDeepDiveHTML(sections));
     }).catch(function(err) {
-        var errHTML =
-            '<div class="deep-dive-section reveal-ready" style="border-left-color:#f87171;">' +
-            '<h4>Something went wrong</h4>' +
-            '<p style="color:var(--text-secondary)">' + (err.message || 'Could not reach the API.') + '</p>' +
-            '<p style="color:var(--text-muted);font-size:0.85em;margin-top:8px;">Use the \uD83D\uDD11 button below to update your API key, then try again.</p>' +
-            '</div>';
-        finishAndNavigate(errHTML);
+        finishAndNavigate('<div class="deep-dive-section reveal-ready" style="border-left-color:#f87171;"><h4>Something went wrong</h4><p style="color:var(--text-secondary)">' + (err.message || 'Could not reach the API.') + '</p></div>');
     });
 }
 

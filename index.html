@@ -151,21 +151,6 @@
         </div>
     </div>
 
-    <!-- S-005: API Key Modal (T-005-02) -->
-    <div id="apiKeyModal" role="dialog" aria-modal="true" aria-labelledby="apiKeyModalTitle">
-        <div class="api-key-card">
-            <h3 id="apiKeyModalTitle">🔑 Add your Anthropic API key</h3>
-            <p>Your key is stored only in this browser and never sent anywhere except the Anthropic API directly.</p>
-            <input type="password" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off" spellcheck="false">
-            <p class="api-key-error" id="apiKeyError"></p>
-            <div class="api-key-row">
-                <button onclick="submitApiKey()">Save &amp; continue</button>
-                <button class="api-key-cancel" onclick="cancelApiKeyModal()">Cancel</button>
-            </div>
-        </div>
-    </div>
-    <button id="apiKeySettingsBtn" title="API key settings" onclick="openApiKeySettings()">🔑</button>
-
     <div class="loading-overlay" id="loadingOverlay" role="status" aria-live="polite" aria-atomic="true">
         <div class="loading-content">
             <div id="loadingFigureIcon"></div>
