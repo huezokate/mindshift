@@ -838,6 +838,43 @@
         }
         .wizard-nav button { margin: 0; }
 
+        /* === S-003 Figure Grid (vent page) === */
+        .figure-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 12px;
+        }
+        .figure-card {
+            background: var(--card-bg);
+            border: 1.5px solid var(--card-border);
+            border-radius: 14px;
+            padding: 18px 12px 14px;
+            cursor: pointer;
+            text-align: center;
+            transition: border-color 0.2s, transform 0.18s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+        .figure-card:hover {
+            border-color: var(--hub-accent);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 28px rgba(167, 139, 250, 0.18);
+        }
+        .figure-icon { font-size: 1.7em; line-height: 1; }
+        .figure-name {
+            color: var(--text-primary);
+            font-size: 0.82em;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+        .figure-tag {
+            color: var(--text-muted);
+            font-size: 0.7em;
+            line-height: 1.3;
+        }
+
         /* === S-003 Per-Node Lens Button (T-003-04) === */
         .cn-lens-btn {
             display: none;
@@ -1009,8 +1046,8 @@
 
         <div class="deep-dive" id="deepDiveContent"></div>
 
-        <button class="back-button" onclick="navigateToPage(4)">← Try Another Lens</button>
-        <button onclick="navigateToPage(3)">Back to Map</button>
+        <button class="back-button" onclick="backFromPage5()">← Try Another Lens</button>
+        <button onclick="backFromPage5ToHome()">Back to Map</button>
     </div>
 
     <div class="container" id="page6">
@@ -1018,9 +1055,61 @@
         <h2>What's on your mind?</h2>
         <p>A decision you can't make, a fear you keep circling, a situation weighing on you. No structure needed — just write.</p>
         <div class="question-group">
-            <textarea id="ventText" rows="6" placeholder="Pour it out here…"></textarea>
+            <textarea id="ventText" rows="4" placeholder="Pour it out here…"></textarea>
         </div>
-        <button onclick="startVentLens()">Find My Lens →</button>
+        <h3 style="margin-top:28px; margin-bottom:16px; font-size:1em; letter-spacing:0.04em;">Now pick your lens</h3>
+        <div class="figure-grid">
+            <div class="figure-card" onclick="ventToFigure('Dolly Parton')">
+                <div class="figure-icon">🌟</div>
+                <div class="figure-name">Dolly Parton</div>
+                <div class="figure-tag">Resilience &amp; joy</div>
+            </div>
+            <div class="figure-card" onclick="ventToFigure('Socrates')">
+                <div class="figure-icon">🏛️</div>
+                <div class="figure-name">Socrates</div>
+                <div class="figure-tag">Question everything</div>
+            </div>
+            <div class="figure-card" onclick="ventToFigure('Abraham Lincoln')">
+                <div class="figure-icon">🎩</div>
+                <div class="figure-name">Abraham Lincoln</div>
+                <div class="figure-tag">Persist through failure</div>
+            </div>
+            <div class="figure-card" onclick="ventToFigure('Maya Angelou')">
+                <div class="figure-icon">✍️</div>
+                <div class="figure-name">Maya Angelou</div>
+                <div class="figure-tag">Strength &amp; voice</div>
+            </div>
+            <div class="figure-card" onclick="ventToFigure('Marcus Aurelius')">
+                <div class="figure-icon">⚖️</div>
+                <div class="figure-name">Marcus Aurelius</div>
+                <div class="figure-tag">Stoic clarity</div>
+            </div>
+            <div class="figure-card" onclick="ventToFigure('Marie Curie')">
+                <div class="figure-icon">🔬</div>
+                <div class="figure-name">Marie Curie</div>
+                <div class="figure-tag">Break every barrier</div>
+            </div>
+            <div class="figure-card" onclick="ventToFigure('Nelson Mandela')">
+                <div class="figure-icon">✊</div>
+                <div class="figure-name">Nelson Mandela</div>
+                <div class="figure-tag">Long-game &amp; forgiveness</div>
+            </div>
+            <div class="figure-card" onclick="ventToFigure('Frida Kahlo')">
+                <div class="figure-icon">🌺</div>
+                <div class="figure-name">Frida Kahlo</div>
+                <div class="figure-tag">Pain into power</div>
+            </div>
+            <div class="figure-card" onclick="ventToFigure('Steve Jobs')">
+                <div class="figure-icon">💡</div>
+                <div class="figure-name">Steve Jobs</div>
+                <div class="figure-tag">Vision &amp; disruption</div>
+            </div>
+            <div class="figure-card" onclick="ventToFigure('Oprah Winfrey')">
+                <div class="figure-icon">🌊</div>
+                <div class="figure-name">Oprah Winfrey</div>
+                <div class="figure-tag">Vulnerability &amp; reinvention</div>
+            </div>
+        </div>
     </div>
 
     <div class="loading-overlay" id="loadingOverlay">
@@ -1865,7 +1954,40 @@
             navigateToPage(4);
         }
 
+        function ventToFigure(name) {
+            userData.vent = (document.getElementById('ventText').value || '').trim();
+            userData.lensContext = 'vent';
+            showLoading('Channeling ' + name + '\u2026', 'Shifting your perspective');
+            setTimeout(function() {
+                document.getElementById('personaTitle').textContent = '\u2728 ' + name + '\u2019s Perspective';
+                document.getElementById('personaIntro').textContent = 'Here\u2019s how ' + name + ' might approach what\u2019s on your mind.';
+                document.getElementById('deepDiveContent').innerHTML =
+                    '<div class="deep-dive-section"><h4>Core Philosophy</h4><p>In the full version with AI integration, ' + name + ' would offer their unique lens on your specific situation.</p></div>' +
+                    '<div style="background:rgba(255,243,205,0.08);border:1px solid rgba(255,243,205,0.2);padding:15px;border-radius:10px;margin-top:20px;color:var(--text-secondary);font-size:0.95em;"><strong style="color:var(--text-primary);">\uD83D\uDCA1 This is a preview.</strong> The full version will use the Anthropic API to generate authentic, personalised insights.</div>';
+                hideLoading();
+                navigateToPage(5);
+            }, 1800);
+        }
+
         function backFromPage4() {
+            if (userData.lensContext === 'vent') {
+                navigateToPage(6);
+            } else {
+                navigateToPage(3);
+            }
+        }
+
+        function backFromPage5() {
+            // "Try Another Lens" — vent flow goes back to vent page, canvas flow to lens picker
+            if (userData.lensContext === 'vent') {
+                navigateToPage(6);
+            } else {
+                navigateToPage(4);
+            }
+        }
+
+        function backFromPage5ToHome() {
+            // "Back to Map / Back to Start" — vent flow returns to vent, canvas flow to canvas
             if (userData.lensContext === 'vent') {
                 navigateToPage(6);
             } else {
@@ -1912,6 +2034,11 @@
             } else {
                 // Remove canvas-mode when navigating away; preserve CanvasTransform for return trip
                 document.body.classList.remove('canvas-mode');
+            }
+            // Update page5 secondary button label based on flow context
+            if (n === 5) {
+                const homeBtn = document.querySelector('#page5 button:not(.back-button)');
+                if (homeBtn) homeBtn.textContent = userData.lensContext === 'vent' ? 'Try Another Figure' : 'Back to Map';
             }
             _navigateToPage_orig(n);
         };
