@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>MindShift — Cyberpunk Edition</title>
+  <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+  <style>
+    /* ── Cyberpunk Design Tokens ── */
+    :root {
+      --bg:         #07070F;
+      --bg-2:       #0D0D1C;
+      --bg-3:       #121228;
+      --cyan:       #00FFC8;
+      --cyan-dim:   rgba(0, 255, 200, 0.12);
+      --cyan-glow:  0 0 16px rgba(0, 255, 200, 0.45);
+      --pink:       #FF2D6B;
+      --pink-dim:   rgba(255, 45, 107, 0.12);
+      --pink-glow:  0 0 16px rgba(255, 45, 107, 0.45);
+      --white:      #E8E8FF;
+      --white-2:    #A0A0CC;
+      --white-3:    #505077;
+      --border:     rgba(0, 255, 200, 0.25);
+      --border-2:   rgba(0, 255, 200, 0.08);
+      --font-mono:  'Courier New', 'Lucida Console', monospace;
+      --font-sans:  -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: var(--font-mono);
+      background: var(--bg);
+      color: var(--white);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    /* ── App Shell ── */
+    #app {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      background: var(--bg);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border-left: 1px solid var(--border-2);
+      border-right: 1px solid var(--border-2);
+    }
+
+    /* Scanline overlay */
+    #app::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.04) 2px,
+        rgba(0,0,0,0.04) 4px
+      );
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    /* ── Top Nav ── */
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-2);
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .nav-logo {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--white);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .nav-logo span { color: var(--cyan); }
+    .nav-tabs {
+      display: flex;
+      gap: 2px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 2px;
+    }
+    .nav-tab {
+      padding: 5px 14px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--white-3);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      border-radius: 1px;
+      transition: all 0.2s;
+    }
+    .nav-tab.active {
+      background: var(--cyan-dim);
+      color: var(--cyan);
+      border: 1px solid var(--border);
+    }
+    .nav-icon-btn {
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: var(--cyan);
+      transition: all 0.2s;
+    }
+    .nav-icon-btn:hover { background: var(--cyan-dim); box-shadow: var(--cyan-glow); }
+
+    /* ── Screen Container ── */
+    .screen {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: 40px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+    .screen.active { display: flex; }
+
+    /* ── Section Label ── */
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 10px;
+    }
+
+    /* ── Screen 1: Question ── */
+    #screen-question {
+      padding: 28px 20px;
+      gap: 28px;
+    }
+    .question-heading {
+      font-family: var(--font-sans);
+      font-size: 26px;
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -0.3px;
+      color: var(--white);
+    }
+    .question-heading span { color: var(--cyan); }
+    .question-subtext {
+      font-size: 12px;
+      color: var(--white-3);
+      line-height: 1.6;
+      letter-spacing: 0.02em;
+      margin-top: 6px;
+    }
+
+    /* Input field */
+    .input-wrap {
+      border: 1px solid var(--cyan);
+      background: var(--bg-2);
+      transition: box-shadow 0.2s;
+    }
+    .input-wrap:focus-within {
+      box-shadow: var(--cyan-glow);
+    }
+    .input-label {
+      padding: 8px 16px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      color: var(--cyan);
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+    }
+    #question-input {
+      width: 100%;
+      min-height: 120px;
+      padding: 16px;
+      font-size: 14px;
+      color: var(--white);
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: var(--font-mono);
+      resize: none;
+      line-height: 1.6;
+      letter-spacing: 0.02em;
+    }
+    #question-input::placeholder { color: var(--white-3); }
+    .char-counter {
+      padding: 4px 16px 10px;
+      font-size: 10px;
+      color: var(--white-3);
+      letter-spacing: 0.08em;
+      text-align: right;
+    }
+    .char-counter.over { color: var(--pink); }
+
+    .example-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .example-pill {
+      padding: 7px 12px;
+      background: var(--pink-dim);
+      color: var(--pink);
+      border: 1px solid var(--pink);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.02em;
+    }
+    .example-pill:hover { background: rgba(255,45,107,0.22); box-shadow: var(--pink-glow); }
+
+    /* Buttons */
+    .cta-btn {
+      width: 100%;
+      padding: 16px;
+      background: transparent;
+      color: var(--cyan);
+      border: 1px solid var(--cyan);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--cyan-dim);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .cta-btn:hover::before { opacity: 1; }
+    .cta-btn:hover { box-shadow: var(--cyan-glow); }
+    .cta-btn:disabled { opacity: 0.3; cursor: not-allowed; box-shadow: none; }
+    .cta-btn:disabled::before { opacity: 0; }
+
+    .usage-note {
+      text-align: center;
+      font-size: 10px;
+      color: var(--white-3);
+      letter-spacing: 0.08em;
+    }
+
+    /* ── Screen 2: Figures ── */
+    #screen-figures { padding: 0; }
+    .figures-header { padding: 20px 20px 16px; }
+    .screen-title {
+      font-family: var(--font-sans);
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--white);
+      letter-spacing: -0.2px;
+    }
+    .screen-subtitle {
+      font-size: 11px;
+      color: var(--white-3);
+      margin-top: 4px;
+      letter-spacing: 0.04em;
+    }
+    .back-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px 0;
+    }
+    .back-btn {
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--border);
+      background: var(--bg-2);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: var(--cyan);
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .back-btn:hover { box-shadow: var(--cyan-glow); }
+    .question-bubble {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      font-size: 12px;
+      color: var(--white-2);
+      line-height: 1.4;
+      flex: 1;
+      font-style: italic;
+      letter-spacing: 0.02em;
+    }
+
+    /* Figure grid */
+    .figure-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      padding: 16px 20px;
+    }
+    .figure-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 8px;
+      background: var(--bg-2);
+      border: 1px solid var(--border-2);
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .figure-card:hover {
+      border-color: var(--cyan);
+      background: var(--cyan-dim);
+    }
+    .figure-card.selected {
+      border-color: var(--cyan);
+      background: var(--cyan-dim);
+      box-shadow: var(--cyan-glow);
+    }
+    .figure-card.selected::after {
+      content: '▶';
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      font-size: 8px;
+      color: var(--cyan);
+    }
+    .figure-portrait {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--border);
+      transition: border-color 0.2s;
+    }
+    .figure-card.selected .figure-portrait,
+    .figure-card:hover .figure-portrait {
+      border-color: var(--cyan);
+    }
+    .figure-name {
+      font-size: 10px;
+      font-weight: 700;
+      text-align: center;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      line-height: 1.2;
+    }
+    .figure-desc {
+      font-size: 9px;
+      color: var(--white-3);
+      text-align: center;
+      line-height: 1.3;
+      letter-spacing: 0.02em;
+    }
+    .get-perspective-bar {
+      padding: 16px 20px;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      position: sticky;
+      bottom: 0;
+    }
+
+    /* ── Screen 3: Response ── */
+    #screen-response { padding: 0; }
+    .response-header {
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-2);
+    }
+    .response-figure-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .response-portrait {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--cyan);
+      box-shadow: var(--cyan-glow);
+    }
+    .response-figure-info h3 {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--cyan);
+    }
+    .response-figure-info span {
+      font-size: 10px;
+      color: var(--white-3);
+      letter-spacing: 0.04em;
+    }
+    .response-actions-top { display: flex; gap: 8px; }
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--border);
+      background: var(--bg-2);
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      color: var(--white-2);
+    }
+    .icon-btn:hover { border-color: var(--cyan); color: var(--cyan); box-shadow: var(--cyan-glow); }
+
+    .response-question-ref {
+      margin: 14px 20px 0;
+      padding: 10px 14px;
+      background: var(--bg-2);
+      border-left: 2px solid var(--pink);
+      font-size: 12px;
+      color: var(--white-2);
+      font-style: italic;
+      letter-spacing: 0.02em;
+    }
+
+    /* Terminal-style response area */
+    .terminal-box {
+      margin: 16px 20px 0;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+    }
+    .terminal-header {
+      padding: 8px 14px;
+      background: var(--bg-3);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .terminal-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    .terminal-dot.cyan { background: var(--cyan); box-shadow: var(--cyan-glow); }
+    .terminal-dot.pink { background: var(--pink); }
+    .terminal-dot.dim { background: var(--white-3); }
+    .terminal-label {
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      color: var(--white-3);
+      text-transform: uppercase;
+      margin-left: 4px;
+    }
+    .terminal-body {
+      padding: 20px;
+    }
+    .terminal-loading {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--cyan);
+      letter-spacing: 0.08em;
+    }
+    .dots-anim span {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background: var(--cyan);
+      animation: blink 1s infinite step-start both;
+    }
+    .dots-anim span:nth-child(1) { animation-delay: 0s; }
+    .dots-anim span:nth-child(2) { animation-delay: 0.33s; }
+    .dots-anim span:nth-child(3) { animation-delay: 0.66s; }
+    @keyframes blink { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+
+    #response-text {
+      font-size: 13px;
+      line-height: 1.75;
+      color: var(--white-2);
+      letter-spacing: 0.02em;
+      white-space: pre-wrap;
+    }
+    #response-text::before {
+      content: '> ';
+      color: var(--cyan);
+      font-weight: 700;
+    }
+
+    .response-footer {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .response-secondary-actions { display: flex; gap: 10px; }
+    .outline-btn {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid var(--border);
+      background: transparent;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--white-3);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .outline-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+    .pink-outline-btn { border-color: rgba(255,45,107,0.4); color: var(--pink); }
+    .pink-outline-btn:hover { border-color: var(--pink); box-shadow: var(--pink-glow); }
+
+    /* ── Screen 4: Customize ── */
+    #screen-customize { padding: 24px 20px; gap: 24px; }
+    .customize-preview {
+      border: 1px solid var(--border);
+      overflow: hidden;
+      position: relative;
+    }
+    .theme-preview-card {
+      padding: 20px;
+      min-height: 140px;
+      background: linear-gradient(135deg, #00FFC8 0%, #00AAFF 100%);
+    }
+    .theme-preview-text {
+      font-size: 13px;
+      line-height: 1.6;
+      font-family: var(--font-mono);
+      color: #000;
+    }
+    .sticker-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .placed-sticker {
+      position: absolute;
+      font-size: 28px;
+      cursor: move;
+      pointer-events: all;
+      user-select: none;
+    }
+
+    .color-scheme-grid { display: flex; gap: 8px; }
+    .color-scheme-btn {
+      flex: 1;
+      height: 44px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .color-scheme-btn.selected { border-color: var(--cyan); box-shadow: var(--cyan-glow); }
+    .color-scheme-btn .check {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      font-size: 10px;
+      display: none;
+    }
+    .color-scheme-btn.selected .check { display: block; color: var(--cyan); }
+
+    .sticker-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+    .sticker-btn {
+      width: 48px;
+      height: 48px;
+      border: 1px solid var(--border);
+      background: var(--bg-2);
+      font-size: 22px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .sticker-btn:hover { border-color: var(--cyan); box-shadow: var(--cyan-glow); }
+
+    .dark-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      background: var(--bg-2);
+      border: 1px solid var(--border-2);
+    }
+    .toggle-label { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--white-2); }
+    .toggle-switch {
+      width: 44px;
+      height: 24px;
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      position: relative;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-radius: 0;
+    }
+    .toggle-switch.on { background: var(--cyan-dim); border-color: var(--cyan); }
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 16px;
+      height: 16px;
+      background: var(--white-3);
+      transition: transform 0.2s, background 0.2s;
+    }
+    .toggle-switch.on::after { transform: translateX(20px); background: var(--cyan); }
+
+    /* ── Screen 5: Share ── */
+    #screen-share { padding: 24px 20px; gap: 20px; }
+    .share-preview {
+      border: 1px solid var(--border);
+      position: relative;
+      aspect-ratio: 9/16;
+      max-height: 300px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24px 20px;
+      overflow: hidden;
+    }
+    .share-preview-question { font-size: 11px; opacity: 0.6; font-style: italic; }
+    .share-preview-response {
+      font-size: 12px;
+      line-height: 1.6;
+      flex: 1;
+      margin: 14px 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 5;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .share-preview-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .share-preview-figure {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .share-preview-portrait {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid var(--cyan);
+    }
+    .share-watermark { font-size: 9px; opacity: 0.4; letter-spacing: 0.1em; }
+    .share-buttons { display: flex; flex-direction: column; gap: 10px; }
+    .share-platform-btn {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      background: var(--bg-2);
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--white);
+      transition: all 0.2s;
+    }
+    .share-platform-btn:hover { border-color: var(--pink); color: var(--pink); box-shadow: var(--pink-glow); }
+    .share-platform-icon { font-size: 18px; }
+    .share-copy-btn {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid var(--border);
+      background: transparent;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--white-3);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .share-copy-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ── Screen 6: Journal ── */
+    #screen-journal { padding: 0; }
+    .journal-header { padding: 20px 20px 12px; }
+    .journal-filter {
+      display: flex;
+      gap: 6px;
+      padding: 0 20px 16px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .journal-filter::-webkit-scrollbar { display: none; }
+    .filter-chip {
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      background: transparent;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--white-3);
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .filter-chip.active { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-dim); }
+
+    .journal-empty {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .journal-empty-icon { font-size: 48px; filter: drop-shadow(0 0 8px var(--cyan)); }
+    .journal-empty h3 { font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--cyan); }
+    .journal-empty p { font-size: 12px; color: var(--white-3); max-width: 240px; line-height: 1.6; letter-spacing: 0.02em; }
+
+    .journal-entries { padding: 0 20px; display: flex; flex-direction: column; gap: 10px; }
+    .journal-entry {
+      background: var(--bg-2);
+      border: 1px solid var(--border-2);
+      padding: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .journal-entry:hover { border-color: var(--cyan); }
+    .journal-entry-top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .journal-entry-portrait {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid var(--border);
+    }
+    .journal-entry-meta { flex: 1; }
+    .journal-entry-figure { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--cyan); }
+    .journal-entry-date { font-size: 10px; color: var(--white-3); letter-spacing: 0.04em; }
+    .journal-entry-question { font-size: 12px; color: var(--white-2); font-style: italic; line-height: 1.4; margin-bottom: 6px; }
+    .journal-entry-preview {
+      font-size: 11px;
+      color: var(--white-3);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .journal-entry-actions { display: flex; gap: 8px; margin-top: 10px; }
+    .entry-action-btn {
+      padding: 5px 10px;
+      border: 1px solid var(--border);
+      background: transparent;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--white-3);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .entry-action-btn:hover { border-color: var(--pink); color: var(--pink); }
+
+    /* ── Modals ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 100;
+      backdrop-filter: blur(4px);
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-sheet {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      padding: 24px 24px 40px;
+      width: 100%;
+      max-width: 430px;
+      animation: slideUp 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+      box-shadow: 0 -20px 60px rgba(0, 255, 200, 0.08);
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .modal-handle {
+      width: 36px;
+      height: 2px;
+      background: var(--border);
+      margin: 0 auto 20px;
+    }
+    .modal-title {
+      font-family: var(--font-sans);
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--white);
+      margin-bottom: 6px;
+    }
+    .modal-subtitle { font-size: 12px; color: var(--white-3); margin-bottom: 20px; line-height: 1.6; letter-spacing: 0.02em; }
+    .modal-benefits { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+    .modal-benefit { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--white-2); letter-spacing: 0.02em; }
+    .benefit-check { color: var(--cyan); font-size: 14px; }
+    .modal-auth-btn {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid var(--border);
+      background: transparent;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--white);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      transition: all 0.2s;
+    }
+    .modal-auth-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+    .modal-auth-btn.primary { background: var(--cyan-dim); border-color: var(--cyan); color: var(--cyan); }
+    .modal-auth-btn.primary:hover { box-shadow: var(--cyan-glow); }
+    .modal-skip { text-align: center; padding-top: 8px; font-size: 11px; color: var(--white-3); cursor: pointer; letter-spacing: 0.06em; text-decoration: underline; }
+
+    .premium-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid #FFD700;
+      color: #FFD700;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .pricing-row { display: flex; gap: 10px; margin: 14px 0; }
+    .price-card {
+      flex: 1;
+      padding: 16px;
+      border: 1px solid var(--border);
+      background: var(--bg-3);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .price-card.highlighted { border-color: var(--cyan); background: var(--cyan-dim); box-shadow: var(--cyan-glow); }
+    .price-card .price-amount { font-size: 22px; font-weight: 800; color: var(--white); font-family: var(--font-sans); }
+    .price-card .price-period { font-size: 10px; color: var(--white-3); letter-spacing: 0.08em; }
+    .price-card .price-tag { margin-top: 6px; font-size: 10px; font-weight: 700; color: var(--cyan); letter-spacing: 0.1em; }
+
+    /* ── Responsive ── */
+    @media (min-width: 431px) {
+      #app { margin: 20px auto; min-height: calc(100vh - 40px); }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- Top Nav -->
+  <nav class="top-nav">
+    <div class="nav-logo">mind<span>shift</span></div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showTab('perspectives')" id="tab-perspectives">Perspectives</button>
+      <button class="nav-tab" onclick="showTab('journal')" id="tab-journal">Journal</button>
+    </div>
+    <button class="nav-icon-btn" onclick="showPremiumModal()" title="Upgrade">⭐</button>
+  </nav>
+
+  <!-- ── Screen 1: Question ── -->
+  <section class="screen active" id="screen-question">
+    <div>
+      <h1 class="question-heading">Have something<br>on your <span>mind?</span></h1>
+      <p class="question-subtext">Get a raw, unfiltered perspective from a historical mind that changed the world.</p>
+    </div>
+
+    <div class="input-wrap">
+      <div class="input-label">Vent it out...</div>
+      <textarea
+        id="question-input"
+        placeholder="Type it all out right here!"
+        maxlength="280"
+        oninput="onQuestionInput(this)"
+      ></textarea>
+      <div class="char-counter" id="char-counter">0 / 280</div>
+    </div>
+
+    <div>
+      <div class="section-label" style="margin-bottom:10px;">Try one of these</div>
+      <div class="example-pills">
+        <button class="example-pill" onclick="setExample(this.textContent)">Should I quit my job to start something?</button>
+        <button class="example-pill" onclick="setExample(this.textContent)">I feel stuck and uninspired lately</button>
+        <button class="example-pill" onclick="setExample(this.textContent)">How do I handle a difficult relationship?</button>
+        <button class="example-pill" onclick="setExample(this.textContent)">I'm afraid of failing</button>
+      </div>
+    </div>
+
+    <button class="cta-btn" id="speak-to-figure-btn" onclick="goToFigures()" disabled>
+      ▶ Speak to a figure
+    </button>
+
+    <p class="usage-note" id="usage-note">// 3 free perspectives remaining</p>
+  </section>
+
+  <!-- ── Screen 2: Figure Selection ── -->
+  <section class="screen" id="screen-figures">
+    <div class="back-row">
+      <button class="back-btn" onclick="showScreen('question')">←</button>
+      <div class="question-bubble" id="figures-question-bubble">"…"</div>
+    </div>
+    <div class="figures-header">
+      <div class="section-label">Choose your lens</div>
+      <h2 class="screen-title">Who do you want<br>to hear from?</h2>
+      <p class="screen-subtitle">Select a figure — their perspective awaits</p>
+    </div>
+
+    <div class="figure-grid" id="figure-grid"><!-- JS --></div>
+
+    <div class="get-perspective-bar">
+      <button class="cta-btn" id="get-perspective-btn" onclick="getPerspective()" disabled>
+        ▶ Get perspective
+      </button>
+    </div>
+  </section>
+
+  <!-- ── Screen 3: Response ── -->
+  <section class="screen" id="screen-response">
+    <div class="response-header">
+      <div class="response-figure-badge">
+        <img class="response-portrait" id="response-portrait" src="" alt="">
+        <div class="response-figure-info">
+          <h3 id="response-figure-name">—</h3>
+          <span id="response-figure-desc">—</span>
+        </div>
+      </div>
+      <div class="response-actions-top">
+        <button class="icon-btn" onclick="saveToJournal()" title="Save">🔖</button>
+        <button class="icon-btn" onclick="showScreen('customize')" title="Customize">🎨</button>
+      </div>
+    </div>
+
+    <div class="response-question-ref" id="response-question-ref">""</div>
+
+    <div class="terminal-box">
+      <div class="terminal-header">
+        <div class="terminal-dot cyan"></div>
+        <div class="terminal-dot pink"></div>
+        <div class="terminal-dot dim"></div>
+        <span class="terminal-label">perspective output</span>
+      </div>
+      <div class="terminal-body">
+        <div class="terminal-loading" id="loading-indicator">
+          <div class="dots-anim"><span></span><span></span><span></span></div>
+          <span>// Channeling their wisdom...</span>
+        </div>
+        <p id="response-text" style="display:none;"></p>
+      </div>
+    </div>
+
+    <div class="response-footer">
+      <button class="cta-btn" onclick="showScreen('share')">▶ Share this perspective</button>
+      <div class="response-secondary-actions">
+        <button class="outline-btn" onclick="goToFigures()">Try another</button>
+        <button class="outline-btn pink-outline-btn" onclick="showScreen('question')">New question</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Screen 4: Customize ── -->
+  <section class="screen" id="screen-customize">
+    <div class="back-row" style="padding:0;">
+      <button class="back-btn" onclick="showScreen('response')">←</button>
+      <h2 class="screen-title" style="margin:0;">Customize</h2>
+    </div>
+
+    <div class="customize-preview" id="customize-preview">
+      <div class="theme-preview-card" id="theme-preview-card">
+        <p class="theme-preview-text" id="theme-preview-text">"Loading your perspective…"</p>
+        <div style="margin-top:10px;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;opacity:0.6;" id="theme-preview-figure">— Figure</div>
+      </div>
+      <div class="sticker-layer" id="sticker-layer"></div>
+    </div>
+
+    <div>
+      <div class="section-label">Color scheme</div>
+      <div class="color-scheme-grid">
+        <button class="color-scheme-btn selected" data-scheme="cyberpunk" onclick="setColorScheme('cyberpunk',this)"
+          style="background:linear-gradient(135deg,#00FFC8,#0044FF);">
+          <div class="check">✓</div>
+        </button>
+        <button class="color-scheme-btn" data-scheme="blood" onclick="setColorScheme('blood',this)"
+          style="background:linear-gradient(135deg,#FF2D6B,#8800FF);">
+          <div class="check">✓</div>
+        </button>
+        <button class="color-scheme-btn" data-scheme="mono" onclick="setColorScheme('mono',this)"
+          style="background:linear-gradient(135deg,#E8E8FF,#303050);">
+          <div class="check">✓</div>
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <div class="dark-toggle">
+        <span class="toggle-label">Scanlines</span>
+        <button class="toggle-switch on" id="scanline-toggle" onclick="toggleScanlines()"></button>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">Add a sticker</div>
+      <div class="sticker-grid" id="sticker-grid"></div>
+    </div>
+
+    <button class="cta-btn" onclick="showScreen('share')">▶ Done — Share</button>
+  </section>
+
+  <!-- ── Screen 5: Share ── -->
+  <section class="screen" id="screen-share">
+    <div class="back-row" style="padding:0;">
+      <button class="back-btn" onclick="showScreen('response')">←</button>
+      <h2 class="screen-title" style="margin:0;">Share</h2>
+    </div>
+
+    <div class="share-preview" id="share-preview"
+      style="background:linear-gradient(135deg,#00FFC8 0%,#0044FF 100%);color:#000;">
+      <div class="share-preview-question" id="share-q">""</div>
+      <div class="share-preview-response" id="share-r">—</div>
+      <div class="share-preview-footer">
+        <div class="share-preview-figure">
+          <img class="share-preview-portrait" id="share-portrait" src="" alt="">
+          <span id="share-name">—</span>
+        </div>
+        <div class="share-watermark">MINDSHIFT.APP</div>
+      </div>
+    </div>
+
+    <div class="share-buttons">
+      <button class="share-platform-btn" onclick="shareToIG()">
+        <span class="share-platform-icon">📸</span>
+        <span>Instagram Story</span>
+      </button>
+      <button class="share-platform-btn" onclick="shareToTikTok()">
+        <span class="share-platform-icon">🎵</span>
+        <span>TikTok</span>
+      </button>
+      <button class="share-copy-btn" onclick="copyLink()">// Copy link</button>
+    </div>
+  </section>
+
+  <!-- ── Screen 6: Journal ── -->
+  <section class="screen" id="screen-journal">
+    <div class="journal-header">
+      <div class="section-label">Your archive</div>
+      <h2 class="screen-title">Journal</h2>
+    </div>
+    <div class="journal-filter" id="journal-filter">
+      <button class="filter-chip active" onclick="filterJournal('all',this)">All</button>
+    </div>
+    <div id="journal-body"></div>
+  </section>
+
+</div><!-- /#app -->
+
+<!-- ── Account Modal ── -->
+<div class="modal-overlay" id="account-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <h2 class="modal-title">Save your journal?</h2>
+    <p class="modal-subtitle">// You've used 3 free perspectives. Create an account to keep going and save everything.</p>
+    <div class="modal-benefits">
+      <div class="modal-benefit"><span class="benefit-check">▶</span> Unlimited journal saves</div>
+      <div class="modal-benefit"><span class="benefit-check">▶</span> Access from any device</div>
+      <div class="modal-benefit"><span class="benefit-check">▶</span> Re-share & re-customize anytime</div>
+    </div>
+    <button class="modal-auth-btn primary" onclick="mockSignIn('apple')">Apple ID</button>
+    <button class="modal-auth-btn" onclick="mockSignIn('google')">Google</button>
+    <button class="modal-auth-btn" onclick="mockSignIn('email')">Email magic link</button>
+    <div class="modal-skip" onclick="closeModal('account-modal')">Maybe later</div>
+  </div>
+</div>
+
+<!-- ── Premium Modal ── -->
+<div class="modal-overlay" id="premium-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="premium-badge">⭐ MindShift Premium</div>
+    <h2 class="modal-title">Unlock all figures</h2>
+    <p class="modal-subtitle">// You've hit the limit. Upgrade for unlimited access to every historical mind.</p>
+    <div class="pricing-row">
+      <div class="price-card" onclick="selectPlan('monthly',this)">
+        <div class="price-amount">$1.99</div>
+        <div class="price-period">/ month</div>
+      </div>
+      <div class="price-card highlighted" onclick="selectPlan('yearly',this)">
+        <div class="price-amount">$9.99</div>
+        <div class="price-period">/ year</div>
+        <div class="price-tag">SAVE 58%</div>
+      </div>
+    </div>
+    <div class="modal-benefits">
+      <div class="modal-benefit"><span class="benefit-check">▶</span> Unlimited perspectives per question</div>
+      <div class="modal-benefit"><span class="benefit-check">▶</span> All 50+ figures unlocked</div>
+      <div class="modal-benefit"><span class="benefit-check">▶</span> Premium sticker packs</div>
+      <div class="modal-benefit"><span class="benefit-check">▶</span> No watermark on shares</div>
+    </div>
+    <button class="cta-btn" onclick="mockUpgrade()">▶ Unlock Premium</button>
+    <div class="modal-skip" style="margin-top:12px;" onclick="closeModal('premium-modal')">Keep free tier</div>
+  </div>
+</div>
+
+<script>
+// ── Data ──────────────────────────────────────────────────────
+const PORTRAIT_BASE = '/portraits/cyberpunk/';
+
+const FIGURES = [
+  { id:'socrates',   portrait:'socrates_cyberpunk.png',          name:'Socrates',         desc:'Question everything',            voice:'Athenian philosopher' },
+  { id:'lincoln',    portrait:'abraham_lincoln_cyberpunk.png',    name:'A. Lincoln',        desc:'Persistence & moral clarity',    voice:'16th US President' },
+  { id:'dolly',      portrait:'dolly_parton_cyberpunk.png',       name:'Dolly Parton',      desc:'Authentic & resilient',          voice:'Country icon & philanthropist' },
+  { id:'angelou',    portrait:'maya_angelou_cyberpunk.png',       name:'Maya Angelou',      desc:'Voice & expression',             voice:'Poet & activist' },
+  { id:'mandela',    portrait:'nelson_mandela_cyberpunk.png',     name:'N. Mandela',        desc:'Patience & long-term vision',    voice:'Anti-apartheid leader' },
+  { id:'parks',      portrait:'rosa_parks_cyberpunk.png',         name:'Rosa Parks',        desc:'Strength & dignity',             voice:'Civil rights activist' },
+  { id:'kahlo',      portrait:'frida_kahlo_cyberpunk.png',        name:'Frida Kahlo',       desc:'Art heals all',                  voice:'Surrealist painter' },
+  { id:'guevara',    portrait:'che_guevara_cyberpunk.png',        name:'Che Guevara',       desc:'Radical conviction',             voice:'Revolutionary leader' },
+  { id:'ching',      portrait:'ching_shih_cyberpunk.png',         name:'Ching Shih',        desc:'Command & strategy',             voice:'Pirate queen of the seas' },
+  { id:'gandhi',     portrait:'mahatma_gandhi_cyberpunk.png',     name:'M. Gandhi',         desc:'Nonviolent resistance',          voice:'Independence leader' },
+  { id:'napoleon',   portrait:'napoleon_bonaparte_cyberpunk.png', name:'Napoleon',          desc:'Ambition & strategy',            voice:'French emperor' },
+  { id:'dali',       portrait:'salvador_dali_cyberpunk.png',      name:'Salvador Dalí',     desc:'The surreal is real',            voice:'Surrealist master' },
+  { id:'chuck',      portrait:'chuck_norris_cyberpunk.png',       name:'Chuck Norris',      desc:'Discipline & toughness',         voice:'Martial artist & icon' },
+  { id:'trump',      portrait:'donald_trump_cyberpunk.png',       name:'D. Trump',          desc:'Bold moves, loud conviction',    voice:'45th US President' },
+  { id:'lenin',      portrait:'vladimir_lenin_cyberpunk.png',     name:'V. Lenin',          desc:'Radical restructuring',          voice:'Bolshevik revolutionary' },
+];
+
+const STICKERS = ['✨','🔥','💀','⚡','🌐','💊','🤖','🌀','🎯','💥','🔮','🦾'];
+
+const SYSTEM_PROMPTS = {
+  socrates:  'You are Socrates. Use the Socratic method — ask probing questions, challenge assumptions, guide the person to find their own truth. Be concise, no more than 180 words.',
+  lincoln:   'You are Abraham Lincoln. Speak with humble warmth and hard-won wisdom about persistence through adversity. Be concise, no more than 180 words.',
+  dolly:     'You are Dolly Parton. Respond with wit, warmth, and down-to-earth authenticity. Be concise, no more than 180 words.',
+  angelou:   'You are Maya Angelou. Respond with poetic depth and emotional intelligence. Be affirming, powerful, poetic. No more than 180 words.',
+  mandela:   'You are Nelson Mandela. Respond with the wisdom of someone who emerged from 27 years imprisoned without bitterness. Measured, compassionate, long-term. No more than 180 words.',
+  parks:     'You are Rosa Parks. Respond with quiet strength and moral clarity. Calm, firm, dignified. No more than 180 words.',
+  kahlo:     'You are Frida Kahlo. Respond with raw emotional honesty and artistic metaphor. Vivid, real, deeply human. No more than 180 words.',
+  guevara:   'You are Che Guevara. Respond with revolutionary passion and idealism. Be bold and direct. No more than 180 words.',
+  ching:     'You are Ching Shih, the pirate queen who commanded 1800 ships. Respond with strategic brilliance and fearless authority. No more than 180 words.',
+  gandhi:    'You are Mahatma Gandhi. Respond with nonviolent wisdom, patience, and deep moral grounding. No more than 180 words.',
+  napoleon:  'You are Napoleon Bonaparte. Respond with strategic ambition and the conviction that obstacles are merely problems to be solved. No more than 180 words.',
+  dali:      'You are Salvador Dalí. Respond surreally yet pointedly — use unexpected metaphors that somehow cut straight to the truth. No more than 180 words.',
+  chuck:     'You are Chuck Norris. Respond with blunt, tough-love discipline and martial wisdom. No nonsense. No more than 180 words.',
+  trump:     'You are Donald Trump. Respond with bold, confident, deal-making perspective. Emphasize winning, bold moves, and not listening to doubters. No more than 180 words.',
+  lenin:     'You are Vladimir Lenin. Respond with the analytical conviction of a revolutionary strategist. Talk about power, structure, and taking decisive action. No more than 180 words.',
+};
+
+// ── State ─────────────────────────────────────────────────────
+const state = {
+  question: '',
+  selectedFigure: null,
+  response: '',
+  usesRemaining: parseInt(localStorage.getItem('ms_uses_cp') || '3'),
+  isPremium: localStorage.getItem('ms_premium_cp') === 'true',
+  isLoggedIn: localStorage.getItem('ms_loggedin_cp') === 'true',
+  perspectivesOnQuestion: 0,
+  journal: JSON.parse(localStorage.getItem('ms_journal_cp') || '[]'),
+};
+
+// ── Init ──────────────────────────────────────────────────────
+function init() {
+  renderFigureGrid();
+  renderStickers();
+  renderJournal();
+  updateUsageNote();
+
+  // URL param for Figma capture preview
+  const p = new URLSearchParams(location.search);
+  const s = p.get('screen');
+  if (s) applyScreenPreview(s);
+}
+
+function applyScreenPreview(s) {
+  state.question = 'Should I quit my job to start something?';
+  state.selectedFigure = FIGURES.find(f => f.id === 'guevara') || FIGURES[0];
+  state.response = 'If you tremble with indignation at every injustice, you are a comrade of destiny. But trembling alone changes nothing.\n\nYou already know the answer — you are asking because you fear the cost of the right one. Every revolution begins with someone who decided that the risk of staying was greater than the risk of moving.\n\nAsk yourself: in ten years, which will haunt you more — having tried and stumbled, or having never tried at all? Comfort is the cage they built for you. The door is open.\n\nMove.';
+
+  if (s === 'figures') {
+    document.getElementById('figures-question-bubble').textContent = '"' + state.question + '"';
+    const cards = document.querySelectorAll('.figure-card');
+    if (cards[7]) cards[7].classList.add('selected');
+    document.getElementById('get-perspective-btn').disabled = false;
+  }
+  if (s === 'response') setResponseUI(state.selectedFigure, state.response, state.question);
+  if (s === 'customize') {
+    document.getElementById('theme-preview-text').textContent = '"' + state.response.slice(0,160) + '…"';
+    document.getElementById('theme-preview-figure').textContent = '— ' + state.selectedFigure.name;
+  }
+  if (s === 'share') setShareUI(state.selectedFigure, state.question, state.response);
+  if (s === 'journal') {
+    state.journal = [{ id:1, question: state.question, figure: state.selectedFigure, response: state.response, date: 'Apr 12, 2026' }];
+    renderJournal();
+  }
+  if (s && s !== 'question') showScreen(s);
+}
+
+// ── Navigation ────────────────────────────────────────────────
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  document.getElementById('tab-perspectives').classList.remove('active');
+  document.getElementById('tab-journal').classList.remove('active');
+  if (name === 'journal') document.getElementById('tab-journal').classList.add('active');
+  else document.getElementById('tab-perspectives').classList.add('active');
+}
+function showTab(tab) { showScreen(tab === 'journal' ? 'journal' : 'question'); }
+
+// ── Question Input ────────────────────────────────────────────
+function onQuestionInput(el) {
+  const len = el.value.length;
+  const counter = document.getElementById('char-counter');
+  counter.textContent = len + ' / 280';
+  counter.classList.toggle('over', len >= 270);
+  document.getElementById('speak-to-figure-btn').disabled = len < 5;
+}
+function setExample(text) {
+  const ta = document.getElementById('question-input');
+  ta.value = text;
+  onQuestionInput(ta);
+}
+function goToFigures() {
+  state.question = document.getElementById('question-input').value.trim();
+  if (!state.question) return;
+  state.selectedFigure = null;
+  state.perspectivesOnQuestion = 0;
+  document.getElementById('figures-question-bubble').textContent = '"' + state.question + '"';
+  document.querySelectorAll('.figure-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('get-perspective-btn').disabled = true;
+  showScreen('figures');
+}
+
+// ── Figure Selection ──────────────────────────────────────────
+function renderFigureGrid() {
+  const grid = document.getElementById('figure-grid');
+  grid.innerHTML = FIGURES.map(f => `
+    <div class="figure-card" data-id="${f.id}" onclick="selectFigure('${f.id}')">
+      <img class="figure-portrait" src="${PORTRAIT_BASE}${f.portrait}" alt="${f.name}" onerror="this.style.display='none'">
+      <div class="figure-name">${f.name}</div>
+      <div class="figure-desc">${f.desc}</div>
+    </div>
+  `).join('');
+}
+function selectFigure(id) {
+  state.selectedFigure = FIGURES.find(f => f.id === id);
+  document.querySelectorAll('.figure-card').forEach(c => c.classList.toggle('selected', c.dataset.id === id));
+  document.getElementById('get-perspective-btn').disabled = false;
+}
+
+// ── API Call ──────────────────────────────────────────────────
+async function getPerspective() {
+  if (!state.selectedFigure || !state.question) return;
+  if (!state.isPremium && state.perspectivesOnQuestion >= 3) { showPremiumModal(); return; }
+  if (!state.isLoggedIn && state.usesRemaining <= 0) { showModal('account-modal'); return; }
+
+  showScreen('response');
+  document.getElementById('loading-indicator').style.display = 'flex';
+  document.getElementById('response-text').style.display = 'none';
+
+  const fig = state.selectedFigure;
+  document.getElementById('response-portrait').src = PORTRAIT_BASE + fig.portrait;
+  document.getElementById('response-figure-name').textContent = fig.name;
+  document.getElementById('response-figure-desc').textContent = fig.voice;
+  document.getElementById('response-question-ref').textContent = '"' + state.question + '"';
+
+  try {
+    const res = await fetch('/functions/generate-response', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ systemPrompt: SYSTEM_PROMPTS[fig.id], userPrompt: state.question })
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text || null;
+    if (!text) throw new Error('No response');
+    state.response = text;
+    setResponseUI(fig, text, state.question);
+    setShareUI(fig, state.question, text);
+    if (!state.isLoggedIn) {
+      state.usesRemaining = Math.max(0, state.usesRemaining - 1);
+      localStorage.setItem('ms_uses_cp', state.usesRemaining);
+      updateUsageNote();
+    }
+    state.perspectivesOnQuestion++;
+    if (!state.isLoggedIn && state.usesRemaining === 0) setTimeout(() => showModal('account-modal'), 2000);
+  } catch {
+    const demo = 'If you tremble with indignation at every injustice, you are a comrade of destiny. But trembling alone changes nothing.\n\nYou already know the answer — you are asking because you fear the cost of the right one. Every revolution begins with someone who decided that the risk of staying was greater than the risk of moving.\n\nMove.';
+    state.response = demo;
+    setResponseUI(fig, demo, state.question);
+    setShareUI(fig, state.question, demo);
+    state.perspectivesOnQuestion++;
+  }
+}
+
+function setResponseUI(fig, text, question) {
+  document.getElementById('response-portrait').src = PORTRAIT_BASE + fig.portrait;
+  document.getElementById('response-figure-name').textContent = fig.name;
+  document.getElementById('response-figure-desc').textContent = fig.voice;
+  document.getElementById('response-question-ref').textContent = '"' + question + '"';
+  document.getElementById('response-text').textContent = text;
+  document.getElementById('response-text').style.display = 'block';
+  document.getElementById('loading-indicator').style.display = 'none';
+  document.getElementById('theme-preview-text').textContent = '"' + text.slice(0, 160) + '…"';
+  document.getElementById('theme-preview-figure').textContent = '— ' + fig.name;
+}
+
+function setShareUI(fig, question, text) {
+  document.getElementById('share-q').textContent = '"' + question + '"';
+  document.getElementById('share-r').textContent = text;
+  document.getElementById('share-portrait').src = PORTRAIT_BASE + fig.portrait;
+  document.getElementById('share-name').textContent = fig.name;
+}
+
+// ── Journal ────────────────────────────────────────────────────
+function saveToJournal() {
+  if (!state.response) return;
+  const entry = { id: Date.now(), question: state.question, figure: state.selectedFigure, response: state.response, date: new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }) };
+  state.journal.unshift(entry);
+  localStorage.setItem('ms_journal_cp', JSON.stringify(state.journal));
+  renderJournal();
+  const btn = event.currentTarget; const orig = btn.textContent; btn.textContent = '✓'; setTimeout(() => btn.textContent = orig, 1200);
+}
+function renderJournal(filterFigure = 'all') {
+  const body = document.getElementById('journal-body');
+  const entries = filterFigure === 'all' ? state.journal : state.journal.filter(e => e.figure.id === filterFigure);
+  if (entries.length === 0) {
+    body.innerHTML = `<div class="journal-empty"><div class="journal-empty-icon">📓</div><h3>No entries yet</h3><p>// Save perspectives using the bookmark icon after each response.</p><button class="cta-btn" style="width:auto;padding:12px 24px;margin-top:8px;" onclick="showTab('perspectives')">▶ Get a perspective</button></div>`;
+    return;
+  }
+  const uniqueFigs = [...new Map(state.journal.map(e => [e.figure.id, e.figure])).values()];
+  const filterDiv = document.getElementById('journal-filter');
+  filterDiv.innerHTML = `<button class="filter-chip ${filterFigure==='all'?'active':''}" onclick="filterJournal('all',this)">All</button>` + uniqueFigs.map(f => `<button class="filter-chip ${filterFigure===f.id?'active':''}" onclick="filterJournal('${f.id}',this)">${f.name}</button>`).join('');
+  body.innerHTML = `<div class="journal-entries">` + entries.map(e => `
+    <div class="journal-entry">
+      <div class="journal-entry-top">
+        <img class="journal-entry-portrait" src="${PORTRAIT_BASE}${e.figure.portrait}" alt="${e.figure.name}" onerror="this.style.display='none'">
+        <div class="journal-entry-meta"><div class="journal-entry-figure">${e.figure.name}</div><div class="journal-entry-date">${e.date}</div></div>
+      </div>
+      <div class="journal-entry-question">"${e.question}"</div>
+      <div class="journal-entry-preview">${e.response}</div>
+      <div class="journal-entry-actions">
+        <button class="entry-action-btn" onclick="reloadEntry(${e.id})">Re-read</button>
+        <button class="entry-action-btn" onclick="deleteEntry(${e.id})">Delete</button>
+      </div>
+    </div>
+  `).join('') + `</div>`;
+}
+function filterJournal(figId, btn) { document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active')); btn.classList.add('active'); renderJournal(figId); }
+function deleteEntry(id) { state.journal = state.journal.filter(e => e.id !== id); localStorage.setItem('ms_journal_cp', JSON.stringify(state.journal)); renderJournal(); }
+function reloadEntry(id) {
+  const e = state.journal.find(x => x.id === id);
+  if (!e) return;
+  state.question = e.question; state.selectedFigure = e.figure; state.response = e.response;
+  setResponseUI(e.figure, e.response, e.question);
+  showScreen('response');
+}
+
+// ── Customize ─────────────────────────────────────────────────
+function renderStickers() {
+  document.getElementById('sticker-grid').innerHTML = STICKERS.map(s => `<button class="sticker-btn" onclick="placeSticker('${s}')">${s}</button>`).join('');
+}
+const SCHEME_GRADIENTS = {
+  cyberpunk: 'linear-gradient(135deg, #00FFC8 0%, #0044FF 100%)',
+  blood:     'linear-gradient(135deg, #FF2D6B 0%, #8800FF 100%)',
+  mono:      'linear-gradient(135deg, #E8E8FF 0%, #303050 100%)',
+};
+function setColorScheme(scheme, btn) {
+  document.querySelectorAll('.color-scheme-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  const grad = SCHEME_GRADIENTS[scheme] || SCHEME_GRADIENTS.cyberpunk;
+  document.getElementById('theme-preview-card').style.background = grad;
+  document.getElementById('share-preview').style.background = grad;
+  document.getElementById('share-preview').style.color = scheme === 'mono' ? '#000' : '#000';
+}
+let scanlinesOn = true;
+function toggleScanlines() {
+  scanlinesOn = !scanlinesOn;
+  document.getElementById('scanline-toggle').classList.toggle('on', scanlinesOn);
+  document.querySelector('#app::before') && null; // scanlines are CSS only, toggle via class
+  document.getElementById('app').style.setProperty('--scanline-opacity', scanlinesOn ? '1' : '0');
+}
+function placeSticker(emoji) {
+  const layer = document.getElementById('sticker-layer');
+  const el = document.createElement('div'); el.className = 'placed-sticker'; el.textContent = emoji;
+  el.style.top = (15 + Math.random() * 60) + '%'; el.style.left = (10 + Math.random() * 70) + '%';
+  let sx, sy, ol, ot;
+  el.addEventListener('mousedown', e => {
+    sx = e.clientX; sy = e.clientY; ol = el.offsetLeft; ot = el.offsetTop;
+    const mv = e2 => { el.style.left = (ol + e2.clientX - sx) + 'px'; el.style.top = (ot + e2.clientY - sy) + 'px'; };
+    const up = () => { document.removeEventListener('mousemove', mv); document.removeEventListener('mouseup', up); };
+    document.addEventListener('mousemove', mv); document.addEventListener('mouseup', up);
+  });
+  layer.appendChild(el);
+}
+
+// ── Share ─────────────────────────────────────────────────────
+function shareToIG() { alert('📸 In production: exports a 9:16 image → Instagram Stories.'); }
+function shareToTikTok() { alert('🎵 In production: opens TikTok with perspective as caption.'); }
+function copyLink() {
+  const text = `"${state.question}" — ${state.selectedFigure?.name || 'a historical mind'} via mindshift.app\n\n${state.response?.slice(0, 200)}…`;
+  navigator.clipboard?.writeText(text).then(() => { const b = document.querySelector('.share-copy-btn'); b.textContent = '// Copied!'; setTimeout(() => b.textContent = '// Copy link', 1800); });
+}
+
+// ── Modals ────────────────────────────────────────────────────
+function showModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+function showPremiumModal() { showModal('premium-modal'); }
+function mockSignIn() { state.isLoggedIn = true; state.usesRemaining = 999; localStorage.setItem('ms_loggedin_cp','true'); localStorage.setItem('ms_uses_cp','999'); closeModal('account-modal'); updateUsageNote(); }
+function mockUpgrade() { state.isPremium = true; localStorage.setItem('ms_premium_cp','true'); closeModal('premium-modal'); }
+function selectPlan(plan, el) { document.querySelectorAll('.price-card').forEach(c => c.classList.remove('highlighted')); el.classList.add('highlighted'); }
+function updateUsageNote() {
+  const note = document.getElementById('usage-note');
+  if (state.isLoggedIn) note.textContent = state.isPremium ? '// ⭐ Premium — unlimited access' : '// Logged in — unlimited saves';
+  else note.textContent = '// ' + state.usesRemaining + ' free perspective' + (state.usesRemaining !== 1 ? 's' : '') + ' remaining';
+}
+document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => { if (e.target === o) o.classList.remove('active'); }));
+
+init();
+</script>
+</body>
+</html>

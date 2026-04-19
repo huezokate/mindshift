@@ -1,0 +1,71 @@
+.ms-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ms-chip__remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  font-size: 14px;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+.ms-chip__remove:hover { opacity: 1; }
+
+/* ─── dark theme ─── */
+[data-theme="dark"] .ms-chip {
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  font-family: var(--font-display);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 10px;
+}
+[data-theme="dark"] .ms-chip--cyan   { border-color: var(--accent-1); color: var(--accent-1); }
+[data-theme="dark"] .ms-chip--purple { border-color: var(--accent-2); color: var(--accent-2); }
+[data-theme="dark"] .ms-chip--pink   { border-color: var(--accent-3); color: var(--accent-3); }
+[data-theme="dark"] .ms-chip--green  { border-color: var(--accent-4); color: var(--accent-4); }
+[data-theme="dark"] .ms-chip__remove { color: inherit; }
+
+/* ─── bright theme ─── */
+[data-theme="bright"] .ms-chip {
+  padding: 5px 14px;
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0;
+}
+[data-theme="bright"] .ms-chip--default { background: #f3e8ff; color: #7c3aed; }
+[data-theme="bright"] .ms-chip--cyan    { background: #e0f2fe; color: #0284c7; }
+[data-theme="bright"] .ms-chip--purple  { background: #ede9fe; color: #7c3aed; }
+[data-theme="bright"] .ms-chip--pink    { background: #fce7f3; color: #db2777; }
+[data-theme="bright"] .ms-chip--green   { background: #dcfce7; color: #16a34a; }
+[data-theme="bright"] .ms-chip__remove { color: inherit; }
+
+/* ─── paper theme ─── */
+[data-theme="paper"] .ms-chip {
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 0.03em;
+}
+[data-theme="paper"] .ms-chip--default { border-color: var(--border); }
+[data-theme="paper"] .ms-chip--cyan    { border-color: var(--accent-1); color: var(--accent-1); }
+[data-theme="paper"] .ms-chip--purple  { border-color: var(--accent-3); color: var(--accent-3); }
+[data-theme="paper"] .ms-chip--pink    { border-color: var(--accent-4); color: var(--accent-4); }
+[data-theme="paper"] .ms-chip--green   { border-color: var(--accent-2); color: var(--accent-2); }
+[data-theme="paper"] .ms-chip__remove { color: inherit; }

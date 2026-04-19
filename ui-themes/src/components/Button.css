@@ -1,0 +1,159 @@
+.ms-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  letter-spacing: var(--tracking);
+  border: none;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* sizes */
+.ms-btn--sm { padding: 6px 14px; font-size: 11px; }
+.ms-btn--md { padding: 10px 22px; font-size: 13px; }
+.ms-btn--lg { padding: 14px 30px; font-size: 15px; }
+
+/* disabled */
+.ms-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ─── dark theme ─── */
+[data-theme="dark"] .ms-btn {
+  border-radius: var(--radius-md);
+  font-family: var(--font-display);
+  letter-spacing: var(--tracking-wide);
+}
+[data-theme="dark"] .ms-btn--primary {
+  background: transparent;
+  color: var(--accent-1);
+  border: 1px solid var(--accent-1);
+  box-shadow: var(--shadow-glow-cyan);
+}
+[data-theme="dark"] .ms-btn--primary:hover:not(:disabled) {
+  background: var(--accent-1);
+  color: var(--text-inverse);
+  box-shadow: 0 0 20px #00f5ffaa, 0 0 60px #00f5ff44;
+}
+[data-theme="dark"] .ms-btn--secondary {
+  background: transparent;
+  color: var(--accent-2);
+  border: 1px solid var(--accent-2);
+  box-shadow: var(--shadow-glow-purple);
+}
+[data-theme="dark"] .ms-btn--secondary:hover:not(:disabled) {
+  background: var(--accent-2);
+  color: var(--text-inverse);
+}
+[data-theme="dark"] .ms-btn--ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+[data-theme="dark"] .ms-btn--ghost:hover:not(:disabled) {
+  border-color: var(--accent-1);
+  color: var(--accent-1);
+}
+[data-theme="dark"] .ms-btn--danger {
+  background: transparent;
+  color: var(--accent-3);
+  border: 1px solid var(--accent-3);
+  box-shadow: var(--shadow-glow-pink);
+}
+[data-theme="dark"] .ms-btn--danger:hover:not(:disabled) {
+  background: var(--accent-3);
+  color: #fff;
+}
+
+/* ─── bright theme ─── */
+[data-theme="bright"] .ms-btn {
+  border-radius: var(--radius-pill);
+  text-transform: none;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+[data-theme="bright"] .ms-btn--primary {
+  background: var(--accent-1);
+  color: #fff;
+  border: 2px solid transparent;
+  box-shadow: 0 4px 16px #c084fc55;
+}
+[data-theme="bright"] .ms-btn--primary:hover:not(:disabled) {
+  background: #a855f7;
+  box-shadow: 0 6px 24px #c084fc88;
+  transform: translateY(-1px);
+}
+[data-theme="bright"] .ms-btn--secondary {
+  background: var(--accent-2);
+  color: #fff;
+  box-shadow: 0 4px 16px #ff85c855;
+}
+[data-theme="bright"] .ms-btn--secondary:hover:not(:disabled) {
+  background: #f472b6;
+  transform: translateY(-1px);
+}
+[data-theme="bright"] .ms-btn--ghost {
+  background: white;
+  color: var(--accent-1);
+  border: 2px solid var(--accent-1);
+}
+[data-theme="bright"] .ms-btn--ghost:hover:not(:disabled) {
+  background: #f3e8ff;
+}
+[data-theme="bright"] .ms-btn--danger {
+  background: #fde8f5;
+  color: #db2777;
+  border: 2px solid #f9a8d4;
+}
+[data-theme="bright"] .ms-btn--danger:hover:not(:disabled) {
+  background: #fce7f3;
+}
+
+/* ─── paper theme ─── */
+[data-theme="paper"] .ms-btn {
+  border-radius: var(--radius-md);
+  text-transform: none;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+[data-theme="paper"] .ms-btn--primary {
+  background: var(--accent-1);
+  color: var(--text-inverse);
+  border: 1.5px solid #5a8a5a;
+  box-shadow: 2px 3px 0 #5a8a5a;
+}
+[data-theme="paper"] .ms-btn--primary:hover:not(:disabled) {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 4px 0 #5a8a5a;
+}
+[data-theme="paper"] .ms-btn--secondary {
+  background: var(--accent-2);
+  color: var(--text-inverse);
+  border: 1.5px solid #a87550;
+  box-shadow: 2px 3px 0 #a87550;
+}
+[data-theme="paper"] .ms-btn--secondary:hover:not(:disabled) {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 4px 0 #a87550;
+}
+[data-theme="paper"] .ms-btn--ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1.5px solid var(--border);
+}
+[data-theme="paper"] .ms-btn--ghost:hover:not(:disabled) {
+  border-color: var(--accent-1);
+  color: var(--accent-1);
+  background: #f0f5f0;
+}
+[data-theme="paper"] .ms-btn--danger {
+  background: transparent;
+  color: #c0605a;
+  border: 1.5px solid #d4a5a5;
+  box-shadow: 2px 3px 0 #d4a5a5;
+}
+[data-theme="paper"] .ms-btn--danger:hover:not(:disabled) {
+  background: #fdf0f0;
+  transform: translate(-1px, -1px);
+}

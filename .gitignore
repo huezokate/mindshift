@@ -1,0 +1,5 @@
+.DS_Store
+.lisa/
+.lisa.toml
+.lisa-layout.kdl
+*.mov
