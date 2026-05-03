@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MindShift V100</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Alumni+Sans+SC:wght@400;600;700&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+
+/* ════════════════════════════════════════════════
+   1. THEME VARIABLES
+════════════════════════════════════════════════ */
+
+[data-theme="cyberpunk"] {
+  --bg:        #080810;
+  --bg-card:   #0D0D1A;
+  --bg-card2:  #0D0D1C;
+  --c1:        #00F5FF;   /* cyan  — borders, labels */
+  --c2:        #39FF14;   /* green — primary CTA, figure names */
+  --c3:        #FF2D78;   /* pink  — secondary, warnings */
+  --c4:        #B04CFF;   /* violet— response card, popup */
+  --text-h:    #E0F7FF;
+  --text-b:    #7ECFDF;
+  --text-m:    #3697B8;
+  --font-h:    'Courier Prime', 'Courier New', monospace;
+  --font-b:    'Courier Prime', 'Courier New', monospace;
+  --font-ui:   'Alumni Sans SC', 'Courier New', sans-serif;
+  --r:         2px;
+  --r-card:    4px;
+  --glow-c1:   0 0 16px rgba(0,245,255,0.4);
+  --glow-c2:   0 0 16px rgba(57,255,20,0.4);
+  --glow-c3:   0 0 10px rgba(255,45,120,0.4);
+  --glow-c4:   0 0 16px rgba(176,76,255,0.4);
+  --overlay-bg: rgba(8,8,16,0.9);
+}
+
+[data-theme="kawaii"] {
+  --bg:        #edf2ff;
+  --bg-card:   #ffffff;
+  --bg-card2:  #f5f0ff;
+  --c1:        #8b5cf6;   /* violet — primary */
+  --c2:        #ff2d78;   /* pink   — highlight */
+  --c3:        #5b8dee;   /* blue   — secondary */
+  --c4:        #2dff78;   /* green  — accent */
+  --text-h:    #0D0D1C;
+  --text-b:    #3a3560;
+  --text-m:    #9490b8;
+  --font-h:    'Nunito', system-ui, sans-serif;
+  --font-b:    'Nunito', system-ui, sans-serif;
+  --font-ui:   'Nunito', system-ui, sans-serif;
+  --r:         16px;
+  --r-card:    20px;
+  --glow-c1:   0 4px 20px rgba(139,92,246,0.25);
+  --glow-c2:   0 4px 20px rgba(255,45,120,0.25);
+  --glow-c3:   0 4px 20px rgba(91,141,238,0.25);
+  --glow-c4:   0 4px 20px rgba(45,255,120,0.25);
+  --overlay-bg: rgba(237,242,255,0.92);
+}
+
+[data-theme="notepad"] {
+  --bg:        #fdfdfb;
+  --bg-card:   #ffffff;
+  --bg-card2:  #f7f4ef;
+  --c1:        #4a8855;   /* forest green — primary */
+  --c2:        #3a6fa8;   /* ink blue     — secondary */
+  --c3:        #c0605a;   /* warm red     — destructive */
+  --c4:        #5a4e47;   /* warm dark    — text */
+  --text-h:    #1c1916;
+  --text-b:    #5a4e47;
+  --text-m:    #9b8f87;
+  --font-h:    'Lora', Georgia, serif;
+  --font-b:    'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --r:         4px;
+  --r-card:    6px;
+  --glow-c1:   0 2px 8px rgba(74,136,85,0.2);
+  --glow-c2:   0 2px 8px rgba(58,111,168,0.2);
+  --glow-c3:   0 2px 8px rgba(192,96,90,0.2);
+  --glow-c4:   0 2px 8px rgba(90,78,71,0.15);
+  --overlay-bg: rgba(253,253,251,0.95);
+}
+
+/* ════════════════════════════════════════════════
+   2. RESET + BASE
+════════════════════════════════════════════════ */
+
+*, *::before, *::after {
+  box-sizing: border-box; margin: 0; padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  height: 100%; overflow: hidden;
+  background: #080810;
+}
+
+body {
+  display: flex; justify-content: center; align-items: flex-start;
+  font-family: var(--font-b);
+  transition: background 0.35s ease;
+}
+
+button { cursor: pointer; font-family: inherit; background: none; border: none; }
+input, textarea { font-family: inherit; outline: none; resize: none; }
+
+/* ════════════════════════════════════════════════
+   3. APP SHELL
+════════════════════════════════════════════════ */
+
+#app {
+  width: 100%; max-width: 420px;
+  height: 100dvh; height: 100vh;
+  background: var(--bg);
+  position: relative;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  transition: background 0.35s ease;
+}
+
+/* Cyberpunk scan-line overlay */
+[data-theme="cyberpunk"] #app::after {
+  content: '';
+  position: absolute; inset: 0; pointer-events: none; z-index: 900;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 2px,
+    rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px
+  );
+}
+
+/* Kawaii dot pattern */
+[data-theme="kawaii"] #app::before {
+  content: '';
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background-image: radial-gradient(circle, rgba(139,92,246,0.12) 1.5px, transparent 1.5px);
+  background-size: 28px 28px;
+}
+
+/* Notepad ruled lines */
+[data-theme="notepad"] #app::before {
+  content: '';
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background-image: repeating-linear-gradient(
+    transparent, transparent 27px, rgba(58,111,168,0.08) 27px, rgba(58,111,168,0.08) 28px
+  );
+}
+
+/* ════════════════════════════════════════════════
+   4. THEME TAB BAR
+════════════════════════════════════════════════ */
+
+.theme-bar {
+  display: flex; flex-shrink: 0; width: 100%;
+  position: sticky; top: 0; z-index: 50;
+  transition: background 0.35s, border-color 0.35s;
+}
+
+[data-theme="cyberpunk"] .theme-bar {
+  background: var(--bg-card);
+  border-bottom: 1px solid rgba(0,245,255,0.1);
+}
+[data-theme="kawaii"] .theme-bar {
+  background: var(--bg-card);
+  border-bottom: 2px solid rgba(139,92,246,0.15);
+  box-shadow: 0 2px 12px rgba(139,92,246,0.08);
+}
+[data-theme="notepad"] .theme-bar {
+  background: var(--bg-card);
+  border-bottom: 1.5px solid #e8e0d5;
+}
+
+.theme-tab {
+  flex: 1; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+  border: none; cursor: pointer; font-family: var(--font-ui);
+}
+
+/* Cyberpunk tabs */
+[data-theme="cyberpunk"] .theme-tab {
+  color: var(--text-m); background: var(--bg-card);
+  border-top: 1px solid transparent; border-bottom: 2px solid transparent;
+  border-left: 1px solid transparent; border-right: 2px solid transparent;
+  border-radius: var(--r);
+}
+[data-theme="cyberpunk"] .theme-tab[aria-selected="true"] {
+  color: var(--c3);
+  border-top-color: var(--c3); border-left-color: var(--c3);
+  border-bottom-color: var(--c3); border-right-color: var(--c3);
+}
+[data-theme="cyberpunk"] .theme-tab:hover { background: rgba(255,255,255,0.03); }
+
+/* Kawaii tabs */
+[data-theme="kawaii"] .theme-tab {
+  color: var(--text-m); background: transparent;
+  border-bottom: 3px solid transparent;
+}
+[data-theme="kawaii"] .theme-tab[aria-selected="true"] {
+  color: var(--c1); border-bottom-color: var(--c1); background: rgba(139,92,246,0.05);
+}
+[data-theme="kawaii"] .theme-tab:hover { background: rgba(139,92,246,0.04); }
+
+/* Notepad tabs */
+[data-theme="notepad"] .theme-tab {
+  color: var(--text-m); background: transparent;
+  border-bottom: 2px solid transparent; font-family: var(--font-b);
+  font-size: 11px; font-weight: 500;
+}
+[data-theme="notepad"] .theme-tab[aria-selected="true"] {
+  color: var(--c1); border-bottom-color: var(--c1);
+}
+
+/* ════════════════════════════════════════════════
+   5. SCREENS
+════════════════════════════════════════════════ */
+
+main { flex: 1; position: relative; overflow: hidden; }
+
+.screen {
+  display: none; flex-direction: column;
+  position: absolute; inset: 0;
+  overflow-y: auto; overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin; scrollbar-color: rgba(128,128,128,0.2) transparent;
+  padding: 32px 24px 24px;
+  gap: 24px;
+  z-index: 1;
+}
+.screen.active { display: flex; animation: fadeUp 0.25s ease; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ════════════════════════════════════════════════
+   6. TYPOGRAPHY
+════════════════════════════════════════════════ */
+
+.t-h1 { font-family: var(--font-h); color: var(--text-h); line-height: 1.15; }
+.t-h2 { font-family: var(--font-h); color: var(--text-h); }
+.t-sub { color: var(--text-m); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
+.t-body { font-family: var(--font-b); color: var(--text-b); line-height: 1.6; font-size: 14px; }
+.t-meta { font-family: var(--font-b); color: var(--text-m); font-size: 11px; }
+
+/* Cyberpunk type specifics */
+[data-theme="cyberpunk"] .t-h1 {
+  font-weight: 700; font-size: 26px; letter-spacing: 3px; text-transform: uppercase;
+  background: linear-gradient(171.9deg, var(--c1) 0%, var(--c4) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+[data-theme="cyberpunk"] .t-h2 {
+  font-weight: 700; font-size: 18px; letter-spacing: 1.44px; text-transform: uppercase;
+  color: var(--c2); text-shadow: 0 0 12px rgba(57,255,20,0.35);
+  -webkit-text-fill-color: var(--c2);
+}
+[data-theme="cyberpunk"] .t-sub { font-family: var(--font-h); color: var(--c1); }
+[data-theme="cyberpunk"] .t-body { color: var(--text-b); }
+
+/* Kawaii type specifics */
+[data-theme="kawaii"] .t-h1 {
+  font-weight: 900; font-size: 26px; color: var(--text-h);
+  -webkit-text-fill-color: var(--text-h);
+}
+[data-theme="kawaii"] .t-h2 {
+  font-weight: 800; font-size: 18px; color: var(--c1);
+  -webkit-text-fill-color: var(--c1);
+}
+[data-theme="kawaii"] .t-sub { font-weight: 700; color: var(--c1); }
+
+/* Notepad type specifics */
+[data-theme="notepad"] .t-h1 {
+  font-weight: 700; font-size: 24px; color: var(--text-h);
+  -webkit-text-fill-color: var(--text-h);
+}
+[data-theme="notepad"] .t-h2 {
+  font-weight: 700; font-size: 18px; color: var(--c1);
+  -webkit-text-fill-color: var(--c1);
+}
+[data-theme="notepad"] .t-sub { font-family: var(--font-b); color: var(--text-m); }
+
+/* ════════════════════════════════════════════════
+   7. BUTTONS — base
+════════════════════════════════════════════════ */
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 6px; cursor: pointer; text-transform: uppercase;
+  font-family: var(--font-ui); font-weight: 700;
+  transition: box-shadow 0.15s, background 0.15s, opacity 0.15s;
+  white-space: nowrap;
+}
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.35; pointer-events: none; }
+
+/* Primary — CTA / confirm */
+[data-theme="cyberpunk"] .btn-primary {
+  color: var(--c2); background: transparent;
+  border-top: 4px solid var(--c2); border-left: 4px solid var(--c2);
+  border-right: 1px solid var(--c2); border-bottom: 1px solid var(--c2);
+  border-radius: var(--r); font-size: 13px; letter-spacing: 2.4px;
+  padding: 14px 18px 12px;
+}
+[data-theme="cyberpunk"] .btn-primary:hover { box-shadow: var(--glow-c2); background: rgba(57,255,20,0.05); }
+
+[data-theme="kawaii"] .btn-primary {
+  color: #fff; background: var(--c1);
+  border: 2px solid var(--c1); border-radius: 24px;
+  font-size: 13px; letter-spacing: 0.5px; padding: 12px 24px;
+  box-shadow: 0 4px 14px rgba(139,92,246,0.3);
+}
+[data-theme="kawaii"] .btn-primary:hover { box-shadow: 0 6px 20px rgba(139,92,246,0.45); background: #7c3aed; }
+
+[data-theme="notepad"] .btn-primary {
+  color: #fff; background: var(--c1);
+  border: 2px solid var(--c1); border-radius: var(--r);
+  font-size: 13px; letter-spacing: 0.3px; padding: 12px 20px;
+  font-family: var(--font-b); text-transform: none; font-weight: 600;
+}
+[data-theme="notepad"] .btn-primary:hover { background: #3a7044; border-color: #3a7044; box-shadow: var(--glow-c1); }
+
+/* Secondary */
+[data-theme="cyberpunk"] .btn-secondary {
+  color: var(--c3); background: transparent;
+  border-top: 1px solid var(--c3); border-left: 1px solid var(--c3);
+  border-right: 2px solid var(--c3); border-bottom: 2px solid var(--c3);
+  border-radius: var(--r); font-size: 13px; letter-spacing: 2.4px;
+  padding: 10px 16px;
+}
+[data-theme="cyberpunk"] .btn-secondary:hover { box-shadow: var(--glow-c3); background: rgba(255,45,120,0.05); }
+
+[data-theme="kawaii"] .btn-secondary {
+  color: var(--c2); background: #fff;
+  border: 2px solid var(--c2); border-radius: 24px;
+  font-size: 13px; letter-spacing: 0.5px; padding: 11px 22px;
+}
+[data-theme="kawaii"] .btn-secondary:hover { background: #fff0f5; box-shadow: var(--glow-c2); }
+
+[data-theme="notepad"] .btn-secondary {
+  color: var(--c2); background: transparent;
+  border: 1.5px solid var(--c2); border-radius: var(--r);
+  font-size: 13px; letter-spacing: 0.3px; padding: 11px 18px;
+  font-family: var(--font-b); text-transform: none; font-weight: 500;
+}
+[data-theme="notepad"] .btn-secondary:hover { background: rgba(58,111,168,0.06); box-shadow: var(--glow-c2); }
+
+/* Tertiary / ghost (response action buttons) */
+[data-theme="cyberpunk"] .btn-ghost {
+  color: var(--c4); background: transparent;
+  border-top: 1px solid var(--c4); border-left: 1px solid var(--c4);
+  border-right: 4px solid var(--c4); border-bottom: 4px solid var(--c4);
+  border-radius: var(--r); font-size: 11px; letter-spacing: 1px;
+  padding: 8px 14px;
+}
+[data-theme="cyberpunk"] .btn-ghost:hover { box-shadow: var(--glow-c4); background: rgba(176,76,255,0.05); }
+
+[data-theme="kawaii"] .btn-ghost {
+  color: var(--c1); background: rgba(139,92,246,0.08);
+  border: 2px solid rgba(139,92,246,0.3); border-radius: 20px;
+  font-size: 12px; letter-spacing: 0.3px; padding: 8px 14px;
+}
+[data-theme="kawaii"] .btn-ghost:hover { background: rgba(139,92,246,0.15); }
+
+[data-theme="notepad"] .btn-ghost {
+  color: var(--text-b); background: var(--bg-card2);
+  border: 1px solid #d4cbbf; border-radius: var(--r);
+  font-size: 12px; letter-spacing: 0.3px; padding: 8px 14px;
+  font-family: var(--font-b); text-transform: none; font-weight: 500;
+}
+[data-theme="notepad"] .btn-ghost:hover { background: #ede8e1; }
+
+/* ════════════════════════════════════════════════
+   8. INPUT FIELD — VENT TEXTAREA
+════════════════════════════════════════════════ */
+
+.vent-field { width: 100%; display: flex; flex-direction: column; }
+
+/* Cyberpunk input */
+[data-theme="cyberpunk"] .vent-field {
+  background: var(--bg-card);
+  border-top: 4px solid var(--c1); border-left: 4px solid var(--c1);
+  border-right: 1px solid var(--c1); border-bottom: 1px solid var(--c1);
+  border-radius: var(--r-card);
+}
+[data-theme="cyberpunk"] .vent-field:focus-within { box-shadow: var(--glow-c1); }
+[data-theme="cyberpunk"] .vent-label {
+  border-bottom: 1px solid var(--c1); padding: 8px 14px 4px;
+  font-family: var(--font-h); font-weight: 700;
+  font-size: 10px; letter-spacing: 1.32px; text-transform: uppercase; color: var(--c1);
+}
+[data-theme="cyberpunk"] .vent-field textarea {
+  background: transparent; color: var(--text-b);
+  font-size: 13px; letter-spacing: 0.5px; line-height: 1.7;
+  padding: 14px; min-height: 160px; border: none;
+}
+[data-theme="cyberpunk"] .vent-field textarea::placeholder { color: var(--text-m); }
+[data-theme="cyberpunk"] .vent-footer {
+  padding: 8px 14px; border-top: 1px solid rgba(0,245,255,0.1);
+  display: flex; justify-content: flex-end;
+}
+
+/* Kawaii input */
+[data-theme="kawaii"] .vent-field {
+  background: var(--bg-card);
+  border: 2px solid rgba(139,92,246,0.3); border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(139,92,246,0.1);
+  overflow: hidden;
+}
+[data-theme="kawaii"] .vent-field:focus-within {
+  border-color: var(--c1); box-shadow: 0 4px 20px rgba(139,92,246,0.25);
+}
+[data-theme="kawaii"] .vent-label {
+  padding: 12px 16px 6px;
+  font-weight: 800; font-size: 10px; letter-spacing: 0.5px;
+  text-transform: uppercase; color: var(--c1);
+  border-bottom: 1px solid rgba(139,92,246,0.15);
+}
+[data-theme="kawaii"] .vent-field textarea {
+  background: transparent; color: var(--text-h);
+  font-size: 14px; line-height: 1.7;
+  padding: 12px 16px; min-height: 160px; border: none;
+}
+[data-theme="kawaii"] .vent-field textarea::placeholder { color: var(--text-m); }
+[data-theme="kawaii"] .vent-footer {
+  padding: 8px 16px; display: flex; justify-content: flex-end;
+}
+
+/* Notepad input */
+[data-theme="notepad"] .vent-field {
+  background: var(--bg-card);
+  border: 1.5px solid #d4cbbf; border-radius: var(--r-card);
+  box-shadow: 0 1px 4px rgba(196,184,170,0.25);
+  overflow: hidden;
+}
+[data-theme="notepad"] .vent-field:focus-within { border-color: var(--c1); box-shadow: var(--glow-c1); }
+[data-theme="notepad"] .vent-label {
+  padding: 10px 14px 4px;
+  font-family: var(--font-h); font-style: italic;
+  font-size: 12px; color: var(--text-m);
+  border-bottom: 1px solid #e8e0d5;
+}
+[data-theme="notepad"] .vent-field textarea {
+  background: transparent; color: var(--text-h);
+  font-family: var(--font-h); font-size: 14px; line-height: 1.8;
+  padding: 12px 14px; min-height: 160px; border: none;
+}
+[data-theme="notepad"] .vent-field textarea::placeholder {
+  color: var(--text-m); font-style: italic; font-weight: 400;
+}
+[data-theme="notepad"] .vent-footer {
+  padding: 8px 14px; border-top: 1px solid #e8e0d5;
+  display: flex; justify-content: flex-end;
+}
+
+.char-counter { font-size: 10px; letter-spacing: 0.5px; color: var(--text-m); }
+.char-counter.over { color: var(--c3); }
+.field-error { font-size: 11px; color: var(--c3); letter-spacing: 0.3px; }
+
+/* ════════════════════════════════════════════════
+   9. COMING SOON / ADD CARD
+════════════════════════════════════════════════ */
+
+.add-card { padding: 20px 20px; }
+
+[data-theme="cyberpunk"] .add-card {
+  background: var(--bg-card);
+  border-top: 1px solid var(--c3); border-left: 4px solid var(--c3);
+  border-right: 4px solid var(--c3); border-bottom: 2px solid var(--c3);
+  border-radius: var(--r-card); display: flex; flex-direction: column; gap: 8px;
+}
+[data-theme="kawaii"] .add-card {
+  background: linear-gradient(135deg, #fff0f5 0%, #f0ebff 100%);
+  border: 2px solid rgba(255,45,120,0.2); border-radius: 20px;
+  display: flex; flex-direction: column; gap: 10px;
+  box-shadow: 0 4px 16px rgba(255,45,120,0.1);
+}
+[data-theme="notepad"] .add-card {
+  background: var(--bg-card2);
+  border: 1.5px solid #d4cbbf; border-left: 4px solid var(--c1);
+  border-radius: var(--r-card); display: flex; flex-direction: column; gap: 8px;
+}
+
+/* ════════════════════════════════════════════════
+   10. USER QUOTE FIELD (read-only on lens/response screens)
+════════════════════════════════════════════════ */
+
+.quote-field { width: 100%; }
+
+[data-theme="cyberpunk"] .quote-field {
+  background: var(--bg-card);
+  border-top: 4px solid var(--c1); border-left: 4px solid var(--c1);
+  border-right: 1px solid var(--c1); border-bottom: 1px solid var(--c1);
+  border-radius: var(--r-card); overflow: hidden;
+}
+[data-theme="kawaii"] .quote-field {
+  background: var(--bg-card);
+  border: 2px solid rgba(139,92,246,0.25); border-radius: 20px;
+  overflow: hidden; box-shadow: 0 4px 14px rgba(139,92,246,0.08);
+}
+[data-theme="notepad"] .quote-field {
+  background: var(--bg-card);
+  border: 1.5px solid #d4cbbf; border-left: 4px solid var(--c2);
+  border-radius: var(--r-card); overflow: hidden;
+}
+
+.quote-label {
+  padding: 8px 14px 4px; font-size: 10px; letter-spacing: 1px;
+  text-transform: uppercase; font-weight: 700;
+}
+[data-theme="cyberpunk"] .quote-label {
+  font-family: var(--font-h); color: var(--c1);
+  border-bottom: 1px solid rgba(0,245,255,0.2);
+}
+[data-theme="kawaii"] .quote-label {
+  color: var(--c1); border-bottom: 1px solid rgba(139,92,246,0.12);
+}
+[data-theme="notepad"] .quote-label {
+  font-family: var(--font-h); font-style: italic; font-weight: 400;
+  font-size: 11px; color: var(--text-m); border-bottom: 1px solid #e8e0d5;
+}
+
+.quote-text {
+  padding: 12px 14px; font-size: 13px; line-height: 1.65;
+  max-height: 160px; overflow-y: auto; color: var(--text-h);
+}
+[data-theme="cyberpunk"] .quote-text { font-family: var(--font-h); }
+[data-theme="notepad"]   .quote-text { font-family: var(--font-h); font-style: italic; }
+
+/* ════════════════════════════════════════════════
+   11. FIGURE GRID
+════════════════════════════════════════════════ */
+
+.figure-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+}
+
+.figure-card {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 8px; padding: 14px 8px; cursor: pointer;
+  transition: box-shadow 0.18s, background 0.18s, transform 0.18s;
+}
+.figure-card:active { transform: scale(0.96); }
+
+[data-theme="cyberpunk"] .figure-card {
+  background: var(--bg-card2);
+  border: 1px solid rgba(176,76,255,0.4); border-radius: var(--r);
+}
+[data-theme="cyberpunk"] .figure-card:hover,
+[data-theme="cyberpunk"] .figure-card.selected {
+  border-color: var(--c1); background: rgba(0,245,255,0.06);
+  box-shadow: 0 0 16px rgba(0,245,255,0.25);
+}
+
+[data-theme="kawaii"] .figure-card {
+  background: var(--bg-card);
+  border: 2px solid rgba(139,92,246,0.15); border-radius: 18px;
+  box-shadow: 0 2px 8px rgba(139,92,246,0.06);
+}
+[data-theme="kawaii"] .figure-card:hover,
+[data-theme="kawaii"] .figure-card.selected {
+  border-color: var(--c1); box-shadow: 0 6px 20px rgba(139,92,246,0.22);
+  background: rgba(139,92,246,0.04);
+}
+
+[data-theme="notepad"] .figure-card {
+  background: var(--bg-card);
+  border: 1px solid #d4cbbf; border-radius: var(--r-card);
+}
+[data-theme="notepad"] .figure-card:hover,
+[data-theme="notepad"] .figure-card.selected {
+  border-color: var(--c1); box-shadow: var(--glow-c1);
+  background: rgba(74,136,85,0.04);
+}
+
+/* Portrait image in grid */
+.figure-portrait {
+  width: 64px; height: 64px; object-fit: cover; flex-shrink: 0;
+  transition: border-color 0.2s;
+}
+
+[data-theme="cyberpunk"] .figure-portrait {
+  border-radius: 32px; border: 1px solid var(--c2);
+}
+[data-theme="cyberpunk"] .figure-card.selected .figure-portrait,
+[data-theme="cyberpunk"] .figure-card:hover .figure-portrait {
+  border-width: 2px; box-shadow: var(--glow-c2);
+}
+[data-theme="kawaii"] .figure-portrait {
+  border-radius: 14px; border: 2px solid rgba(139,92,246,0.2);
+}
+[data-theme="kawaii"] .figure-card.selected .figure-portrait,
+[data-theme="kawaii"] .figure-card:hover .figure-portrait {
+  border-color: var(--c1);
+}
+[data-theme="notepad"] .figure-portrait {
+  border-radius: 50%; border: 1.5px solid #d4cbbf;
+}
+[data-theme="notepad"] .figure-card.selected .figure-portrait,
+[data-theme="notepad"] .figure-card:hover .figure-portrait {
+  border-color: var(--c1);
+}
+
+.figure-name {
+  font-size: 11px; font-weight: 700; text-align: center; line-height: 1.2;
+  letter-spacing: 0.8px; text-transform: uppercase;
+}
+[data-theme="cyberpunk"] .figure-name { font-family: var(--font-h); color: var(--c2); letter-spacing: 1.2px; }
+[data-theme="kawaii"]    .figure-name { color: var(--c1); letter-spacing: 0.3px; }
+[data-theme="notepad"]   .figure-name { color: var(--text-h); font-family: var(--font-b); }
+
+.figure-tag {
+  font-size: 9px; letter-spacing: 0.3px; text-align: center;
+  line-height: 1.3; color: var(--text-m);
+}
+[data-theme="cyberpunk"] .figure-tag {
+  font-family: var(--font-h); color: var(--text-h); letter-spacing: 0.8px; text-transform: uppercase;
+}
+[data-theme="notepad"] .figure-tag { font-style: italic; font-size: 10px; }
+
+/* ════════════════════════════════════════════════
+   12. RESPONSE CARD
+════════════════════════════════════════════════ */
+
+.response-card { width: 100%; }
+
+[data-theme="cyberpunk"] .response-card {
+  background: var(--bg-card);
+  border-top: 1px solid var(--c4); border-left: 1px solid var(--c4);
+  border-right: 4px solid var(--c4); border-bottom: 4px solid var(--c4);
+  border-radius: var(--r-card);
+}
+[data-theme="kawaii"] .response-card {
+  background: var(--bg-card);
+  border: 2px solid rgba(139,92,246,0.2); border-radius: 20px;
+  box-shadow: 0 6px 24px rgba(139,92,246,0.12);
+}
+[data-theme="notepad"] .response-card {
+  background: var(--bg-card);
+  border: 1.5px solid #d4cbbf; border-top: 3px solid var(--c2);
+  border-radius: var(--r-card); box-shadow: 0 2px 8px rgba(196,184,170,0.2);
+}
+
+.response-head {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+}
+
+[data-theme="cyberpunk"] .response-head {
+  border-bottom: 1px solid rgba(176,76,255,0.3);
+  box-shadow: 0 0 16px rgba(0,255,200,0.1);
+}
+[data-theme="kawaii"] .response-head {
+  border-bottom: 1px solid rgba(139,92,246,0.1);
+}
+[data-theme="notepad"] .response-head {
+  border-bottom: 1px solid #e8e0d5;
+}
+
+.response-portrait {
+  width: 36px; height: 36px; object-fit: cover; flex-shrink: 0;
+}
+[data-theme="cyberpunk"] .response-portrait {
+  border-radius: 18px; border: 1px solid var(--c2);
+}
+[data-theme="kawaii"] .response-portrait {
+  border-radius: 10px; border: 2px solid rgba(139,92,246,0.3);
+}
+[data-theme="notepad"] .response-portrait {
+  border-radius: 50%; border: 1.5px solid #d4cbbf;
+}
+
+.response-figure-name { font-size: 15px; font-weight: 700; }
+[data-theme="cyberpunk"] .response-figure-name {
+  font-family: var(--font-h); color: var(--c2); letter-spacing: 1px; text-transform: uppercase;
+  text-shadow: var(--glow-c2);
+}
+[data-theme="kawaii"] .response-figure-name { color: var(--c1); }
+[data-theme="notepad"] .response-figure-name { font-family: var(--font-h); color: var(--c2); }
+
+.response-body { padding: 16px 14px; display: flex; flex-direction: column; gap: 14px; }
+
+.response-section {
+  opacity: 0; transform: translateY(8px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.response-section.revealed { opacity: 1; transform: none; }
+
+.response-section-title {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.8px;
+  text-transform: uppercase; margin-bottom: 6px;
+}
+[data-theme="cyberpunk"] .response-section-title { font-family: var(--font-h); color: var(--c1); letter-spacing: 1.2px; }
+[data-theme="kawaii"]    .response-section-title { color: var(--c1); }
+[data-theme="notepad"]   .response-section-title { font-family: var(--font-b); color: var(--c2); }
+
+.response-section-body {
+  font-size: 13px; line-height: 1.7;
+}
+[data-theme="cyberpunk"] .response-section-body { font-family: var(--font-h); color: var(--text-b); }
+[data-theme="kawaii"]    .response-section-body { color: var(--text-b); }
+[data-theme="notepad"]   .response-section-body { font-family: var(--font-h); font-style: italic; color: var(--text-b); }
+
+/* ════════════════════════════════════════════════
+   13. BOTTOM NAV (response screen)
+════════════════════════════════════════════════ */
+
+.bottom-nav {
+  display: flex; align-items: stretch;
+  flex-shrink: 0; margin-top: auto;
+  position: sticky; bottom: 0; z-index: 10;
+}
+
+[data-theme="cyberpunk"] .bottom-nav {
+  border-top: 1px solid rgba(0,245,255,0.08); background: var(--bg);
+}
+[data-theme="kawaii"] .bottom-nav {
+  border-top: 2px solid rgba(139,92,246,0.1);
+  background: var(--bg-card); box-shadow: 0 -4px 16px rgba(139,92,246,0.06);
+}
+[data-theme="notepad"] .bottom-nav {
+  border-top: 1.5px solid #e8e0d5; background: var(--bg-card);
+}
+
+.bottom-nav .btn {
+  flex: 1; height: 64px; flex-direction: column; gap: 3px;
+  font-size: 10px; letter-spacing: 0.5px; border-radius: 0; border: none;
+  text-transform: none; padding: 0;
+}
+.bottom-nav .btn svg, .bottom-nav .btn .nav-icon { font-size: 20px; }
+
+[data-theme="cyberpunk"] .bottom-nav .btn-primary {
+  color: var(--c2); border: none;
+  border-right: 1px solid rgba(0,245,255,0.08);
+  padding: 0;
+}
+[data-theme="cyberpunk"] .bottom-nav .btn-secondary {
+  color: var(--c3); border: none;
+  border-right: 1px solid rgba(0,245,255,0.08);
+  padding: 0;
+}
+[data-theme="kawaii"] .bottom-nav .btn-primary {
+  color: var(--c1); border: none; background: transparent; box-shadow: none;
+  border-radius: 0; padding: 0;
+}
+[data-theme="kawaii"] .bottom-nav .btn-secondary {
+  color: var(--c2); border: none; background: transparent; box-shadow: none;
+  border-radius: 0; padding: 0;
+}
+[data-theme="notepad"] .bottom-nav .btn-primary {
+  color: var(--c1); border: none; background: transparent;
+  border-radius: 0; padding: 0; text-transform: none;
+}
+[data-theme="notepad"] .bottom-nav .btn-secondary {
+  color: var(--c2); border: none; background: transparent;
+  border-radius: 0; padding: 0; text-transform: none;
+}
+.bottom-nav .btn:hover { background: rgba(128,128,128,0.06); }
+
+/* ════════════════════════════════════════════════
+   14. PREVIEW OVERLAY (lens popup)
+════════════════════════════════════════════════ */
+
+#overlay-preview {
+  position: fixed; inset: 0; z-index: 200;
+  background: var(--overlay-bg);
+  display: none; flex-direction: column; align-items: center;
+  justify-content: center; gap: 24px; padding: 32px;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+}
+#overlay-preview.open {
+  display: flex; animation: fadeUp 0.22s ease;
+}
+
+.preview-card { width: 100%; }
+
+[data-theme="cyberpunk"] .preview-card {
+  background: var(--bg-card);
+  border-top: 1px solid var(--c4); border-left: 1px solid var(--c4);
+  border-right: 4px solid var(--c4); border-bottom: 4px solid var(--c4);
+  border-radius: var(--r-card); padding: 24px 20px;
+}
+[data-theme="kawaii"] .preview-card {
+  background: var(--bg-card);
+  border: 2px solid rgba(139,92,246,0.25); border-radius: 24px;
+  padding: 28px 24px; box-shadow: 0 12px 40px rgba(139,92,246,0.18);
+}
+[data-theme="notepad"] .preview-card {
+  background: var(--bg-card);
+  border: 1.5px solid #d4cbbf; border-top: 4px solid var(--c2);
+  border-radius: var(--r-card); padding: 24px 20px;
+  box-shadow: 0 4px 16px rgba(196,184,170,0.25);
+}
+
+.preview-inner { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+
+.preview-portrait {
+  width: 88px; height: 88px; object-fit: cover;
+}
+[data-theme="cyberpunk"] .preview-portrait {
+  border-radius: 44px; border: 2px solid var(--c2); box-shadow: var(--glow-c2);
+}
+[data-theme="kawaii"] .preview-portrait {
+  border-radius: 20px; border: 3px solid var(--c1); box-shadow: var(--glow-c1);
+}
+[data-theme="notepad"] .preview-portrait {
+  border-radius: 50%; border: 2px solid var(--c2);
+}
+
+.preview-name { font-size: 18px; font-weight: 700; text-align: center; }
+[data-theme="cyberpunk"] .preview-name {
+  font-family: var(--font-h); color: var(--c2); letter-spacing: 1.4px; text-transform: uppercase;
+  text-shadow: var(--glow-c2);
+}
+[data-theme="kawaii"] .preview-name { color: var(--c1); }
+[data-theme="notepad"] .preview-name { font-family: var(--font-h); color: var(--c2); }
+
+.preview-quote {
+  font-size: 13px; line-height: 1.6; text-align: center;
+  font-style: italic; color: var(--text-h);
+}
+.preview-bio {
+  font-size: 12px; line-height: 1.6; text-align: center;
+  color: var(--text-b);
+}
+
+.preview-actions {
+  display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 12px;
+}
+
+/* ════════════════════════════════════════════════
+   15. LOADING OVERLAY
+════════════════════════════════════════════════ */
+
+#overlay-loading {
+  position: fixed; inset: 0; z-index: 500;
+  display: none; flex-direction: column;
+  align-items: center; justify-content: center; gap: 18px;
+}
+#overlay-loading.open {
+  display: flex;
+}
+
+[data-theme="cyberpunk"] #overlay-loading { background: rgba(8,8,16,0.97); }
+[data-theme="kawaii"]    #overlay-loading { background: rgba(237,242,255,0.97); }
+[data-theme="notepad"]   #overlay-loading { background: rgba(253,253,251,0.97); }
+
+.loading-portrait {
+  width: 72px; height: 72px; object-fit: cover;
+  animation: loadingPulse 1.8s ease-in-out infinite;
+}
+[data-theme="cyberpunk"] .loading-portrait {
+  border-radius: 36px; border: 2px solid var(--c1); box-shadow: 0 0 24px rgba(0,245,255,0.5);
+}
+[data-theme="kawaii"] .loading-portrait {
+  border-radius: 16px; border: 2px solid var(--c1); box-shadow: var(--glow-c1);
+}
+[data-theme="notepad"] .loading-portrait {
+  border-radius: 50%; border: 2px solid var(--c2);
+}
+@keyframes loadingPulse {
+  0%, 100% { opacity: 0.7; transform: scale(0.95); }
+  50%       { opacity: 1;   transform: scale(1.05); }
+}
+
+.loading-title {
+  font-size: 16px; font-weight: 700; text-align: center; color: var(--text-h);
+}
+[data-theme="cyberpunk"] .loading-title {
+  font-family: var(--font-h); letter-spacing: 1.4px; text-transform: uppercase;
+}
+.loading-subtitle {
+  font-size: 11px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-m);
+  text-align: center;
+}
+[data-theme="cyberpunk"] .loading-subtitle { font-family: var(--font-h); color: var(--c1); }
+[data-theme="kawaii"] .loading-subtitle { font-weight: 700; color: var(--c1); }
+
+.loading-dots { display: flex; gap: 8px; }
+.ldot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--c1);
+  animation: ldotPulse 1.3s infinite ease-in-out;
+}
+.ldot:nth-child(1) { animation-delay: 0s; }
+.ldot:nth-child(2) { animation-delay: 0.18s; }
+.ldot:nth-child(3) { animation-delay: 0.36s; }
+@keyframes ldotPulse {
+  0%, 100% { opacity: 0.2; transform: scale(0.75); }
+  50%       { opacity: 1;   transform: scale(1.15); }
+}
+
+/* ════════════════════════════════════════════════
+   16. SCREEN-SPECIFIC LAYOUTS
+════════════════════════════════════════════════ */
+
+/* Landing */
+#screen-landing { gap: 28px; }
+.landing-copy { display: flex; flex-direction: column; gap: 14px; }
+
+/* Lenses */
+#screen-lenses { gap: 20px; }
+#screen-lenses .section-title { text-align: center; }
+
+/* Response */
+#screen-response { gap: 16px; padding-bottom: 0; }
+.response-action-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+
+/* Account */
+#screen-account { gap: 24px; align-items: center; }
+.account-fields { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 327px; }
+.compact-input { width: 100%; }
+
+[data-theme="cyberpunk"] .compact-input {
+  background: var(--bg-card);
+  border-top: 4px solid var(--c1); border-left: 4px solid var(--c1);
+  border-right: 1px solid var(--c1); border-bottom: 1px solid var(--c1);
+  border-radius: var(--r);
+}
+[data-theme="cyberpunk"] .compact-label {
+  font-family: var(--font-h); font-size: 9px; letter-spacing: 1.2px; color: var(--c1);
+  text-transform: uppercase; padding: 6px 10px 2px; border-bottom: 1px solid rgba(0,245,255,0.2);
+}
+[data-theme="cyberpunk"] .compact-input input {
+  background: transparent; color: var(--text-m); width: 100%; border: none;
+  font-family: var(--font-h); font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+  padding: 4px 10px 6px;
+}
+[data-theme="kawaii"] .compact-input {
+  background: var(--bg-card);
+  border: 2px solid rgba(139,92,246,0.2); border-radius: 14px; overflow: hidden;
+}
+[data-theme="kawaii"] .compact-label {
+  font-size: 10px; font-weight: 800; color: var(--c1); text-transform: uppercase;
+  letter-spacing: 0.5px; padding: 8px 14px 2px; border-bottom: 1px solid rgba(139,92,246,0.1);
+}
+[data-theme="kawaii"] .compact-input input {
+  background: transparent; color: var(--text-h); width: 100%; border: none;
+  font-size: 13px; padding: 4px 14px 8px;
+}
+[data-theme="notepad"] .compact-input {
+  background: var(--bg-card);
+  border: 1.5px solid #d4cbbf; border-radius: var(--r); overflow: hidden;
+}
+[data-theme="notepad"] .compact-label {
+  font-family: var(--font-h); font-style: italic; font-size: 11px; color: var(--text-m);
+  padding: 6px 12px 2px; border-bottom: 1px solid #e8e0d5;
+}
+[data-theme="notepad"] .compact-input input {
+  background: transparent; color: var(--text-h); width: 100%; border: none;
+  font-size: 13px; padding: 4px 12px 6px;
+}
+.compact-input input::placeholder { opacity: 0.5; }
+
+/* ════════════════════════════════════════════════
+   17. ACCESSIBILITY
+════════════════════════════════════════════════ */
+
+.skip-link {
+  position: absolute; left: -9999px; top: 4px;
+  background: var(--bg-card); color: var(--c1);
+  padding: 8px 16px; font-size: 12px; z-index: 9999;
+}
+.skip-link:focus { left: 4px; }
+:focus-visible { outline: 2px solid var(--c1); outline-offset: 3px; border-radius: 2px; }
+
+/* Smooth theme transition */
+#app, #app * {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: 0.28s;
+  transition-timing-function: ease;
+}
+/* Exclude portrait images from transitions to avoid flicker */
+#app img { transition: none; }
+#app .screen, #app .response-section { transition: none; }
+
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+
+<div id="app" data-theme="cyberpunk">
+
+  <!-- Theme tab switcher -->
+  <div class="theme-bar" role="tablist" aria-label="UI Theme">
+    <button class="theme-tab" data-theme-target="cyberpunk"
+            role="tab" aria-selected="true"
+            onclick="switchTheme('cyberpunk')">CyberPunk</button>
+    <button class="theme-tab" data-theme-target="kawaii"
+            role="tab" aria-selected="false"
+            onclick="switchTheme('kawaii')">Kawaii</button>
+    <button class="theme-tab" data-theme-target="notepad"
+            role="tab" aria-selected="false"
+            onclick="switchTheme('notepad')">Notepad</button>
+  </div>
+
+  <main id="main">
+
+    <!-- ══════════════════ SCREEN: LANDING ══════════════════ -->
+    <div class="screen active" id="screen-landing">
+
+      <div class="landing-copy">
+        <h1 class="t-h1">Have something on your mind?</h1>
+        <p class="t-body">
+          A decision, a fear, a frustration. Write it out honestly — the more you share, the richer the shift.
+        </p>
+        <h2 class="t-h2">Vent it out, then see it through the lens of a historical figure.</h2>
+      </div>
+
+      <div class="vent-field" id="vent-wrap">
+        <div class="vent-label">Vent it out…</div>
+        <textarea id="ventText" rows="7" maxlength="800"
+          aria-label="What's on your mind"
+          placeholder="No filter needed — pour it all out."
+          oninput="updateCharCount()"></textarea>
+        <div class="vent-footer">
+          <span class="char-counter" id="charCounter">0/800</span>
+        </div>
+      </div>
+
+      <p class="field-error" id="ventError" style="display:none;" role="alert"></p>
+
+      <button class="btn btn-primary" style="align-self:center;" onclick="goToLenses()">
+        Select the Lens
+      </button>
+
+      <div class="add-card">
+        <span class="t-sub">Coming Soon</span>
+        <h2 class="t-h2" style="font-size:17px;">Mind-Mapping Tool</h2>
+        <p class="t-body" style="font-size:13px;">
+          Reflect, plan and achieve new horizons with step-by-step guidance.
+        </p>
+      </div>
+
+    </div><!-- /screen-landing -->
+
+
+    <!-- ══════════════════ SCREEN: LENS SELECTION ══════════════════ -->
+    <div class="screen" id="screen-lenses">
+
+      <div class="quote-field">
+        <div class="quote-label" id="lensTopicLabel">Your thought</div>
+        <div class="quote-text" id="lensVentDisplay"></div>
+      </div>
+
+      <h2 class="t-h2 section-title">Pick a Lens</h2>
+
+      <div class="figure-grid" id="figureGrid"></div>
+
+    </div><!-- /screen-lenses -->
+
+
+    <!-- ══════════════════ SCREEN: RESPONSE ══════════════════ -->
+    <div class="screen" id="screen-response" style="padding-bottom:0;">
+
+      <div class="quote-field">
+        <div class="quote-label" id="respTopicLabel">Your thought</div>
+        <div class="quote-text" id="respVentDisplay"></div>
+      </div>
+
+      <div class="response-card">
+        <div class="response-head">
+          <img class="response-portrait" id="respPortrait" src="" alt="">
+          <span class="response-figure-name" id="respFigureName"></span>
+        </div>
+        <div class="response-body" id="respBody">
+          <!-- Sections inserted by JS -->
+        </div>
+      </div>
+
+      <div class="response-action-row">
+        <button class="btn btn-secondary" onclick="goToLenses()">← Try another</button>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-ghost" onclick="shareResponse()" title="Share">
+            <span>↗</span> Share
+          </button>
+          <button class="btn btn-ghost" onclick="goToAccount()" title="Save">
+            ✦ Save
+          </button>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <button class="btn btn-primary" onclick="goToLenses()">
+          <span class="nav-icon">⊙</span>
+          <span>New Lens</span>
+        </button>
+        <button class="btn btn-secondary" onclick="goToLanding()">
+          <span class="nav-icon">⌂</span>
+          <span>Home</span>
+        </button>
+        <button class="btn btn-primary" onclick="goToAccount()">
+          <span class="nav-icon">✦</span>
+          <span>Decorate</span>
+        </button>
+      </div>
+
+    </div><!-- /screen-response -->
+
+
+    <!-- ══════════════════ SCREEN: ACCOUNT ══════════════════ -->
+    <div class="screen" id="screen-account">
+
+      <h1 class="t-h1" style="text-align:center;">Create Account</h1>
+      <p class="t-body" style="text-align:center;">
+        Unlock <strong>Journal</strong> and <strong>Decorate</strong> — save the perspectives you get.
+      </p>
+
+      <div class="account-fields">
+        <div class="compact-input">
+          <div class="compact-label">@nickname</div>
+          <input type="text" id="acNick" placeholder="your handle" autocomplete="username">
+        </div>
+        <div class="compact-input">
+          <div class="compact-label">e-mail</div>
+          <input type="email" id="acEmail" placeholder="your@email.com" autocomplete="email">
+        </div>
+        <div class="compact-input">
+          <div class="compact-label">phone</div>
+          <input type="tel" id="acPhone" placeholder="+1 234 567 8900" autocomplete="tel">
+        </div>
+        <div class="compact-input">
+          <div class="compact-label">password</div>
+          <input type="password" id="acPass" placeholder="min 8 characters" autocomplete="new-password">
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="createAccount()">Create Account</button>
+
+      <div class="add-card">
+        <span class="t-sub">Be first to explore</span>
+        <h2 class="t-h2" style="font-size:17px;text-align:center;">Premium Features</h2>
+        <p class="t-body" style="font-size:13px;">Chat with any lens · Unlimited sessions · Journal your shifts</p>
+        <button class="btn btn-secondary" style="align-self:center;margin-top:6px;" onclick="goToLanding()">Subscribe</button>
+      </div>
+
+      <button class="btn btn-ghost" style="align-self:center;" onclick="goBackFromAccount()">← Back</button>
+
+    </div><!-- /screen-account -->
+
+  </main>
+</div><!-- #app -->
+
+
+<!-- ══════════════════ OVERLAY: LENS PREVIEW ══════════════════ -->
+<div id="overlay-preview" role="dialog" aria-modal="true" aria-label="Lens preview">
+  <div class="preview-card">
+    <div class="preview-inner">
+      <img class="preview-portrait" id="previewPortrait" src="" alt="">
+      <div class="preview-name" id="previewName"></div>
+      <p class="preview-quote" id="previewQuote"></p>
+      <p class="preview-bio" id="previewBio"></p>
+    </div>
+  </div>
+  <div class="preview-actions">
+    <button class="btn btn-secondary" onclick="closePreview()">Back to selection</button>
+    <button class="btn btn-primary" onclick="confirmLens()">Select the Lens</button>
+  </div>
+</div>
+
+
+<!-- ══════════════════ OVERLAY: LOADING ══════════════════ -->
+<div id="overlay-loading" role="status" aria-live="polite" aria-atomic="true">
+  <img class="loading-portrait" id="loadingPortrait" src="" alt="">
+  <div class="loading-title" id="loadingTitle">Loading…</div>
+  <div class="loading-dots">
+    <div class="ldot"></div><div class="ldot"></div><div class="ldot"></div>
+  </div>
+  <div class="loading-subtitle" id="loadingSubtitle">Shifting perspective…</div>
+</div>
+
+
+<script>
+/* ════════════════════════════════════════════════
+   FIGURES DATA (15 lenses, all 3 portrait sets)
+════════════════════════════════════════════════ */
+
+const FIGURES = [
+  {
+    id: 'socrates', name: 'Socrates', fullName: 'Socrates',
+    tag: 'Question everything',
+    portraits: {
+      cyberpunk: '../portraits/cyberpunk/socrates_cyberpunk.png',
+      kawaii:    '../portraits/kawaii/Socrates_Kawaii.png',
+      notepad:   '../portraits/notepad/socrates_ notepad.png'
+    },
+    quote: '"The unexamined life is not worth living."',
+    bio: 'Athenian philosopher who used radical questioning to expose everyone\'s hidden assumptions.',
+    loadingLine: 'Examining your assumptions…',
+    mock: {
+      sections: [
+        { title: 'What do you actually know?', body: 'Before we proceed — what do you believe you know about this situation? And how certain are you that you know it? The first step to clarity is distinguishing what you have truly examined from what you have merely assumed.' },
+        { title: 'Whose voice is that?', body: 'When you feel the pressure you are describing — whose expectations are speaking? Are these your values, or ones you inherited without ever questioning them? Have you tested whether they actually hold up under scrutiny?' },
+        { title: 'What would you choose in private?', body: 'Strip away the judgement, the social consequences, the approval. If the choice were entirely invisible to others — what would you actually do? And does that answer surprise you?' }
+      ]
+    }
+  },
+  {
+    id: 'lincoln', name: 'A. Lincoln', fullName: 'Abraham Lincoln',
+    tag: 'Persist through failure',
+    portraits: {
+      cyberpunk: '../portraits/cyberpunk/abraham_lincoln_cyberpunk.png',
+      kawaii:    '../portraits/kawaii/Lincoln_Kawaii_v2.png',
+      notepad:   '../portraits/notepad/abraham_lincoln_ notepad.png'
+    },
+    quote: '"Give me six hours to chop down a tree — four to sharpen the axe."',
+    bio: '16th US President. Failed repeatedly before holding a nation together through its bloodiest war.',
+    loadingLine: 'Drawing from hard-won experience…',
+    mock: {
+      sections: [
+        { title: 'Every failure is schooling', body: 'I failed in business twice, lost eight elections, suffered a nervous breakdown — and still became President. Each setback taught me something the victory never could have. The question is not whether you have failed. The question is what you have been willing to learn.' },
+        { title: 'Preparation outlasts panic', body: 'When a crisis arrives, most people reach for speed. But speed without preparation is just noise. The time you spend now — thinking clearly, sharpening your understanding — is the four hours on the axe. The chopping goes much faster after.' },
+        { title: 'Patience is not passivity', body: 'I waited years before the right moment arrived for what needed to be done. That waiting was not weakness — it was strategy. Patience and persistence are different from resignation. One is active; the other is surrender.' }
+      ]
+    }
+  },
+  {
+    id: 'dolly', name: 'Dolly Parton', fullName: 'Dolly Parton',
+    tag: 'Resilience & joy',
+    portraits: {
+      cyberpunk: '../portraits/cyberpunk/dolly_parton_cyberpunk.png',
+      kawaii:    '../portraits/kawaii/DollyParton_Kawaii.png',
+      notepad:   '../portraits/notepad/dolly_parton_ notepad.png'
+    },
+    quote: '"If you want the rainbow, you gotta put up with the rain."',
+    bio: 'Country music legend and businesswoman. Turned hardship into beauty without losing her warmth.',
+    loadingLine: 'Counting your blessings…',
+    mock: {
+      sections: [
+        { title: 'Honey, you are more resilient than you think', body: 'I grew up dirt-poor in a one-room cabin with eleven brothers and sisters, and I never stopped finding something to be grateful for. Not because life was easy — it wasn\'t — but because gratitude kept me soft when the world wanted me to go hard.' },
+        { title: 'Your story is your superpower', body: 'People used to look down on where I came from. I turned every single bit of it into songs. Whatever you are struggling with right now — that struggle is not a weakness in you. It is material. It is the story that\'s going to help somebody else one day.' },
+        { title: 'Find the joy in the middle of the mess', body: 'You don\'t have to wait until everything is fixed to feel good. I never did. Find one small thing today that makes you smile, even if it\'s tiny. Joy is not a reward for surviving the hard part. It is the fuel you need to get through it.' }
+      ]
+    }
+  },
+  {
+    id: 'mandela', name: 'N. Mandela', fullName: 'Nelson Mandela',
+    tag: 'Long-game & forgiveness',
+    portraits: {
+      cyberpunk: '../portraits/cyberpunk/nelson_mandela_cyberpunk.png',
+      kawaii:    '../portraits/kawaii/NelsonMandela_Kawaii.png',
+      notepad:   '../portraits/notepad/nelson_mandela_ notepad.png'
+    },
+    quote: '"It always seems impossible until it is done."',
+    bio: 'Anti-apartheid leader, imprisoned for 27 years, became South Africa\'s first democratically elected President.',
+    loadingLine: 'Playing the long game…',
+    mock: {
+      sections: [
+        { title: 'Twenty-seven years is a long time to think', body: 'I had twenty-seven years on Robben Island to understand one thing: resentment is a prison you build for yourself. The moment I chose to see my captors as human beings — flawed and afraid — was the moment I became truly free. Bitterness would have destroyed me long before release.' },
+        { title: 'The long view changes everything', body: 'What feels catastrophic today may be the necessary prologue to what you are actually building. I did not plan my presidency in weeks — I planned it in decades. When the timeframe expands, so does your capacity to endure what is in front of you.' },
+        { title: 'Courage is acting despite the fear', body: 'I was afraid many times. Anyone who says they are not afraid is either lying or not paying attention. Courage is not the absence of fear — it is the decision that something else matters more. What is it, for you, that matters more?' }
+      ]
+    }
+  },
+  {
+    id: 'rosaparks', name: 'Rosa Parks', fullName: 'Rosa Parks',
+    tag: 'Strength & dignity',
+    portraits: {
+      cyberpunk: '../portraits/cyberpunk/rosa_parks_cyberpunk.png',
+      kawaii:    '../portraits/kawaii/RosaParks_Kawaii.png',
+      notepad:   '../portraits/notepad/rosa_parks_ notepad.png'
+    },
+    quote: '"You must never be fearful about what you are doing when it is right."',
+    bio: 'Civil rights activist whose quiet refusal changed the course of American history.',
+    loadingLine: 'Standing firm in what\'s right…',
+    mock: {
+      sections: [
+        { title: 'Quiet is not small', body: 'People think of my refusal as a sudden act. It was not. It was the culmination of years of quiet conviction, of doing the right thing when no one was watching. The loudest statement I ever made was staying still and saying no. You do not need noise to have power.' },
+        { title: 'Know your line', body: 'Every person has a line — a place past which they will not go, regardless of the cost. The trouble is that most people don\'t know where their line is until they\'ve already crossed it. I knew mine. What is yours? Where does it sit, and are you living in front of it or behind it?' },
+        { title: 'Dignity is non-negotiable', body: 'You cannot be diminished by someone else if you know your own worth. I was not angry that night — I was clear. Clarity is much more powerful than anger. When you know what you stand for, no one can take your seat — even if they legally can.' }
+      ]
+    }
+  },
+  {
+    id: 'maya', name: 'Maya Angelou', fullName: 'Maya Angelou',
+    tag: 'Voice & expression',
+    portraits: {
+      cyberpunk: '../portraits/cyberpunk/maya_angelou_cyberpunk.png',
+      kawaii:    '../portraits/kawaii/MayaAngelou_Kawaii.png',
+      notepad:   '../portraits/notepad/maya_angelou_ notepad.png'
+    },
+    quote: '"You may not control events, but you can decide not to be reduced by them."',
+    bio: 'Poet and memoirist who transformed trauma into language that made others feel less alone.',
+    loadingLine: 'Finding the words for what you feel…',
+    mock: {
+      sections: [
+        { title: 'Name what is happening', body: 'The act of naming something gives you a relationship with it — and a relationship means you are no longer subject to it in the dark. I wrote about things that would have destroyed me if I had kept them inside. What have you not yet been able to say out loud?' },
+        { title: 'You have survived 100% of your hardest days', body: 'I was mute for five years as a child. I lived through things I could not speak about for decades. And still I came. Not despite those things — but carrying them, transformed. You are still here. That is not nothing. That is everything.' },
+        { title: 'Your story belongs to you', body: 'No one else gets to decide what your experience means. Interpretation is an act of power. The moment you put language around what you have been through, you claim it — you stop it from claiming you. Write it down. Even just for yourself.' }
+      ]
+    }
+  },
+  {
+    id: 'frida', name: 'Frida Kahlo', fullName: 'Frida Kahlo',
+    tag: 'Art heals all',
+    portraits: {
+      cyberpunk: '../portraits/cyberpunk/frida_kahlo_cyberpunk.png',
+      kawaii:    '../portraits/kawaii/FridaKahlo_Kawaii.png',
+      notepad:   '../portraits/notepad/frida_kahlo_ notepad.png'
+    },
+    quote: '"I paint so things will not die — I paint to feel alive."',
+    bio: 'Mexican painter who turned chronic pain and political conviction into powerful self-portraits.',
+    loadingLine: 'Turning pain into something beautiful…',
+    mock: {
+      sections: [
+        { title: 'Enter the pain directly', body: 'Do not flinch from what you are feeling. I spent years painting my own suffering — my broken spine, my miscarriages, my shattered heart — because looking away made it worse. The pain does not get smaller when you avoid it. It gets larger, stranger, more monstrous. Look at it.' },
+        { title: 'Make something from it', body: 'I could have spent my bedridden years in pure agony. Instead I had a mirror mounted to the ceiling above my bed and I painted myself. Not because I was narcissistic — because I was the subject I knew best, and making something from suffering is the most defiant act there is.' },
+        { title: 'Your truth is your art', body: 'You do not have to paint. But you do have to express — somehow, in some form — what is real inside you. Expression is not decoration. It is survival. Find the medium and use it. Your interior life is not something to manage. It is something to inhabit.' }
+      ]
+    }
+  },
+  {
+    id: 'che', name: 'Che Guevara', fullName: 'Ernesto "Che" Guevara',
+    tag: 'Radical conviction',
+    portraits: {
+      cyberpunk: '../portraits/cyberpunk/che_guevara_cyberpunk.png',
+      kawaii:    '../portraits/kawaii/CheGuevara_Kawaii.png',
+      notepad:   '../portraits/notepad/che_guevara_ notepad.png'
+    },
+    quote: '"If you tremble with indignation at every injustice, you are a comrade."',
+    bio: 'Argentine doctor turned revolutionary guerrilla and global countercultural symbol.',
+    loadingLine: 'Examining the system…',
+    mock: {
+      sections: [
+        { title: 'The personal is structural', body: 'What you are experiencing is not merely a personal problem. Every individual struggle is a symptom of larger forces — economic, social, institutional. Before you can solve what\'s in front of you, you must ask: who benefits from things being this way? That question changes everything.' },
+        { title: 'Comfort is not neutrality', body: 'There is no such thing as doing nothing. When you accept the conditions imposed on you without resistance, you become part of the mechanism that perpetuates them. The question is not whether to act — it is whether you will act with intention, or by default.' },
+        { title: 'Conviction is a resource', body: 'I crossed a continent on a motorcycle with almost nothing — no money, no guarantee, only the certainty that I needed to understand the world I had been born into. Conviction will take you further than resources. What do you believe in strongly enough to be uncomfortable for?' }
+      ]
+    }
+  },
+  {
+    id: 'chingshih', name: 'Ching Shih', fullName: 'Ching Shih',
+    tag: 'Command & strategy',
+    portraits: {
+      cyberpunk: '../portraits/cyberpunk/ching_shih_cyberpunk.png',
+      kawaii:    '../portraits/kawaii/ChingShih_Kawaii.png',
+      notepad:   '../portraits/notepad/ching_shih_ notepad.png'
+    },
+    quote: '"Power is taken — not given."',
+    bio: 'Rose from poverty to command 1,800 ships and 80,000 sailors — the most powerful pirate in history.',
+    loadingLine: 'Assessing the power dynamics…',
+    mock: {
+      sections: [
+        { title: 'Read the room before you move', body: 'I took command of the Red Flag Fleet within days of my husband\'s death — not because I was entitled to it, but because I moved before anyone else decided what to do with the situation. Timing is the difference between a takeover and a takeover attempt. When is the window open in your situation?' },
+        { title: 'Rules protect those who write them', body: 'I created a code for my fleet — specific, fair, and ruthlessly enforced. Not because I was soft, but because predictable rules keep large organisations moving. What rules govern your situation, and who wrote them? Are they protecting the powerful or enabling the capable?' },
+        { title: 'Negotiate from strength you already have', body: 'When the Chinese government sent fleets to destroy me and failed, I came to the negotiating table — but on my terms. I kept my ships, kept my money, and walked away intact. Never negotiate from weakness if you can build your leverage first. What leverage do you actually have that you haven\'t used?' }
+      ]
+    }
+  },
+  {
+    id: 'gandhi', name: 'M. Gandhi', fullName: 'Mahatma Gandhi',
+    tag: 'Nonviolent resistance',
+    portraits: {
+      cyberpunk: '../portraits/cyberpunk/mahatma_gandhi_cyberpunk.png',
+      kawaii:    '../portraits/kawaii/Gandhi_Kawaii.png',
+      notepad:   '../portraits/notepad/mahatma_gandhi_ notepad.png'
+    },
+    quote: '"Be the change you wish to see in the world."',
+    bio: 'Led India to independence through nonviolent civil disobedience.',
+    loadingLine: 'Seeking the peaceful path…',
+    mock: {
+      sections: [
+        { title: 'The means and the end are one', body: 'You cannot achieve peace through violence, or truth through deception. Whatever methods you use to pursue your goal will shape the goal itself — and will shape you. I refused to separate what I was doing from how I was doing it. Are your methods consistent with the world you are trying to create?' },
+        { title: 'Begin with yourself', body: 'I was asked once what my message was. I said: my life is my message. Everything I asked of others, I first asked of myself. This is not a small thing — it is the hardest thing. But no change of consequence has ever come from demanding it of others while exempting yourself.' },
+        { title: 'Patience is strategic, not passive', body: 'The salt march was 240 miles. We did not rush. We stopped at every village. We were not performing patience — we were using it as a weapon, forcing the empire to respond to something it could not easily suppress. Your restraint, when deliberate, is not weakness. It is power in another form.' }
+      ]
+    }
+  },
+  {
+    id: 'napoleon', name: 'Napoleon', fullName: 'Napoleon Bonaparte',
+    tag: 'Ambition & strategy',
+    portraits: {
+      cyberpunk: '../portraits/cyberpunk/napoleon_bonaparte_cyberpunk.png',
+      kawaii:    '../portraits/kawaii/Napoleon_Kawaii.png',
+      notepad:   '../portraits/notepad/napoleon_bonaparte_ notepad.png'
+    },
+    quote: '"Impossible is a word found only in the dictionary of fools."',
+    bio: 'Rose from obscurity to reshape Europe. Military genius and master of psychological warfare.',
+    loadingLine: 'Calculating the next move…',
+    mock: {
+      sections: [
+        { title: 'Intelligence is a force multiplier', body: 'I won battles before they started by knowing the terrain better than my enemies, by studying everything. Your situation is not different from a campaign — it has terrain, it has opposing forces, it has chokepoints. How well do you actually know the ground you are fighting on?' },
+        { title: 'Speed defeats perfection', body: 'I made decisions fast — not recklessly, but decisively. A plan executed with seventy percent information beats a perfect plan arrived at too late. Most people lose not because they chose wrong but because they waited until they had certainty, which never came. What is the decision you are already delaying?' },
+        { title: 'Manage perception as carefully as reality', body: 'Morale is a force — I would estimate it at three-to-one against the physical. Your adversaries, your allies, your own mind — all of them respond to the story you project as much as to the facts on the ground. What story are you currently telling, and is it the one you intend?' }
+      ]
+    }
+  },
+  {
+    id: 'dali', name: 'Salvador Dalí', fullName: 'Salvador Dalí',
+    tag: 'The surreal is real',
+    portraits: {
+      cyberpunk: '../portraits/cyberpunk/salvador_dali_cyberpunk.png',
+      kawaii:    '../portraits/kawaii/SalvadorDali_Kawaii.png',
+      notepad:   '../portraits/notepad/salvador_dali_ notepad.png'
+    },
+    quote: '"Have no fear of perfection — you will never reach it."',
+    bio: 'Surrealist painter who turned dreams, desire and decay into the 20th century\'s most iconic images.',
+    loadingLine: 'Melting the clock…',
+    mock: {
+      sections: [
+        { title: 'The unconscious is not wrong', body: 'I would fall asleep with a key in my hand, and the moment I drifted off, the key would fall and wake me — carrying images from the liminal state before sleep. Your anxieties and obsessions are not pathological. They are data. What keeps appearing in your mind when you stop trying to control it?' },
+        { title: 'Make the irrational visible', body: 'I painted impossible things with photographic precision — not to escape reality, but to make the invisible parts of reality visible. What is the irrational element in your situation that everyone is pretending is not there? Name it. It will stop controlling you once it is seen.' },
+        { title: 'Eccentricity is protective', body: 'I was eccentric deliberately — because eccentricity creates distance, and distance gives you room to see what the conformists cannot. If you have been called strange or excessive, consider that those words may be the sound of someone who cannot see what you see. That is their limitation, not yours.' }
+      ]
+    }
+  },
+  {
+    id: 'chuck', name: 'Chuck Norris', fullName: 'Chuck Norris',
+    tag: 'Discipline & toughness',
+    portraits: {
+      cyberpunk: '../portraits/cyberpunk/chuck_norris_cyberpunk.png',
+      kawaii:    '../portraits/kawaii/ChuckNorris_Kawaii.png',
+      notepad:   '../portraits/notepad/chuck_norris_ notepad.png'
+    },
+    quote: '"A black belt is a white belt that never quit."',
+    bio: 'Martial arts champion and cultural icon who built an identity around discipline and grit.',
+    loadingLine: 'No excuses — only results…',
+    mock: {
+      sections: [
+        { title: 'Show up when it is hard', body: 'I trained every single day — not when I felt motivated, not when conditions were right. Every day. That\'s the deal. Motivation is unreliable. Discipline is a decision you make once and then execute. The secret is there is no secret: you just have to do the thing, especially when you don\'t want to.' },
+        { title: 'Stop explaining, start doing', body: 'I see a lot of people who are great at describing what they would do under better circumstances. The circumstances don\'t get better. You get stronger. The conditions you are waiting for are not coming. What can you do with what you have, where you are, right now today?' },
+        { title: 'Pain is a signal, not a stop sign', body: 'In training you learn to read pain — this kind means stop, this kind means keep going. Most of the pain people avoid is the second kind: the discomfort of growth, of doing something hard, of being bad at something before you get good. That pain is the training. Do not run from it.' }
+      ]
+    }
+  },
+  {
+    id: 'trump', name: 'D. Trump', fullName: 'Donald Trump',
+    tag: 'Bold moves, loud conviction',
+    portraits: {
+      cyberpunk: '../portraits/cyberpunk/donald_trump_cyberpunk.png',
+      kawaii:    '../portraits/kawaii/Trump_Kawaii.png',
+      notepad:   '../portraits/notepad/donald_trump_ notepad.png'
+    },
+    quote: '"Sometimes you have to think anyway and get lucky."',
+    bio: 'Real estate mogul and 45th US President, known for bold, unconventional decision-making.',
+    loadingLine: 'Thinking big…',
+    mock: {
+      sections: [
+        { title: 'Think bigger than the problem', body: 'Most people look at a problem and see a problem. I look at a problem and see a deal. What are the assets in this situation that nobody else is seeing? Everything has leverage. The question is whether you are willing to see it and use it.' },
+        { title: 'Go on offence', body: 'You cannot win playing defence. I know — I have had huge losses, bankruptcies, critics on every side. Every time, the way back was not to be careful. It was to make a move, make noise, control the narrative. What is the offensive play available to you right now?' },
+        { title: 'Brand yourself or be branded', body: 'People are going to say something about you. The only question is whether it\'s your story or theirs. I put my name on everything — for better or worse — because I understood that visibility is a resource. What is the story you want told about what you are doing?' }
+      ]
+    }
+  },
+  {
+    id: 'lenin', name: 'V. Lenin', fullName: 'Vladimir Lenin',
+    tag: 'Radical restructuring',
+    portraits: {
+      cyberpunk: '../portraits/cyberpunk/vladimir_lenin_cyberpunk.png',
+      kawaii:    '../portraits/kawaii/Lenin_Kawaii_v2.png',
+      notepad:   '../portraits/notepad/vladimir_lenin_ notepad.png'
+    },
+    quote: '"There are decades where nothing happens, and weeks where decades happen."',
+    bio: 'Revolutionary leader who transformed Russia and rewrote the political map of the 20th century.',
+    loadingLine: 'Analysing the structure…',
+    mock: {
+      sections: [
+        { title: 'Identify the contradiction', body: 'Every situation contains within it a fundamental tension — a force pushing for change and a structure resisting it. Before you can act effectively, you must identify this contradiction precisely. Not your emotional reaction to it — the structural fact of it. What exactly is in conflict here, and why?' },
+        { title: 'The moment of crisis is the moment of possibility', body: 'I waited years in exile for the moment when the old structure would become unmanageable. When it came, everything moved at once. What appears to be chaos or crisis is often the moment when what was impossible yesterday becomes inevitable today. Are you positioned to move when the window opens?' },
+        { title: 'Organisation is the real weapon', body: 'Will and anger are abundant. Organisation is rare. The difference between a revolution and a riot is not the intensity of feeling — it is the quality of preparation, the clarity of goals, the discipline of execution. What is your plan, and how specifically will you execute it?' }
+      ]
+    }
+  }
+];
+
+/* ════════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════════ */
+
+let currentTheme   = 'cyberpunk';
+let currentVent    = '';
+let previewFigure  = null;
+let currentFigure  = null;
+let previousScreen = 'screen-landing';
+
+/* ════════════════════════════════════════════════
+   THEME SWITCHING
+════════════════════════════════════════════════ */
+
+function switchTheme(theme) {
+  if (theme === currentTheme) return;
+  currentTheme = theme;
+
+  /* Update data-theme */
+  document.getElementById('app').setAttribute('data-theme', theme);
+
+  /* Update tab aria states */
+  document.querySelectorAll('.theme-tab').forEach(tab => {
+    const selected = tab.dataset.themeTarget === theme;
+    tab.setAttribute('aria-selected', selected ? 'true' : 'false');
+  });
+
+  /* Swap all portrait images in the grid */
+  document.querySelectorAll('[data-portrait-id]').forEach(img => {
+    const fig = FIGURES.find(f => f.id === img.dataset.portraitId);
+    if (fig) img.src = fig.portraits[theme];
+  });
+
+  /* Swap preview portrait if open */
+  if (previewFigure) {
+    const pImg = document.getElementById('previewPortrait');
+    pImg.src = previewFigure.portraits[theme];
+  }
+
+  /* Swap response portrait if showing */
+  if (currentFigure) {
+    const rImg = document.getElementById('respPortrait');
+    rImg.src = currentFigure.portraits[theme];
+  }
+
+  /* Swap loading portrait if showing */
+  const lImg = document.getElementById('loadingPortrait');
+  if (lImg.src) {
+    /* preserve current loading figure */
+  }
+}
+
+/* ════════════════════════════════════════════════
+   SCREEN NAVIGATION
+════════════════════════════════════════════════ */
+
+function showScreen(id) {
+  const screens = document.querySelectorAll('.screen');
+  screens.forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) {
+    el.classList.add('active');
+    el.scrollTop = 0;
+  }
+}
+
+function goToLanding() { showScreen('screen-landing'); }
+
+function goToLenses() {
+  const vent = document.getElementById('ventText').value.trim();
+  const err  = document.getElementById('ventError');
+
+  if (!vent) {
+    err.textContent = 'Write something first — even a few words is enough.';
+    err.style.display = 'block';
+    document.getElementById('ventText').focus();
+    return;
+  }
+  err.style.display = 'none';
+  currentVent = vent;
+
+  document.getElementById('lensVentDisplay').textContent = vent;
+  document.getElementById('lensTopicLabel').textContent  = guessTopic(vent);
+
+  renderGrid();
+  previousScreen = document.querySelector('.screen.active')?.id || 'screen-landing';
+  showScreen('screen-lenses');
+}
+
+function goToAccount() {
+  previousScreen = document.querySelector('.screen.active')?.id || 'screen-response';
+  showScreen('screen-account');
+}
+
+function goBackFromAccount() {
+  showScreen(previousScreen || 'screen-response');
+}
+
+/* ════════════════════════════════════════════════
+   CHAR COUNTER
+════════════════════════════════════════════════ */
+
+function updateCharCount() {
+  const ta = document.getElementById('ventText');
+  const el = document.getElementById('charCounter');
+  const len = ta.value.length;
+  el.textContent = len + '/800';
+  el.classList.toggle('over', len >= 800);
+}
+
+/* ════════════════════════════════════════════════
+   TOPIC GUESSER
+════════════════════════════════════════════════ */
+
+function guessTopic(t) {
+  const lc = t.toLowerCase();
+  if (lc.match(/job|career|work|boss|resign|fired/)) return 'Career question';
+  if (lc.match(/relat|partner|love|broke ?up|divorce/)) return 'Relationship';
+  if (lc.match(/money|financ|debt|afford|broke/)) return 'Finances';
+  if (lc.match(/health|anx|stress|depress|anxious/)) return 'Wellbeing';
+  if (lc.match(/decision|choose|choice|option/)) return 'Decision';
+  return 'Your thought';
+}
+
+/* ════════════════════════════════════════════════
+   RENDER FIGURE GRID
+════════════════════════════════════════════════ */
+
+function renderGrid() {
+  const grid = document.getElementById('figureGrid');
+  grid.innerHTML = '';
+
+  FIGURES.forEach(fig => {
+    const card = document.createElement('button');
+    card.className = 'figure-card';
+    card.setAttribute('aria-label', fig.name + ' — ' + fig.tag);
+    card.type = 'button';
+
+    const portraitSrc = fig.portraits[currentTheme] || fig.portraits.cyberpunk;
+
+    card.innerHTML =
+      `<img class="figure-portrait" data-portrait-id="${fig.id}"
+            src="${portraitSrc}" alt="${fig.fullName}" loading="lazy">` +
+      `<div class="figure-name">${fig.name}</div>` +
+      `<div class="figure-tag">${fig.tag}</div>`;
+
+    card.addEventListener('click', () => openPreview(fig, card));
+    grid.appendChild(card);
+  });
+}
+
+/* ════════════════════════════════════════════════
+   PREVIEW POPUP
+════════════════════════════════════════════════ */
+
+function openPreview(fig, cardEl) {
+  previewFigure = fig;
+
+  /* Highlight selected card */
+  document.querySelectorAll('.figure-card').forEach(c => c.classList.remove('selected'));
+  if (cardEl) cardEl.classList.add('selected');
+
+  /* Populate preview */
+  document.getElementById('previewName').textContent  = fig.fullName;
+  document.getElementById('previewQuote').textContent = fig.quote;
+  document.getElementById('previewBio').textContent   = fig.bio;
+  document.getElementById('previewPortrait').src      = fig.portraits[currentTheme] || fig.portraits.cyberpunk;
+  document.getElementById('previewPortrait').alt      = fig.fullName;
+
+  document.getElementById('overlay-preview').classList.add('open');
+}
+
+function closePreview() {
+  document.getElementById('overlay-preview').classList.remove('open');
+  previewFigure = null;
+}
+
+function confirmLens() {
+  if (!previewFigure) return;
+  document.getElementById('overlay-preview').classList.remove('open');
+  callLens(previewFigure);
+}
+
+/* ════════════════════════════════════════════════
+   CALL LENS (loading + response)
+════════════════════════════════════════════════ */
+
+function callLens(fig) {
+  currentFigure = fig;
+
+  /* Loading overlay */
+  const portrait = fig.portraits[currentTheme] || fig.portraits.cyberpunk;
+  document.getElementById('loadingPortrait').src  = portrait;
+  document.getElementById('loadingPortrait').alt  = fig.fullName;
+  document.getElementById('loadingTitle').textContent    = fig.fullName + '\'s Perspective';
+  document.getElementById('loadingSubtitle').textContent = fig.loadingLine;
+  document.getElementById('overlay-loading').classList.add('open');
+
+  /* Populate response screen header */
+  document.getElementById('respPortrait').src          = portrait;
+  document.getElementById('respPortrait').alt          = fig.fullName;
+  document.getElementById('respFigureName').textContent = fig.fullName;
+  document.getElementById('respVentDisplay').textContent = currentVent;
+  document.getElementById('respTopicLabel').textContent  = guessTopic(currentVent);
+  document.getElementById('respBody').innerHTML = '';
+
+  /* Try real API first, fall back to mock */
+  const apiPromise = (typeof callClaudeAPI === 'function')
+    ? callClaudeAPI(buildSystemPrompt(fig), currentVent).catch(() => null)
+    : Promise.resolve(null);
+
+  /* Show result after a minimum 1.8s loading feel */
+  const minDelay = new Promise(res => setTimeout(res, 1800));
+
+  Promise.all([apiPromise, minDelay]).then(([apiText]) => {
+    document.getElementById('overlay-loading').classList.remove('open');
+    renderResponse(fig, apiText);
+    showScreen('screen-response');
+  });
+}
+
+function buildSystemPrompt(fig) {
+  return `You are ${fig.fullName}. Respond to what the user shared. Give your response as JSON with exactly 3 sections, each with a "title" and a "body". Return ONLY valid JSON: {"sections":[{"title":"...","body":"..."},{"title":"...","body":"..."},{"title":"...","body":"..."}]}`;
+}
+
+function renderResponse(fig, apiText) {
+  let sections = fig.mock.sections; /* default to mock */
+
+  if (apiText) {
+    try {
+      const raw = apiText.replace(/^```json\s*/i,'').replace(/^```\s*/i,'').replace(/\s*```$/i,'').trim();
+      const parsed = JSON.parse(raw);
+      if (parsed.sections && parsed.sections.length) sections = parsed.sections;
+    } catch(_) { /* use mock */ }
+  }
+
+  const body = document.getElementById('respBody');
+  body.innerHTML = sections.map(s =>
+    `<div class="response-section">
+       <div class="response-section-title">${escapeHTML(s.title)}</div>
+       <div class="response-section-body">${escapeHTML(s.body)}</div>
+     </div>`
+  ).join('');
+
+  /* Stagger reveal */
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  body.querySelectorAll('.response-section').forEach((el, i) => {
+    if (prefersReduced) { el.classList.add('revealed'); }
+    else { setTimeout(() => el.classList.add('revealed'), 80 + i * 200); }
+  });
+}
+
+/* ════════════════════════════════════════════════
+   SHARE / ACCOUNT
+════════════════════════════════════════════════ */
+
+function shareResponse() {
+  const text = `MindShift — ${currentFigure?.fullName || ''} on: "${currentVent.slice(0,80)}…"`;
+  if (navigator.share) {
+    navigator.share({ title: 'MindShift', text, url: window.location.href }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(text + '\n' + window.location.href)
+      .then(() => alert('Copied to clipboard!'))
+      .catch(() => alert('Share: ' + window.location.href));
+  }
+}
+
+function createAccount() {
+  const nick  = document.getElementById('acNick').value.trim();
+  const email = document.getElementById('acEmail').value.trim();
+  if (!nick || !email) { alert('Please enter at least a nickname and e-mail.'); return; }
+  alert('Welcome, ' + nick + '! Account creation coming soon — you\'ll be first to know.');
+}
+
+/* ════════════════════════════════════════════════
+   UTILITY
+════════════════════════════════════════════════ */
+
+function escapeHTML(str) {
+  if (!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+            .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+/* Close preview on overlay backdrop click */
+document.getElementById('overlay-preview').addEventListener('click', function(e) {
+  if (e.target === this) closePreview();
+});
+
+/* Keyboard: close overlays on Escape */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (document.getElementById('overlay-preview').classList.contains('open')) closePreview();
+  }
+});
+
+</script>
+
+<!-- Optional: try to use the real API if running on Cloudflare Pages -->
+<script>
+async function callClaudeAPI(systemPrompt, userPrompt) {
+  try {
+    const res = await fetch('/functions/generate-response', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ systemPrompt, userPrompt })
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data?.content?.[0]?.text || null;
+  } catch(_) { return null; }
+}
+</script>
+
+</body>
+</html>
