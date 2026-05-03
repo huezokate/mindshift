@@ -1251,6 +1251,243 @@ main { flex: 1; position: relative; overflow: hidden; }
 #app img { transition: none; }
 #app .screen, #app .response-section { transition: none; }
 
+/* ════════════════════════════════════════════════
+   24. WELCOME SCREEN (always dark, no CSS variables)
+════════════════════════════════════════════════ */
+
+#screen-welcome {
+  background: #080810;
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+  padding: 48px 24px 40px;
+  gap: 0;
+}
+
+.welcome-card {
+  border: 1.5px solid rgba(176,76,255,0.6);
+  border-radius: 4px;
+  padding: 40px 24px 32px;
+  display: flex; flex-direction: column; align-items: center; gap: 18px;
+}
+
+.welcome-logo {
+  color: #39FF14;
+  font-family: 'Courier Prime', monospace;
+  font-size: 28px; font-weight: 700;
+  letter-spacing: 4px; text-align: center;
+  text-shadow: 0 0 20px rgba(57,255,20,0.4);
+}
+
+.welcome-tagline {
+  color: #00F5FF;
+  font-family: 'Courier Prime', monospace;
+  font-size: 13px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1px;
+  text-align: center; line-height: 1.5;
+}
+
+.welcome-body {
+  color: #39FF14;
+  font-family: 'Courier Prime', monospace;
+  font-size: 13px; line-height: 1.7;
+  text-align: center;
+}
+
+.welcome-enter-btn {
+  color: #39FF14;
+  border-top: 4px solid #39FF14; border-left: 4px solid #39FF14;
+  border-right: 1px solid #39FF14; border-bottom: 1px solid #39FF14;
+  border-radius: 2px;
+  background: transparent;
+  font-family: 'Courier Prime', monospace;
+  font-size: 13px; font-weight: 700; letter-spacing: 2.4px;
+  text-transform: uppercase;
+  padding: 14px 18px 12px;
+  cursor: pointer;
+  transition: box-shadow 0.15s, background 0.15s;
+}
+.welcome-enter-btn:hover { box-shadow: 0 0 16px rgba(57,255,20,0.4); background: rgba(57,255,20,0.05); }
+.welcome-enter-btn:active { transform: scale(0.97); }
+
+.welcome-disclaimer {
+  text-align: center;
+  display: flex; flex-direction: column; gap: 8px;
+  padding-top: 32px;
+}
+
+.welcome-disclaimer-label {
+  color: #FF2D78;
+  font-family: 'Courier Prime', monospace;
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+.welcome-disclaimer-body {
+  color: #39FF14;
+  font-family: 'Courier Prime', monospace;
+  font-size: 12px; line-height: 1.7;
+}
+
+.welcome-disclaimer-em {
+  color: #39FF14;
+  font-family: 'Courier Prime', monospace;
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+/* ════════════════════════════════════════════════
+   25. HERO CARD (landing screen)
+════════════════════════════════════════════════ */
+
+.hero-card {
+  padding: 20px;
+}
+
+[data-theme="cyberpunk"] .hero-card {
+  background: var(--bg-card);
+  border: 2px solid var(--c3);
+  border-radius: var(--r-card);
+  display: flex; flex-direction: column; gap: 10px;
+}
+[data-theme="kawaii"] .hero-card {
+  background: var(--bg-card);
+  border: 2.5px solid #111;
+  border-radius: 20px;
+  display: flex; flex-direction: column; gap: 10px;
+  align-items: center;
+}
+[data-theme="notepad"] .hero-card {
+  background: var(--bg-card);
+  border: 1.5px solid var(--c3);
+  border-radius: var(--r-card);
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+.hero-heading {
+  font-weight: 700;
+}
+[data-theme="cyberpunk"] .hero-heading {
+  font-family: 'Courier Prime', monospace;
+  font-size: 18px; color: var(--c3);
+  text-transform: uppercase; letter-spacing: 1px;
+}
+[data-theme="kawaii"] .hero-heading {
+  font-family: var(--font-h);
+  font-size: 22px; font-weight: 900;
+  color: var(--c2); text-align: center;
+  text-transform: none;
+}
+[data-theme="notepad"] .hero-heading {
+  font-family: var(--font-h);
+  font-size: 18px; color: var(--c2);
+  letter-spacing: 0.3px;
+}
+
+.hero-body {
+  font-size: 13px; line-height: 1.65;
+}
+[data-theme="cyberpunk"] .hero-body {
+  font-family: 'Courier Prime', monospace;
+  color: var(--c1);
+}
+[data-theme="kawaii"] .hero-body {
+  font-family: var(--font-b);
+  font-size: 14px; color: var(--text-b);
+  text-align: center; line-height: 1.6;
+}
+[data-theme="notepad"] .hero-body {
+  font-family: var(--font-b);
+  color: var(--text-b); line-height: 1.6;
+}
+
+/* ════════════════════════════════════════════════
+   26. ADD-CARD EXTENDED CONTENT
+════════════════════════════════════════════════ */
+
+.add-card-title { font-size: 17px; text-align: center; }
+.add-card-body  { font-size: 13px; text-align: center; }
+
+.add-card-cats {
+  font-size: 10px; letter-spacing: 0.3px;
+  text-align: center; line-height: 1.5;
+}
+[data-theme="cyberpunk"] .add-card-cats { color: var(--c3); }
+[data-theme="kawaii"]    .add-card-cats { color: var(--c2); }
+[data-theme="notepad"]   .add-card-cats { color: var(--c1); }
+
+.add-card-waitlist {
+  font-size: 12px; color: var(--text-b);
+  text-align: center;
+}
+
+.add-card-signup { align-self: center; margin-top: 4px; }
+
+/* ════════════════════════════════════════════════
+   27. THEME SELECTION MODAL OVERLAY
+════════════════════════════════════════════════ */
+
+#overlay-theme {
+  position: absolute; inset: 0; z-index: 150;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  display: none; align-items: center; justify-content: center;
+}
+#overlay-theme.open { display: flex; animation: fadeUp 0.22s ease; }
+
+.theme-modal-card {
+  width: calc(100% - 64px); max-width: 360px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 14px; padding: 32px 24px 24px; text-align: center;
+}
+[data-theme="cyberpunk"] .theme-modal-card {
+  background: var(--bg-card); border: 1.5px solid rgba(176,76,255,0.7);
+  border-radius: var(--r-card); box-shadow: 0 0 40px rgba(176,76,255,0.18);
+}
+[data-theme="kawaii"] .theme-modal-card {
+  background: var(--bg-card); border: 2px solid rgba(139,92,246,0.3);
+  border-radius: 24px; box-shadow: 0 8px 40px rgba(139,92,246,0.15);
+}
+[data-theme="notepad"] .theme-modal-card {
+  background: var(--bg-card); border: 1.5px solid #c8bfb4;
+  border-radius: var(--r-card); box-shadow: 0 4px 20px rgba(196,184,170,0.3);
+}
+
+.theme-modal-name {
+  font-size: 22px; font-weight: 800;
+  letter-spacing: 2.5px; text-transform: uppercase;
+}
+[data-theme="cyberpunk"] .theme-modal-name { font-family: var(--font-h); color: var(--c2); text-shadow: var(--glow-c2); }
+[data-theme="kawaii"]    .theme-modal-name { color: var(--c2); font-family: var(--font-h); }
+[data-theme="notepad"]   .theme-modal-name { font-family: var(--font-h); color: var(--c2); }
+
+.theme-modal-tagline {
+  font-size: 15px; line-height: 1.7; font-weight: 700;
+}
+[data-theme="cyberpunk"] .theme-modal-tagline { font-family: var(--font-h); color: var(--c1); }
+[data-theme="kawaii"]    .theme-modal-tagline { color: var(--c2); }
+[data-theme="notepad"]   .theme-modal-tagline { color: var(--c1); font-family: var(--font-h); font-style: italic; }
+
+.theme-modal-desc {
+  font-size: 12px; line-height: 1.65; color: var(--text-b);
+}
+[data-theme="cyberpunk"] .theme-modal-desc { font-family: var(--font-h); }
+
+.theme-modal-choose { min-width: 120px; }
+
+.theme-modal-nav {
+  display: flex; align-items: center; gap: 16px;
+  color: var(--text-m); margin-top: 4px;
+}
+.theme-modal-nav-label {
+  font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; font-weight: 700;
+}
+.theme-modal-arrow {
+  background: none; border: none; cursor: pointer;
+  font-size: 22px; color: var(--c1); padding: 4px 8px;
+  line-height: 1; transition: opacity 0.15s;
+}
+.theme-modal-arrow:hover { opacity: 0.6; }
+
 </style>
 </head>
 <body>
@@ -1258,57 +1495,57 @@ main { flex: 1; position: relative; overflow: hidden; }
 
 <div id="app" data-theme="cyberpunk">
 
-  <!-- Theme pill selector -->
-  <div class="theme-picker" role="tablist" aria-label="UI Theme">
-    <div class="theme-picker-inner">
-      <button class="theme-pill" data-theme-target="cyberpunk"
-              role="tab" aria-selected="true"
-              onclick="switchTheme('cyberpunk')">CyberPunk</button>
-      <button class="theme-pill" data-theme-target="kawaii"
-              role="tab" aria-selected="false"
-              onclick="switchTheme('kawaii')">Kawaii</button>
-      <button class="theme-pill" data-theme-target="notepad"
-              role="tab" aria-selected="false"
-              onclick="switchTheme('notepad')">Notepad</button>
-    </div>
-  </div>
-
   <main id="main">
 
-    <!-- ══════════════════ SCREEN: LANDING ══════════════════ -->
-    <div class="screen active" id="screen-landing">
+    <!-- ══════════════════ SCREEN: WELCOME ══════════════════ -->
+    <div class="screen active" id="screen-welcome">
+      <div class="welcome-card">
+        <div class="welcome-logo">MINDSHIFT</div>
+        <div class="welcome-tagline" id="welcomeTagline">FOR THE OVERTHINKERS, THE STUCK ONES,<br>AND ANYONE WHO JUST NEEDS A FRESH ANGLE.</div>
+        <p class="welcome-body">A perspective-shifting space for anyone who's ever thought "I know, but also… do I?" MindShift helps you explore what you already know from angles you haven't tried yet.</p>
+        <button class="welcome-enter-btn" onclick="goToLanding()">ENTER THE SPACE</button>
+      </div>
 
-      <div class="landing-copy">
-        <h1 class="t-h1">WHAT'S WEIGHING ON YOU?</h1>
-        <p class="t-body">
-          A decision, a fear, a frustration. Write it out honestly — then see it through the eyes of someone who lived through worse.
-        </p>
-        <h2 class="t-h2">Get a perspective shift from a historical figure.</h2>
+      <div class="welcome-disclaimer">
+        <div class="welcome-disclaimer-label">A FEW THINGS BEFORE WE BEGIN:</div>
+        <p class="welcome-disclaimer-body">MindShift is a space for reflection, not a substitute for professional mental health support.</p>
+        <div class="welcome-disclaimer-em">NOTHING HERE IS CLINICAL ADVICE.</div>
+      </div>
+    </div><!-- /screen-welcome -->
+
+
+    <!-- ══════════════════ SCREEN: LANDING ══════════════════ -->
+    <div class="screen" id="screen-landing">
+
+      <div class="hero-card">
+        <h1 class="hero-heading">GET IT OFF YOUR CHEST</h1>
+        <p class="hero-body">Let it all out — then see it through the eyes of someone who lived through years of history.</p>
       </div>
 
       <div class="vent-field" id="vent-wrap">
-        <div class="vent-label">Vent it out…</div>
-        <textarea id="ventText" rows="7" maxlength="450"
+        <div class="vent-label">DUMP IT ALL HERE:</div>
+        <textarea id="ventText" rows="7" maxlength="800"
           aria-label="What's on your mind"
-          placeholder="No filter. No judgement. Dump it all here."
+          placeholder="START TYPING..."
           oninput="updateCharCount()"></textarea>
         <div class="vent-footer">
-          <span class="char-counter" id="charCounter">0/450</span>
+          <span class="char-counter" id="charCounter">0/800 CHARACTERS</span>
         </div>
       </div>
 
       <p class="field-error" id="ventError" role="alert"></p>
 
       <button class="btn btn-primary" style="align-self:center;" onclick="goToLenses()">
-        Select the Lens
+        SELECT THE LENS
       </button>
 
       <div class="add-card">
-        <span class="t-sub">Coming Soon</span>
-        <h2 class="t-h2" style="font-size:17px;">Mind-Mapping Tool</h2>
-        <p class="t-body" style="font-size:13px;">
-          Reflect, plan and achieve new horizons with step-by-step guidance.
-        </p>
+        <span class="t-sub">Coming soon</span>
+        <h2 class="t-h2 add-card-title">Mind-Mapping Tool</h2>
+        <p class="t-body add-card-body">Reflect, plan and achieve new horizons with step-by-step guidance.</p>
+        <p class="add-card-cats">CAREER, HEALTH AND WELLNESS, CREATIVITY, PERSONAL DEVELOPMENT, RELATIONSHIPS, TRAVEL &amp; FINANCES</p>
+        <p class="add-card-waitlist">Get on the waitlist to be the first to know</p>
+        <button class="btn btn-secondary add-card-signup" onclick="goToAccount()">Sign Up</button>
       </div>
 
     </div><!-- /screen-landing -->
@@ -1479,6 +1716,22 @@ main { flex: 1; position: relative; overflow: hidden; }
     </div><!-- /screen-share -->
 
   </main>
+
+  <!-- ══════════════════ OVERLAY: THEME MODAL (inside #app) ══════════════════ -->
+  <div id="overlay-theme" role="dialog" aria-modal="true" aria-label="Choose theme">
+    <div class="theme-modal-card">
+      <div class="theme-modal-name" id="themeModalName">CYBERPUNK</div>
+      <div class="theme-modal-tagline" id="themeModalTagline">Neon edges.<br>Dark depths.<br>Maximum signal.</div>
+      <p class="theme-modal-desc" id="themeModalDesc">Hack your mind in a high-contrast terminal aesthetic built for focus and intensity. For the ones who think in code and dream in electric light.</p>
+      <button class="btn btn-primary theme-modal-choose" onclick="chooseTheme()">CHOOSE</button>
+      <div class="theme-modal-nav">
+        <button class="theme-modal-arrow" onclick="cycleThemeModal(-1)" aria-label="Previous theme">&#8249;</button>
+        <span class="theme-modal-nav-label">SWIPE FOR NEXT</span>
+        <button class="theme-modal-arrow" onclick="cycleThemeModal(1)" aria-label="Next theme">&#8250;</button>
+      </div>
+    </div>
+  </div>
+
 </div><!-- #app -->
 
 
@@ -1509,6 +1762,7 @@ main { flex: 1; position: relative; overflow: hidden; }
   </div>
   <div class="loading-subtitle" id="loadingSubtitle">Shifting perspective…</div>
 </div>
+
 
 
 <script>
@@ -1818,28 +2072,40 @@ let selectedFigureId = null;
 
 const THEME_COPY = {
   cyberpunk: {
-    h1:              'WHAT\'S WEIGHING ON YOU?',
-    ventLabel:       'VENT IT OUT > _',
-    ventPlaceholder: 'No filter. No judgement. Dump it all here.',
-    cta:             'SHIFT MY PERSPECTIVE',
+    h1:              'GET IT OFF YOUR CHEST',
+    heroBody:        'Let it all out — then see it through the eyes of someone who lived through years of history.',
+    ventLabel:       'DUMP IT ALL HERE:',
+    ventPlaceholder: 'START TYPING...',
+    cta:             'SELECT THE LENS',
     pickLens:        'WHO DO YOU WANT TO HEAR FROM?',
-    charMax:         450
+    charMax:         800,
+    themeModalName:  'CYBERPUNK',
+    themeModalTagline: 'Neon edges.\nDark depths.\nMaximum signal.',
+    themeModalDesc:  'Hack your mind in a high-contrast terminal aesthetic built for focus and intensity. For the ones who think in code and dream in electric light.'
   },
   kawaii: {
-    h1:              'What\'s on your mind? 💭',
-    ventLabel:       'pour it out 💕',
-    ventPlaceholder: 'pour out whatever you\'re feeling — this is a safe space ✨',
-    cta:             'See it differently ✨',
+    h1:              'GET IT OFF YOUR CHEST',
+    heroBody:        'Let it all out — then see it through the eyes of someone who lived through years of history.',
+    ventLabel:       'DUMP IT ALL HERE:',
+    ventPlaceholder: 'START TYPING...',
+    cta:             'SELECT THE LENS',
     pickLens:        'who do you want to hear from?',
-    charMax:         450
+    charMax:         800,
+    themeModalName:  'KAWAII',
+    themeModalTagline: 'Soft edges.\nBright energy.\nGood vibes only.',
+    themeModalDesc:  'A playful, candy-colored skin that makes self-growth feel like a treat. For the ones who know joy is the best motivator.'
   },
   notepad: {
-    h1:              'Something you need to get out?',
-    ventLabel:       'Write it out...',
-    ventPlaceholder: 'Don\'t edit — just write. The more honest, the better.',
-    cta:             'Shift my perspective',
+    h1:              'GET IT OFF YOUR CHEST',
+    heroBody:        'Let it all out — then see it through the eyes of someone who lived through years of history.',
+    ventLabel:       'DUMP IT ALL HERE:',
+    ventPlaceholder: 'START TYPING...',
+    cta:             'SELECT THE LENS',
     pickLens:        'Who would you like to hear from?',
-    charMax:         450
+    charMax:         800,
+    themeModalName:  'NOTEPAD',
+    themeModalTagline: 'Clean lines.\nClear thinking.\nNo noise.',
+    themeModalDesc:  'A distraction-free, paper-light interface that gets out of your way. For the ones who believe clarity is the sharpest tool.'
   }
 };
 
@@ -1858,16 +2124,24 @@ function triggerHaptic(pattern) {
 function applyThemeCopy(theme) {
   const c = THEME_COPY[theme];
   if (!c) return;
-  const h1 = document.querySelector('#screen-landing .t-h1');
-  if (h1) h1.textContent = c.h1;
+  // hero card
+  const heroH = document.querySelector('.hero-heading');
+  if (heroH) heroH.textContent = c.h1;
+  const heroB = document.querySelector('.hero-body');
+  if (heroB) heroB.textContent = c.heroBody;
+  // vent field
   const lbl = document.querySelector('.vent-label');
   if (lbl) lbl.textContent = c.ventLabel;
   const ta = document.getElementById('ventText');
   if (ta) { ta.placeholder = c.ventPlaceholder; ta.maxLength = c.charMax; }
+  // CTA
   const cta = document.querySelector('#screen-landing .btn-primary');
   if (cta) cta.textContent = c.cta;
+  // lens screen heading
   const pick = document.getElementById('pickLensHeading');
   if (pick) pick.textContent = c.pickLens;
+  // theme modal
+  updateThemeModalContent(theme);
   updateCharCount();
 }
 
@@ -1949,7 +2223,7 @@ function goToLenses() {
   const err  = document.getElementById('ventError');
 
   if (!vent) {
-    err.textContent = 'Write something first — even a few words is enough.';
+    err.textContent = 'Write something first — even a sentence is enough.';
     err.classList.add('visible');
     document.getElementById('ventText').focus();
     return;
@@ -1965,6 +2239,7 @@ function goToLenses() {
   updateLensBadge();
   previousScreen = document.querySelector('.screen.active')?.id || 'screen-landing';
   showScreen('screen-lenses');
+  openThemeModal();
 }
 
 function goToAccount() {
@@ -1984,8 +2259,8 @@ function updateCharCount() {
   const ta = document.getElementById('ventText');
   const el = document.getElementById('charCounter');
   const len = ta.value.length;
-  const max = parseInt(ta.maxLength) || 450;
-  el.textContent = len + '/' + max;
+  const max = parseInt(ta.maxLength) || 800;
+  el.textContent = len + '/' + max + ' CHARACTERS';
   el.classList.toggle('over', len >= max);
 }
 
@@ -2387,6 +2662,53 @@ function escapeHTML(str) {
             .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
+/* ════════════════════════════════════════════════
+   WELCOME TAGLINES
+════════════════════════════════════════════════ */
+
+const WELCOME_TAGLINES = [
+  'FOR THE OVERTHINKERS, THE STUCK ONES,\nAND ANYONE WHO JUST NEEDS A FRESH ANGLE.',
+  'A WELLNESS TOOL FOR PEOPLE WHO HATE\nBEING TOLD WHAT TO DO — BUT LOVE A GOOD QUESTION.',
+  'NOT ADVICE. NOT THERAPY. JUST YOU,\nSOME GOOD QUESTIONS, AND A DIFFERENT ANGLE.',
+  "YOU'RE NOT LOST.\nJUST LOOKING AT THE MAP UPSIDE DOWN."
+];
+
+/* ════════════════════════════════════════════════
+   THEME MODAL
+════════════════════════════════════════════════ */
+
+const THEME_ORDER = ['cyberpunk', 'kawaii', 'notepad'];
+let themeModalIndex = 0;
+
+function openThemeModal() {
+  themeModalIndex = THEME_ORDER.indexOf(currentTheme);
+  if (themeModalIndex < 0) themeModalIndex = 0;
+  updateThemeModalContent(THEME_ORDER[themeModalIndex]);
+  document.getElementById('overlay-theme').classList.add('open');
+}
+
+function updateThemeModalContent(theme) {
+  const c = THEME_COPY[theme];
+  if (!c) return;
+  const nameEl = document.getElementById('themeModalName');
+  const tagEl  = document.getElementById('themeModalTagline');
+  const descEl = document.getElementById('themeModalDesc');
+  if (nameEl) nameEl.textContent = c.themeModalName;
+  if (tagEl)  tagEl.innerHTML = c.themeModalTagline.replace(/\n/g, '<br>');
+  if (descEl) descEl.textContent = c.themeModalDesc;
+}
+
+function cycleThemeModal(direction) {
+  themeModalIndex = (themeModalIndex + direction + THEME_ORDER.length) % THEME_ORDER.length;
+  const previewTheme = THEME_ORDER[themeModalIndex];
+  switchTheme(previewTheme);
+  updateThemeModalContent(previewTheme);
+}
+
+function chooseTheme() {
+  document.getElementById('overlay-theme').classList.remove('open');
+}
+
 /* Close preview on overlay backdrop click */
 document.getElementById('overlay-preview').addEventListener('click', function(e) {
   if (e.target === this) closePreview();
@@ -2396,11 +2718,24 @@ document.getElementById('overlay-preview').addEventListener('click', function(e)
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     if (document.getElementById('overlay-preview').classList.contains('open')) closePreview();
+    if (document.getElementById('overlay-theme').classList.contains('open')) chooseTheme();
   }
 });
 
+/* Set random welcome tagline */
+(function() {
+  const el = document.getElementById('welcomeTagline');
+  if (el) {
+    const line = WELCOME_TAGLINES[Math.floor(Math.random() * WELCOME_TAGLINES.length)];
+    el.innerHTML = line.replace(/\n/g, '<br>');
+  }
+})();
+
 /* Apply initial theme copy on load */
 applyThemeCopy(currentTheme);
+
+/* Show welcome screen on load */
+showScreen('screen-welcome');
 
 </script>
 
