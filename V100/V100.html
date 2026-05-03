@@ -147,70 +147,62 @@ input, textarea { font-family: inherit; outline: none; resize: none; }
 }
 
 /* ════════════════════════════════════════════════
-   4. THEME TAB BAR
+   4. THEME PILL SELECTOR (horizontal scroll)
 ════════════════════════════════════════════════ */
 
-.theme-bar {
-  display: flex; flex-shrink: 0; width: 100%;
-  position: sticky; top: 0; z-index: 50;
+.theme-picker {
+  flex-shrink: 0; overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; padding: 10px 16px;
   transition: background 0.35s, border-color 0.35s;
 }
+.theme-picker::-webkit-scrollbar { display: none; }
+.theme-picker-inner { display: flex; gap: 8px; width: max-content; align-items: center; }
 
-[data-theme="cyberpunk"] .theme-bar {
-  background: var(--bg-card);
-  border-bottom: 1px solid rgba(0,245,255,0.1);
+[data-theme="cyberpunk"] .theme-picker {
+  background: var(--bg-card); border-bottom: 1px solid rgba(0,245,255,0.08);
 }
-[data-theme="kawaii"] .theme-bar {
-  background: var(--bg-card);
-  border-bottom: 2px solid rgba(139,92,246,0.15);
-  box-shadow: 0 2px 12px rgba(139,92,246,0.08);
+[data-theme="kawaii"] .theme-picker {
+  background: var(--bg-card); border-bottom: 2px solid rgba(139,92,246,0.12);
+  box-shadow: 0 2px 12px rgba(139,92,246,0.06);
 }
-[data-theme="notepad"] .theme-bar {
-  background: var(--bg-card);
-  border-bottom: 1.5px solid #e8e0d5;
-}
-
-.theme-tab {
-  flex: 1; height: 44px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
-  transition: color 0.2s, border-color 0.2s, background 0.2s;
-  border: none; cursor: pointer; font-family: var(--font-ui);
+[data-theme="notepad"] .theme-picker {
+  background: var(--bg-card); border-bottom: 1.5px solid #e8e0d5;
 }
 
-/* Cyberpunk tabs */
-[data-theme="cyberpunk"] .theme-tab {
-  color: var(--text-m); background: var(--bg-card);
-  border-top: 1px solid transparent; border-bottom: 2px solid transparent;
-  border-left: 1px solid transparent; border-right: 2px solid transparent;
-  border-radius: var(--r);
+.theme-pill {
+  padding: 6px 18px; border-radius: 20px; white-space: nowrap;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;
+  font-family: var(--font-ui); cursor: pointer;
+  transition: color 0.2s, background 0.2s, border-color 0.2s, box-shadow 0.2s;
+  border: 1.5px solid transparent;
 }
-[data-theme="cyberpunk"] .theme-tab[aria-selected="true"] {
-  color: var(--c3);
-  border-top-color: var(--c3); border-left-color: var(--c3);
-  border-bottom-color: var(--c3); border-right-color: var(--c3);
-}
-[data-theme="cyberpunk"] .theme-tab:hover { background: rgba(255,255,255,0.03); }
 
-/* Kawaii tabs */
-[data-theme="kawaii"] .theme-tab {
-  color: var(--text-m); background: transparent;
-  border-bottom: 3px solid transparent;
+[data-theme="cyberpunk"] .theme-pill {
+  color: var(--text-m); background: transparent; border-color: rgba(0,245,255,0.15);
 }
-[data-theme="kawaii"] .theme-tab[aria-selected="true"] {
-  color: var(--c1); border-bottom-color: var(--c1); background: rgba(139,92,246,0.05);
+[data-theme="cyberpunk"] .theme-pill[aria-selected="true"] {
+  color: var(--c3); border-color: var(--c3); background: rgba(255,45,120,0.07);
+  box-shadow: 0 0 10px rgba(255,45,120,0.25);
 }
-[data-theme="kawaii"] .theme-tab:hover { background: rgba(139,92,246,0.04); }
+[data-theme="cyberpunk"] .theme-pill:hover:not([aria-selected="true"]) { background: rgba(255,255,255,0.03); }
 
-/* Notepad tabs */
-[data-theme="notepad"] .theme-tab {
-  color: var(--text-m); background: transparent;
-  border-bottom: 2px solid transparent; font-family: var(--font-b);
-  font-size: 11px; font-weight: 500;
+[data-theme="kawaii"] .theme-pill {
+  color: var(--text-m); background: transparent; border-color: rgba(139,92,246,0.2);
 }
-[data-theme="notepad"] .theme-tab[aria-selected="true"] {
-  color: var(--c1); border-bottom-color: var(--c1);
+[data-theme="kawaii"] .theme-pill[aria-selected="true"] {
+  color: #fff; background: var(--c1); border-color: var(--c1);
+  box-shadow: 0 4px 14px rgba(139,92,246,0.35);
 }
+[data-theme="kawaii"] .theme-pill:hover:not([aria-selected="true"]) { background: rgba(139,92,246,0.06); }
+
+[data-theme="notepad"] .theme-pill {
+  color: var(--text-m); background: transparent; border-color: #d4cbbf;
+  font-family: var(--font-b); font-weight: 500;
+}
+[data-theme="notepad"] .theme-pill[aria-selected="true"] {
+  color: var(--c1); border-color: var(--c1); background: rgba(74,136,85,0.07);
+}
+[data-theme="notepad"] .theme-pill:hover:not([aria-selected="true"]) { background: var(--bg-card2); }
 
 /* ════════════════════════════════════════════════
    5. SCREENS
@@ -533,95 +525,75 @@ main { flex: 1; position: relative; overflow: hidden; }
 [data-theme="notepad"]   .quote-text { font-family: var(--font-h); font-style: italic; }
 
 /* ════════════════════════════════════════════════
-   11. FIGURE GRID
+   11. LENS CAROUSEL (horizontal scroll chips)
 ════════════════════════════════════════════════ */
 
-.figure-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+.lens-carousel {
+  display: flex; gap: 12px;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory; scrollbar-width: none;
+  padding: 4px 0 12px;
 }
+.lens-carousel::-webkit-scrollbar { display: none; }
 
-.figure-card {
+.lens-chip {
+  flex-shrink: 0; scroll-snap-align: start;
   display: flex; flex-direction: column; align-items: center;
-  gap: 8px; padding: 14px 8px; cursor: pointer;
-  transition: box-shadow 0.18s, background 0.18s, transform 0.18s;
+  gap: 6px; cursor: pointer; padding: 6px 4px;
+  transition: transform 0.18s; -webkit-tap-highlight-color: transparent;
 }
-.figure-card:active { transform: scale(0.96); }
+.lens-chip:active { transform: scale(0.94); }
 
-[data-theme="cyberpunk"] .figure-card {
-  background: var(--bg-card2);
-  border: 1px solid rgba(176,76,255,0.4); border-radius: var(--r);
+.lens-chip-portrait {
+  width: 56px; height: 56px; object-fit: cover; flex-shrink: 0;
+  transition: border-color 0.18s, box-shadow 0.18s;
 }
-[data-theme="cyberpunk"] .figure-card:hover,
-[data-theme="cyberpunk"] .figure-card.selected {
-  border-color: var(--c1); background: rgba(0,245,255,0.06);
-  box-shadow: 0 0 16px rgba(0,245,255,0.25);
+.lens-chip-name {
+  font-size: 9px; font-weight: 700; text-align: center;
+  max-width: 60px; white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis; text-transform: uppercase; letter-spacing: 0.5px;
 }
-
-[data-theme="kawaii"] .figure-card {
-  background: var(--bg-card);
-  border: 2px solid rgba(139,92,246,0.15); border-radius: 18px;
-  box-shadow: 0 2px 8px rgba(139,92,246,0.06);
-}
-[data-theme="kawaii"] .figure-card:hover,
-[data-theme="kawaii"] .figure-card.selected {
-  border-color: var(--c1); box-shadow: 0 6px 20px rgba(139,92,246,0.22);
-  background: rgba(139,92,246,0.04);
+.lens-chip-fallback {
+  width: 56px; height: 56px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; letter-spacing: 1px;
 }
 
-[data-theme="notepad"] .figure-card {
-  background: var(--bg-card);
-  border: 1px solid #d4cbbf; border-radius: var(--r-card);
+/* Cyberpunk chips */
+[data-theme="cyberpunk"] .lens-chip-portrait {
+  border-radius: 28px; border: 1.5px solid rgba(57,255,20,0.4);
 }
-[data-theme="notepad"] .figure-card:hover,
-[data-theme="notepad"] .figure-card.selected {
-  border-color: var(--c1); box-shadow: var(--glow-c1);
-  background: rgba(74,136,85,0.04);
+[data-theme="cyberpunk"] .lens-chip.active .lens-chip-portrait,
+[data-theme="cyberpunk"] .lens-chip:hover .lens-chip-portrait {
+  border-color: var(--c1); box-shadow: 0 0 14px rgba(0,245,255,0.4);
 }
+[data-theme="cyberpunk"] .lens-chip-name { font-family: var(--font-h); color: var(--text-m); }
+[data-theme="cyberpunk"] .lens-chip.active .lens-chip-name { color: var(--c1); }
+[data-theme="cyberpunk"] .lens-chip-fallback { border-radius: 28px; border: 1.5px solid var(--c1); background: var(--bg-card2); color: var(--c1); font-family: var(--font-h); }
 
-/* Portrait image in grid */
-.figure-portrait {
-  width: 64px; height: 64px; object-fit: cover; flex-shrink: 0;
-  transition: border-color 0.2s;
-}
-
-[data-theme="cyberpunk"] .figure-portrait {
-  border-radius: 32px; border: 1px solid var(--c2);
-}
-[data-theme="cyberpunk"] .figure-card.selected .figure-portrait,
-[data-theme="cyberpunk"] .figure-card:hover .figure-portrait {
-  border-width: 2px; box-shadow: var(--glow-c2);
-}
-[data-theme="kawaii"] .figure-portrait {
+/* Kawaii chips */
+[data-theme="kawaii"] .lens-chip-portrait {
   border-radius: 14px; border: 2px solid rgba(139,92,246,0.2);
 }
-[data-theme="kawaii"] .figure-card.selected .figure-portrait,
-[data-theme="kawaii"] .figure-card:hover .figure-portrait {
-  border-color: var(--c1);
+[data-theme="kawaii"] .lens-chip.active .lens-chip-portrait,
+[data-theme="kawaii"] .lens-chip:hover .lens-chip-portrait {
+  border-color: var(--c1); box-shadow: 0 4px 14px rgba(139,92,246,0.3);
 }
-[data-theme="notepad"] .figure-portrait {
+[data-theme="kawaii"] .lens-chip-name { color: var(--text-m); }
+[data-theme="kawaii"] .lens-chip.active .lens-chip-name { color: var(--c1); }
+[data-theme="kawaii"] .lens-chip-fallback { border-radius: 14px; border: 2px solid var(--c1); background: var(--bg-card2); color: var(--c1); }
+
+/* Notepad chips */
+[data-theme="notepad"] .lens-chip-portrait {
   border-radius: 50%; border: 1.5px solid #d4cbbf;
 }
-[data-theme="notepad"] .figure-card.selected .figure-portrait,
-[data-theme="notepad"] .figure-card:hover .figure-portrait {
-  border-color: var(--c1);
+[data-theme="notepad"] .lens-chip.active .lens-chip-portrait,
+[data-theme="notepad"] .lens-chip:hover .lens-chip-portrait {
+  border-color: var(--c1); box-shadow: var(--glow-c1);
 }
-
-.figure-name {
-  font-size: 11px; font-weight: 700; text-align: center; line-height: 1.2;
-  letter-spacing: 0.8px; text-transform: uppercase;
-}
-[data-theme="cyberpunk"] .figure-name { font-family: var(--font-h); color: var(--c2); letter-spacing: 1.2px; }
-[data-theme="kawaii"]    .figure-name { color: var(--c1); letter-spacing: 0.3px; }
-[data-theme="notepad"]   .figure-name { color: var(--text-h); font-family: var(--font-b); }
-
-.figure-tag {
-  font-size: 10px; letter-spacing: 0.3px; text-align: center;
-  line-height: 1.3; color: var(--text-m);
-}
-[data-theme="cyberpunk"] .figure-tag {
-  font-family: var(--font-h); color: var(--text-h); letter-spacing: 0.8px; text-transform: uppercase;
-}
-[data-theme="notepad"] .figure-tag { font-style: italic; font-size: 11px; }
+[data-theme="notepad"] .lens-chip-name { font-family: var(--font-b); color: var(--text-m); font-style: italic; }
+[data-theme="notepad"] .lens-chip.active .lens-chip-name { color: var(--c1); }
+[data-theme="notepad"] .lens-chip-fallback { border-radius: 50%; border: 1.5px solid var(--c1); background: var(--bg-card2); color: var(--c1); }
 
 /* ════════════════════════════════════════════════
    12. RESPONSE CARD
@@ -768,68 +740,93 @@ main { flex: 1; position: relative; overflow: hidden; }
 #overlay-preview {
   position: absolute; inset: 0; z-index: 200;
   background: var(--overlay-bg);
-  display: none; flex-direction: column; align-items: center;
-  justify-content: center; gap: 24px; padding: 32px;
+  display: none; flex-direction: column;
+  justify-content: flex-end; gap: 0; padding: 0;
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  overflow: hidden;
 }
 #overlay-preview.open {
   display: flex; animation: fadeUp 0.22s ease;
 }
+.preview-sheet {
+  background: var(--bg-card); border-radius: 24px 24px 0 0;
+  padding: 24px 20px 0; display: flex; flex-direction: column; gap: 16px;
+  max-height: 92dvh; overflow: hidden;
+}
+[data-theme="cyberpunk"] .preview-sheet {
+  border-top: 2px solid var(--c4); background: var(--bg-card);
+  border-radius: 0; border-left: none; border-right: none;
+  box-shadow: 0 -8px 32px rgba(176,76,255,0.2);
+}
+[data-theme="kawaii"] .preview-sheet {
+  border-top: 2px solid rgba(139,92,246,0.3);
+  box-shadow: 0 -8px 32px rgba(139,92,246,0.15);
+}
+[data-theme="notepad"] .preview-sheet {
+  border-top: 2px solid var(--c2);
+  box-shadow: 0 -4px 16px rgba(196,184,170,0.3);
+}
+
+.preview-drag-handle {
+  width: 36px; height: 4px; border-radius: 2px;
+  background: var(--text-m); opacity: 0.3;
+  align-self: center; margin-bottom: 4px; flex-shrink: 0;
+}
+
+.preview-disclaimer {
+  font-size: 11px; text-align: center; color: var(--text-m);
+  padding-bottom: 4px;
+}
+[data-theme="cyberpunk"] .preview-disclaimer { font-family: var(--font-h); letter-spacing: 0.5px; }
+
+/* Strip carousel inside overlay */
+.preview-carousel-row {
+  display: flex; flex-direction: column; gap: 0;
+  border-top: 1px solid rgba(128,128,128,0.1);
+  padding-top: 12px; padding-bottom: 20px; flex-shrink: 0;
+}
+.preview-carousel-row .lens-carousel { padding-bottom: 4px; }
 
 .preview-card { width: 100%; }
 
-[data-theme="cyberpunk"] .preview-card {
-  background: var(--bg-card);
-  border-top: 1px solid var(--c4); border-left: 1px solid var(--c4);
-  border-right: 4px solid var(--c4); border-bottom: 4px solid var(--c4);
-  border-radius: var(--r-card); padding: 24px 20px;
-}
-[data-theme="kawaii"] .preview-card {
-  background: var(--bg-card);
-  border: 2px solid rgba(139,92,246,0.25); border-radius: 24px;
-  padding: 28px 24px; box-shadow: 0 12px 40px rgba(139,92,246,0.18);
-}
-[data-theme="notepad"] .preview-card {
-  background: var(--bg-card);
-  border: 1.5px solid #d4cbbf; border-top: 4px solid var(--c2);
-  border-radius: var(--r-card); padding: 24px 20px;
-  box-shadow: 0 4px 16px rgba(196,184,170,0.25);
-}
-
-.preview-inner { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.preview-inner { display: flex; flex-direction: row; align-items: center; gap: 16px; }
 
 .preview-portrait {
-  width: 88px; height: 88px; object-fit: cover;
+  width: 72px; height: 72px; object-fit: cover; flex-shrink: 0;
 }
 [data-theme="cyberpunk"] .preview-portrait {
-  border-radius: 44px; border: 2px solid var(--c2); box-shadow: var(--glow-c2);
+  border-radius: 36px; border: 2px solid var(--c2); box-shadow: var(--glow-c2);
 }
 [data-theme="kawaii"] .preview-portrait {
-  border-radius: 20px; border: 3px solid var(--c1); box-shadow: var(--glow-c1);
+  border-radius: 16px; border: 2px solid var(--c1); box-shadow: var(--glow-c1);
 }
 [data-theme="notepad"] .preview-portrait {
   border-radius: 50%; border: 2px solid var(--c2);
 }
 
-.preview-name { font-size: 18px; font-weight: 700; text-align: center; }
+.preview-text-block { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
+
+.preview-name { font-size: 17px; font-weight: 700; }
 [data-theme="cyberpunk"] .preview-name {
-  font-family: var(--font-h); color: var(--c2); letter-spacing: 1.4px; text-transform: uppercase;
+  font-family: var(--font-h); color: var(--c2); letter-spacing: 1.2px; text-transform: uppercase;
   text-shadow: var(--glow-c2);
 }
 [data-theme="kawaii"] .preview-name { color: var(--c1); }
 [data-theme="notepad"] .preview-name { font-family: var(--font-h); color: var(--c2); }
 
 .preview-quote {
-  font-size: 13px; line-height: 1.6; text-align: center;
+  font-size: 12px; line-height: 1.55;
   font-style: italic; color: var(--text-h);
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
 }
 .preview-bio {
-  font-size: 12px; line-height: 1.6; text-align: center;
-  color: var(--text-b);
+  font-size: 11px; line-height: 1.55; color: var(--text-b);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 
 .preview-actions {
-  display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 12px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding-bottom: 16px;
 }
 
 /* ════════════════════════════════════════════════
@@ -903,8 +900,49 @@ main { flex: 1; position: relative; overflow: hidden; }
 .landing-copy { display: flex; flex-direction: column; gap: 14px; }
 
 /* Lenses */
-#screen-lenses { gap: 20px; padding-bottom: 32px; }
-#screen-lenses .section-title { text-align: center; }
+#screen-lenses { gap: 16px; padding-bottom: 32px; }
+
+/* Share preview */
+#screen-share { gap: 0; align-items: stretch; }
+.share-canvas {
+  flex: 1; position: relative; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: flex-end;
+}
+.share-quote-block {
+  padding: 24px; display: flex; flex-direction: column; gap: 12px;
+  background: rgba(0,0,0,0.6);
+}
+[data-theme="kawaii"] .share-quote-block { background: rgba(237,242,255,0.85); }
+[data-theme="notepad"] .share-quote-block { background: rgba(253,253,251,0.9); }
+
+.share-watermark {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  font-size: 40px; font-weight: 900; letter-spacing: 6px; text-transform: uppercase;
+  color: rgba(255,255,255,0.08); pointer-events: none; white-space: nowrap;
+  font-family: var(--font-h);
+}
+[data-theme="kawaii"] .share-watermark { color: rgba(139,92,246,0.07); font-family: var(--font-h); }
+[data-theme="notepad"] .share-watermark { color: rgba(90,78,71,0.07); }
+
+.share-social-row {
+  display: flex; gap: 12px; padding: 16px 24px; justify-content: center;
+  flex-shrink: 0; flex-wrap: wrap;
+}
+.share-social-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+  color: var(--text-m); cursor: pointer;
+  padding: 8px 12px; border-radius: var(--r-card);
+  background: var(--bg-card); border: 1px solid rgba(128,128,128,0.15);
+  transition: background 0.15s;
+}
+.share-social-btn .social-icon { font-size: 22px; }
+.share-social-btn:hover { background: var(--bg-card2); }
+.share-upsell {
+  font-size: 11px; text-align: center; color: var(--text-m);
+  padding: 0 24px 16px; cursor: pointer; text-decoration: underline;
+  text-underline-offset: 3px;
+}
 
 /* Response — scrollable content + pinned footer */
 #screen-response { gap: 0; padding: 0; }
@@ -1135,17 +1173,19 @@ main { flex: 1; position: relative; overflow: hidden; }
 
 <div id="app" data-theme="cyberpunk">
 
-  <!-- Theme tab switcher -->
-  <div class="theme-bar" role="tablist" aria-label="UI Theme">
-    <button class="theme-tab" data-theme-target="cyberpunk"
-            role="tab" aria-selected="true"
-            onclick="switchTheme('cyberpunk')">CyberPunk</button>
-    <button class="theme-tab" data-theme-target="kawaii"
-            role="tab" aria-selected="false"
-            onclick="switchTheme('kawaii')">Kawaii</button>
-    <button class="theme-tab" data-theme-target="notepad"
-            role="tab" aria-selected="false"
-            onclick="switchTheme('notepad')">Notepad</button>
+  <!-- Theme pill selector -->
+  <div class="theme-picker" role="tablist" aria-label="UI Theme">
+    <div class="theme-picker-inner">
+      <button class="theme-pill" data-theme-target="cyberpunk"
+              role="tab" aria-selected="true"
+              onclick="switchTheme('cyberpunk')">CyberPunk</button>
+      <button class="theme-pill" data-theme-target="kawaii"
+              role="tab" aria-selected="false"
+              onclick="switchTheme('kawaii')">Kawaii</button>
+      <button class="theme-pill" data-theme-target="notepad"
+              role="tab" aria-selected="false"
+              onclick="switchTheme('notepad')">Notepad</button>
+    </div>
   </div>
 
   <main id="main">
@@ -1154,11 +1194,11 @@ main { flex: 1; position: relative; overflow: hidden; }
     <div class="screen active" id="screen-landing">
 
       <div class="landing-copy">
-        <h1 class="t-h1">WHAT'S ON YOUR MIND?</h1>
+        <h1 class="t-h1">WHAT'S WEIGHING ON YOU?</h1>
         <p class="t-body">
-          A decision, a fear, a frustration. Write it out honestly — the more you share, the richer the shift.
+          A decision, a fear, a frustration. Write it out honestly — then see it through the eyes of someone who lived through worse.
         </p>
-        <h2 class="t-h2">Vent it out, then see it through the lens of a historical figure.</h2>
+        <h2 class="t-h2">Get a perspective shift from a historical figure.</h2>
       </div>
 
       <div class="vent-field" id="vent-wrap">
@@ -1200,12 +1240,12 @@ main { flex: 1; position: relative; overflow: hidden; }
       <div class="lens-nav-row">
         <button class="btn btn-ghost" onclick="goToLanding()" aria-label="Back to vent">← Back</button>
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-          <h2 class="t-h2 section-title" id="pickLensHeading">Pick a Lens</h2>
+          <h2 class="t-h2 section-title" id="pickLensHeading">Who do you want to hear from?</h2>
           <div class="lens-count-badge" id="lensCountBadge" style="display:none;"></div>
         </div>
       </div>
 
-      <div class="figure-grid" id="figureGrid"></div>
+      <div class="lens-carousel" id="figureCarousel"></div>
 
     </div><!-- /screen-lenses -->
 
@@ -1231,29 +1271,29 @@ main { flex: 1; position: relative; overflow: hidden; }
       </div>
 
       <div class="action-icon-row">
-        <button class="btn btn-ghost action-btn" onclick="goToAccount()" aria-label="Save">
-          <span class="action-icon">📖</span><span>Save</span>
+        <button class="btn btn-ghost action-btn" onclick="goToAccount()" aria-label="Keep it">
+          <span class="action-icon">📖</span><span>Keep it</span>
         </button>
-        <button class="btn btn-ghost action-btn" onclick="goToAccount()" aria-label="Decorate">
-          <span class="action-icon">🎨</span><span>Decorate</span>
+        <button class="btn btn-ghost action-btn" onclick="goToAccount()" aria-label="Make it yours">
+          <span class="action-icon">🎨</span><span>Make it yours</span>
         </button>
-        <button class="btn btn-ghost action-btn" onclick="shareResponse()" aria-label="Share to Socials">
-          <span class="action-icon">↗</span><span>Socials</span>
+        <button class="btn btn-ghost action-btn" onclick="goToSharePreview()" aria-label="Share it">
+          <span class="action-icon">↗</span><span>Share it</span>
         </button>
       </div>
 
       <div class="bottom-nav">
         <button class="btn btn-primary" onclick="goToLenses()">
           <span class="nav-icon">⊙</span>
-          <span>Try another</span>
+          <span>Different lens</span>
         </button>
         <button class="btn btn-secondary" onclick="goToLanding()">
           <span class="nav-icon">⌂</span>
-          <span>New</span>
+          <span>Start over</span>
         </button>
         <button class="btn btn-primary" onclick="continueConversation()">
           <span class="nav-icon">→</span>
-          <span>Continue</span>
+          <span>Go deeper</span>
         </button>
       </div>
 
@@ -1263,63 +1303,126 @@ main { flex: 1; position: relative; overflow: hidden; }
     <!-- ══════════════════ SCREEN: ACCOUNT ══════════════════ -->
     <div class="screen" id="screen-account">
 
-      <h1 class="t-h1" style="text-align:center;">Create Account</h1>
+      <h1 class="t-h1" style="text-align:center;">Your shifts deserve saving</h1>
       <p class="t-body" style="text-align:center;">
-        Unlock <strong>Journal</strong> and <strong>Decorate</strong> — save the perspectives you get.
+        Unlock your <strong>Journal</strong> and share without the big watermark. 5 perspectives per day, 3 problems.
       </p>
 
       <div class="account-fields">
         <div class="compact-input">
           <div class="compact-label">@nickname</div>
-          <input type="text" id="acNick" placeholder="your handle" autocomplete="username">
+          <input type="text" id="acNick" placeholder="what should we call you" autocomplete="username">
         </div>
         <div class="compact-input">
           <div class="compact-label">e-mail</div>
           <input type="email" id="acEmail" placeholder="your@email.com" autocomplete="email">
         </div>
         <div class="compact-input">
-          <div class="compact-label">phone</div>
-          <input type="tel" id="acPhone" placeholder="+1 234 567 8900" autocomplete="tel">
-        </div>
-        <div class="compact-input">
-          <div class="compact-label">password</div>
-          <input type="password" id="acPass" placeholder="min 8 characters" autocomplete="new-password">
+          <div class="compact-label">confirm e-mail</div>
+          <input type="email" id="acEmailConfirm" placeholder="same again" autocomplete="email">
         </div>
       </div>
 
-      <button class="btn btn-primary" onclick="createAccount()">Create Account</button>
+      <p class="t-meta" style="text-align:center;padding:0 8px;">
+        We won't spam you — only new feature announcements, roughly once a month.
+      </p>
+
+      <button class="btn btn-primary" onclick="createAccount()">Save my shifts</button>
 
       <div class="add-card">
-        <span class="t-sub">Be first to explore</span>
-        <h2 class="t-h2" style="font-size:17px;text-align:center;">Premium Features</h2>
-        <p class="t-body" style="font-size:13px;">Chat with any lens · Unlimited sessions · Journal your shifts</p>
-        <button class="btn btn-secondary" style="align-self:center;margin-top:6px;" onclick="goToLanding()">Subscribe</button>
+        <span class="t-sub">Coming soon</span>
+        <h2 class="t-h2" style="font-size:17px;text-align:center;">Go further</h2>
+        <p class="t-body" style="font-size:13px;">Unlimited lenses · Chat mode · Watermark-free shares</p>
+        <button class="btn btn-secondary" style="align-self:center;margin-top:6px;" onclick="goToLanding()">Get notified first</button>
       </div>
 
       <div style="display:flex;gap:12px;align-self:center;flex-wrap:wrap;justify-content:center;">
         <button class="btn btn-ghost" onclick="goBackFromAccount()">← Back</button>
-        <button class="btn btn-ghost" id="skipGateBtn" onclick="skipAccountGate()" style="display:none;">Skip for now →</button>
+        <button class="btn btn-ghost" id="skipGateBtn" onclick="skipAccountGate()" style="display:none;">Keep exploring →</button>
       </div>
 
     </div><!-- /screen-account -->
+
+
+    <!-- ══════════════════ SCREEN: SHARE PREVIEW ══════════════════ -->
+    <div class="screen" id="screen-share">
+
+      <div class="share-canvas" id="shareCanvas">
+        <div class="share-watermark">MindShift</div>
+        <div class="share-quote-block">
+          <div class="quote-field" style="margin:0;">
+            <div class="quote-label" id="shareTopicLabel">Your thought</div>
+            <div class="quote-text" id="shareVentDisplay"></div>
+          </div>
+          <div class="response-card">
+            <div class="response-head">
+              <img class="response-portrait" id="sharePortrait" src="" alt="">
+              <span class="response-figure-name" id="shareFigureName"></span>
+            </div>
+            <div class="response-body" id="shareRespBody" style="padding:12px 14px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="share-social-row">
+        <button class="share-social-btn" onclick="shareResponse()">
+          <span class="social-icon">↗</span><span>Share</span>
+        </button>
+        <button class="share-social-btn" onclick="saveToCamera()">
+          <span class="social-icon">⬇</span><span>Save</span>
+        </button>
+        <button class="share-social-btn" onclick="goToAccount()">
+          <span class="social-icon">📖</span><span>Journal</span>
+        </button>
+      </div>
+
+      <p class="share-upsell" onclick="goToAccount()">
+        Minimize watermark by creating a free account →
+      </p>
+
+      <div class="bottom-nav">
+        <button class="btn btn-secondary" onclick="showScreen('screen-response')">
+          <span class="nav-icon">←</span>
+          <span>Back</span>
+        </button>
+        <button class="btn btn-primary" onclick="goToLanding()">
+          <span class="nav-icon">⌂</span>
+          <span>Start over</span>
+        </button>
+      </div>
+
+    </div><!-- /screen-share -->
 
   </main>
 </div><!-- #app -->
 
 
-<!-- ══════════════════ OVERLAY: LENS PREVIEW ══════════════════ -->
+<!-- ══════════════════ OVERLAY: LENS PREVIEW (bottom sheet) ══════════════════ -->
 <div id="overlay-preview" role="dialog" aria-modal="true" aria-label="Lens preview">
-  <div class="preview-card">
-    <div class="preview-inner">
-      <img class="preview-portrait" id="previewPortrait" src="" alt="">
-      <div class="preview-name" id="previewName"></div>
-      <p class="preview-quote" id="previewQuote"></p>
-      <p class="preview-bio" id="previewBio"></p>
+  <div class="preview-sheet">
+    <div class="preview-drag-handle"></div>
+
+    <div class="preview-card">
+      <div class="preview-inner">
+        <img class="preview-portrait" id="previewPortrait" src="" alt="">
+        <div class="preview-text-block">
+          <div class="preview-name" id="previewName"></div>
+          <p class="preview-quote" id="previewQuote"></p>
+          <p class="preview-bio" id="previewBio"></p>
+        </div>
+      </div>
     </div>
-  </div>
-  <div class="preview-actions">
-    <button class="btn btn-secondary" onclick="closePreview()">Back to selection</button>
-    <button class="btn btn-primary" onclick="confirmLens()">Select the Lens</button>
+
+    <div class="preview-actions">
+      <button class="btn btn-secondary" onclick="closePreview()">← All lenses</button>
+      <button class="btn btn-primary" id="confirmLensBtn" onclick="confirmLens()">Hear from them</button>
+    </div>
+
+    <p class="preview-disclaimer" id="previewDisclaimer"></p>
+
+    <div class="preview-carousel-row">
+      <div class="lens-carousel" id="previewCarousel"></div>
+    </div>
   </div>
 </div>
 
@@ -1637,33 +1740,32 @@ let currentVent      = '';
 let previewFigure    = null;
 let currentFigure    = null;
 let previousScreen   = 'screen-landing';
-let lensUseCount     = 0;
 let pendingFigure    = null;
 let selectedFigureId = null;
 
 const THEME_COPY = {
   cyberpunk: {
-    h1:              'WHAT\'S ON YOUR MIND?',
+    h1:              'WHAT\'S WEIGHING ON YOU?',
     ventLabel:       'VENT IT OUT > _',
     ventPlaceholder: 'No filter. No judgement. Dump it all here.',
-    cta:             'SELECT THE LENS',
-    pickLens:        'CHOOSE YOUR LENS',
+    cta:             'SHIFT MY PERSPECTIVE',
+    pickLens:        'WHO DO YOU WANT TO HEAR FROM?',
     charMax:         450
   },
   kawaii: {
-    h1:              'What\'s on your mind? ✨',
-    ventLabel:       'share it here 💕',
+    h1:              'What\'s on your mind? 💭',
+    ventLabel:       'pour it out 💕',
     ventPlaceholder: 'pour out whatever you\'re feeling — this is a safe space ✨',
-    cta:             'Pick your lens ✨',
+    cta:             'See it differently ✨',
     pickLens:        'who do you want to hear from?',
     charMax:         450
   },
   notepad: {
-    h1:              'Something on your mind?',
+    h1:              'Something you need to get out?',
     ventLabel:       'Write it out...',
     ventPlaceholder: 'Don\'t edit — just write. The more honest, the better.',
-    cta:             'Choose a perspective',
-    pickLens:        'Choose a lens',
+    cta:             'Shift my perspective',
+    pickLens:        'Who would you like to hear from?',
     charMax:         450
   }
 };
@@ -1726,13 +1828,13 @@ function switchTheme(theme) {
     const app = document.getElementById('app');
     app.setAttribute('data-theme', theme);
 
-    document.querySelectorAll('.theme-tab').forEach(tab => {
-      tab.setAttribute('aria-selected', tab.dataset.themeTarget === theme ? 'true' : 'false');
+    document.querySelectorAll('.theme-pill').forEach(pill => {
+      pill.setAttribute('aria-selected', pill.dataset.themeTarget === theme ? 'true' : 'false');
     });
 
     document.querySelectorAll('[data-portrait-id]').forEach(img => {
       const fig = FIGURES.find(f => f.id === img.dataset.portraitId);
-      if (fig) img.src = fig.portraits[theme];
+      if (fig) img.src = fig.portraits[theme] || fig.portraits.cyberpunk;
     });
 
     if (previewFigure) {
@@ -1788,7 +1890,7 @@ function goToLenses() {
   document.getElementById('lensVentDisplay').textContent = vent;
   document.getElementById('lensTopicLabel').textContent  = guessTopic(vent);
 
-  renderGrid();
+  renderCarousel();
   updateLensBadge();
   previousScreen = document.querySelector('.screen.active')?.id || 'screen-landing';
   showScreen('screen-lenses');
@@ -1831,67 +1933,135 @@ function guessTopic(t) {
 }
 
 /* ════════════════════════════════════════════════
-   RENDER FIGURE GRID
+   DAILY LENS LIMIT (localStorage, resets midnight)
 ════════════════════════════════════════════════ */
 
-function renderGrid() {
-  const grid = document.getElementById('figureGrid');
-  grid.innerHTML = '';
+const DAILY_FREE_LIMIT = 3;
 
-  FIGURES.forEach(fig => {
-    const card = document.createElement('button');
-    card.className = 'figure-card';
-    if (fig.id === selectedFigureId) card.classList.add('selected');
-    card.setAttribute('aria-label', fig.name + ' — ' + fig.tag);
-    card.type = 'button';
+function getTodayKey() {
+  return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+}
 
-    const portraitSrc = fig.portraits[currentTheme] || fig.portraits.cyberpunk;
+function getDailyCount() {
+  try {
+    const raw = localStorage.getItem('ms_daily');
+    if (!raw) return 0;
+    const { date, count } = JSON.parse(raw);
+    if (date !== getTodayKey()) return 0;
+    return count || 0;
+  } catch(_) { return 0; }
+}
 
-    const img = document.createElement('img');
-    img.className = 'figure-portrait';
-    img.dataset.portraitId = fig.id;
-    img.src = portraitSrc;
-    img.alt = fig.fullName;
-    img.loading = 'lazy';
-    img.onerror = function() {
-      this.style.display = 'none';
-      const fb = document.createElement('div');
-      fb.className = 'portrait-fallback';
-      fb.textContent = (fig.name.match(/\b\w/g) || []).slice(0,2).join('').toUpperCase();
-      this.parentNode.insertBefore(fb, this);
-    };
+function incrementDailyCount() {
+  try {
+    const count = getDailyCount() + 1;
+    localStorage.setItem('ms_daily', JSON.stringify({ date: getTodayKey(), count }));
+    return count;
+  } catch(_) { return 1; }
+}
 
-    card.appendChild(img);
-    card.insertAdjacentHTML('beforeend',
-      `<div class="figure-name">${fig.name}</div>` +
-      `<div class="figure-tag">${fig.tag}</div>`
-    );
+function isGateSkipped() {
+  return sessionStorage.getItem('gateSkipped') === '1';
+}
 
-    card.addEventListener('click', () => { triggerHaptic(10); openPreview(fig, card); });
-    grid.appendChild(card);
-  });
+/* ════════════════════════════════════════════════
+   RENDER LENS CAROUSEL
+════════════════════════════════════════════════ */
+
+function makeChip(fig, containerEl, onClickFn) {
+  const chip = document.createElement('button');
+  chip.className = 'lens-chip';
+  chip.type = 'button';
+  chip.setAttribute('aria-label', fig.fullName + ' — ' + fig.tag);
+  chip.dataset.figId = fig.id;
+  if (fig.id === selectedFigureId) chip.classList.add('active');
+
+  const src = fig.portraits[currentTheme] || fig.portraits.cyberpunk;
+  const img = document.createElement('img');
+  img.className = 'lens-chip-portrait';
+  img.dataset.portraitId = fig.id;
+  img.src = src; img.alt = fig.fullName; img.loading = 'lazy';
+  img.onerror = function() {
+    this.style.display = 'none';
+    const fb = document.createElement('div');
+    fb.className = 'lens-chip-fallback';
+    fb.textContent = (fig.name.match(/\b\w/g) || []).slice(0,2).join('').toUpperCase();
+    this.parentNode.insertBefore(fb, this);
+  };
+
+  const name = document.createElement('div');
+  name.className = 'lens-chip-name';
+  name.textContent = fig.name;
+
+  chip.appendChild(img); chip.appendChild(name);
+  chip.addEventListener('click', () => { triggerHaptic(10); onClickFn(fig, chip); });
+  containerEl.appendChild(chip);
+  return chip;
+}
+
+function renderCarousel() {
+  const carousel = document.getElementById('figureCarousel');
+  if (!carousel) return;
+  carousel.innerHTML = '';
+  FIGURES.forEach(fig => makeChip(fig, carousel, (f) => openPreview(f)));
+}
+
+function renderPreviewCarousel() {
+  const carousel = document.getElementById('previewCarousel');
+  if (!carousel) return;
+  carousel.innerHTML = '';
+  FIGURES.forEach(fig => makeChip(fig, carousel, (f) => updatePreview(f)));
 }
 
 /* ════════════════════════════════════════════════
    PREVIEW POPUP
 ════════════════════════════════════════════════ */
 
-function openPreview(fig, cardEl) {
+function openPreview(fig) {
+  previewFigure = fig;
+  selectedFigureId = fig.id;
+  updatePreview(fig);
+  renderPreviewCarousel();
+  document.getElementById('overlay-preview').classList.add('open');
+  /* Scroll active chip into view in preview carousel */
+  requestAnimationFrame(() => {
+    const activeChip = document.querySelector('#previewCarousel .lens-chip.active');
+    if (activeChip) activeChip.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  });
+}
+
+function updatePreview(fig) {
   previewFigure = fig;
   selectedFigureId = fig.id;
 
-  /* Highlight selected card */
-  document.querySelectorAll('.figure-card').forEach(c => c.classList.remove('selected'));
-  if (cardEl) cardEl.classList.add('selected');
-
-  /* Populate preview */
   document.getElementById('previewName').textContent  = fig.fullName;
   document.getElementById('previewQuote').textContent = fig.quote;
   document.getElementById('previewBio').textContent   = fig.bio;
   document.getElementById('previewPortrait').src      = fig.portraits[currentTheme] || fig.portraits.cyberpunk;
   document.getElementById('previewPortrait').alt      = fig.fullName;
 
-  document.getElementById('overlay-preview').classList.add('open');
+  /* Personalise CTA */
+  const btn = document.getElementById('confirmLensBtn');
+  if (btn) btn.textContent = 'Hear from ' + fig.name;
+
+  /* Update disclaimer with daily count */
+  const dailyCount = getDailyCount();
+  const disclaimer = document.getElementById('previewDisclaimer');
+  if (disclaimer) {
+    if (isGateSkipped()) {
+      disclaimer.textContent = '';
+    } else {
+      const remaining = Math.max(0, DAILY_FREE_LIMIT - dailyCount);
+      disclaimer.textContent = remaining > 0
+        ? remaining + ' of ' + DAILY_FREE_LIMIT + ' free perspectives today · Create account for more'
+        : 'You\'ve had your 3 today — come back tomorrow or create an account';
+    }
+  }
+
+  /* Highlight active chip in both carousels */
+  document.querySelectorAll('.lens-chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.figId === fig.id);
+  });
 }
 
 function closePreview() {
@@ -1902,15 +2072,19 @@ function closePreview() {
 function confirmLens() {
   if (!previewFigure) return;
   triggerHaptic(20);
-  document.getElementById('overlay-preview').classList.remove('open');
-  lensUseCount++;
-  updateLensBadge();
-  if (lensUseCount >= 4 && !sessionStorage.getItem('gateSkipped')) {
+
+  const dailyCount = getDailyCount();
+  if (dailyCount >= DAILY_FREE_LIMIT && !isGateSkipped()) {
+    document.getElementById('overlay-preview').classList.remove('open');
     pendingFigure = previewFigure;
     showAccountGate();
-  } else {
-    callLens(previewFigure);
+    return;
   }
+
+  document.getElementById('overlay-preview').classList.remove('open');
+  incrementDailyCount();
+  updateLensBadge();
+  callLens(previewFigure);
 }
 
 function showAccountGate() {
@@ -1925,19 +2099,19 @@ function skipAccountGate() {
   updateLensBadge();
   const fig = pendingFigure;
   pendingFigure = null;
-  if (fig) callLens(fig);
+  if (fig) { incrementDailyCount(); callLens(fig); }
   else showScreen('screen-lenses');
 }
 
 function updateLensBadge() {
   const badge = document.getElementById('lensCountBadge');
   if (!badge) return;
-  if (lensUseCount === 0) { badge.style.display = 'none'; return; }
+  const count = getDailyCount();
+  if (count === 0) { badge.style.display = 'none'; return; }
   badge.style.display = '';
-  const skipped = sessionStorage.getItem('gateSkipped');
-  if (skipped) { badge.textContent = 'Unlimited ✓'; return; }
-  const free = Math.max(0, 3 - lensUseCount);
-  badge.textContent = free > 0 ? free + ' of 3 free' : 'Limit reached';
+  if (isGateSkipped()) { badge.textContent = 'Unlimited ✓'; return; }
+  const remaining = Math.max(0, DAILY_FREE_LIMIT - count);
+  badge.textContent = remaining > 0 ? remaining + ' of 3 today' : '3 of 3 used today';
 }
 
 function continueConversation() {
@@ -2046,10 +2220,29 @@ function shareResponse() {
 }
 
 function createAccount() {
-  const nick  = document.getElementById('acNick').value.trim();
-  const email = document.getElementById('acEmail').value.trim();
-  if (!nick || !email) { alert('Please enter at least a nickname and e-mail.'); return; }
-  alert('Welcome, ' + nick + '! Account creation coming soon — you\'ll be first to know.');
+  const nick    = document.getElementById('acNick').value.trim();
+  const email   = document.getElementById('acEmail').value.trim();
+  const confirm = document.getElementById('acEmailConfirm').value.trim();
+  if (!nick || !email) { showToast('Enter a nickname and e-mail to continue'); return; }
+  if (email !== confirm) { showToast('E-mails don\'t match — double-check'); return; }
+  showToast('You\'re on the list, ' + nick + ' — we\'ll be in touch ✦');
+  setTimeout(() => showScreen('screen-landing'), 1800);
+}
+
+function goToSharePreview() {
+  if (!currentFigure) return;
+  /* Mirror response content to share screen */
+  document.getElementById('shareTopicLabel').textContent  = document.getElementById('respTopicLabel').textContent;
+  document.getElementById('shareVentDisplay').textContent = currentVent;
+  document.getElementById('sharePortrait').src            = currentFigure.portraits[currentTheme] || currentFigure.portraits.cyberpunk;
+  document.getElementById('sharePortrait').alt            = currentFigure.fullName;
+  document.getElementById('shareFigureName').textContent  = currentFigure.fullName;
+  document.getElementById('shareRespBody').innerHTML      = document.getElementById('respBody').innerHTML;
+  showScreen('screen-share');
+}
+
+function saveToCamera() {
+  showToast('Save to camera roll — coming soon ✦');
 }
 
 /* ════════════════════════════════════════════════
