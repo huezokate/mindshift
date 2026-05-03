@@ -247,8 +247,8 @@ main { flex: 1; position: relative; overflow: hidden; }
 /* Cyberpunk type specifics */
 [data-theme="cyberpunk"] .t-h1 {
   font-weight: 700; font-size: 26px; letter-spacing: 3px; text-transform: uppercase;
-  background: linear-gradient(171.9deg, var(--c1) 0%, var(--c4) 100%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  color: var(--c1); -webkit-text-fill-color: var(--c1);
+  text-shadow: 0 0 22px rgba(0,245,255,0.45);
 }
 [data-theme="cyberpunk"] .t-h2 {
   font-weight: 700; font-size: 18px; letter-spacing: 1.44px; text-transform: uppercase;
@@ -455,7 +455,12 @@ main { flex: 1; position: relative; overflow: hidden; }
 
 .char-counter { font-size: 10px; letter-spacing: 0.5px; color: var(--text-m); }
 .char-counter.over { color: var(--c3); }
-.field-error { font-size: 11px; color: var(--c3); letter-spacing: 0.3px; }
+.field-error {
+  font-size: 11px; color: var(--c3); letter-spacing: 0.3px;
+  max-height: 0; opacity: 0; overflow: hidden;
+  transition: max-height 0.2s ease, opacity 0.2s ease;
+}
+.field-error.visible { max-height: 2.5em; opacity: 1; }
 
 /* ════════════════════════════════════════════════
    9. COMING SOON / ADD CARD
@@ -470,10 +475,10 @@ main { flex: 1; position: relative; overflow: hidden; }
   border-radius: var(--r-card); display: flex; flex-direction: column; gap: 8px;
 }
 [data-theme="kawaii"] .add-card {
-  background: linear-gradient(135deg, #fff0f5 0%, #f0ebff 100%);
+  background: var(--bg-card2);
   border: 2px solid rgba(255,45,120,0.2); border-radius: 20px;
   display: flex; flex-direction: column; gap: 10px;
-  box-shadow: 0 4px 16px rgba(255,45,120,0.1);
+  box-shadow: 0 4px 16px rgba(255,45,120,0.08);
 }
 [data-theme="notepad"] .add-card {
   background: var(--bg-card2);
@@ -521,8 +526,8 @@ main { flex: 1; position: relative; overflow: hidden; }
 }
 
 .quote-text {
-  padding: 12px 14px; font-size: 13px; line-height: 1.65;
-  max-height: 160px; overflow-y: auto; color: var(--text-h);
+  padding: 12px 14px; font-size: 13px; line-height: 1.65; color: var(--text-h);
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden;
 }
 [data-theme="cyberpunk"] .quote-text { font-family: var(--font-h); }
 [data-theme="notepad"]   .quote-text { font-family: var(--font-h); font-style: italic; }
@@ -706,8 +711,8 @@ main { flex: 1; position: relative; overflow: hidden; }
 
 .bottom-nav {
   display: flex; align-items: stretch;
-  flex-shrink: 0; margin-top: auto;
-  position: sticky; bottom: 0; z-index: 10;
+  flex-shrink: 0;
+  z-index: 10;
 }
 
 [data-theme="cyberpunk"] .bottom-nav {
@@ -761,7 +766,7 @@ main { flex: 1; position: relative; overflow: hidden; }
 ════════════════════════════════════════════════ */
 
 #overlay-preview {
-  position: fixed; inset: 0; z-index: 200;
+  position: absolute; inset: 0; z-index: 200;
   background: var(--overlay-bg);
   display: none; flex-direction: column; align-items: center;
   justify-content: center; gap: 24px; padding: 32px;
@@ -832,7 +837,7 @@ main { flex: 1; position: relative; overflow: hidden; }
 ════════════════════════════════════════════════ */
 
 #overlay-loading {
-  position: fixed; inset: 0; z-index: 500;
+  position: absolute; inset: 0; z-index: 500;
   display: none; flex-direction: column;
   align-items: center; justify-content: center; gap: 18px;
 }
@@ -901,8 +906,17 @@ main { flex: 1; position: relative; overflow: hidden; }
 #screen-lenses { gap: 20px; padding-bottom: 32px; }
 #screen-lenses .section-title { text-align: center; }
 
-/* Response */
-#screen-response { gap: 16px; padding-bottom: 0; }
+/* Response — scrollable content + pinned footer */
+#screen-response { gap: 0; padding: 0; }
+.resp-scroll-area {
+  flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  display: flex; flex-direction: column; gap: 16px;
+  padding: 32px 24px 20px;
+  scrollbar-width: thin; scrollbar-color: rgba(128,128,128,0.2) transparent;
+}
+#screen-response .action-icon-row {
+  flex-shrink: 0; padding: 8px 24px 0;
+}
 .response-action-row {
   display: flex; align-items: center; justify-content: space-between; gap: 8px;
 }
@@ -1066,6 +1080,44 @@ main { flex: 1; position: relative; overflow: hidden; }
 .skip-link:focus { left: 4px; }
 :focus-visible { outline: 2px solid var(--c1); outline-offset: 3px; border-radius: 2px; }
 
+/* ════════════════════════════════════════════════
+   22. TOAST NOTIFICATION
+════════════════════════════════════════════════ */
+
+.app-toast {
+  position: absolute; bottom: 80px; left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: var(--bg-card); color: var(--text-h);
+  border: 1px solid var(--text-m); border-radius: 20px;
+  padding: 9px 22px; font-size: 12px; font-weight: 600;
+  white-space: nowrap; z-index: 300; pointer-events: none;
+  opacity: 0; transition: opacity 0.22s ease, transform 0.22s ease;
+}
+.app-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+[data-theme="cyberpunk"] .app-toast {
+  font-family: var(--font-h); color: var(--c4); border-color: var(--c4);
+  letter-spacing: 1px; font-size: 11px;
+}
+[data-theme="kawaii"] .app-toast {
+  border-color: var(--c1); color: var(--c1); border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(139,92,246,0.2);
+}
+[data-theme="notepad"] .app-toast {
+  font-family: var(--font-b); border-color: var(--c1); color: var(--c1);
+}
+
+/* ════════════════════════════════════════════════
+   23. LENS SCREEN BACK BUTTON ROW
+════════════════════════════════════════════════ */
+
+.lens-nav-row {
+  display: flex; align-items: center;
+  justify-content: space-between; gap: 12px; flex-wrap: wrap;
+}
+.lens-nav-row .btn-ghost {
+  padding: 6px 12px; font-size: 11px; min-height: 36px; min-width: auto;
+}
+
 /* Smooth theme transition */
 #app, #app * {
   transition-property: background-color, border-color, color, box-shadow;
@@ -1102,7 +1154,7 @@ main { flex: 1; position: relative; overflow: hidden; }
     <div class="screen active" id="screen-landing">
 
       <div class="landing-copy">
-        <h1 class="t-h1">Have something on your mind?</h1>
+        <h1 class="t-h1">WHAT'S ON YOUR MIND?</h1>
         <p class="t-body">
           A decision, a fear, a frustration. Write it out honestly — the more you share, the richer the shift.
         </p>
@@ -1111,16 +1163,16 @@ main { flex: 1; position: relative; overflow: hidden; }
 
       <div class="vent-field" id="vent-wrap">
         <div class="vent-label">Vent it out…</div>
-        <textarea id="ventText" rows="7" maxlength="800"
+        <textarea id="ventText" rows="7" maxlength="450"
           aria-label="What's on your mind"
-          placeholder="No filter needed — pour it all out."
+          placeholder="No filter. No judgement. Dump it all here."
           oninput="updateCharCount()"></textarea>
         <div class="vent-footer">
-          <span class="char-counter" id="charCounter">0/800</span>
+          <span class="char-counter" id="charCounter">0/450</span>
         </div>
       </div>
 
-      <p class="field-error" id="ventError" style="display:none;" role="alert"></p>
+      <p class="field-error" id="ventError" role="alert"></p>
 
       <button class="btn btn-primary" style="align-self:center;" onclick="goToLenses()">
         Select the Lens
@@ -1145,9 +1197,12 @@ main { flex: 1; position: relative; overflow: hidden; }
         <div class="quote-text" id="lensVentDisplay"></div>
       </div>
 
-      <div style="display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;">
-        <h2 class="t-h2 section-title" id="pickLensHeading">Pick a Lens</h2>
-        <div class="lens-count-badge" id="lensCountBadge" style="display:none;"></div>
+      <div class="lens-nav-row">
+        <button class="btn btn-ghost" onclick="goToLanding()" aria-label="Back to vent">← Back</button>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <h2 class="t-h2 section-title" id="pickLensHeading">Pick a Lens</h2>
+          <div class="lens-count-badge" id="lensCountBadge" style="display:none;"></div>
+        </div>
       </div>
 
       <div class="figure-grid" id="figureGrid"></div>
@@ -1156,20 +1211,22 @@ main { flex: 1; position: relative; overflow: hidden; }
 
 
     <!-- ══════════════════ SCREEN: RESPONSE ══════════════════ -->
-    <div class="screen" id="screen-response" style="padding-bottom:0;">
+    <div class="screen" id="screen-response">
 
-      <div class="quote-field">
-        <div class="quote-label" id="respTopicLabel">Your thought</div>
-        <div class="quote-text" id="respVentDisplay"></div>
-      </div>
-
-      <div class="response-card">
-        <div class="response-head">
-          <img class="response-portrait" id="respPortrait" src="" alt="">
-          <span class="response-figure-name" id="respFigureName"></span>
+      <div class="resp-scroll-area">
+        <div class="quote-field">
+          <div class="quote-label" id="respTopicLabel">Your thought</div>
+          <div class="quote-text" id="respVentDisplay"></div>
         </div>
-        <div class="response-body" id="respBody">
-          <!-- Sections inserted by JS -->
+
+        <div class="response-card">
+          <div class="response-head">
+            <img class="response-portrait" id="respPortrait" src="" alt="">
+            <span class="response-figure-name" id="respFigureName"></span>
+          </div>
+          <div class="response-body" id="respBody">
+            <!-- Sections inserted by JS -->
+          </div>
         </div>
       </div>
 
@@ -1700,11 +1757,17 @@ function showScreen(id) {
   if (el) {
     el.classList.add('active');
     el.scrollTop = 0;
+    const scrollArea = el.querySelector('.resp-scroll-area');
+    if (scrollArea) scrollArea.scrollTop = 0;
   }
 }
 
 function goToLanding() {
   selectedFigureId = null;
+  const ta = document.getElementById('ventText');
+  if (ta) ta.value = '';
+  updateCharCount();
+  document.getElementById('ventError')?.classList.remove('visible');
   showScreen('screen-landing');
 }
 
@@ -1714,11 +1777,11 @@ function goToLenses() {
 
   if (!vent) {
     err.textContent = 'Write something first — even a few words is enough.';
-    err.style.display = 'block';
+    err.classList.add('visible');
     document.getElementById('ventText').focus();
     return;
   }
-  err.style.display = 'none';
+  err.classList.remove('visible');
   triggerHaptic(20);
   currentVent = vent;
 
@@ -1878,7 +1941,21 @@ function updateLensBadge() {
 }
 
 function continueConversation() {
-  alert('Continue conversation — coming in the premium tier!');
+  showToast('Chat mode coming in premium ✦');
+}
+
+function showToast(msg) {
+  let toast = document.getElementById('appToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'appToast';
+    toast.className = 'app-toast';
+    document.getElementById('app').appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => toast.classList.remove('show'), 2600);
 }
 
 /* ════════════════════════════════════════════════
