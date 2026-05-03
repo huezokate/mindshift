@@ -1426,67 +1426,143 @@ main { flex: 1; position: relative; overflow: hidden; }
    27. THEME SELECTION MODAL OVERLAY
 ════════════════════════════════════════════════ */
 
-#overlay-theme {
-  position: absolute; inset: 0; z-index: 150;
-  background: rgba(0,0,0,0.55);
-  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-  display: none; align-items: center; justify-content: center;
-}
-#overlay-theme.open { display: flex; animation: fadeUp 0.22s ease; }
+/* ════════════════════════════════════════════════
+   UI SELECTION SCREEN (carousel)
+════════════════════════════════════════════════ */
 
-.theme-modal-card {
-  width: calc(100% - 64px); max-width: 360px;
+#screen-ui-select { padding: 0; gap: 0; overflow: hidden; background: #080810; }
+
+.ui-select-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px 8px; flex-shrink: 0;
+}
+.ui-select-header-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  color: rgba(255,255,255,0.35); font-family: 'Courier Prime', monospace;
+}
+.ui-select-back {
+  font-size: 13px; color: rgba(255,255,255,0.45); border: none;
+  background: none; cursor: pointer; padding: 4px 0;
+}
+
+.ui-select-track {
+  flex: 1; display: flex; align-items: center;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory; scrollbar-width: none;
+  gap: 16px;
+  /* center first/last card */
+  padding-left: max(16px, calc(50% - 170px));
+  padding-right: max(16px, calc(50% - 170px));
+}
+.ui-select-track::-webkit-scrollbar { display: none; }
+
+.ui-select-card {
+  flex-shrink: 0; scroll-snap-align: center;
+  width: 340px; max-width: calc(100vw - 48px);
   display: flex; flex-direction: column; align-items: center;
-  gap: 14px; padding: 32px 24px 24px; text-align: center;
-}
-[data-theme="cyberpunk"] .theme-modal-card {
-  background: var(--bg-card); border: 1.5px solid rgba(176,76,255,0.7);
-  border-radius: var(--r-card); box-shadow: 0 0 40px rgba(176,76,255,0.18);
-}
-[data-theme="kawaii"] .theme-modal-card {
-  background: var(--bg-card); border: 2px solid rgba(139,92,246,0.3);
-  border-radius: 24px; box-shadow: 0 8px 40px rgba(139,92,246,0.15);
-}
-[data-theme="notepad"] .theme-modal-card {
-  background: var(--bg-card); border: 1.5px solid #c8bfb4;
-  border-radius: var(--r-card); box-shadow: 0 4px 20px rgba(196,184,170,0.3);
+  gap: 18px; padding: 40px 28px 32px;
+  text-align: center;
 }
 
-.theme-modal-name {
-  font-size: 22px; font-weight: 800;
-  letter-spacing: 2.5px; text-transform: uppercase;
+/* Cyberpunk card */
+.ui-select-card[data-theme-id="cyberpunk"] {
+  background: #0D0D1A; border: 1.5px solid rgba(176,76,255,0.65);
+  border-radius: 4px; box-shadow: 0 0 40px rgba(176,76,255,0.12);
 }
-[data-theme="cyberpunk"] .theme-modal-name { font-family: var(--font-h); color: var(--c2); text-shadow: var(--glow-c2); }
-[data-theme="kawaii"]    .theme-modal-name { color: var(--c2); font-family: var(--font-h); }
-[data-theme="notepad"]   .theme-modal-name { font-family: var(--font-h); color: var(--c2); }
+.ui-select-card[data-theme-id="cyberpunk"] .ui-select-card-name {
+  font-family: 'Courier Prime', monospace; font-size: 26px; font-weight: 700;
+  letter-spacing: 3px; color: #39FF14; text-shadow: 0 0 16px rgba(57,255,20,0.4);
+}
+.ui-select-card[data-theme-id="cyberpunk"] .ui-select-card-tagline {
+  font-family: 'Courier Prime', monospace; font-size: 15px; font-weight: 700;
+  line-height: 1.75; color: #00F5FF;
+}
+.ui-select-card[data-theme-id="cyberpunk"] .ui-select-card-desc {
+  font-family: 'Courier Prime', monospace; font-size: 12px;
+  line-height: 1.65; color: #7ECFDF;
+}
+.ui-select-card[data-theme-id="cyberpunk"] .ui-select-card-btn {
+  background: transparent; border: 1.5px solid #39FF14; color: #39FF14;
+  font-family: 'Courier Prime', monospace; font-size: 12px; font-weight: 700;
+  letter-spacing: 1.5px; padding: 13px 36px; cursor: pointer; border-radius: 2px;
+  transition: box-shadow 0.18s, background 0.18s;
+}
+.ui-select-card[data-theme-id="cyberpunk"] .ui-select-card-btn:hover {
+  box-shadow: 0 0 16px rgba(57,255,20,0.4); background: rgba(57,255,20,0.06);
+}
 
-.theme-modal-tagline {
-  font-size: 15px; line-height: 1.7; font-weight: 700;
+/* Kawaii card */
+.ui-select-card[data-theme-id="kawaii"] {
+  background: #fff; border: 2.5px solid #111;
+  border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.08);
 }
-[data-theme="cyberpunk"] .theme-modal-tagline { font-family: var(--font-h); color: var(--c1); }
-[data-theme="kawaii"]    .theme-modal-tagline { color: var(--c2); }
-[data-theme="notepad"]   .theme-modal-tagline { color: var(--c1); font-family: var(--font-h); font-style: italic; }
+.ui-select-card[data-theme-id="kawaii"] .ui-select-card-name {
+  font-family: 'Nunito', sans-serif; font-size: 26px; font-weight: 900;
+  color: #ff2d78;
+}
+.ui-select-card[data-theme-id="kawaii"] .ui-select-card-tagline {
+  font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700;
+  line-height: 1.75; color: #ff2d78;
+}
+.ui-select-card[data-theme-id="kawaii"] .ui-select-card-desc {
+  font-family: 'Nunito', sans-serif; font-size: 12px;
+  line-height: 1.65; color: #3a3560;
+}
+.ui-select-card[data-theme-id="kawaii"] .ui-select-card-btn {
+  background: #ff2d78; border: none; color: #fff;
+  font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800;
+  padding: 13px 36px; cursor: pointer; border-radius: 24px;
+  transition: box-shadow 0.18s, transform 0.12s;
+}
+.ui-select-card[data-theme-id="kawaii"] .ui-select-card-btn:hover {
+  box-shadow: 0 4px 20px rgba(255,45,120,0.4); transform: translateY(-1px);
+}
 
-.theme-modal-desc {
-  font-size: 12px; line-height: 1.65; color: var(--text-b);
+/* Notepad card */
+.ui-select-card[data-theme-id="notepad"] {
+  background: #fdfdfb; border: 1.5px solid #c8bfb4;
+  border-left: 4px solid #4a8855; border-radius: 6px;
+  box-shadow: 0 2px 12px rgba(196,184,170,0.25);
 }
-[data-theme="cyberpunk"] .theme-modal-desc { font-family: var(--font-h); }
+.ui-select-card[data-theme-id="notepad"] .ui-select-card-name {
+  font-family: 'Lora', Georgia, serif; font-size: 24px; font-weight: 700;
+  color: #3a6fa8;
+}
+.ui-select-card[data-theme-id="notepad"] .ui-select-card-tagline {
+  font-family: 'Lora', Georgia, serif; font-size: 14px; font-weight: 600;
+  line-height: 1.75; font-style: italic; color: #4a8855;
+}
+.ui-select-card[data-theme-id="notepad"] .ui-select-card-desc {
+  font-family: 'Inter', sans-serif; font-size: 12px;
+  line-height: 1.65; color: #5a4e47;
+}
+.ui-select-card[data-theme-id="notepad"] .ui-select-card-btn {
+  background: transparent; border: 1.5px solid #3a6fa8; color: #3a6fa8;
+  font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
+  padding: 13px 36px; cursor: pointer; border-radius: 4px;
+  transition: background 0.18s, box-shadow 0.18s;
+}
+.ui-select-card[data-theme-id="notepad"] .ui-select-card-btn:hover {
+  background: rgba(58,111,168,0.07); box-shadow: 0 2px 8px rgba(58,111,168,0.2);
+}
 
-.theme-modal-choose { min-width: 120px; }
-
-.theme-modal-nav {
-  display: flex; align-items: center; gap: 16px;
-  color: var(--text-m); margin-top: 4px;
+/* Footer: arrows + dots */
+.ui-select-footer {
+  display: flex; align-items: center; justify-content: center;
+  gap: 20px; padding: 16px 24px 32px; flex-shrink: 0;
 }
-.theme-modal-nav-label {
-  font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; font-weight: 700;
+.ui-select-arrow {
+  background: none; border: none; cursor: pointer; font-size: 30px;
+  color: rgba(255,255,255,0.3); padding: 4px 8px; line-height: 1;
+  transition: color 0.15s;
 }
-.theme-modal-arrow {
-  background: none; border: none; cursor: pointer;
-  font-size: 22px; color: var(--c1); padding: 4px 8px;
-  line-height: 1; transition: opacity 0.15s;
+.ui-select-arrow:hover { color: rgba(255,255,255,0.65); }
+.ui-select-dots { display: flex; gap: 10px; align-items: center; }
+.ui-select-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: rgba(255,255,255,0.22); transition: background 0.2s, transform 0.2s;
 }
-.theme-modal-arrow:hover { opacity: 0.6; }
+.ui-select-dot.active { background: #fff; transform: scale(1.35); }
 
 </style>
 </head>
@@ -1503,7 +1579,7 @@ main { flex: 1; position: relative; overflow: hidden; }
         <div class="welcome-logo">MINDSHIFT</div>
         <div class="welcome-tagline" id="welcomeTagline">FOR THE OVERTHINKERS, THE STUCK ONES,<br>AND ANYONE WHO JUST NEEDS A FRESH ANGLE.</div>
         <p class="welcome-body">A perspective-shifting space for anyone who's ever thought "I know, but also… do I?" MindShift helps you explore what you already know from angles you haven't tried yet.</p>
-        <button class="welcome-enter-btn" onclick="goToLanding()">ENTER THE SPACE</button>
+        <button class="welcome-enter-btn" onclick="showScreen('screen-ui-select'); initUISelect();">ENTER THE SPACE</button>
       </div>
 
       <div class="welcome-disclaimer">
@@ -1512,6 +1588,53 @@ main { flex: 1; position: relative; overflow: hidden; }
         <div class="welcome-disclaimer-em">NOTHING HERE IS CLINICAL ADVICE.</div>
       </div>
     </div><!-- /screen-welcome -->
+
+
+    <!-- ══════════════════ SCREEN: UI SELECTION ══════════════════ -->
+    <div class="screen" id="screen-ui-select">
+
+      <div class="ui-select-header">
+        <button class="ui-select-back" onclick="showScreen('screen-welcome')" aria-label="Back">← Back</button>
+        <span class="ui-select-header-label">CHOOSE YOUR STYLE</span>
+        <span style="width:56px;"></span><!-- spacer -->
+      </div>
+
+      <div class="ui-select-track" id="uiSelectTrack">
+
+        <div class="ui-select-card" data-theme-id="cyberpunk">
+          <div class="ui-select-card-name">CYBERPUNK</div>
+          <div class="ui-select-card-tagline">Neon edges.<br>Dark depths.<br>Maximum signal.</div>
+          <p class="ui-select-card-desc">Hack your mind in a high-contrast terminal aesthetic built for focus and intensity. For the ones who think in code and dream in electric light.</p>
+          <button class="ui-select-card-btn" onclick="chooseUITheme('cyberpunk')">CHOOSE</button>
+        </div>
+
+        <div class="ui-select-card" data-theme-id="kawaii">
+          <div class="ui-select-card-name">KAWAII</div>
+          <div class="ui-select-card-tagline">Soft edges.<br>Bright energy.<br>Good vibes only.</div>
+          <p class="ui-select-card-desc">A playful, candy-colored skin that makes self-growth feel like a treat. For the ones who know joy is the best motivator.</p>
+          <button class="ui-select-card-btn" onclick="chooseUITheme('kawaii')">CHOOSE</button>
+        </div>
+
+        <div class="ui-select-card" data-theme-id="notepad">
+          <div class="ui-select-card-name">NOTEPAD</div>
+          <div class="ui-select-card-tagline">Clean lines.<br>Clear thinking.<br>No noise.</div>
+          <p class="ui-select-card-desc">A distraction-free, paper-light interface that gets out of your way. For the ones who believe clarity is the sharpest tool.</p>
+          <button class="ui-select-card-btn" onclick="chooseUITheme('notepad')">CHOOSE</button>
+        </div>
+
+      </div>
+
+      <div class="ui-select-footer">
+        <button class="ui-select-arrow" onclick="scrollUISelect(-1)" aria-label="Previous">&#8249;</button>
+        <div class="ui-select-dots">
+          <span class="ui-select-dot active" data-dot="0"></span>
+          <span class="ui-select-dot" data-dot="1"></span>
+          <span class="ui-select-dot" data-dot="2"></span>
+        </div>
+        <button class="ui-select-arrow" onclick="scrollUISelect(1)" aria-label="Next">&#8250;</button>
+      </div>
+
+    </div><!-- /screen-ui-select -->
 
 
     <!-- ══════════════════ SCREEN: LANDING ══════════════════ -->
@@ -1716,21 +1839,6 @@ main { flex: 1; position: relative; overflow: hidden; }
     </div><!-- /screen-share -->
 
   </main>
-
-  <!-- ══════════════════ OVERLAY: THEME MODAL (inside #app) ══════════════════ -->
-  <div id="overlay-theme" role="dialog" aria-modal="true" aria-label="Choose theme">
-    <div class="theme-modal-card">
-      <div class="theme-modal-name" id="themeModalName">CYBERPUNK</div>
-      <div class="theme-modal-tagline" id="themeModalTagline">Neon edges.<br>Dark depths.<br>Maximum signal.</div>
-      <p class="theme-modal-desc" id="themeModalDesc">Hack your mind in a high-contrast terminal aesthetic built for focus and intensity. For the ones who think in code and dream in electric light.</p>
-      <button class="btn btn-primary theme-modal-choose" onclick="chooseTheme()">CHOOSE</button>
-      <div class="theme-modal-nav">
-        <button class="theme-modal-arrow" onclick="cycleThemeModal(-1)" aria-label="Previous theme">&#8249;</button>
-        <span class="theme-modal-nav-label">SWIPE FOR NEXT</span>
-        <button class="theme-modal-arrow" onclick="cycleThemeModal(1)" aria-label="Next theme">&#8250;</button>
-      </div>
-    </div>
-  </div>
 
 </div><!-- #app -->
 
@@ -2140,8 +2248,6 @@ function applyThemeCopy(theme) {
   // lens screen heading
   const pick = document.getElementById('pickLensHeading');
   if (pick) pick.textContent = c.pickLens;
-  // theme modal
-  updateThemeModalContent(theme);
   updateCharCount();
 }
 
@@ -2239,7 +2345,6 @@ function goToLenses() {
   updateLensBadge();
   previousScreen = document.querySelector('.screen.active')?.id || 'screen-landing';
   showScreen('screen-lenses');
-  openThemeModal();
 }
 
 function goToAccount() {
@@ -2674,39 +2779,72 @@ const WELCOME_TAGLINES = [
 ];
 
 /* ════════════════════════════════════════════════
-   THEME MODAL
+   UI SELECTION CAROUSEL
 ════════════════════════════════════════════════ */
 
-const THEME_ORDER = ['cyberpunk', 'kawaii', 'notepad'];
-let themeModalIndex = 0;
+const UI_THEMES = ['cyberpunk', 'kawaii', 'notepad'];
+let _uiScrollTimer = null;
 
-function openThemeModal() {
-  themeModalIndex = THEME_ORDER.indexOf(currentTheme);
-  if (themeModalIndex < 0) themeModalIndex = 0;
-  updateThemeModalContent(THEME_ORDER[themeModalIndex]);
-  document.getElementById('overlay-theme').classList.add('open');
+function initUISelect() {
+  const track = document.getElementById('uiSelectTrack');
+  if (!track) return;
+  /* Scroll to the card matching currentTheme */
+  const idx = UI_THEMES.indexOf(currentTheme);
+  const cards = track.querySelectorAll('.ui-select-card');
+  if (cards[idx]) {
+    const card = cards[idx];
+    requestAnimationFrame(() => {
+      track.scrollLeft = card.offsetLeft - (track.offsetWidth - card.offsetWidth) / 2;
+      updateUISelectDots(idx);
+    });
+  }
+  /* Attach scroll listener only once */
+  if (!track._uiListenerAttached) {
+    track._uiListenerAttached = true;
+    track.addEventListener('scroll', function() {
+      clearTimeout(_uiScrollTimer);
+      _uiScrollTimer = setTimeout(() => {
+        const centerX = track.scrollLeft + track.offsetWidth / 2;
+        let closest = null, minDist = Infinity, closestIdx = 0;
+        track.querySelectorAll('.ui-select-card').forEach((card, i) => {
+          const dist = Math.abs((card.offsetLeft + card.offsetWidth / 2) - centerX);
+          if (dist < minDist) { minDist = dist; closest = card; closestIdx = i; }
+        });
+        if (closest) {
+          updateUISelectDots(closestIdx);
+          switchTheme(closest.dataset.themeId);
+        }
+      }, 80);
+    }, { passive: true });
+  }
 }
 
-function updateThemeModalContent(theme) {
-  const c = THEME_COPY[theme];
-  if (!c) return;
-  const nameEl = document.getElementById('themeModalName');
-  const tagEl  = document.getElementById('themeModalTagline');
-  const descEl = document.getElementById('themeModalDesc');
-  if (nameEl) nameEl.textContent = c.themeModalName;
-  if (tagEl)  tagEl.innerHTML = c.themeModalTagline.replace(/\n/g, '<br>');
-  if (descEl) descEl.textContent = c.themeModalDesc;
+function scrollUISelect(direction) {
+  const track = document.getElementById('uiSelectTrack');
+  if (!track) return;
+  const centerX = track.scrollLeft + track.offsetWidth / 2;
+  let closestIdx = 0, minDist = Infinity;
+  const cards = track.querySelectorAll('.ui-select-card');
+  cards.forEach((card, i) => {
+    const dist = Math.abs((card.offsetLeft + card.offsetWidth / 2) - centerX);
+    if (dist < minDist) { minDist = dist; closestIdx = i; }
+  });
+  const targetIdx = Math.max(0, Math.min(cards.length - 1, closestIdx + direction));
+  const target = cards[targetIdx];
+  if (target) {
+    track.scrollTo({ left: target.offsetLeft - (track.offsetWidth - target.offsetWidth) / 2, behavior: 'smooth' });
+  }
 }
 
-function cycleThemeModal(direction) {
-  themeModalIndex = (themeModalIndex + direction + THEME_ORDER.length) % THEME_ORDER.length;
-  const previewTheme = THEME_ORDER[themeModalIndex];
-  switchTheme(previewTheme);
-  updateThemeModalContent(previewTheme);
+function updateUISelectDots(activeIdx) {
+  document.querySelectorAll('.ui-select-dot').forEach((dot, i) => {
+    dot.classList.toggle('active', i === activeIdx);
+  });
 }
 
-function chooseTheme() {
-  document.getElementById('overlay-theme').classList.remove('open');
+function chooseUITheme(themeId) {
+  switchTheme(themeId);
+  showScreen('screen-landing');
 }
 
 /* Close preview on overlay backdrop click */
@@ -2718,7 +2856,6 @@ document.getElementById('overlay-preview').addEventListener('click', function(e)
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     if (document.getElementById('overlay-preview').classList.contains('open')) closePreview();
-    if (document.getElementById('overlay-theme').classList.contains('open')) chooseTheme();
   }
 });
 
