@@ -1252,11 +1252,11 @@ main { flex: 1; position: relative; overflow: hidden; }
 #app .screen, #app .response-section { transition: none; }
 
 /* ════════════════════════════════════════════════
-   24. WELCOME SCREEN (always dark, no CSS variables)
+   24. WELCOME SCREEN (theme-aware)
 ════════════════════════════════════════════════ */
 
 #screen-welcome {
-  background: #080810;
+  background: var(--bg);
   display: flex; flex-direction: column;
   justify-content: space-between;
   padding: 48px 24px 40px;
@@ -1264,49 +1264,77 @@ main { flex: 1; position: relative; overflow: hidden; }
 }
 
 .welcome-card {
-  border: 1.5px solid rgba(176,76,255,0.6);
-  border-radius: 4px;
   padding: 40px 24px 32px;
   display: flex; flex-direction: column; align-items: center; gap: 18px;
 }
 
-.welcome-logo {
-  color: #39FF14;
-  font-family: 'Courier Prime', monospace;
-  font-size: 28px; font-weight: 700;
-  letter-spacing: 4px; text-align: center;
-  text-shadow: 0 0 20px rgba(57,255,20,0.4);
+[data-theme="cyberpunk"] .welcome-card {
+  border: 1.5px solid rgba(176,76,255,0.6); border-radius: 4px;
 }
+[data-theme="kawaii"] .welcome-card {
+  border: 2px solid rgba(139,92,246,0.3); border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(139,92,246,0.1);
+}
+[data-theme="notepad"] .welcome-card {
+  border: 1.5px solid #c8bfb4; border-left: 4px solid var(--c1); border-radius: 6px;
+}
+
+.welcome-logo { color: var(--c2); font-size: 28px; font-weight: 700; text-align: center; }
+[data-theme="cyberpunk"] .welcome-logo {
+  font-family: 'Courier Prime', monospace;
+  text-shadow: var(--glow-c2); letter-spacing: 4px;
+}
+[data-theme="kawaii"] .welcome-logo { font-family: var(--font-h); color: var(--c1); }
+[data-theme="notepad"] .welcome-logo { font-family: var(--font-h); color: var(--c2); }
 
 .welcome-tagline {
-  color: #00F5FF;
-  font-family: 'Courier Prime', monospace;
+  color: var(--c1);
   font-size: 13px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 1px;
   text-align: center; line-height: 1.5;
 }
+[data-theme="cyberpunk"] .welcome-tagline {
+  font-family: 'Courier Prime', monospace; color: var(--c2);
+  letter-spacing: 1px; text-transform: uppercase;
+}
+[data-theme="kawaii"] .welcome-tagline { font-weight: 800; }
+[data-theme="notepad"] .welcome-tagline { font-family: var(--font-h); font-style: italic; }
 
 .welcome-body {
-  color: #39FF14;
-  font-family: 'Courier Prime', monospace;
-  font-size: 13px; line-height: 1.7;
-  text-align: center;
+  color: var(--text-b);
+  font-size: 13px; line-height: 1.7; text-align: center;
+}
+[data-theme="cyberpunk"] .welcome-body {
+  font-family: 'Courier Prime', monospace; color: var(--c2);
 }
 
 .welcome-enter-btn {
-  color: #39FF14;
-  border-top: 4px solid #39FF14; border-left: 4px solid #39FF14;
-  border-right: 1px solid #39FF14; border-bottom: 1px solid #39FF14;
-  border-radius: 2px;
+  color: var(--c1);
+  border: 1.5px solid var(--c1);
+  border-radius: var(--r-card, 4px);
   background: transparent;
-  font-family: 'Courier Prime', monospace;
-  font-size: 13px; font-weight: 700; letter-spacing: 2.4px;
+  font-size: 13px; font-weight: 700; letter-spacing: 2px;
   text-transform: uppercase;
   padding: 14px 18px 12px;
   cursor: pointer;
   transition: box-shadow 0.15s, background 0.15s;
 }
-.welcome-enter-btn:hover { box-shadow: 0 0 16px rgba(57,255,20,0.4); background: rgba(57,255,20,0.05); }
+[data-theme="cyberpunk"] .welcome-enter-btn {
+  font-family: 'Courier Prime', monospace;
+  color: #39FF14; border-top: 4px solid #39FF14; border-left: 4px solid #39FF14;
+  border-right: 1px solid #39FF14; border-bottom: 1px solid #39FF14;
+  border-radius: 2px;
+}
+[data-theme="cyberpunk"] .welcome-enter-btn:hover {
+  box-shadow: 0 0 16px rgba(57,255,20,0.4); background: rgba(57,255,20,0.05);
+}
+[data-theme="kawaii"] .welcome-enter-btn {
+  color: #ff2d78; border-color: #ff2d78; border-radius: 40px; font-family: var(--font-h);
+}
+[data-theme="kawaii"] .welcome-enter-btn:hover { background: rgba(255,45,120,0.06); }
+[data-theme="notepad"] .welcome-enter-btn {
+  color: #4a8855; border-color: #4a8855; font-family: var(--font-h);
+}
+[data-theme="notepad"] .welcome-enter-btn:hover { background: rgba(74,136,85,0.06); }
 .welcome-enter-btn:active { transform: scale(0.97); }
 
 .welcome-disclaimer {
@@ -1315,25 +1343,14 @@ main { flex: 1; position: relative; overflow: hidden; }
   padding-top: 32px;
 }
 
-.welcome-disclaimer-label {
-  color: #FF2D78;
-  font-family: 'Courier Prime', monospace;
-  font-size: 11px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.5px;
-}
+.welcome-disclaimer-label { color: var(--c3); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+[data-theme="cyberpunk"] .welcome-disclaimer-label { font-family: 'Courier Prime', monospace; }
 
-.welcome-disclaimer-body {
-  color: #39FF14;
-  font-family: 'Courier Prime', monospace;
-  font-size: 12px; line-height: 1.7;
-}
+.welcome-disclaimer-body { color: var(--text-b); font-size: 12px; line-height: 1.7; }
+[data-theme="cyberpunk"] .welcome-disclaimer-body { font-family: 'Courier Prime', monospace; color: var(--c2); }
 
-.welcome-disclaimer-em {
-  color: #39FF14;
-  font-family: 'Courier Prime', monospace;
-  font-size: 11px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.5px;
-}
+.welcome-disclaimer-em { color: var(--c2); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+[data-theme="cyberpunk"] .welcome-disclaimer-em { font-family: 'Courier Prime', monospace; text-transform: uppercase; }
 
 /* ════════════════════════════════════════════════
    25. HERO CARD (landing screen)
@@ -1430,7 +1447,21 @@ main { flex: 1; position: relative; overflow: hidden; }
    UI SELECTION SCREEN (carousel)
 ════════════════════════════════════════════════ */
 
-#screen-ui-select { padding: 0; gap: 0; overflow: hidden; background: #080810; }
+#screen-ui-select { padding: 0; gap: 0; overflow: hidden; position: relative; }
+
+/* Portrait grid background — fills with themed portrait images, blurred */
+.ui-select-bg {
+  position: absolute; inset: 0; z-index: 0;
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 6px; padding: 6px;
+  opacity: 0.18; filter: blur(3px) saturate(0.8);
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+.ui-select-bg img { width: 100%; aspect-ratio: 1; object-fit: cover; }
+
+/* Everything else in ui-select must sit above the bg */
+.ui-select-header, .ui-select-track, .ui-select-footer { position: relative; z-index: 1; }
 
 .ui-select-header {
   display: flex; align-items: center; justify-content: space-between;
@@ -1593,6 +1624,9 @@ main { flex: 1; position: relative; overflow: hidden; }
     <!-- ══════════════════ SCREEN: UI SELECTION ══════════════════ -->
     <div class="screen" id="screen-ui-select">
 
+      <!-- Blurred portrait grid background (populated by JS) -->
+      <div class="ui-select-bg" id="uiSelectBg" aria-hidden="true"></div>
+
       <div class="ui-select-header">
         <button class="ui-select-back" onclick="showScreen('screen-welcome')" aria-label="Back">← Back</button>
         <span class="ui-select-header-label">CHOOSE YOUR STYLE</span>
@@ -1601,20 +1635,59 @@ main { flex: 1; position: relative; overflow: hidden; }
 
       <div class="ui-select-track" id="uiSelectTrack">
 
+        <!-- Set A (before) -->
         <div class="ui-select-card" data-theme-id="cyberpunk">
           <div class="ui-select-card-name">CYBERPUNK</div>
           <div class="ui-select-card-tagline">Neon edges.<br>Dark depths.<br>Maximum signal.</div>
           <p class="ui-select-card-desc">Hack your mind in a high-contrast terminal aesthetic built for focus and intensity. For the ones who think in code and dream in electric light.</p>
           <button class="ui-select-card-btn" onclick="chooseUITheme('cyberpunk')">CHOOSE</button>
         </div>
-
         <div class="ui-select-card" data-theme-id="kawaii">
           <div class="ui-select-card-name">KAWAII</div>
           <div class="ui-select-card-tagline">Soft edges.<br>Bright energy.<br>Good vibes only.</div>
           <p class="ui-select-card-desc">A playful, candy-colored skin that makes self-growth feel like a treat. For the ones who know joy is the best motivator.</p>
           <button class="ui-select-card-btn" onclick="chooseUITheme('kawaii')">CHOOSE</button>
         </div>
+        <div class="ui-select-card" data-theme-id="notepad">
+          <div class="ui-select-card-name">NOTEPAD</div>
+          <div class="ui-select-card-tagline">Clean lines.<br>Clear thinking.<br>No noise.</div>
+          <p class="ui-select-card-desc">A distraction-free, paper-light interface that gets out of your way. For the ones who believe clarity is the sharpest tool.</p>
+          <button class="ui-select-card-btn" onclick="chooseUITheme('notepad')">CHOOSE</button>
+        </div>
 
+        <!-- Set B (center — start here) -->
+        <div class="ui-select-card" data-theme-id="cyberpunk">
+          <div class="ui-select-card-name">CYBERPUNK</div>
+          <div class="ui-select-card-tagline">Neon edges.<br>Dark depths.<br>Maximum signal.</div>
+          <p class="ui-select-card-desc">Hack your mind in a high-contrast terminal aesthetic built for focus and intensity. For the ones who think in code and dream in electric light.</p>
+          <button class="ui-select-card-btn" onclick="chooseUITheme('cyberpunk')">CHOOSE</button>
+        </div>
+        <div class="ui-select-card" data-theme-id="kawaii">
+          <div class="ui-select-card-name">KAWAII</div>
+          <div class="ui-select-card-tagline">Soft edges.<br>Bright energy.<br>Good vibes only.</div>
+          <p class="ui-select-card-desc">A playful, candy-colored skin that makes self-growth feel like a treat. For the ones who know joy is the best motivator.</p>
+          <button class="ui-select-card-btn" onclick="chooseUITheme('kawaii')">CHOOSE</button>
+        </div>
+        <div class="ui-select-card" data-theme-id="notepad">
+          <div class="ui-select-card-name">NOTEPAD</div>
+          <div class="ui-select-card-tagline">Clean lines.<br>Clear thinking.<br>No noise.</div>
+          <p class="ui-select-card-desc">A distraction-free, paper-light interface that gets out of your way. For the ones who believe clarity is the sharpest tool.</p>
+          <button class="ui-select-card-btn" onclick="chooseUITheme('notepad')">CHOOSE</button>
+        </div>
+
+        <!-- Set C (after) -->
+        <div class="ui-select-card" data-theme-id="cyberpunk">
+          <div class="ui-select-card-name">CYBERPUNK</div>
+          <div class="ui-select-card-tagline">Neon edges.<br>Dark depths.<br>Maximum signal.</div>
+          <p class="ui-select-card-desc">Hack your mind in a high-contrast terminal aesthetic built for focus and intensity. For the ones who think in code and dream in electric light.</p>
+          <button class="ui-select-card-btn" onclick="chooseUITheme('cyberpunk')">CHOOSE</button>
+        </div>
+        <div class="ui-select-card" data-theme-id="kawaii">
+          <div class="ui-select-card-name">KAWAII</div>
+          <div class="ui-select-card-tagline">Soft edges.<br>Bright energy.<br>Good vibes only.</div>
+          <p class="ui-select-card-desc">A playful, candy-colored skin that makes self-growth feel like a treat. For the ones who know joy is the best motivator.</p>
+          <button class="ui-select-card-btn" onclick="chooseUITheme('kawaii')">CHOOSE</button>
+        </div>
         <div class="ui-select-card" data-theme-id="notepad">
           <div class="ui-select-card-name">NOTEPAD</div>
           <div class="ui-select-card-tagline">Clean lines.<br>Clear thinking.<br>No noise.</div>
@@ -2768,15 +2841,23 @@ function escapeHTML(str) {
 }
 
 /* ════════════════════════════════════════════════
-   WELCOME TAGLINES
+   WELCOME TAGLINES (per-theme)
 ════════════════════════════════════════════════ */
 
-const WELCOME_TAGLINES = [
-  'FOR THE OVERTHINKERS, THE STUCK ONES,\nAND ANYONE WHO JUST NEEDS A FRESH ANGLE.',
-  'A WELLNESS TOOL FOR PEOPLE WHO HATE\nBEING TOLD WHAT TO DO — BUT LOVE A GOOD QUESTION.',
-  'NOT ADVICE. NOT THERAPY. JUST YOU,\nSOME GOOD QUESTIONS, AND A DIFFERENT ANGLE.',
-  "YOU'RE NOT LOST.\nJUST LOOKING AT THE MAP UPSIDE DOWN."
-];
+const WELCOME_TAGLINES = {
+  cyberpunk: [
+    'FOR THE OVERTHINKERS, THE STUCK ONES,\nAND ANYONE WHO JUST NEEDS A FRESH ANGLE.',
+    "YOU'RE NOT LOST.\nJUST LOOKING AT THE MAP UPSIDE DOWN.",
+  ],
+  kawaii: [
+    'for the overthinkers, the stuck ones,\nand anyone who just needs a fresh angle ✨',
+    "you're not lost.\njust looking at the map upside down 💭",
+  ],
+  notepad: [
+    'For the overthinkers, the stuck ones,\nand anyone who just needs a fresh angle.',
+    "You're not lost.\nJust looking at the map upside down.",
+  ]
+};
 
 /* ════════════════════════════════════════════════
    UI SELECTION CAROUSEL
@@ -2784,35 +2865,77 @@ const WELCOME_TAGLINES = [
 
 const UI_THEMES = ['cyberpunk', 'kawaii', 'notepad'];
 let _uiScrollTimer = null;
+const _UI_BG_COLORS = { cyberpunk: '#080810', kawaii: '#edf2ff', notepad: '#fdfdfb' };
+
+function updateUISelectBg(themeId) {
+  const bg = document.getElementById('uiSelectBg');
+  const screen = document.getElementById('screen-ui-select');
+  if (!bg || !screen) return;
+  bg.innerHTML = '';
+  FIGURES.forEach(fig => {
+    const img = document.createElement('img');
+    img.src = fig.portraits[themeId] || fig.portraits.cyberpunk;
+    img.alt = '';
+    img.loading = 'lazy';
+    bg.appendChild(img);
+  });
+  screen.style.background = _UI_BG_COLORS[themeId] || '#080810';
+}
+
+function _uiGetCentered(track) {
+  const centerX = track.scrollLeft + track.offsetWidth / 2;
+  let closest = null, minDist = Infinity, closestIdx = 0;
+  track.querySelectorAll('.ui-select-card').forEach((card, i) => {
+    const dist = Math.abs((card.offsetLeft + card.offsetWidth / 2) - centerX);
+    if (dist < minDist) { minDist = dist; closest = card; closestIdx = i; }
+  });
+  return { card: closest, idx: closestIdx };
+}
+
+function _uiScrollToIdx(track, idx, smooth) {
+  const cards = track.querySelectorAll('.ui-select-card');
+  const card = cards[idx];
+  if (!card) return;
+  const left = card.offsetLeft - (track.offsetWidth - card.offsetWidth) / 2;
+  if (smooth) {
+    track.scrollTo({ left, behavior: 'smooth' });
+  } else {
+    track.scrollLeft = left;
+  }
+}
 
 function initUISelect() {
   const track = document.getElementById('uiSelectTrack');
   if (!track) return;
-  /* Scroll to the card matching currentTheme */
-  const idx = UI_THEMES.indexOf(currentTheme);
-  const cards = track.querySelectorAll('.ui-select-card');
-  if (cards[idx]) {
-    const card = cards[idx];
-    requestAnimationFrame(() => {
-      track.scrollLeft = card.offsetLeft - (track.offsetWidth - card.offsetWidth) / 2;
-      updateUISelectDots(idx);
-    });
-  }
+
+  /* Start at center set (indices 3-5) matching current theme */
+  const themeIdx = UI_THEMES.indexOf(currentTheme);
+  const startIdx = 3 + (themeIdx >= 0 ? themeIdx : 0);
+
+  requestAnimationFrame(() => {
+    _uiScrollToIdx(track, startIdx, false);
+    updateUISelectDots(themeIdx >= 0 ? themeIdx : 0);
+    updateUISelectBg(currentTheme);
+  });
+
   /* Attach scroll listener only once */
   if (!track._uiListenerAttached) {
     track._uiListenerAttached = true;
     track.addEventListener('scroll', function() {
       clearTimeout(_uiScrollTimer);
       _uiScrollTimer = setTimeout(() => {
-        const centerX = track.scrollLeft + track.offsetWidth / 2;
-        let closest = null, minDist = Infinity, closestIdx = 0;
-        track.querySelectorAll('.ui-select-card').forEach((card, i) => {
-          const dist = Math.abs((card.offsetLeft + card.offsetWidth / 2) - centerX);
-          if (dist < minDist) { minDist = dist; closest = card; closestIdx = i; }
-        });
-        if (closest) {
-          updateUISelectDots(closestIdx);
-          switchTheme(closest.dataset.themeId);
+        const { card, idx: centeredIdx } = _uiGetCentered(track);
+        if (!card) return;
+
+        const themeId = card.dataset.themeId;
+        updateUISelectDots(centeredIdx % 3);
+        switchTheme(themeId);
+        updateUISelectBg(themeId);
+
+        /* Infinite scroll: silently jump to equivalent card in center set */
+        if (centeredIdx < 3 || centeredIdx > 5) {
+          const equivalentIdx = (centeredIdx % 3) + 3;
+          _uiScrollToIdx(track, equivalentIdx, false);
         }
       }, 80);
     }, { passive: true });
@@ -2822,18 +2945,10 @@ function initUISelect() {
 function scrollUISelect(direction) {
   const track = document.getElementById('uiSelectTrack');
   if (!track) return;
-  const centerX = track.scrollLeft + track.offsetWidth / 2;
-  let closestIdx = 0, minDist = Infinity;
+  const { idx: centeredIdx } = _uiGetCentered(track);
   const cards = track.querySelectorAll('.ui-select-card');
-  cards.forEach((card, i) => {
-    const dist = Math.abs((card.offsetLeft + card.offsetWidth / 2) - centerX);
-    if (dist < minDist) { minDist = dist; closestIdx = i; }
-  });
-  const targetIdx = Math.max(0, Math.min(cards.length - 1, closestIdx + direction));
-  const target = cards[targetIdx];
-  if (target) {
-    track.scrollTo({ left: target.offsetLeft - (track.offsetWidth - target.offsetWidth) / 2, behavior: 'smooth' });
-  }
+  const targetIdx = Math.max(0, Math.min(cards.length - 1, centeredIdx + direction));
+  _uiScrollToIdx(track, targetIdx, true);
 }
 
 function updateUISelectDots(activeIdx) {
@@ -2859,11 +2974,17 @@ document.addEventListener('keydown', e => {
   }
 });
 
-/* Set random welcome tagline */
+/* Pick random theme for this session (no localStorage — resets each visit) */
 (function() {
+  const SESSION_THEMES = ['cyberpunk', 'kawaii', 'notepad'];
+  const sessionTheme = SESSION_THEMES[Math.floor(Math.random() * SESSION_THEMES.length)];
+  switchTheme(sessionTheme);
+
+  /* Set tagline from this session's theme */
   const el = document.getElementById('welcomeTagline');
   if (el) {
-    const line = WELCOME_TAGLINES[Math.floor(Math.random() * WELCOME_TAGLINES.length)];
+    const lines = WELCOME_TAGLINES[sessionTheme] || WELCOME_TAGLINES.cyberpunk;
+    const line = lines[Math.floor(Math.random() * lines.length)];
     el.innerHTML = line.replace(/\n/g, '<br>');
   }
 })();
