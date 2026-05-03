@@ -525,75 +525,160 @@ main { flex: 1; position: relative; overflow: hidden; }
 [data-theme="notepad"]   .quote-text { font-family: var(--font-h); font-style: italic; }
 
 /* ════════════════════════════════════════════════
-   11. LENS CAROUSEL (horizontal scroll chips)
+   11. FIGURE GRID (lens selection screen)
 ════════════════════════════════════════════════ */
 
-.lens-carousel {
+.figure-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+}
+
+.figure-card {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 7px; padding: 12px 6px; cursor: pointer;
+  transition: box-shadow 0.18s, background 0.18s, transform 0.18s;
+  -webkit-tap-highlight-color: transparent;
+}
+.figure-card:active { transform: scale(0.95); }
+
+[data-theme="cyberpunk"] .figure-card {
+  background: var(--bg-card2);
+  border: 1px solid rgba(176,76,255,0.35); border-radius: var(--r);
+}
+[data-theme="cyberpunk"] .figure-card:hover,
+[data-theme="cyberpunk"] .figure-card.selected {
+  border-color: var(--c1); background: rgba(0,245,255,0.05);
+  box-shadow: 0 0 14px rgba(0,245,255,0.22);
+}
+[data-theme="kawaii"] .figure-card {
+  background: var(--bg-card);
+  border: 2px solid rgba(139,92,246,0.12); border-radius: 18px;
+  box-shadow: 0 2px 8px rgba(139,92,246,0.05);
+}
+[data-theme="kawaii"] .figure-card:hover,
+[data-theme="kawaii"] .figure-card.selected {
+  border-color: var(--c1); box-shadow: 0 6px 18px rgba(139,92,246,0.2);
+}
+[data-theme="notepad"] .figure-card {
+  background: var(--bg-card);
+  border: 1px solid #d4cbbf; border-radius: var(--r-card);
+}
+[data-theme="notepad"] .figure-card:hover,
+[data-theme="notepad"] .figure-card.selected {
+  border-color: var(--c1); box-shadow: var(--glow-c1);
+}
+
+.figure-portrait {
+  width: 58px; height: 58px; object-fit: cover; flex-shrink: 0;
+}
+[data-theme="cyberpunk"] .figure-portrait { border-radius: 29px; border: 1.5px solid var(--c2); }
+[data-theme="cyberpunk"] .figure-card.selected .figure-portrait { border-width: 2px; box-shadow: var(--glow-c2); }
+[data-theme="kawaii"]    .figure-portrait { border-radius: 12px; border: 2px solid rgba(139,92,246,0.18); }
+[data-theme="kawaii"]    .figure-card.selected .figure-portrait { border-color: var(--c1); }
+[data-theme="notepad"]   .figure-portrait { border-radius: 50%; border: 1.5px solid #d4cbbf; }
+[data-theme="notepad"]   .figure-card.selected .figure-portrait { border-color: var(--c1); }
+
+.figure-name {
+  font-size: 10px; font-weight: 700; text-align: center; line-height: 1.2;
+  letter-spacing: 0.6px; text-transform: uppercase;
+}
+[data-theme="cyberpunk"] .figure-name { font-family: var(--font-h); color: var(--c2); letter-spacing: 1px; }
+[data-theme="kawaii"]    .figure-name { color: var(--c1); letter-spacing: 0.2px; }
+[data-theme="notepad"]   .figure-name { color: var(--text-h); font-family: var(--font-b); }
+
+.figure-tag {
+  font-size: 9px; letter-spacing: 0.2px; text-align: center;
+  line-height: 1.3; color: var(--text-m);
+}
+[data-theme="cyberpunk"] .figure-tag { font-family: var(--font-h); color: var(--text-m); text-transform: uppercase; font-size: 8px; }
+[data-theme="notepad"]   .figure-tag { font-style: italic; font-size: 10px; }
+
+.portrait-fallback {
+  width: 58px; height: 58px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-card2); color: var(--c1);
+  font-size: 14px; font-weight: 700; letter-spacing: 1px;
+  border: 1px solid var(--c1);
+}
+[data-theme="cyberpunk"] .portrait-fallback { border-radius: 29px; font-family: var(--font-h); }
+[data-theme="kawaii"]    .portrait-fallback { border-radius: 12px; }
+[data-theme="notepad"]   .portrait-fallback { border-radius: 50%; }
+
+/* ════════════════════════════════════════════════
+   11b. PREVIEW CARD SWIPER (inside popup overlay)
+════════════════════════════════════════════════ */
+
+.preview-card-track {
   display: flex; gap: 12px;
   overflow-x: auto; -webkit-overflow-scrolling: touch;
   scroll-snap-type: x mandatory; scrollbar-width: none;
-  padding: 4px 0 12px;
+  padding: 4px 0 8px;
+  /* negative margin to let cards peek at edges past the sheet padding */
+  margin-left: -20px; margin-right: -20px;
+  padding-left: 20px; padding-right: 20px;
 }
-.lens-carousel::-webkit-scrollbar { display: none; }
+.preview-card-track::-webkit-scrollbar { display: none; }
 
-.lens-chip {
-  flex-shrink: 0; scroll-snap-align: start;
+.preview-card-item {
+  flex-shrink: 0; scroll-snap-align: center;
+  width: calc(100% - 40px); /* peek effect: shows ~20px of adjacent cards */
   display: flex; flex-direction: column; align-items: center;
-  gap: 6px; cursor: pointer; padding: 6px 4px;
-  transition: transform 0.18s; -webkit-tap-highlight-color: transparent;
+  gap: 12px; padding: 20px 16px;
+  transition: opacity 0.2s;
 }
-.lens-chip:active { transform: scale(0.94); }
+.preview-card-item:not(.active-card) { opacity: 0.55; }
 
-.lens-chip-portrait {
-  width: 56px; height: 56px; object-fit: cover; flex-shrink: 0;
-  transition: border-color 0.18s, box-shadow 0.18s;
+[data-theme="cyberpunk"] .preview-card-item {
+  background: var(--bg-card2);
+  border: 1px solid rgba(176,76,255,0.5); border-radius: var(--r-card);
 }
-.lens-chip-name {
-  font-size: 9px; font-weight: 700; text-align: center;
-  max-width: 60px; white-space: nowrap; overflow: hidden;
-  text-overflow: ellipsis; text-transform: uppercase; letter-spacing: 0.5px;
+[data-theme="cyberpunk"] .preview-card-item.active-card {
+  border-color: var(--c1); box-shadow: 0 0 20px rgba(0,245,255,0.18);
 }
-.lens-chip-fallback {
-  width: 56px; height: 56px; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; font-weight: 700; letter-spacing: 1px;
+[data-theme="kawaii"] .preview-card-item {
+  background: var(--bg-card);
+  border: 2px solid rgba(139,92,246,0.18); border-radius: 20px;
 }
-
-/* Cyberpunk chips */
-[data-theme="cyberpunk"] .lens-chip-portrait {
-  border-radius: 28px; border: 1.5px solid rgba(57,255,20,0.4);
+[data-theme="kawaii"] .preview-card-item.active-card {
+  border-color: var(--c1); box-shadow: 0 8px 28px rgba(139,92,246,0.18);
 }
-[data-theme="cyberpunk"] .lens-chip.active .lens-chip-portrait,
-[data-theme="cyberpunk"] .lens-chip:hover .lens-chip-portrait {
-  border-color: var(--c1); box-shadow: 0 0 14px rgba(0,245,255,0.4);
+[data-theme="notepad"] .preview-card-item {
+  background: var(--bg-card);
+  border: 1.5px solid #d4cbbf; border-radius: var(--r-card);
 }
-[data-theme="cyberpunk"] .lens-chip-name { font-family: var(--font-h); color: var(--text-m); }
-[data-theme="cyberpunk"] .lens-chip.active .lens-chip-name { color: var(--c1); }
-[data-theme="cyberpunk"] .lens-chip-fallback { border-radius: 28px; border: 1.5px solid var(--c1); background: var(--bg-card2); color: var(--c1); font-family: var(--font-h); }
-
-/* Kawaii chips */
-[data-theme="kawaii"] .lens-chip-portrait {
-  border-radius: 14px; border: 2px solid rgba(139,92,246,0.2);
-}
-[data-theme="kawaii"] .lens-chip.active .lens-chip-portrait,
-[data-theme="kawaii"] .lens-chip:hover .lens-chip-portrait {
-  border-color: var(--c1); box-shadow: 0 4px 14px rgba(139,92,246,0.3);
-}
-[data-theme="kawaii"] .lens-chip-name { color: var(--text-m); }
-[data-theme="kawaii"] .lens-chip.active .lens-chip-name { color: var(--c1); }
-[data-theme="kawaii"] .lens-chip-fallback { border-radius: 14px; border: 2px solid var(--c1); background: var(--bg-card2); color: var(--c1); }
-
-/* Notepad chips */
-[data-theme="notepad"] .lens-chip-portrait {
-  border-radius: 50%; border: 1.5px solid #d4cbbf;
-}
-[data-theme="notepad"] .lens-chip.active .lens-chip-portrait,
-[data-theme="notepad"] .lens-chip:hover .lens-chip-portrait {
+[data-theme="notepad"] .preview-card-item.active-card {
   border-color: var(--c1); box-shadow: var(--glow-c1);
 }
-[data-theme="notepad"] .lens-chip-name { font-family: var(--font-b); color: var(--text-m); font-style: italic; }
-[data-theme="notepad"] .lens-chip.active .lens-chip-name { color: var(--c1); }
-[data-theme="notepad"] .lens-chip-fallback { border-radius: 50%; border: 1.5px solid var(--c1); background: var(--bg-card2); color: var(--c1); }
+
+.preview-card-portrait {
+  width: 88px; height: 88px; object-fit: cover; flex-shrink: 0;
+}
+[data-theme="cyberpunk"] .preview-card-portrait { border-radius: 44px; border: 2px solid var(--c2); box-shadow: var(--glow-c2); }
+[data-theme="kawaii"]    .preview-card-portrait { border-radius: 20px; border: 2px solid var(--c1); box-shadow: var(--glow-c1); }
+[data-theme="notepad"]   .preview-card-portrait { border-radius: 50%; border: 2px solid var(--c2); }
+
+.preview-card-name {
+  font-size: 16px; font-weight: 700; text-align: center;
+}
+[data-theme="cyberpunk"] .preview-card-name { font-family: var(--font-h); color: var(--c2); letter-spacing: 1.2px; text-transform: uppercase; text-shadow: var(--glow-c2); }
+[data-theme="kawaii"]    .preview-card-name { color: var(--c1); }
+[data-theme="notepad"]   .preview-card-name { font-family: var(--font-h); color: var(--c2); }
+
+.preview-card-quote {
+  font-size: 12px; line-height: 1.6; text-align: center;
+  font-style: italic; color: var(--text-h);
+}
+.preview-card-bio {
+  font-size: 11px; line-height: 1.55; text-align: center; color: var(--text-b);
+}
+.preview-card-fallback {
+  width: 88px; height: 88px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-card2); color: var(--c1);
+  font-size: 20px; font-weight: 700; border: 2px solid var(--c1);
+}
+[data-theme="cyberpunk"] .preview-card-fallback { border-radius: 44px; font-family: var(--font-h); }
+[data-theme="kawaii"]    .preview-card-fallback { border-radius: 20px; }
+[data-theme="notepad"]   .preview-card-fallback { border-radius: 50%; }
 
 /* ════════════════════════════════════════════════
    12. RESPONSE CARD
@@ -750,7 +835,7 @@ main { flex: 1; position: relative; overflow: hidden; }
 }
 .preview-sheet {
   background: var(--bg-card); border-radius: 24px 24px 0 0;
-  padding: 24px 20px 0; display: flex; flex-direction: column; gap: 16px;
+  padding: 24px 20px 24px; display: flex; flex-direction: column; gap: 16px;
   max-height: 92dvh; overflow: hidden;
 }
 [data-theme="cyberpunk"] .preview-sheet {
@@ -1245,7 +1330,7 @@ main { flex: 1; position: relative; overflow: hidden; }
         </div>
       </div>
 
-      <div class="lens-carousel" id="figureCarousel"></div>
+      <div class="figure-grid" id="figureGrid"></div>
 
     </div><!-- /screen-lenses -->
 
@@ -1402,16 +1487,8 @@ main { flex: 1; position: relative; overflow: hidden; }
   <div class="preview-sheet">
     <div class="preview-drag-handle"></div>
 
-    <div class="preview-card">
-      <div class="preview-inner">
-        <img class="preview-portrait" id="previewPortrait" src="" alt="">
-        <div class="preview-text-block">
-          <div class="preview-name" id="previewName"></div>
-          <p class="preview-quote" id="previewQuote"></p>
-          <p class="preview-bio" id="previewBio"></p>
-        </div>
-      </div>
-    </div>
+    <!-- Horizontal card swiper — all figures rendered by JS -->
+    <div class="preview-card-track" id="previewCardTrack"></div>
 
     <div class="preview-actions">
       <button class="btn btn-secondary" onclick="closePreview()">← All lenses</button>
@@ -1419,10 +1496,6 @@ main { flex: 1; position: relative; overflow: hidden; }
     </div>
 
     <p class="preview-disclaimer" id="previewDisclaimer"></p>
-
-    <div class="preview-carousel-row">
-      <div class="lens-carousel" id="previewCarousel"></div>
-    </div>
   </div>
 </div>
 
@@ -1837,9 +1910,7 @@ function switchTheme(theme) {
       if (fig) img.src = fig.portraits[theme] || fig.portraits.cyberpunk;
     });
 
-    if (previewFigure) {
-      document.getElementById('previewPortrait').src = previewFigure.portraits[theme] || previewFigure.portraits.cyberpunk;
-    }
+    /* previewCardTrack portrait images are updated by the [data-portrait-id] loop above */
     if (currentFigure) {
       document.getElementById('respPortrait').src = currentFigure.portraits[theme] || currentFigure.portraits.cyberpunk;
     }
@@ -1890,7 +1961,7 @@ function goToLenses() {
   document.getElementById('lensVentDisplay').textContent = vent;
   document.getElementById('lensTopicLabel').textContent  = guessTopic(vent);
 
-  renderCarousel();
+  renderGrid();
   updateLensBadge();
   previousScreen = document.querySelector('.screen.active')?.id || 'screen-landing';
   showScreen('screen-lenses');
@@ -1965,52 +2036,124 @@ function isGateSkipped() {
 }
 
 /* ════════════════════════════════════════════════
-   RENDER LENS CAROUSEL
+   RENDER FIGURE GRID (lens selection screen)
 ════════════════════════════════════════════════ */
 
-function makeChip(fig, containerEl, onClickFn) {
-  const chip = document.createElement('button');
-  chip.className = 'lens-chip';
-  chip.type = 'button';
-  chip.setAttribute('aria-label', fig.fullName + ' — ' + fig.tag);
-  chip.dataset.figId = fig.id;
-  if (fig.id === selectedFigureId) chip.classList.add('active');
+function renderGrid() {
+  const grid = document.getElementById('figureGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  FIGURES.forEach(fig => {
+    const card = document.createElement('button');
+    card.className = 'figure-card' + (fig.id === selectedFigureId ? ' selected' : '');
+    card.type = 'button';
+    card.setAttribute('aria-label', fig.fullName + ' — ' + fig.tag);
+    card.dataset.figId = fig.id;
 
-  const src = fig.portraits[currentTheme] || fig.portraits.cyberpunk;
-  const img = document.createElement('img');
-  img.className = 'lens-chip-portrait';
-  img.dataset.portraitId = fig.id;
-  img.src = src; img.alt = fig.fullName; img.loading = 'lazy';
-  img.onerror = function() {
-    this.style.display = 'none';
-    const fb = document.createElement('div');
-    fb.className = 'lens-chip-fallback';
-    fb.textContent = (fig.name.match(/\b\w/g) || []).slice(0,2).join('').toUpperCase();
-    this.parentNode.insertBefore(fb, this);
-  };
+    const src = fig.portraits[currentTheme] || fig.portraits.cyberpunk;
+    const img = document.createElement('img');
+    img.className = 'figure-portrait';
+    img.dataset.portraitId = fig.id;
+    img.src = src; img.alt = fig.fullName; img.loading = 'lazy';
+    img.onerror = function() {
+      this.style.display = 'none';
+      const fb = document.createElement('div');
+      fb.className = 'portrait-fallback';
+      fb.textContent = (fig.name.match(/\b\w/g) || []).slice(0,2).join('').toUpperCase();
+      this.parentNode.insertBefore(fb, this);
+    };
 
-  const name = document.createElement('div');
-  name.className = 'lens-chip-name';
-  name.textContent = fig.name;
+    const name = document.createElement('div');
+    name.className = 'figure-name';
+    name.textContent = fig.name;
 
-  chip.appendChild(img); chip.appendChild(name);
-  chip.addEventListener('click', () => { triggerHaptic(10); onClickFn(fig, chip); });
-  containerEl.appendChild(chip);
-  return chip;
+    const tag = document.createElement('div');
+    tag.className = 'figure-tag';
+    tag.textContent = fig.tag;
+
+    card.appendChild(img); card.appendChild(name); card.appendChild(tag);
+    card.addEventListener('click', () => { triggerHaptic(10); openPreview(fig); });
+    grid.appendChild(card);
+  });
 }
 
-function renderCarousel() {
-  const carousel = document.getElementById('figureCarousel');
-  if (!carousel) return;
-  carousel.innerHTML = '';
-  FIGURES.forEach(fig => makeChip(fig, carousel, (f) => openPreview(f)));
+/* ════════════════════════════════════════════════
+   PREVIEW CARD SWIPER (inside popup)
+════════════════════════════════════════════════ */
+
+let _swiperScrollTimer = null;
+
+function renderPreviewSwiper(startFig) {
+  const track = document.getElementById('previewCardTrack');
+  if (!track) return;
+  track.innerHTML = '';
+
+  FIGURES.forEach((fig, idx) => {
+    const item = document.createElement('div');
+    item.className = 'preview-card-item' + (fig.id === startFig.id ? ' active-card' : '');
+    item.dataset.figId = fig.id;
+    item.dataset.idx = idx;
+
+    const src = fig.portraits[currentTheme] || fig.portraits.cyberpunk;
+    const img = document.createElement('img');
+    img.className = 'preview-card-portrait';
+    img.src = src; img.alt = fig.fullName; img.loading = 'lazy';
+    img.onerror = function() {
+      this.style.display = 'none';
+      const fb = document.createElement('div');
+      fb.className = 'preview-card-fallback';
+      fb.textContent = (fig.name.match(/\b\w/g) || []).slice(0,2).join('').toUpperCase();
+      this.parentNode.insertBefore(fb, this);
+    };
+
+    const name = document.createElement('div');
+    name.className = 'preview-card-name';
+    name.textContent = fig.fullName;
+
+    const quote = document.createElement('p');
+    quote.className = 'preview-card-quote';
+    quote.textContent = fig.quote;
+
+    const bio = document.createElement('p');
+    bio.className = 'preview-card-bio';
+    bio.textContent = fig.bio;
+
+    item.appendChild(img); item.appendChild(name); item.appendChild(quote); item.appendChild(bio);
+    track.appendChild(item);
+  });
+
+  /* Snap to startFig instantly, then attach scroll detection */
+  requestAnimationFrame(() => {
+    const startIdx = FIGURES.findIndex(f => f.id === startFig.id);
+    const items = track.querySelectorAll('.preview-card-item');
+    if (items[startIdx]) {
+      const el = items[startIdx];
+      track.scrollLeft = el.offsetLeft - (track.offsetWidth - el.offsetWidth) / 2;
+    }
+    attachSwiperListener(track);
+  });
 }
 
-function renderPreviewCarousel() {
-  const carousel = document.getElementById('previewCarousel');
-  if (!carousel) return;
-  carousel.innerHTML = '';
-  FIGURES.forEach(fig => makeChip(fig, carousel, (f) => updatePreview(f)));
+function attachSwiperListener(track) {
+  track.addEventListener('scroll', function onScroll() {
+    clearTimeout(_swiperScrollTimer);
+    _swiperScrollTimer = setTimeout(() => {
+      const centerX = track.scrollLeft + track.offsetWidth / 2;
+      let closest = null, minDist = Infinity;
+      track.querySelectorAll('.preview-card-item').forEach(item => {
+        const dist = Math.abs((item.offsetLeft + item.offsetWidth / 2) - centerX);
+        if (dist < minDist) { minDist = dist; closest = item; }
+      });
+      if (closest) {
+        const fig = FIGURES.find(f => f.id === closest.dataset.figId);
+        if (fig && fig.id !== (previewFigure && previewFigure.id)) {
+          track.querySelectorAll('.preview-card-item').forEach(el => el.classList.remove('active-card'));
+          closest.classList.add('active-card');
+          updatePreviewMeta(fig);
+        }
+      }
+    }, 80);
+  }, { passive: true });
 }
 
 /* ════════════════════════════════════════════════
@@ -2020,25 +2163,14 @@ function renderPreviewCarousel() {
 function openPreview(fig) {
   previewFigure = fig;
   selectedFigureId = fig.id;
-  updatePreview(fig);
-  renderPreviewCarousel();
+  renderPreviewSwiper(fig);
+  updatePreviewMeta(fig);
   document.getElementById('overlay-preview').classList.add('open');
-  /* Scroll active chip into view in preview carousel */
-  requestAnimationFrame(() => {
-    const activeChip = document.querySelector('#previewCarousel .lens-chip.active');
-    if (activeChip) activeChip.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-  });
 }
 
-function updatePreview(fig) {
+function updatePreviewMeta(fig) {
   previewFigure = fig;
   selectedFigureId = fig.id;
-
-  document.getElementById('previewName').textContent  = fig.fullName;
-  document.getElementById('previewQuote').textContent = fig.quote;
-  document.getElementById('previewBio').textContent   = fig.bio;
-  document.getElementById('previewPortrait').src      = fig.portraits[currentTheme] || fig.portraits.cyberpunk;
-  document.getElementById('previewPortrait').alt      = fig.fullName;
 
   /* Personalise CTA */
   const btn = document.getElementById('confirmLensBtn');
@@ -2058,9 +2190,9 @@ function updatePreview(fig) {
     }
   }
 
-  /* Highlight active chip in both carousels */
-  document.querySelectorAll('.lens-chip').forEach(c => {
-    c.classList.toggle('active', c.dataset.figId === fig.id);
+  /* Highlight selected card in the grid */
+  document.querySelectorAll('.figure-card').forEach(c => {
+    c.classList.toggle('selected', c.dataset.figId === fig.id);
   });
 }
 
