@@ -88,6 +88,7 @@ export default function ResponsePage() {
             borderRadius: 'var(--card-radius)',
             minHeight: 300,
             boxShadow: 'var(--card-shadow)',
+            filter: 'var(--card-filter, none)',
           }}
         >
           <div
@@ -130,10 +131,10 @@ export default function ResponsePage() {
               onClick={() => router.push('/app/lens')}
               className="w-full py-3 uppercase text-center"
               style={{
-                fontFamily: 'var(--font-display)',
+                fontFamily: 'var(--font-btn)',
                 fontWeight: 600,
                 fontSize: 13,
-                letterSpacing: 3,
+                letterSpacing: 'var(--btn-letter-spacing, 3px)',
                 color: 'var(--violet)',
                 background: 'transparent',
                 borderTop: '1px solid var(--violet)',
@@ -149,10 +150,10 @@ export default function ResponsePage() {
               onClick={() => router.push('/app/onboarding')}
               className="w-full py-3 uppercase text-center"
               style={{
-                fontFamily: 'var(--font-display)',
+                fontFamily: 'var(--font-btn)',
                 fontWeight: 600,
                 fontSize: 13,
-                letterSpacing: 3,
+                letterSpacing: 'var(--btn-letter-spacing, 3px)',
                 color: 'var(--text-sub)',
                 background: 'transparent',
                 border: '1px solid rgba(255,255,255,0.12)',

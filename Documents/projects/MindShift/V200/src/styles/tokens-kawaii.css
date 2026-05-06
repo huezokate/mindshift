@@ -1,104 +1,104 @@
 /* MindShift V200 — Kawaii Theme Tokens */
-/* Figma: Landing—Kawaii 400:29, Wizard—Kawaii 404:40, Lens—Kawaii 405:76, Response—Kawaii 406:42 */
+/* Source: Figma node 416:7498 — exact colors, no modifications */
 
 html[data-theme="kawaii"] {
   /* Core palette */
-  --bg:       transparent; /* body has gradient */
-  --bg-card:  rgba(255,255,255,0.7);
-  --bg-card2: #ffeff6;
-
-  --cyan:   #31dbc8;
-  --green:  #31dbc8;
-  --pink:   #ff64a0;
-  --violet: #c09df7;
-  --amber:  #ff64a0;
+  --cyan:   #ff50c5;
+  --green:  #49dbc8;
+  --pink:   #ff50c5;
+  --violet: #ff50c5;
+  --amber:  #ffe2ac;
 
   /* Text */
-  --text-body: #270007;
-  --text-sub:  rgba(39,0,7,0.45);
-  --text-h1:   #270007;
-  --text-meta: rgba(192,157,247,0.8);
-  --text-muted: rgba(39,0,7,0.3);
+  --text-body:  #270007;
+  --text-sub:   rgba(39,0,7,0.5);
+  --text-h1:    #270007;
+  --text-meta:  rgba(39,0,7,0.35);
+  --text-muted: rgba(39,0,7,0.25);
 
-  /* Glow */
-  --glow-cyan:  0 0 12px rgba(255,100,160,0.25);
-  --glow-green: 0 0 12px rgba(49,219,200,0.3);
+  /* Glow — none in kawaii */
+  --glow-cyan:  none;
+  --glow-green: none;
 
   /* Typography */
-  --font-display: 'Fredoka One', 'Noto Sans', sans-serif;
-  --font-body:    'Nunito', 'Noto Sans', sans-serif;
-  --font-mono:    'Nunito', 'Noto Sans', sans-serif;
-  --font-alumni:  'Fredoka One', 'Noto Sans', sans-serif;
+  --font-display: 'Nunito Sans', sans-serif;
+  --font-body:    'Nunito Sans', sans-serif;
+  --font-btn:     'Fredoka', sans-serif;
+  --font-mono:    'Nunito Sans', sans-serif;
+  --font-alumni:  'Nunito Sans', sans-serif;
 
-  /* Content card (lavender border, fully rounded) */
-  --card-bt: 2px solid var(--violet);
-  --card-bl: 2px solid var(--violet);
-  --card-br: 2px solid var(--violet);
-  --card-bb: 2px solid var(--violet);
-  --card-radius: 20px;
-  --card-bg: rgba(255,255,255,0.7);
-  --card-shadow: 0 4px 12px rgba(192,157,247,0.12);
+  /* Content card — white, asymmetric dark border + brown inset shadow */
+  --card-bg:     #ffffff;
+  --card-bt:     1px solid #400b14;
+  --card-bl:     2px solid #400b14;
+  --card-br:     4px solid #400b14;
+  --card-bb:     1px solid #400b14;
+  --card-radius: 32px;
+  --card-shadow: inset 4px 0 0 0 rgba(64,11,20,0.5);
+  --card-filter: none;
 
-  /* Heading card — no box, just text */
-  --hcard-bg: transparent;
-  --hcard-bt: none;
-  --hcard-bl: none;
-  --hcard-br: none;
-  --hcard-bb: none;
-  --hcard-radius: 0;
-  --hcard-padding: 0;
+  /* Heading card — same as content card */
+  --hcard-bg:      #ffffff;
+  --hcard-bt:      1px solid #400b14;
+  --hcard-bl:      2px solid #400b14;
+  --hcard-br:      4px solid #400b14;
+  --hcard-bb:      1px solid #400b14;
+  --hcard-radius:  32px;
+  --hcard-padding: 20px 24px;
 
   /* Figure selector cards */
-  --fig-bg: rgba(255,255,255,0.7);
-  --fig-bg-sel: #ffeff6;
-  --fig-border: 1px solid rgba(49,219,200,0.3);
-  --fig-border-sel: 2px solid var(--pink);
-  --fig-radius: 16px;
-  --fig-shadow-sel: 0 0 12px rgba(255,100,160,0.25);
-  --fig-area-bg: #f5ebfa;
-  --fig-initial: rgba(255,100,160,0.3);
-  --fig-initial-sel: var(--pink);
-  --fig-name-unsel: #270007;
-  --fig-name-sel: var(--pink);
-  --fig-desc: rgba(192,157,247,0.6);
+  --fig-bg:          #ffffff;
+  --fig-bg-sel:      #fff0f8;
+  --fig-border:      1px solid rgba(64,11,20,0.15);
+  --fig-border-sel:  2px solid #ff50c5;
+  --fig-radius:      16px;
+  --fig-shadow-sel:  inset 2px 0 0 0 #ff50c5;
+  --fig-area-bg:     #e5fcfa;
+  --fig-initial:     rgba(64,11,20,0.3);
+  --fig-initial-sel: #ff50c5;
+  --fig-name-unsel:  #270007;
+  --fig-name-sel:    #ff50c5;
+  --fig-desc:        rgba(39,0,7,0.4);
 
-  /* Input / textarea */
-  --input-bg: rgba(255,255,255,0.7);
-  --input-bt: 2px solid var(--violet);
-  --input-bl: 2px solid var(--violet);
-  --input-br: 2px solid var(--violet);
-  --input-bb: 2px solid var(--violet);
-  --input-radius: 20px;
-  --input-divider: var(--violet);
+  /* Input / textarea — white, dark asymmetric border + teal inset shadow */
+  --input-bg:      #ffffff;
+  --input-bt:      1px solid #270007;
+  --input-bl:      2px solid #270007;
+  --input-br:      4px solid #270007;
+  --input-bb:      1px solid #270007;
+  --input-radius:  32px;
+  --input-divider: rgba(39,0,7,0.15);
+  --input-shadow:  inset 4px 0 0 0 #49dbc8;
 
-  /* CTA button — solid pink pill */
-  --btn-bg: var(--pink);
-  --btn-color: white;
-  --btn-bt: 2px solid var(--pink);
-  --btn-bl: 2px solid var(--pink);
-  --btn-br: 2px solid var(--pink);
-  --btn-bb: 2px solid var(--pink);
-  --btn-radius: 32px;
-  --btn-shadow: 0px 6px 16px rgba(255,100,160,0.35);
-  --btn-dis-color: rgba(255,100,160,0.35);
-  --btn-dis-border: rgba(255,100,160,0.2);
+  /* CTA button — warm yellow, dark text, Fredoka */
+  --btn-bg:             #ffe2ac;
+  --btn-color:          #270007;
+  --btn-bt:             1px solid #400b14;
+  --btn-bl:             2px solid #400b14;
+  --btn-br:             4px solid #400b14;
+  --btn-bb:             1px solid #400b14;
+  --btn-radius:         32px;
+  --btn-shadow:         none;
+  --btn-filter:         none;
+  --btn-letter-spacing: 2px;
+  --btn-dis-color:      rgba(39,0,7,0.3);
+  --btn-dis-border:     rgba(64,11,20,0.2);
 
-  /* Theme switcher (pill style) */
-  --sw-bg: rgba(255,255,255,0.5);
-  --sw-radius: 40px;
-  --sw-btn-radius: 32px;
-  --sw-btn-w: 94px;
-  --sw-btn-h: 40px;
+  /* Theme switcher — pill style */
+  --sw-bg:           rgba(255,255,255,0.4);
+  --sw-radius:       40px;
+  --sw-btn-radius:   32px;
+  --sw-btn-w:        94px;
+  --sw-btn-h:        40px;
   --sw-cyberpunk-bg: #49dbc8;
-  --sw-kawaii-bg: #fdb6fe;
-  --sw-notepad-bg: white;
-  --sw-text: #270007;
+  --sw-kawaii-bg:    #ff50c5;
+  --sw-notepad-bg:   #ffffff;
+  --sw-text:         #270007;
   --sw-notepad-text: #270007;
-  --sw-border: none;
-  --sw-shadow: none;
+  --sw-border:       none;
+  --sw-shadow:       none;
 }
 
 html[data-theme="kawaii"] body {
-  background: linear-gradient(to bottom, #fff0f8, #f5e7ff);
-  min-height: 100dvh;
+  background-color: #ffafd6;
 }

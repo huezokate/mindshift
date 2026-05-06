@@ -31,6 +31,7 @@
   --font-alumni: 'Alumni Sans SC', 'Courier New', sans-serif;
   --font-display: var(--font-alumni);
   --font-body:    var(--font-mono);
+  --font-btn:     var(--font-display);
 
   /* === Theme-neutral structural vars (cyberpunk defaults) === */
 
@@ -42,6 +43,7 @@
   --card-radius: 4px;
   --card-bg: var(--bg-card);
   --card-shadow: none;
+  --card-filter: none;
 
   /* Heading card (pink accent) */
   --hcard-bg: var(--bg-card);
@@ -74,6 +76,7 @@
   --input-bb: 1px solid var(--cyan);
   --input-radius: 4px;
   --input-divider: var(--cyan);
+  --input-shadow: none;
 
   /* CTA button */
   --btn-bg: transparent;
@@ -84,6 +87,8 @@
   --btn-bb: 4px solid var(--green);
   --btn-radius: 2px;
   --btn-shadow: 0 0 12px rgba(57,255,20,0.2);
+  --btn-filter: none;
+  --btn-letter-spacing: 3px;
   --btn-dis-color: rgba(255,255,255,0.2);
   --btn-dis-border: rgba(255,255,255,0.1);
 

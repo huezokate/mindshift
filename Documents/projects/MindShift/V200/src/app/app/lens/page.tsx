@@ -64,6 +64,7 @@ export default function LensPage() {
             maxHeight: 180,
             overflow: 'hidden',
             boxShadow: 'var(--card-shadow)',
+            filter: 'var(--card-filter, none)',
           }}
         >
           <div
@@ -198,10 +199,10 @@ export default function LensPage() {
             whileTap={{ scale: 0.97 }}
             className="w-full uppercase text-center transition-all"
             style={{
-              fontFamily: 'var(--font-display)',
+              fontFamily: 'var(--font-btn)',
               fontWeight: 600,
               fontSize: 13,
-              letterSpacing: 3,
+              letterSpacing: 'var(--btn-letter-spacing, 3px)',
               color: loading ? 'var(--btn-dis-color)' : 'var(--btn-color)',
               background: loading ? 'transparent' : 'var(--btn-bg)',
               borderTop: 'var(--btn-bt)',
@@ -211,6 +212,7 @@ export default function LensPage() {
               borderRadius: 'var(--btn-radius)',
               padding: '17px 12px',
               boxShadow: loading ? 'none' : 'var(--btn-shadow)',
+              filter: loading ? 'none' : 'var(--btn-filter, none)',
               cursor: loading ? 'wait' : 'pointer',
             }}
           >

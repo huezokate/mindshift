@@ -44,6 +44,7 @@ export default function WelcomePage() {
             borderRadius: 'var(--card-radius)',
             padding: '40px 24px',
             boxShadow: 'var(--card-shadow)',
+            filter: 'var(--card-filter, none)',
           }}
         >
           <motion.h1
@@ -99,10 +100,10 @@ export default function WelcomePage() {
               href="/app/onboarding"
               className="inline-block text-center uppercase transition-opacity hover:opacity-80 active:scale-95"
               style={{
-                fontFamily: 'var(--font-display)',
+                fontFamily: 'var(--font-btn)',
                 fontWeight: 600,
                 fontSize: 13,
-                letterSpacing: 3,
+                letterSpacing: 'var(--btn-letter-spacing, 3px)',
                 color: 'var(--btn-color)',
                 background: 'var(--btn-bg)',
                 borderTop: 'var(--btn-bt)',
@@ -112,6 +113,7 @@ export default function WelcomePage() {
                 borderRadius: 'var(--btn-radius)',
                 padding: '14px 32px',
                 boxShadow: 'var(--btn-shadow)',
+                filter: 'var(--btn-filter, none)',
               }}
             >
               Enter the Space

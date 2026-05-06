@@ -38,6 +38,8 @@ export default function OnboardingPage() {
             borderBottom: 'var(--hcard-bb)',
             borderRadius: 'var(--hcard-radius)',
             padding: 'var(--hcard-padding)',
+            boxShadow: 'var(--card-shadow)',
+            filter: 'var(--card-filter, none)',
           }}
         >
           <p
@@ -69,7 +71,8 @@ export default function OnboardingPage() {
               borderBottom: 'var(--input-bb)',
               borderRadius: 'var(--input-radius)',
               minHeight: 280,
-              boxShadow: 'var(--card-shadow)',
+              boxShadow: 'var(--input-shadow, var(--card-shadow))',
+              filter: 'var(--card-filter, none)',
             }}
           >
             {/* Header */}
@@ -131,10 +134,10 @@ export default function OnboardingPage() {
             whileTap={{ scale: 0.97 }}
             className="w-full uppercase text-center transition-all"
             style={{
-              fontFamily: 'var(--font-display)',
+              fontFamily: 'var(--font-btn)',
               fontWeight: 600,
               fontSize: 14,
-              letterSpacing: 3,
+              letterSpacing: 'var(--btn-letter-spacing, 3px)',
               color: canProceed ? 'var(--btn-color)' : 'var(--btn-dis-color)',
               background: canProceed ? 'var(--btn-bg)' : 'transparent',
               borderTop: canProceed ? 'var(--btn-bt)' : `1px solid var(--btn-dis-border)`,
@@ -144,6 +147,7 @@ export default function OnboardingPage() {
               borderRadius: 'var(--btn-radius)',
               padding: '17px 12px',
               boxShadow: canProceed ? 'var(--btn-shadow)' : 'none',
+              filter: canProceed ? 'var(--btn-filter, none)' : 'none',
               cursor: canProceed ? 'pointer' : 'not-allowed',
             }}
           >
@@ -178,6 +182,8 @@ export default function OnboardingPage() {
               borderRadius: 'var(--hcard-radius, 4px)',
               padding: 'var(--hcard-padding, 16px 24px)',
               width: '100%',
+              boxShadow: 'var(--card-shadow)',
+              filter: 'var(--card-filter, none)',
             }}
           >
             <p className="uppercase" style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 12, letterSpacing: 1.32, lineHeight: '14px', color: 'var(--cyan)', marginBottom: 8 }}>
@@ -201,10 +207,10 @@ export default function OnboardingPage() {
           <button
             className="uppercase transition-opacity hover:opacity-80"
             style={{
-              fontFamily: 'var(--font-display)',
+              fontFamily: 'var(--font-btn)',
               fontWeight: 600,
               fontSize: 14,
-              letterSpacing: 3,
+              letterSpacing: 'var(--btn-letter-spacing, 3px)',
               color: 'var(--pink)',
               background: 'transparent',
               borderTop: 'var(--hcard-bt, 1px solid var(--pink))',
