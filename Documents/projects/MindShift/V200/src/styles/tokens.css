@@ -1,0 +1,68 @@
+/* MindShift V200 — Cyberpunk Design Tokens (from mindshift.html) */
+:root {
+  /* === Core Palette === */
+  --bg:        #080810;
+  --bg-card:   #0d0d1a;
+  --bg-card2:  #0d0d1c;
+
+  --cyan:      #00F5FF;
+  --green:     #39FF14;
+  --pink:      #FF2D78;
+  --violet:    #B04CFF;
+  --amber:     #FFB800;
+
+  /* === Text === */
+  --text-h1:   #E0F7FF;
+  --text-body: #E0F7FF;
+  --text-sub:  #7ECFDF;
+  --text-meta: #3697B8;
+  --text-muted: rgba(224,247,255,0.45);
+
+  /* === Glow Effects === */
+  --glow-cyan:   0 0 16px rgba(0,245,255,0.45);
+  --glow-green:  0 0 16px rgba(57,255,20,0.45);
+  --glow-pink:   0 0 10px #FF4664, 0 0 30px rgba(255,45,120,0.2);
+  --glow-violet: 0 0 16px rgba(176,76,255,0.45);
+  --glow-card:   0 0 16px rgba(0,255,200,0.45);
+  --glow-amber:  0 0 16px rgba(255,184,0,0.45);
+
+  /* === Typography === */
+  --font-mono:   'Courier New', 'Lucida Console', monospace;
+  --font-alumni: 'Alumni Sans SC', 'Courier New', sans-serif;
+
+  /* === Borders === */
+  --border-cyan:   1px solid rgba(0,245,255,0.3);
+  --border-pink:   1px solid rgba(255,45,120,0.3);
+  --border-violet: 1px solid rgba(176,76,255,0.3);
+  --border-subtle: 1px solid rgba(255,255,255,0.08);
+
+  /* === Spacing === */
+  --r-sm: 2px;
+  --r-md: 4px;
+  --r-lg: 8px;
+
+  /* === Glassmorphism === */
+  --glass-bg:     rgba(13,13,26,0.7);
+  --glass-border: rgba(0,245,255,0.15);
+  --blur:         blur(20px);
+
+  /* === Button asymmetric borders === */
+  --btn-primary-border:   4px 1px 1px 4px;
+  --btn-secondary-border: 1px 2px 2px 1px;
+
+  /* === Node category colors (mind map) === */
+  --node-career-bg:        rgba(255,45,120,0.15);
+  --node-career-border:    var(--pink);
+  --node-creativity-bg:    rgba(176,76,255,0.15);
+  --node-creativity-border: var(--violet);
+  --node-health-bg:        rgba(57,255,20,0.15);
+  --node-health-border:    var(--green);
+  --node-relationships-bg: rgba(0,245,255,0.15);
+  --node-relationships-border: var(--cyan);
+  --node-travel-bg:        rgba(255,184,0,0.15);
+  --node-travel-border:    var(--amber);
+  --node-finances-bg:      rgba(57,255,20,0.12);
+  --node-finances-border:  var(--green);
+  --node-living-bg:        rgba(176,76,255,0.12);
+  --node-living-border:    var(--violet);
+}
