@@ -1,0 +1,112 @@
+/* MindShift V200 — Notepad Theme Tokens */
+/* Figma: Landing—Notepad 400:35, Wizard—Notepad 404:57, Lens—Notepad 405:129, Response—Notepad 406:60 */
+
+html[data-theme="notepad"] {
+  /* Core palette */
+  --bg:       transparent; /* body has paper pattern */
+  --bg-card:  #faf7f2;
+  --bg-card2: #faf7f2;
+
+  --cyan:   #3a6fa8;
+  --green:  #7d9e7d;
+  --pink:   #c0605a;
+  --violet: #3a6fa8;
+  --amber:  #7d9e7d;
+
+  /* Text */
+  --text-body: #1e1e40;
+  --text-sub:  rgba(30,30,64,0.5);
+  --text-h1:   #1e1e40;
+  --text-meta: rgba(30,30,64,0.45);
+  --text-muted: rgba(30,30,64,0.3);
+
+  /* Glow */
+  --glow-cyan:  none;
+  --glow-green: none;
+
+  /* Typography */
+  --font-display: 'Inter', sans-serif;
+  --font-body:    'Inter', sans-serif;
+  --font-mono:    'Inter', sans-serif;
+  --font-alumni:  'Inter', sans-serif;
+
+  /* Content card (thin border, square) */
+  --card-bt: 1.5px solid rgba(30,30,64,0.2);
+  --card-bl: 1.5px solid rgba(30,30,64,0.2);
+  --card-br: 1.5px solid rgba(30,30,64,0.2);
+  --card-bb: 1.5px solid rgba(30,30,64,0.2);
+  --card-radius: 6px;
+  --card-bg: white;
+  --card-shadow: none;
+
+  /* Heading card — no box, just text on paper */
+  --hcard-bg: transparent;
+  --hcard-bt: none;
+  --hcard-bl: none;
+  --hcard-br: none;
+  --hcard-bb: none;
+  --hcard-radius: 0;
+  --hcard-padding: 0;
+
+  /* Figure selector cards */
+  --fig-bg: #faf7f2;
+  --fig-bg-sel: white;
+  --fig-border: 1px solid rgba(30,30,64,0.15);
+  --fig-border-sel: 2px solid #1e1e40;
+  --fig-radius: 6px;
+  --fig-shadow-sel: none;
+  --fig-area-bg: #f0efed;
+  --fig-initial: rgba(30,30,64,0.3);
+  --fig-initial-sel: #1e1e40;
+  --fig-name-unsel: #1e1e40;
+  --fig-name-sel: #1e1e40;
+  --fig-desc: rgba(58,111,168,0.6);
+
+  /* Input / textarea */
+  --input-bg: #faf7f2;
+  --input-bt: 1.5px solid #1e1e40;
+  --input-bl: 1.5px solid #1e1e40;
+  --input-br: 1.5px solid #1e1e40;
+  --input-bb: 1.5px solid #1e1e40;
+  --input-radius: 6px;
+  --input-divider: rgba(189,211,232,0.5);
+
+  /* CTA button — navy fill, offset shadow */
+  --btn-bg: #1e1e40;
+  --btn-color: white;
+  --btn-bt: 1.5px solid #1e1e40;
+  --btn-bl: 1.5px solid #1e1e40;
+  --btn-br: 1.5px solid #1e1e40;
+  --btn-bb: 1.5px solid #1e1e40;
+  --btn-radius: 6px;
+  --btn-shadow: 3px 3px 0px #1e1e40;
+  --btn-dis-color: rgba(30,30,64,0.25);
+  --btn-dis-border: rgba(30,30,64,0.12);
+
+  /* Theme switcher (flat / brutalist tabs) */
+  --sw-bg: transparent;
+  --sw-radius: 0;
+  --sw-btn-radius: 0;
+  --sw-btn-w: 88px;
+  --sw-btn-h: 36px;
+  --sw-cyberpunk-bg: #3a6fa8;
+  --sw-kawaii-bg: #c0605a;
+  --sw-notepad-bg: #faf7f2;
+  --sw-text: white;
+  --sw-notepad-text: #1e1e40;
+  --sw-border: 1.5px solid #1e1e40;
+  --sw-shadow: 2px 2px 0 rgba(30,30,64,0.6);
+}
+
+html[data-theme="notepad"] body {
+  background-color: #faf7f2;
+  background-image:
+    linear-gradient(to right, transparent 52px, rgba(192,40,91,0.4) 52px, rgba(192,40,91,0.4) 54px, transparent 54px),
+    repeating-linear-gradient(to bottom, transparent, transparent 37px, rgba(189,211,232,0.45) 37px, rgba(189,211,232,0.45) 38px);
+  background-attachment: local;
+}
+
+/* Scanline only for cyberpunk */
+html:not([data-theme="cyberpunk"]):not(:not([data-theme])) body::before {
+  display: none;
+}

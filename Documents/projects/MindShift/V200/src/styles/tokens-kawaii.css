@@ -1,0 +1,104 @@
+/* MindShift V200 — Kawaii Theme Tokens */
+/* Figma: Landing—Kawaii 400:29, Wizard—Kawaii 404:40, Lens—Kawaii 405:76, Response—Kawaii 406:42 */
+
+html[data-theme="kawaii"] {
+  /* Core palette */
+  --bg:       transparent; /* body has gradient */
+  --bg-card:  rgba(255,255,255,0.7);
+  --bg-card2: #ffeff6;
+
+  --cyan:   #31dbc8;
+  --green:  #31dbc8;
+  --pink:   #ff64a0;
+  --violet: #c09df7;
+  --amber:  #ff64a0;
+
+  /* Text */
+  --text-body: #270007;
+  --text-sub:  rgba(39,0,7,0.45);
+  --text-h1:   #270007;
+  --text-meta: rgba(192,157,247,0.8);
+  --text-muted: rgba(39,0,7,0.3);
+
+  /* Glow */
+  --glow-cyan:  0 0 12px rgba(255,100,160,0.25);
+  --glow-green: 0 0 12px rgba(49,219,200,0.3);
+
+  /* Typography */
+  --font-display: 'Fredoka One', 'Noto Sans', sans-serif;
+  --font-body:    'Nunito', 'Noto Sans', sans-serif;
+  --font-mono:    'Nunito', 'Noto Sans', sans-serif;
+  --font-alumni:  'Fredoka One', 'Noto Sans', sans-serif;
+
+  /* Content card (lavender border, fully rounded) */
+  --card-bt: 2px solid var(--violet);
+  --card-bl: 2px solid var(--violet);
+  --card-br: 2px solid var(--violet);
+  --card-bb: 2px solid var(--violet);
+  --card-radius: 20px;
+  --card-bg: rgba(255,255,255,0.7);
+  --card-shadow: 0 4px 12px rgba(192,157,247,0.12);
+
+  /* Heading card — no box, just text */
+  --hcard-bg: transparent;
+  --hcard-bt: none;
+  --hcard-bl: none;
+  --hcard-br: none;
+  --hcard-bb: none;
+  --hcard-radius: 0;
+  --hcard-padding: 0;
+
+  /* Figure selector cards */
+  --fig-bg: rgba(255,255,255,0.7);
+  --fig-bg-sel: #ffeff6;
+  --fig-border: 1px solid rgba(49,219,200,0.3);
+  --fig-border-sel: 2px solid var(--pink);
+  --fig-radius: 16px;
+  --fig-shadow-sel: 0 0 12px rgba(255,100,160,0.25);
+  --fig-area-bg: #f5ebfa;
+  --fig-initial: rgba(255,100,160,0.3);
+  --fig-initial-sel: var(--pink);
+  --fig-name-unsel: #270007;
+  --fig-name-sel: var(--pink);
+  --fig-desc: rgba(192,157,247,0.6);
+
+  /* Input / textarea */
+  --input-bg: rgba(255,255,255,0.7);
+  --input-bt: 2px solid var(--violet);
+  --input-bl: 2px solid var(--violet);
+  --input-br: 2px solid var(--violet);
+  --input-bb: 2px solid var(--violet);
+  --input-radius: 20px;
+  --input-divider: var(--violet);
+
+  /* CTA button — solid pink pill */
+  --btn-bg: var(--pink);
+  --btn-color: white;
+  --btn-bt: 2px solid var(--pink);
+  --btn-bl: 2px solid var(--pink);
+  --btn-br: 2px solid var(--pink);
+  --btn-bb: 2px solid var(--pink);
+  --btn-radius: 32px;
+  --btn-shadow: 0px 6px 16px rgba(255,100,160,0.35);
+  --btn-dis-color: rgba(255,100,160,0.35);
+  --btn-dis-border: rgba(255,100,160,0.2);
+
+  /* Theme switcher (pill style) */
+  --sw-bg: rgba(255,255,255,0.5);
+  --sw-radius: 40px;
+  --sw-btn-radius: 32px;
+  --sw-btn-w: 94px;
+  --sw-btn-h: 40px;
+  --sw-cyberpunk-bg: #49dbc8;
+  --sw-kawaii-bg: #fdb6fe;
+  --sw-notepad-bg: white;
+  --sw-text: #270007;
+  --sw-notepad-text: #270007;
+  --sw-border: none;
+  --sw-shadow: none;
+}
+
+html[data-theme="kawaii"] body {
+  background: linear-gradient(to bottom, #fff0f8, #f5e7ff);
+  min-height: 100dvh;
+}

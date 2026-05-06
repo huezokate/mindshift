@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
+import ThemeSwitcher from '@/components/ThemeSwitcher'
 
 const MAX_CHARS = 800
 
@@ -21,35 +22,31 @@ export default function OnboardingPage() {
   }
 
   return (
-    /* Full-screen bg */
     <div className="min-h-dvh flex flex-col items-center" style={{ background: 'var(--bg)' }}>
-      {/* Centred column — matches Figma 440px frame */}
-      <div className="flex flex-col gap-8 w-full" style={{ maxWidth: 440, padding: '40px 34px' }}>
+      <div className="flex flex-col gap-8 w-full" style={{ maxWidth: 440, padding: '40px 24px' }}>
 
-        {/* "GET IT OFF YOUR CHEST" card */}
+        {/* Heading card */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
           style={{
-            background: 'var(--bg-card)',
-            border: '1px solid var(--pink)',
-            borderLeft: '4px solid var(--pink)',
-            borderBottom: '2px solid var(--pink)',
-            borderRight: '4px solid var(--pink)',
-            borderRadius: 4,
-            padding: '16px 24px',
+            background: 'var(--hcard-bg)',
+            borderTop: 'var(--hcard-bt)',
+            borderLeft: 'var(--hcard-bl)',
+            borderRight: 'var(--hcard-br)',
+            borderBottom: 'var(--hcard-bb)',
+            borderRadius: 'var(--hcard-radius)',
+            padding: 'var(--hcard-padding)',
           }}
         >
           <p
             className="uppercase w-full"
-            style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 18, letterSpacing: 1.44, lineHeight: '20px', color: '#EEFFEA', marginBottom: 8 }}
+            style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 18, letterSpacing: 1.44, lineHeight: '20px', color: 'var(--text-body)', marginBottom: 8 }}
           >
             Get it off your chest
           </p>
-          <p
-            style={{ fontFamily: 'var(--font-mono)', fontSize: 14, letterSpacing: 0.52, lineHeight: '20px', color: 'var(--cyan)' }}
-          >
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, letterSpacing: 0.52, lineHeight: '20px', color: 'var(--cyan)' }}>
             Let it all out — then see it through the eyes of someone who lived through years of history.
           </p>
         </motion.div>
@@ -60,28 +57,29 @@ export default function OnboardingPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.08 }}
           className="flex flex-col gap-4"
-          style={{ flex: 1 }}
         >
           {/* Textarea card */}
           <div
             className="flex flex-col"
             style={{
-              background: 'var(--bg-card)',
-              border: '1px solid var(--cyan)',
-              borderLeft: '4px solid var(--cyan)',
-              borderTop: '4px solid var(--cyan)',
-              borderRadius: 4,
+              background: 'var(--input-bg)',
+              borderTop: 'var(--input-bt)',
+              borderLeft: 'var(--input-bl)',
+              borderRight: 'var(--input-br)',
+              borderBottom: 'var(--input-bb)',
+              borderRadius: 'var(--input-radius)',
               minHeight: 280,
+              boxShadow: 'var(--card-shadow)',
             }}
           >
-            {/* "DUMP IT ALL HERE:" header */}
+            {/* Header */}
             <div
               className="flex items-center justify-center"
-              style={{ borderBottom: '1px solid var(--cyan)', padding: '8px 16px 4px' }}
+              style={{ borderBottom: `1px solid var(--input-divider)`, padding: '8px 16px 4px' }}
             >
               <p
                 className="flex-1 text-center uppercase"
-                style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 12, letterSpacing: 0.52, lineHeight: '14px', color: 'var(--cyan)' }}
+                style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 12, letterSpacing: 0.52, lineHeight: '14px', color: 'var(--cyan)' }}
               >
                 Dump it all here:
               </p>
@@ -95,11 +93,11 @@ export default function OnboardingPage() {
               className="flex-1 resize-none outline-none w-full"
               style={{
                 background: 'transparent',
-                fontFamily: 'var(--font-mono)',
+                fontFamily: 'var(--font-body)',
                 fontSize: 13,
                 lineHeight: '20px',
                 letterSpacing: 0.5,
-                color: '#EEFFEA',
+                color: 'var(--text-body)',
                 caretColor: 'var(--cyan)',
                 padding: '12px 16px',
                 minHeight: 200,
@@ -109,12 +107,12 @@ export default function OnboardingPage() {
             {/* Char counter */}
             <div
               className="flex justify-end"
-              style={{ borderTop: '1px solid var(--cyan)', padding: '4px 8px' }}
+              style={{ borderTop: `1px solid var(--input-divider)`, padding: '4px 8px' }}
             >
               <p
                 className="uppercase text-right"
                 style={{
-                  fontFamily: 'var(--font-mono)',
+                  fontFamily: 'var(--font-body)',
                   fontSize: 10,
                   letterSpacing: 1,
                   lineHeight: '12px',
@@ -126,25 +124,26 @@ export default function OnboardingPage() {
             </div>
           </div>
 
-          {/* SELECT THE LENS button */}
+          {/* CTA button */}
           <motion.button
             onClick={handleProceed}
             disabled={!canProceed}
             whileTap={{ scale: 0.97 }}
             className="w-full uppercase text-center transition-all"
             style={{
-              fontFamily: 'var(--font-alumni)',
+              fontFamily: 'var(--font-display)',
               fontWeight: 600,
               fontSize: 14,
               letterSpacing: 3,
-              color: canProceed ? 'var(--green)' : 'rgba(255,255,255,0.2)',
-              background: 'transparent',
-              border: `1px solid ${canProceed ? 'var(--green)' : 'rgba(255,255,255,0.1)'}`,
-              borderBottom: `4px solid ${canProceed ? 'var(--green)' : 'rgba(255,255,255,0.1)'}`,
-              borderLeft: `4px solid ${canProceed ? 'var(--green)' : 'rgba(255,255,255,0.1)'}`,
-              borderRadius: 2,
-              padding: '17px 12px 17px 9px',
-              boxShadow: canProceed ? '0 0 12px rgba(57,255,20,0.2)' : 'none',
+              color: canProceed ? 'var(--btn-color)' : 'var(--btn-dis-color)',
+              background: canProceed ? 'var(--btn-bg)' : 'transparent',
+              borderTop: canProceed ? 'var(--btn-bt)' : `1px solid var(--btn-dis-border)`,
+              borderLeft: canProceed ? 'var(--btn-bl)' : `1px solid var(--btn-dis-border)`,
+              borderRight: canProceed ? 'var(--btn-br)' : `1px solid var(--btn-dis-border)`,
+              borderBottom: canProceed ? 'var(--btn-bb)' : `1px solid var(--btn-dis-border)`,
+              borderRadius: 'var(--btn-radius)',
+              padding: '17px 12px',
+              boxShadow: canProceed ? 'var(--btn-shadow)' : 'none',
               cursor: canProceed ? 'pointer' : 'not-allowed',
             }}
           >
@@ -152,7 +151,17 @@ export default function OnboardingPage() {
           </motion.button>
         </motion.div>
 
-        {/* Coming soon teaser + waitlist */}
+        {/* Theme switcher */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="flex justify-center"
+        >
+          <ThemeSwitcher />
+        </motion.div>
+
+        {/* Coming soon teaser */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -161,62 +170,49 @@ export default function OnboardingPage() {
         >
           <div
             style={{
-              background: 'var(--bg-card)',
-              border: '1px solid var(--pink)',
-              borderLeft: '4px solid var(--pink)',
-              borderBottom: '2px solid var(--pink)',
-              borderRight: '4px solid var(--pink)',
-              borderRadius: 4,
-              padding: '16px 24px',
+              background: 'var(--hcard-bg, var(--bg-card))',
+              borderTop: 'var(--hcard-bt)',
+              borderLeft: 'var(--hcard-bl)',
+              borderRight: 'var(--hcard-br)',
+              borderBottom: 'var(--hcard-bb)',
+              borderRadius: 'var(--hcard-radius, 4px)',
+              padding: 'var(--hcard-padding, 16px 24px)',
               width: '100%',
             }}
           >
-            <p
-              className="uppercase"
-              style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 12, letterSpacing: 1.32, lineHeight: '14px', color: 'var(--cyan)', marginBottom: 8 }}
-            >
+            <p className="uppercase" style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 12, letterSpacing: 1.32, lineHeight: '14px', color: 'var(--cyan)', marginBottom: 8 }}>
               Coming Soon
             </p>
-            <p
-              className="uppercase"
-              style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 18, letterSpacing: 1.44, lineHeight: '20px', color: '#EEFFEA', marginBottom: 8 }}
-            >
+            <p className="uppercase" style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 18, letterSpacing: 1.44, lineHeight: '20px', color: 'var(--text-body)', marginBottom: 8 }}>
               Mind-mapping tool
             </p>
-            <p
-              style={{ fontFamily: 'var(--font-mono)', fontSize: 14, letterSpacing: 0.52, lineHeight: '20px', color: 'var(--cyan)', marginBottom: 8 }}
-            >
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, letterSpacing: 0.52, lineHeight: '20px', color: 'var(--cyan)', marginBottom: 8 }}>
               Reflect, plan and achieve new horizons with step by step guidance
             </p>
-            <p
-              className="uppercase"
-              style={{ fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: 1, lineHeight: '12px', color: '#EEFFEA' }}
-            >
+            <p className="uppercase" style={{ fontFamily: 'var(--font-body)', fontSize: 10, letterSpacing: 1, lineHeight: '12px', color: 'var(--text-body)' }}>
               career, health &amp; wellness, creativity, personal development, relationships, travel &amp; finances
             </p>
           </div>
 
-          <p
-            className="text-center w-full"
-            style={{ fontFamily: 'var(--font-mono)', fontSize: 14, letterSpacing: 0.52, lineHeight: '20px', color: 'var(--green)' }}
-          >
+          <p className="text-center w-full" style={{ fontFamily: 'var(--font-body)', fontSize: 14, letterSpacing: 0.52, lineHeight: '20px', color: 'var(--green)' }}>
             Get on the waitlist to be the first to know
           </p>
 
           <button
             className="uppercase transition-opacity hover:opacity-80"
             style={{
-              fontFamily: 'var(--font-alumni)',
+              fontFamily: 'var(--font-display)',
               fontWeight: 600,
               fontSize: 14,
               letterSpacing: 3,
               color: 'var(--pink)',
               background: 'transparent',
-              border: '1px solid var(--pink)',
-              borderBottom: '2px solid var(--pink)',
-              borderRight: '2px solid var(--pink)',
-              borderRadius: 2,
-              padding: '9px 14px 10px 13px',
+              borderTop: 'var(--hcard-bt, 1px solid var(--pink))',
+              borderLeft: 'var(--hcard-bl, 4px solid var(--pink))',
+              borderRight: 'var(--hcard-br, 4px solid var(--pink))',
+              borderBottom: 'var(--hcard-bb, 2px solid var(--pink))',
+              borderRadius: 'var(--hcard-radius, 2px)',
+              padding: '9px 14px',
               cursor: 'pointer',
             }}
           >

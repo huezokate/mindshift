@@ -29,8 +29,79 @@
   /* === Typography === */
   --font-mono:   'Courier New', 'Lucida Console', monospace;
   --font-alumni: 'Alumni Sans SC', 'Courier New', sans-serif;
+  --font-display: var(--font-alumni);
+  --font-body:    var(--font-mono);
 
-  /* === Borders === */
+  /* === Theme-neutral structural vars (cyberpunk defaults) === */
+
+  /* Content card (cyan accent) */
+  --card-bt: 4px solid var(--cyan);
+  --card-bl: 4px solid var(--cyan);
+  --card-br: 1px solid var(--cyan);
+  --card-bb: 1px solid var(--cyan);
+  --card-radius: 4px;
+  --card-bg: var(--bg-card);
+  --card-shadow: none;
+
+  /* Heading card (pink accent) */
+  --hcard-bg: var(--bg-card);
+  --hcard-bt: 1px solid var(--pink);
+  --hcard-bl: 4px solid var(--pink);
+  --hcard-br: 4px solid var(--pink);
+  --hcard-bb: 2px solid var(--pink);
+  --hcard-radius: 4px;
+  --hcard-padding: 16px 24px;
+
+  /* Figure selector cards */
+  --fig-bg: var(--bg-card2);
+  --fig-bg-sel: rgba(0,255,200,0.08);
+  --fig-border: 1px solid var(--violet);
+  --fig-border-sel: 2px solid var(--green);
+  --fig-radius: 2px;
+  --fig-shadow-sel: 0 0 16px rgba(0,255,200,0.35);
+  --fig-area-bg: var(--bg-card);
+  --fig-initial: rgba(176,76,255,0.4);
+  --fig-initial-sel: var(--green);
+  --fig-name-unsel: #EEFFEA;
+  --fig-name-sel: var(--green);
+  --fig-desc: #EEFFEA;
+
+  /* Input / textarea card */
+  --input-bg: transparent;
+  --input-bt: 4px solid var(--cyan);
+  --input-bl: 4px solid var(--cyan);
+  --input-br: 1px solid var(--cyan);
+  --input-bb: 1px solid var(--cyan);
+  --input-radius: 4px;
+  --input-divider: var(--cyan);
+
+  /* CTA button */
+  --btn-bg: transparent;
+  --btn-color: var(--green);
+  --btn-bt: 1px solid var(--green);
+  --btn-bl: 4px solid var(--green);
+  --btn-br: 1px solid var(--green);
+  --btn-bb: 4px solid var(--green);
+  --btn-radius: 2px;
+  --btn-shadow: 0 0 12px rgba(57,255,20,0.2);
+  --btn-dis-color: rgba(255,255,255,0.2);
+  --btn-dis-border: rgba(255,255,255,0.1);
+
+  /* Theme switcher */
+  --sw-bg: rgba(0,0,0,0.3);
+  --sw-radius: 4px;
+  --sw-btn-radius: 2px;
+  --sw-btn-w: 94px;
+  --sw-btn-h: 40px;
+  --sw-cyberpunk-bg: var(--cyan);
+  --sw-kawaii-bg: var(--pink);
+  --sw-notepad-bg: rgba(255,255,255,0.1);
+  --sw-text: var(--bg);
+  --sw-notepad-text: var(--bg);
+  --sw-border: none;
+  --sw-shadow: none;
+
+  /* Borders === */
   --border-cyan:   1px solid rgba(0,245,255,0.3);
   --border-pink:   1px solid rgba(255,45,120,0.3);
   --border-violet: 1px solid rgba(176,76,255,0.3);

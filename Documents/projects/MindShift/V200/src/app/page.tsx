@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import ThemeSwitcher from '@/components/ThemeSwitcher'
 
 const fade = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }
 const stagger = { show: { transition: { staggerChildren: 0.12 } } }
@@ -11,7 +12,7 @@ export default function WelcomePage() {
       className="min-h-dvh flex flex-col items-center justify-center relative overflow-hidden"
       style={{ background: 'var(--bg)', padding: '40px 24px' }}
     >
-      {/* Ambient glow blobs */}
+      {/* Ambient glow blobs — cyberpunk only, hidden by CSS in other themes */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div
           className="absolute -top-32 left-1/2 -translate-x-1/2 rounded-full blur-3xl"
@@ -23,12 +24,11 @@ export default function WelcomePage() {
         />
       </div>
 
-      {/* Centred content column — 440px max, full width on phones */}
       <motion.div
         variants={stagger}
         initial="hidden"
         animate="show"
-        className="relative z-10 flex flex-col items-center gap-10 w-full"
+        className="relative z-10 flex flex-col items-center gap-8 w-full"
         style={{ maxWidth: 440 }}
       >
         {/* Main card */}
@@ -36,20 +36,21 @@ export default function WelcomePage() {
           variants={fade}
           className="w-full flex flex-col gap-6 items-center"
           style={{
-            background: 'var(--bg-card)',
-            border: '1px solid rgba(0,245,255,0.25)',
-            borderLeft: '4px solid var(--cyan)',
-            borderTop: '4px solid var(--cyan)',
-            borderRadius: 4,
+            background: 'var(--card-bg)',
+            borderTop: 'var(--card-bt)',
+            borderLeft: 'var(--card-bl)',
+            borderRight: 'var(--card-br)',
+            borderBottom: 'var(--card-bb)',
+            borderRadius: 'var(--card-radius)',
             padding: '40px 24px',
-            boxShadow: '0 0 32px rgba(0,245,255,0.08)',
+            boxShadow: 'var(--card-shadow)',
           }}
         >
           <motion.h1
             variants={fade}
             className="text-center uppercase"
             style={{
-              fontFamily: 'var(--font-alumni)',
+              fontFamily: 'var(--font-display)',
               fontSize: 36,
               letterSpacing: 6,
               color: 'var(--cyan)',
@@ -64,7 +65,7 @@ export default function WelcomePage() {
             variants={fade}
             className="text-center uppercase"
             style={{
-              fontFamily: 'var(--font-mono)',
+              fontFamily: 'var(--font-body)',
               fontWeight: 700,
               fontSize: 11,
               letterSpacing: 1.4,
@@ -81,7 +82,7 @@ export default function WelcomePage() {
             variants={fade}
             className="text-center"
             style={{
-              fontFamily: 'var(--font-mono)',
+              fontFamily: 'var(--font-body)',
               fontSize: 13,
               letterSpacing: 0.5,
               lineHeight: '20px',
@@ -98,18 +99,19 @@ export default function WelcomePage() {
               href="/app/onboarding"
               className="inline-block text-center uppercase transition-opacity hover:opacity-80 active:scale-95"
               style={{
-                fontFamily: 'var(--font-alumni)',
+                fontFamily: 'var(--font-display)',
                 fontWeight: 600,
                 fontSize: 13,
                 letterSpacing: 3,
-                color: 'var(--green)',
-                background: 'transparent',
-                border: '1px solid var(--green)',
-                borderLeft: '4px solid var(--green)',
-                borderBottom: '4px solid var(--green)',
-                borderRadius: 2,
+                color: 'var(--btn-color)',
+                background: 'var(--btn-bg)',
+                borderTop: 'var(--btn-bt)',
+                borderLeft: 'var(--btn-bl)',
+                borderRight: 'var(--btn-br)',
+                borderBottom: 'var(--btn-bb)',
+                borderRadius: 'var(--btn-radius)',
                 padding: '14px 32px',
-                boxShadow: '0 0 12px rgba(57,255,20,0.2)',
+                boxShadow: 'var(--btn-shadow)',
               }}
             >
               Enter the Space
@@ -117,22 +119,27 @@ export default function WelcomePage() {
           </motion.div>
         </motion.div>
 
+        {/* Theme switcher */}
+        <motion.div variants={fade} className="flex justify-center">
+          <ThemeSwitcher />
+        </motion.div>
+
         {/* Disclaimer */}
         <motion.div variants={fade} className="flex flex-col gap-3 w-full text-center">
           <p
             className="uppercase"
-            style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 11, letterSpacing: 1.3, lineHeight: '14px', color: 'var(--cyan)' }}
+            style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 11, letterSpacing: 1.3, lineHeight: '14px', color: 'var(--cyan)' }}
           >
             A few things before we begin:
           </p>
           <p
-            style={{ fontFamily: 'var(--font-mono)', fontSize: 12, letterSpacing: 0.5, lineHeight: '18px', color: 'var(--text-sub)' }}
+            style={{ fontFamily: 'var(--font-body)', fontSize: 12, letterSpacing: 0.5, lineHeight: '18px', color: 'var(--text-sub)' }}
           >
             MindShift is a space for reflection, not a substitute for professional mental health support.
           </p>
           <p
             className="uppercase"
-            style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 11, letterSpacing: 1.3, lineHeight: '14px', color: 'var(--text-sub)' }}
+            style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 11, letterSpacing: 1.3, lineHeight: '14px', color: 'var(--text-sub)' }}
           >
             Nothing here is clinical advice.
           </p>
