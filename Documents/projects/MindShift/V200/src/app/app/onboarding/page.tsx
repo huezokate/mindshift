@@ -5,18 +5,12 @@ import { motion } from 'framer-motion'
 
 const MAX_CHARS = 800
 
-const PLACEHOLDERS = [
-  'I keep second-guessing my career choice...',
-  "My relationship feels like it's going nowhere...",
-  "I know what I should do, but I just can't start...",
-  'Everyone around me seems to have it figured out...',
-  "I'm scared of making the wrong decision...",
-]
+const DEMO_VENT =
+  "I keep second-guessing my career choice. Everyone around me seems so sure about what they're doing, but I'm constantly wondering if I chose the right path. Maybe I need a completely fresh perspective on all of this."
 
 export default function OnboardingPage() {
   const router = useRouter()
-  const [text, setText] = useState('')
-  const [placeholderIdx] = useState(() => Math.floor(Math.random() * PLACEHOLDERS.length))
+  const [text, setText] = useState(DEMO_VENT)
 
   const canProceed = text.trim().length >= 20
 
@@ -97,7 +91,7 @@ export default function OnboardingPage() {
             <textarea
               value={text}
               onChange={e => setText(e.target.value.slice(0, MAX_CHARS))}
-              placeholder={PLACEHOLDERS[placeholderIdx]}
+              placeholder="What's on your mind?"
               className="flex-1 resize-none outline-none w-full"
               style={{
                 background: 'transparent',
