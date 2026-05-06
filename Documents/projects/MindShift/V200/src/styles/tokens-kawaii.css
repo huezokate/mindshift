@@ -3,6 +3,7 @@
 
 html[data-theme="kawaii"] {
   /* Core palette */
+  --bg:     #ffafd6;
   --cyan:   #ff50c5;
   --green:  #49dbc8;
   --pink:   #ff50c5;

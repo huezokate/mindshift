@@ -3,6 +3,7 @@
 
 html[data-theme="notepad"] {
   /* Core palette */
+  --bg:     #faf7f2;
   --cyan:   #3a6fa8;
   --green:  #7d9e7d;
   --pink:   #c0605a;
