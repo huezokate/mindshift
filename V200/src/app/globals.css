@@ -1,0 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=Alumni+Sans+SC:wght@400;600;700&family=Fredoka:wght@400;500&family=Nunito+Sans:wght@400;700&family=Inter:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+@import "../styles/tokens.css";
+@import "../styles/tokens-kawaii.css";
+@import "../styles/tokens-notepad.css";
+
+@theme inline {
+  --color-background: var(--bg);
+  --color-foreground: var(--text-body);
+}
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text-body);
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+/* Scanline — cyberpunk only */
+html:not([data-theme="kawaii"]):not([data-theme="notepad"]) body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: rgba(0,245,255,0.3); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--cyan); }
+
+/* Selection */
+::selection { background: rgba(0,245,255,0.2); color: var(--cyan); }
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Theme switcher */
+.ms-switcher {
+  display: flex;
+  gap: 8px;
+  background: var(--sw-bg);
+  border-radius: var(--sw-radius);
+  padding: 6px;
+  width: fit-content;
+}
+
+.ms-switcher-btn {
+  width: var(--sw-btn-w);
+  height: var(--sw-btn-h);
+  border-radius: var(--sw-btn-radius);
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border: var(--sw-border);
+  box-shadow: var(--sw-shadow);
+  transition: opacity 0.15s;
+  color: var(--sw-text);
+}
+
+.ms-switcher-btn[data-id="notepad"] {
+  color: var(--sw-notepad-text);
+}
+
+.ms-switcher-btn[data-id="cyberpunk"] { background: var(--sw-cyberpunk-bg); }
+.ms-switcher-btn[data-id="kawaii"]    { background: var(--sw-kawaii-bg); }
+.ms-switcher-btn[data-id="notepad"]   { background: var(--sw-notepad-bg); }
+
+.ms-switcher-btn[data-active="false"] { opacity: 0.55; }

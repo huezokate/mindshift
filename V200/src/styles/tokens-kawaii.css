@@ -1,0 +1,105 @@
+/* MindShift V200 — Kawaii Theme Tokens */
+/* Source: Figma node 416:7498 — exact colors, no modifications */
+
+html[data-theme="kawaii"] {
+  /* Core palette */
+  --bg:     #ffafd6;
+  --cyan:   #ff50c5;
+  --green:  #49dbc8;
+  --pink:   #ff50c5;
+  --violet: #ff50c5;
+  --amber:  #ffe2ac;
+
+  /* Text */
+  --text-body:  #270007;
+  --text-sub:   rgba(39,0,7,0.5);
+  --text-h1:    #270007;
+  --text-meta:  rgba(39,0,7,0.35);
+  --text-muted: rgba(39,0,7,0.25);
+
+  /* Glow — none in kawaii */
+  --glow-cyan:  none;
+  --glow-green: none;
+
+  /* Typography */
+  --font-display: 'Nunito Sans', sans-serif;
+  --font-body:    'Nunito Sans', sans-serif;
+  --font-btn:     'Fredoka', sans-serif;
+  --font-mono:    'Nunito Sans', sans-serif;
+  --font-alumni:  'Nunito Sans', sans-serif;
+
+  /* Content card — white, asymmetric dark border + brown inset shadow */
+  --card-bg:     #ffffff;
+  --card-bt:     1px solid #400b14;
+  --card-bl:     2px solid #400b14;
+  --card-br:     4px solid #400b14;
+  --card-bb:     1px solid #400b14;
+  --card-radius: 32px;
+  --card-shadow: inset 4px 0 0 0 rgba(64,11,20,0.5);
+  --card-filter: none;
+
+  /* Heading card — same as content card */
+  --hcard-bg:      #ffffff;
+  --hcard-bt:      1px solid #400b14;
+  --hcard-bl:      2px solid #400b14;
+  --hcard-br:      4px solid #400b14;
+  --hcard-bb:      1px solid #400b14;
+  --hcard-radius:  32px;
+  --hcard-padding: 20px 24px;
+
+  /* Figure selector cards */
+  --fig-bg:          #ffffff;
+  --fig-bg-sel:      #fff0f8;
+  --fig-border:      1px solid rgba(64,11,20,0.15);
+  --fig-border-sel:  2px solid #ff50c5;
+  --fig-radius:      16px;
+  --fig-shadow-sel:  inset 2px 0 0 0 #ff50c5;
+  --fig-area-bg:     #e5fcfa;
+  --fig-initial:     rgba(64,11,20,0.3);
+  --fig-initial-sel: #ff50c5;
+  --fig-name-unsel:  #270007;
+  --fig-name-sel:    #ff50c5;
+  --fig-desc:        rgba(39,0,7,0.4);
+
+  /* Input / textarea — white, dark asymmetric border + teal inset shadow */
+  --input-bg:      #ffffff;
+  --input-bt:      1px solid #270007;
+  --input-bl:      2px solid #270007;
+  --input-br:      4px solid #270007;
+  --input-bb:      1px solid #270007;
+  --input-radius:  32px;
+  --input-divider: rgba(39,0,7,0.15);
+  --input-shadow:  inset 4px 0 0 0 #49dbc8;
+
+  /* CTA button — warm yellow, dark text, Fredoka */
+  --btn-bg:             #ffe2ac;
+  --btn-color:          #270007;
+  --btn-bt:             1px solid #400b14;
+  --btn-bl:             2px solid #400b14;
+  --btn-br:             4px solid #400b14;
+  --btn-bb:             1px solid #400b14;
+  --btn-radius:         32px;
+  --btn-shadow:         none;
+  --btn-filter:         none;
+  --btn-letter-spacing: 2px;
+  --btn-dis-color:      rgba(39,0,7,0.3);
+  --btn-dis-border:     rgba(64,11,20,0.2);
+
+  /* Theme switcher — pill style */
+  --sw-bg:           rgba(255,255,255,0.4);
+  --sw-radius:       40px;
+  --sw-btn-radius:   32px;
+  --sw-btn-w:        94px;
+  --sw-btn-h:        40px;
+  --sw-cyberpunk-bg: #49dbc8;
+  --sw-kawaii-bg:    #ff50c5;
+  --sw-notepad-bg:   #ffffff;
+  --sw-text:         #270007;
+  --sw-notepad-text: #270007;
+  --sw-border:       none;
+  --sw-shadow:       none;
+}
+
+html[data-theme="kawaii"] body {
+  background-color: #ffafd6;
+}
