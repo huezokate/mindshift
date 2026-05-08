@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>MindShift — Kawaii</title>
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+<style>
+/* ── DESIGN SYSTEM TOKENS ─────────────────────────────── */
+:root {
+  --bg:        #edf2ff;
+  --bg-card:   #f5f0ff;
+  --card:      #ffffff;
+  --ink:       #0D0D1C;
+  --sub:       #3a3560;
+  --muted:     #9490b8;
+  --border:    #ddd6f7;
+  --shadow:    rgba(130,100,240,0.13);
+
+  /* pastel palette */
+  --blue-lt:   #c8dcf9;
+  --violet-lt: #d9c8f9;
+  --pink-lt:   #ffcce0;
+  --green-lt:  #bdf5d4;
+
+  /* vivid highlights */
+  --pink:      #ff2d78;
+  --pink-glow: rgba(255,45,120,0.3);
+  --green:     #2dff78;
+  --green-glow:rgba(45,255,120,0.3);
+  --violet:    #8b5cf6;
+  --blue:      #5b8dee;
+
+  --font: 'Nunito', system-ui, sans-serif;
+}
+
+/* ── RESET & BASE ─────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%;
+  background: linear-gradient(160deg, var(--bg) 0%, var(--bg-card) 100%);
+  background-attachment: fixed;
+  color: var(--ink);
+  font-family: var(--font);
+}
+button { cursor: pointer; font-family: inherit; background: none; border: none; }
+input, textarea { font-family: var(--font); outline: none; resize: none; }
+
+/* ── APP SHELL ────────────────────────────────────────── */
+#app {
+  width: 100%;
+  max-width: 420px;
+  min-height: 100vh;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+  background: transparent;
+}
+
+/* Subtle dot pattern */
+#app::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: radial-gradient(circle, var(--blue-lt) 1.5px, transparent 1.5px);
+  background-size: 28px 28px;
+  opacity: 0.5;
+  pointer-events: none; z-index: 0;
+}
+#app > * { position: relative; z-index: 1; }
+
+/* ── SCREENS ──────────────────────────────────────────── */
+.screen {
+  display: none; flex-direction: column;
+  min-height: 100vh; width: 100%;
+  background: transparent;
+  position: absolute; top: 0; left: 0;
+  animation: fadeIn 0.25s ease;
+}
+.screen.active { display: flex; position: relative; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* ── THEME SWITCHER ───────────────────────────────────── */
+.theme-bar {
+  display: flex;
+  background: var(--card);
+  border-bottom: 2px solid var(--border);
+  flex-shrink: 0;
+  box-shadow: 0 2px 12px var(--shadow);
+}
+.theme-tab {
+  flex: 1; height: 46px;
+  font-size: 10px; font-weight: 800;
+  letter-spacing: 0.5px; text-transform: uppercase;
+  color: var(--muted);
+  background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  border-bottom: 3px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+  margin-bottom: -2px;
+}
+.theme-tab.active { color: var(--pink); border-bottom-color: var(--pink); }
+
+/* ── TYPOGRAPHY ───────────────────────────────────────── */
+.h1 {
+  font-weight: 900; font-size: 26px; letter-spacing: -0.5px;
+  color: var(--ink); line-height: 1.2;
+}
+.h2 {
+  font-weight: 800; font-size: 18px;
+  color: var(--violet);
+}
+.subhead {
+  font-weight: 800; font-size: 12px; letter-spacing: 0.4px;
+  color: var(--blue);
+}
+.body-text {
+  font-weight: 400; font-size: 13px; line-height: 1.65;
+  color: var(--sub);
+}
+.sub-text {
+  font-weight: 700; font-size: 10px; letter-spacing: 0.4px;
+  color: var(--muted);
+}
+.head-text {
+  font-weight: 400; font-size: 13px; line-height: 1.65;
+  color: var(--ink);
+}
+
+/* ── BUTTONS ──────────────────────────────────────────── */
+.btn-primary {
+  font-weight: 800; font-size: 13px; letter-spacing: 0.2px;
+  color: #fff;
+  background: var(--pink);
+  border: none;
+  border-radius: 50px;
+  padding: 11px 26px;
+  box-shadow: 0 4px 18px var(--pink-glow), 0 2px 6px rgba(0,0,0,0.08);
+  transition: box-shadow 0.15s, transform 0.1s;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+}
+.btn-primary:hover { box-shadow: 0 6px 24px var(--pink-glow); transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(1px); box-shadow: 0 2px 8px var(--pink-glow); }
+
+.btn-secondary {
+  font-weight: 800; font-size: 13px;
+  color: #fff;
+  background: var(--violet);
+  border: none;
+  border-radius: 50px;
+  padding: 11px 26px;
+  box-shadow: 0 4px 18px rgba(139,92,246,0.35), 0 2px 6px rgba(0,0,0,0.08);
+  transition: box-shadow 0.15s, transform 0.1s;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.btn-secondary:hover { box-shadow: 0 6px 24px rgba(139,92,246,0.45); transform: translateY(-1px); }
+.btn-secondary:active { transform: translateY(1px); }
+
+.btn-ghost {
+  font-weight: 700; font-size: 13px;
+  color: var(--violet);
+  background: var(--card);
+  border: 2px solid var(--violet-lt);
+  border-radius: 50px;
+  padding: 9px 22px;
+  box-shadow: 0 2px 8px var(--shadow);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.btn-ghost:hover { border-color: var(--violet); box-shadow: 0 4px 14px rgba(139,92,246,0.2); }
+
+/* ── INPUT FIELD ──────────────────────────────────────── */
+.input-field {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px var(--shadow);
+}
+.input-field__label {
+  font-weight: 800; font-size: 9px; letter-spacing: 0.6px; text-transform: uppercase;
+  color: var(--blue);
+  padding: 8px 14px 6px;
+  border-bottom: 1.5px solid var(--border);
+  display: block;
+  background: var(--blue-lt);
+}
+.input-field__body {
+  font-weight: 400; font-size: 13px;
+  color: var(--ink);
+  padding: 10px 14px;
+  width: 100%; background: transparent; border: none;
+}
+.input-field__body::placeholder { color: var(--muted); }
+
+/* ── VENT FIELD ───────────────────────────────────────── */
+.vent-field {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px var(--shadow);
+}
+.vent-field__label {
+  font-weight: 800; font-size: 9px; letter-spacing: 0.6px; text-transform: uppercase;
+  color: var(--blue);
+  padding: 9px 16px 7px;
+  border-bottom: 1.5px solid var(--border);
+  display: block;
+  background: var(--blue-lt);
+}
+.vent-field__textarea {
+  width: 100%; min-height: 320px;
+  background: transparent; border: none;
+  font-size: 14px; font-weight: 400;
+  color: var(--ink); line-height: 1.7;
+  padding: 14px 16px 8px;
+  caret-color: var(--pink);
+}
+.vent-field__textarea::placeholder { color: var(--muted); }
+.vent-field__footer {
+  display: flex; justify-content: flex-end;
+  padding: 4px 16px 10px;
+  background: #f5f0ff;
+  border-top: 1.5px solid var(--border);
+}
+.vent-field__counter {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.4px;
+  text-transform: uppercase; color: var(--muted);
+}
+.vent-field__counter.warn { color: var(--pink); }
+
+/* ── ADD CARD ─────────────────────────────────────────── */
+.add-card {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  box-shadow: 0 4px 18px var(--shadow);
+  padding: 18px 20px;
+  position: relative; overflow: hidden;
+}
+.add-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--pink) 0%, var(--violet) 50%, var(--blue) 100%);
+}
+
+/* ── LENS RESPONSE ────────────────────────────────────── */
+.lens-response {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  box-shadow: 0 4px 20px var(--shadow);
+  overflow: hidden;
+  position: relative;
+}
+.lens-response::before {
+  content: '';
+  position: absolute; top: 0; left: 0; bottom: 0; width: 4px;
+  background: linear-gradient(180deg, var(--green) 0%, var(--blue) 100%);
+}
+.lens-response__header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 16px 10px 20px;
+  border-bottom: 1.5px solid var(--border);
+  background: var(--green-lt);
+}
+.lens-response__portrait {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 2.5px solid var(--green);
+  object-fit: cover; flex-shrink: 0;
+  box-shadow: 0 0 0 3px var(--green-lt);
+  background: var(--green-lt);
+}
+.lens-response__name {
+  font-weight: 900; font-size: 11px; letter-spacing: 0.4px;
+  color: var(--ink);
+}
+.lens-response__body {
+  padding: 16px 16px 16px 20px;
+  font-size: 13px; line-height: 1.7; font-weight: 400;
+  color: var(--sub);
+}
+
+/* ── LENS CARD ────────────────────────────────────────── */
+.lens-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 0 16px 16px;
+}
+.lens-card {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 18px;
+  padding: 10px 6px 12px;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 7px;
+  cursor: pointer;
+  transition: box-shadow 0.15s, transform 0.12s, border-color 0.15s;
+  box-shadow: 0 2px 10px var(--shadow);
+}
+.lens-card:hover {
+  border-color: var(--pink-lt);
+  box-shadow: 0 6px 20px var(--pink-glow);
+  transform: translateY(-2px);
+}
+.lens-card.selected {
+  border-color: var(--pink);
+  box-shadow: 0 6px 20px var(--pink-glow);
+}
+.lens-card__portrait {
+  width: 76px; height: 76px;
+  border-radius: 50%;
+  border: 2.5px solid var(--border);
+  object-fit: cover; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--blue-lt), var(--violet-lt));
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 8px var(--shadow);
+  display: block;
+}
+.lens-card:hover .lens-card__portrait,
+.lens-card.selected .lens-card__portrait {
+  border-color: var(--pink);
+  box-shadow: 0 0 0 3px var(--pink-lt), 0 4px 12px var(--pink-glow);
+}
+.lens-card__name {
+  font-weight: 800; font-size: 8px; letter-spacing: 0.3px;
+  color: var(--ink); text-align: center;
+  line-height: 1.3;
+}
+.lens-card__trait {
+  font-size: 8px; font-weight: 500;
+  color: var(--muted); text-align: center; line-height: 1.4;
+  font-style: italic;
+}
+
+/* ── POPUP OVERLAY ────────────────────────────────────── */
+#popup-overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(13,13,28,0.45);
+  align-items: center; justify-content: center;
+  padding: 24px;
+  backdrop-filter: blur(6px);
+}
+#popup-overlay.active { display: flex; }
+.popup-card {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 28px;
+  box-shadow: 0 12px 50px rgba(139,92,246,0.25);
+  width: 100%; max-width: 360px;
+  padding: 28px 22px 22px;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 12px;
+  animation: popIn 0.28s cubic-bezier(0.34,1.56,0.64,1);
+  position: relative; overflow: hidden;
+}
+.popup-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 5px;
+  background: linear-gradient(90deg, var(--pink) 0%, var(--violet) 50%, var(--blue) 100%);
+}
+@keyframes popIn { from { transform: scale(0.88); opacity: 0; } to { transform: none; opacity: 1; } }
+.popup-card__portrait {
+  width: 108px; height: 108px; border-radius: 50%;
+  border: 3px solid var(--violet-lt);
+  object-fit: cover;
+  background: linear-gradient(135deg, var(--blue-lt), var(--violet-lt));
+  box-shadow: 0 0 0 5px var(--violet-lt), 0 8px 28px rgba(139,92,246,0.25);
+  display: block;
+}
+.popup-card__btns {
+  display: flex; gap: 12px; width: 100%;
+  justify-content: space-between;
+  margin-top: 6px;
+}
+
+/* ── FOOTER NAV ───────────────────────────────────────── */
+.footer-nav {
+  display: flex;
+  background: var(--card);
+  border-top: 2px solid var(--border);
+  margin-top: auto; flex-shrink: 0;
+  box-shadow: 0 -4px 16px var(--shadow);
+}
+.footer-btn {
+  flex: 1; padding: 16px 8px;
+  font-weight: 800; font-size: 9px; letter-spacing: 0.4px;
+  color: var(--muted);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 4px;
+  text-align: center; transition: color 0.15s;
+}
+.footer-btn.primary { color: var(--pink); }
+.footer-btn:hover { color: var(--violet); }
+
+/* ── PAGE PADDING ─────────────────────────────────────── */
+.page-pad { padding: 20px 24px; flex: 1; display: flex; flex-direction: column; }
+
+/* ── ACTION ROW ───────────────────────────────────────── */
+.action-row {
+  display: flex; align-items: stretch;
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px var(--shadow);
+}
+.action-row button {
+  flex: 1; padding: 14px 8px;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.3px;
+}
+
+/* ── DIVIDER ──────────────────────────────────────────── */
+.divider {
+  display: flex; align-items: center; gap: 12px;
+  color: var(--muted); font-size: 10px; font-weight: 700;
+}
+.divider::before, .divider::after {
+  content: ''; flex: 1; height: 1.5px; background: var(--border);
+}
+
+/* ── PILL TAG ─────────────────────────────────────────── */
+.pill {
+  display: inline-block;
+  font-size: 9px; font-weight: 800; letter-spacing: 0.4px;
+  padding: 3px 10px; border-radius: 50px;
+}
+.pill-pink  { background: var(--pink-lt);   color: var(--pink); }
+.pill-green { background: var(--green-lt);  color: #0d7a3e; }
+.pill-blue  { background: var(--blue-lt);   color: var(--blue); }
+.pill-violet{ background: var(--violet-lt); color: var(--violet); }
+
+/* ── TYPEWRITER ───────────────────────────────────────── */
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+.cursor::after {
+  content: '✿'; animation: blink 1s infinite;
+  color: var(--pink); font-size: 0.85em;
+}
+
+/* ── SCROLLBAR ────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--violet-lt); border-radius: 4px; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ════════════════════════════════════════════════════
+       SCREEN 1 — LANDING
+  ═════════════════════════════════════════════════════ -->
+  <div class="screen active" id="screen-landing">
+
+    <div class="theme-bar">
+      <button class="theme-tab">CyberPunk</button>
+      <button class="theme-tab active">KAWAII</button>
+      <button class="theme-tab">NOTEPAD</button>
+    </div>
+
+    <div class="page-pad" style="gap:18px;">
+      <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
+        <span class="pill pill-pink">✦ Safe Space</span>
+        <span class="pill pill-green">Free</span>
+      </div>
+
+      <h1 class="h1">What's weighing<br>on you?</h1>
+
+      <p class="body-text">A decision. A fear. A frustration. Write it out — the more honest you are, the richer your shift.</p>
+
+      <p class="sub-text">Release it here. Then see it through the eyes of history's greatest minds.</p>
+
+      <div class="vent-field" style="margin-top:4px;">
+        <span class="vent-field__label">What's on your mind?</span>
+        <textarea
+          class="vent-field__textarea"
+          id="vent-input"
+          placeholder="Start anywhere. No judgment here ✿"
+          maxlength="450"
+        ></textarea>
+        <div class="vent-field__footer">
+          <span class="vent-field__counter" id="vent-counter">0 / 450</span>
+        </div>
+      </div>
+
+      <div style="text-align:center; margin-top:8px;">
+        <button class="btn-primary" id="cta-choose-lens" style="padding:13px 34px; font-size:14px;">
+          Choose my lens ✨
+        </button>
+      </div>
+    </div>
+
+    <div style="padding: 0 24px 28px;">
+      <div class="add-card">
+        <p class="sub-text" style="margin-bottom:6px; color:var(--violet);">✿ Coming Soon</p>
+        <h2 class="h2" style="font-size:16px; margin-bottom:8px;">Mind Mapping</h2>
+        <p class="body-text" style="font-size:12px;">Reflect, plan and achieve new horizons with step-by-step guidance.</p>
+        <p class="sub-text" style="margin-top:10px;">Career · Health · Creativity · Relationships · Travel · Finances</p>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════
+       SCREEN 2 — LENS SELECTION
+  ═════════════════════════════════════════════════════ -->
+  <div class="screen" id="screen-lens">
+
+    <div class="theme-bar">
+      <button class="theme-tab">CyberPunk</button>
+      <button class="theme-tab active">KAWAII</button>
+      <button class="theme-tab">NOTEPAD</button>
+    </div>
+
+    <div style="padding:14px 24px 0;">
+      <div class="input-field">
+        <span class="input-field__label" id="quote-label-title">Your Thought ✿</span>
+        <p class="input-field__body" id="quote-label-body" style="font-size:13px; line-height:1.5; padding:10px 14px 12px;"></p>
+      </div>
+    </div>
+
+    <div style="padding:14px 24px 8px; display:flex; align-items:center; gap:10px;">
+      <p class="subhead">Who do you want to hear from?</p>
+    </div>
+
+    <div class="lens-grid" id="lens-grid"></div>
+
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════
+       SCREEN 3 — RESPONSE
+  ═════════════════════════════════════════════════════ -->
+  <div class="screen" id="screen-response">
+
+    <div class="theme-bar">
+      <button class="theme-tab">CyberPunk</button>
+      <button class="theme-tab active">KAWAII</button>
+      <button class="theme-tab">NOTEPAD</button>
+    </div>
+
+    <div style="padding:14px 24px 0;">
+      <div class="input-field">
+        <span class="input-field__label" id="resp-quote-title">Your Thought ✿</span>
+        <p class="input-field__body" id="resp-quote-body" style="font-size:13px; line-height:1.5; padding:10px 14px 12px;"></p>
+      </div>
+    </div>
+
+    <div style="padding:14px 24px 0; flex:1; display:flex; flex-direction:column; gap:14px;">
+      <div class="lens-response" style="flex:1;">
+        <div class="lens-response__header">
+          <img class="lens-response__portrait" id="resp-portrait" src="" alt="">
+          <div>
+            <p class="lens-response__name" id="resp-name"></p>
+            <p class="sub-text" style="color:var(--muted); margin-top:1px;">speaks through the lens</p>
+          </div>
+        </div>
+        <div class="lens-response__body">
+          <p id="resp-body" class="cursor"></p>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button style="color:var(--pink); border-right:1.5px solid var(--border);" onclick="copyResponse()">Copy ♡</button>
+        <button style="color:var(--violet);" onclick="shareResponse()">Share ✦</button>
+      </div>
+    </div>
+
+    <div class="footer-nav" style="margin-top:14px;">
+      <button class="footer-btn primary" onclick="goTo('screen-lens')">Try diff.<br>Lens ✦</button>
+      <button class="footer-btn" onclick="goTo('screen-landing')">Home</button>
+      <button class="footer-btn primary" onclick="goDeeper()">Go<br>Deeper ✨</button>
+    </div>
+
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════
+       SCREEN 4 — CREATE ACCOUNT
+  ═════════════════════════════════════════════════════ -->
+  <div class="screen" id="screen-account">
+
+    <div style="padding:32px 24px 0; flex:1; display:flex; flex-direction:column; gap:18px;">
+      <div style="display:flex; gap:8px;">
+        <span class="pill pill-pink">✦ Free forever</span>
+        <span class="pill pill-violet">Early access</span>
+      </div>
+      <h1 class="h1">Join<br>MindShift</h1>
+      <p class="body-text">Save every shift. Revisit when you need it most.</p>
+
+      <div style="display:flex; flex-direction:column; gap:10px; padding:0 2px;">
+        <div class="input-field">
+          <span class="input-field__label">Username</span>
+          <input class="input-field__body" type="text" placeholder="@yourname">
+        </div>
+        <div class="input-field">
+          <span class="input-field__label">Email</span>
+          <input class="input-field__body" type="email" placeholder="you@example.com">
+        </div>
+        <div class="input-field">
+          <span class="input-field__label">Phone (optional)</span>
+          <input class="input-field__body" type="tel" placeholder="+1 (optional)">
+        </div>
+        <div class="input-field">
+          <span class="input-field__label">Password</span>
+          <input class="input-field__body" type="password" placeholder="8+ characters">
+        </div>
+        <div class="input-field">
+          <span class="input-field__label">Confirm Password</span>
+          <input class="input-field__body" type="password" placeholder="same as above">
+        </div>
+      </div>
+
+      <div style="text-align:center;">
+        <button class="btn-primary" onclick="goTo('screen-journal')" style="font-size:14px; padding:13px 34px;">Create my account ✨</button>
+      </div>
+
+      <div class="divider">or continue with</div>
+
+      <div style="display:flex; justify-content:center; gap:10px;">
+        <button class="btn-ghost" style="font-size:11px; padding:8px 16px;">Google</button>
+        <button class="btn-ghost" style="font-size:11px; padding:8px 16px;">Apple</button>
+        <button class="btn-ghost" style="font-size:11px; padding:8px 16px;">Instagram</button>
+      </div>
+
+      <div class="add-card">
+        <p class="sub-text" style="margin-bottom:4px; color:var(--violet);">✿ Early access</p>
+        <h2 class="h2" style="font-size:16px; margin-bottom:6px;">Unlock it all</h2>
+        <p class="body-text" style="font-size:12px;">Mind Mapping + Chat with any Lens</p>
+        <p class="sub-text" style="margin:8px 0 14px;">Unlimited lenses · Unlimited shifts · Priority access</p>
+        <div style="text-align:center;">
+          <button class="btn-secondary" style="font-size:12px; padding:10px 26px;">Unlock it all ✨</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="padding:16px 24px 28px; text-align:center;">
+      <button class="sub-text" style="color:var(--muted); cursor:pointer; background:none; border:none;" onclick="goTo('screen-landing')">← Back</button>
+    </div>
+
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════
+       SCREEN 5 — JOURNAL
+  ═════════════════════════════════════════════════════ -->
+  <div class="screen" id="screen-journal">
+
+    <div class="theme-bar">
+      <button class="theme-tab">CyberPunk</button>
+      <button class="theme-tab active">KAWAII</button>
+      <button class="theme-tab">NOTEPAD</button>
+    </div>
+
+    <div class="page-pad" style="gap:16px;">
+
+      <div class="add-card">
+        <p class="sub-text" style="margin-bottom:6px; color:var(--pink);">✦ Today's Insight</p>
+        <h2 class="h2" style="margin-bottom:8px; font-size:15px;">Your MindShift Journal</h2>
+        <p class="body-text" style="font-size:12px;">Every shift, saved. Every insight, yours.</p>
+        <p class="sub-text" style="margin-top:8px;">Free with your account: journal access + exclusive stickers</p>
+      </div>
+
+      <div id="journal-entries" style="display:flex; flex-direction:column; gap:12px;"></div>
+
+      <div id="journal-empty" style="text-align:center; padding:40px 0;">
+        <p class="subhead" style="color:var(--muted);">No shifts yet ✿</p>
+        <p class="body-text" style="margin-top:8px;">Start your first shift to see it here.</p>
+        <button class="btn-primary" style="margin-top:20px;" onclick="goTo('screen-landing')">Begin a shift ✨</button>
+      </div>
+
+    </div>
+
+    <div class="footer-nav">
+      <button class="footer-btn primary" onclick="goTo('screen-landing')">New<br>Shift ✨</button>
+      <button class="footer-btn active" style="color:var(--pink);">Journal</button>
+      <button class="footer-btn primary" onclick="goTo('screen-response')">Go<br>Deeper ✦</button>
+    </div>
+
+  </div>
+
+</div><!-- /#app -->
+
+
+<!-- ════════════════════════════════════════════════════
+     POPUP OVERLAY — Lens Preview
+═════════════════════════════════════════════════════ -->
+<div id="popup-overlay">
+  <div class="popup-card">
+    <img class="popup-card__portrait" id="popup-portrait" src="" alt="">
+    <h2 class="h2" id="popup-name" style="text-align:center;"></h2>
+    <p class="head-text" id="popup-quote" style="text-align:center; font-size:13px; color:var(--sub); font-style:italic;"></p>
+    <p class="body-text" id="popup-bio" style="text-align:center; font-size:11px;"></p>
+    <div class="popup-card__btns">
+      <button class="btn-ghost" style="font-size:11px; padding:9px 18px;" onclick="closePopup()">← Back</button>
+      <button class="btn-primary" style="font-size:11px; padding:9px 18px;" onclick="selectLens()">Choose this lens ✨</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+const FIGURES = [
+  { id:'socrates',  name:'Socrates',      trait:'Question everything',     portrait:'portraits/kawaii/Socrates_Kawaii.png',      quote:'"The unexamined life is not worth living."',                                                   bio:'Ancient Greek philosopher who founded Western philosophy through relentless questioning.' },
+  { id:'lincoln',   name:'A. Lincoln',    trait:'Persistence & clarity',   portrait:'portraits/kawaii/Lincoln_Kawaii_v2.png',     quote:'"Give me six hours to chop a tree; four to sharpen the axe."',                               bio:'16th U.S. President who navigated the nation\'s greatest crisis through moral clarity and patience.' },
+  { id:'dolly',     name:'Dolly Parton',  trait:'Authentic & resilient',   portrait:'portraits/kawaii/DollyParton_Kawaii.png',    quote:'"Find out who you are and do it on purpose."',                                               bio:'Country legend who built an empire on authenticity, kindness, and unapologetic self-expression.' },
+  { id:'mandela',   name:'N. Mandela',    trait:'Patient long-term vision', portrait:'portraits/kawaii/NelsonMandela_Kawaii.png',  quote:'"It always seems impossible until it\'s done."',                                             bio:'South African leader who transformed 27 years of imprisonment into a platform for reconciliation.' },
+  { id:'rosa',      name:'Rosa Parks',    trait:'Strength & dignity',      portrait:'portraits/kawaii/RosaParks_Kawaii.png',      quote:'"The only tired I was, was tired of giving in."',                                            bio:'Civil rights activist whose quiet act of defiance sparked a movement.' },
+  { id:'maya',      name:'Maya Angelou',  trait:'Voice & expression',      portrait:'portraits/kawaii/MayaAngelou_Kawaii.png',    quote:'"You can\'t use up creativity. The more you use, the more you have."',                       bio:'Poet, memoirist, and activist who turned personal pain into universal truth.' },
+  { id:'frida',     name:'Frida Kahlo',   trait:'Art heals all',           portrait:'portraits/kawaii/FridaKahlo_Kawaii.png',     quote:'"I paint my own reality."',                                                                   bio:'Mexican artist who transformed physical suffering into extraordinary self-portraits.' },
+  { id:'che',       name:'Che Guevara',   trait:'Radical conviction',      portrait:'portraits/kawaii/CheGuevara_Kawaii.png',     quote:'"If you tremble with indignation at every injustice, you are a comrade."',                   bio:'Argentine doctor turned revolutionary guerrilla who became a global countercultural symbol.' },
+  { id:'ching',     name:'Ching Shih',    trait:'Command & strategy',      portrait:'portraits/kawaii/ChingShih_Kawaii.png',      quote:'"Fear is a weapon. Use it wisely."',                                                          bio:'Former sex worker who commanded 1,800 ships and 80,000 pirates — undefeated.' },
+  { id:'gandhi',    name:'M. Gandhi',     trait:'Nonviolent resistance',   portrait:'portraits/kawaii/Gandhi_Kawaii.png',         quote:'"Be the change you wish to see in the world."',                                              bio:'Indian independence leader who proved that moral courage can defeat empires.' },
+  { id:'napoleon',  name:'Napoleon',      trait:'Ambition & strategy',     portrait:'portraits/kawaii/Napoleon_Kawaii.png',       quote:'"Impossible is a word found only in the dictionary of fools."',                             bio:'Military genius who reshaped Europe through sheer strategic ambition.' },
+  { id:'dali',      name:'Salvador Dali', trait:'The surreal is real',     portrait:'portraits/kawaii/SalvadorDali_Kawaii.png',   quote:'"Have no fear of perfection — you\'ll never reach it."',                                    bio:'Surrealist master who transformed dreams and madness into art that outlived empires.' },
+  { id:'chuck',     name:'Chuck Norris',  trait:'Discipline & toughness',  portrait:'portraits/kawaii/ChuckNorris_Kawaii.png',    quote:'"A lot of people give up just before they\'re about to make it."',                         bio:'Martial artist and cultural icon who built a legend on relentless discipline.' },
+  { id:'trump',     name:'D. Trump',      trait:'Bold conviction',         portrait:'portraits/kawaii/Trump_Kawaii.png',          quote:'"Sometimes you have to toot your own horn."',                                                bio:'Business mogul and 45th/47th U.S. President known for bold, unconventional moves.' },
+  { id:'lenin',     name:'V. Lenin',      trait:'Radical restructuring',   portrait:'portraits/kawaii/Lenin_Kawaii_v2.png',       quote:'"There are decades where nothing happens; and there are weeks where decades happen."',       bio:'Revolutionary leader who dismantled an empire and rebuilt it from the ground up.' }
+];
+
+const state = { ventText:'', selectedFigure:null, journal:[] };
+
+function goTo(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function renderLensGrid() {
+  const grid = document.getElementById('lens-grid');
+  grid.innerHTML = '';
+  FIGURES.forEach(fig => {
+    const card = document.createElement('div');
+    card.className = 'lens-card';
+    card.dataset.id = fig.id;
+    card.innerHTML = `
+      <img class="lens-card__portrait" src="${fig.portrait}" alt="${fig.name}" loading="lazy">
+      <span class="lens-card__name">${fig.name}</span>
+      <span class="lens-card__trait">${fig.trait}</span>
+    `;
+    card.addEventListener('click', () => openPopup(fig));
+    grid.appendChild(card);
+  });
+}
+
+function openPopup(fig) {
+  state.selectedFigure = fig;
+  document.getElementById('popup-portrait').src = fig.portrait;
+  document.getElementById('popup-name').textContent = fig.name;
+  document.getElementById('popup-quote').textContent = fig.quote;
+  document.getElementById('popup-bio').textContent = fig.bio;
+  document.getElementById('popup-overlay').classList.add('active');
+}
+function closePopup() { document.getElementById('popup-overlay').classList.remove('active'); }
+function selectLens() { closePopup(); showResponse(); }
+
+document.getElementById('vent-input').addEventListener('input', function() {
+  const len = this.value.length;
+  const counter = document.getElementById('vent-counter');
+  counter.textContent = `${len} / 450`;
+  counter.classList.toggle('warn', len >= 360);
+});
+
+document.getElementById('cta-choose-lens').addEventListener('click', () => {
+  const text = document.getElementById('vent-input').value.trim();
+  if (!text) {
+    document.getElementById('vent-input').focus();
+    document.getElementById('vent-input').placeholder = 'Write something first ✿';
+    return;
+  }
+  state.ventText = text;
+  const truncated = text.length > 80 ? text.slice(0, 80) + '...' : text;
+  document.getElementById('quote-label-body').textContent = truncated;
+  document.getElementById('resp-quote-body').textContent = truncated;
+  renderLensGrid();
+  goTo('screen-lens');
+});
+
+async function showResponse() {
+  const fig = state.selectedFigure;
+  if (!fig) return;
+  document.getElementById('resp-portrait').src = fig.portrait;
+  document.getElementById('resp-name').textContent = fig.name;
+  const bodyEl = document.getElementById('resp-body');
+  bodyEl.textContent = ''; bodyEl.classList.add('cursor');
+  goTo('screen-response');
+  try {
+    const res = await fetch('/api/generate-response', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ userInput:state.ventText, figureId:fig.id, figureName:fig.name })
+    });
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    typewriterEffect(bodyEl, data.response || data.message || '...');
+  } catch {
+    typewriterEffect(bodyEl, `${fig.name} would say: facing "${state.ventText.slice(0,40)}..." — the answer lies not in certainty, but in motion. Act from your values, not your fears. The path clarifies itself as you walk it.`);
+  }
+  state.journal.unshift({ figure:fig, thought:state.ventText, timestamp:new Date().toLocaleDateString() });
+  renderJournal();
+}
+
+function typewriterEffect(el, text) {
+  el.textContent = ''; el.classList.add('cursor');
+  let i = 0;
+  const iv = setInterval(() => {
+    if (i >= text.length) { clearInterval(iv); el.classList.remove('cursor'); return; }
+    el.textContent += text[i++];
+  }, 22);
+}
+
+function renderJournal() {
+  const container = document.getElementById('journal-entries');
+  const empty = document.getElementById('journal-empty');
+  if (!state.journal.length) { empty.style.display='block'; container.innerHTML=''; return; }
+  empty.style.display = 'none';
+  container.innerHTML = state.journal.map(entry => `
+    <div class="lens-response" style="cursor:pointer;">
+      <div class="lens-response__header">
+        <img class="lens-response__portrait" src="${entry.figure.portrait}" alt="${entry.figure.name}">
+        <div>
+          <p class="lens-response__name">${entry.figure.name}</p>
+          <p class="sub-text" style="margin-top:1px;">${entry.timestamp}</p>
+        </div>
+      </div>
+      <div class="lens-response__body" style="padding:12px 16px 12px 20px;">
+        <p class="sub-text" style="margin-bottom:4px; color:var(--muted);">Your thought</p>
+        <p style="font-size:12px; color:var(--sub); line-height:1.5;">${entry.thought.slice(0,120)}${entry.thought.length>120?'...':''}</p>
+      </div>
+    </div>
+  `).join('');
+}
+
+function copyResponse() {
+  const text = document.getElementById('resp-body').textContent;
+  if (navigator.clipboard) navigator.clipboard.writeText(text);
+}
+function shareResponse() {
+  if (navigator.share) navigator.share({ title:'MindShift', text:document.getElementById('resp-body').textContent });
+  else copyResponse();
+}
+function goDeeper() { if (state.selectedFigure) showResponse(); }
+
+(function() {
+  const sp = new URLSearchParams(window.location.search);
+  const initScreen = sp.get('screen');
+  const demoThought = 'I feel overwhelmed by all the decisions I need to make right now.';
+  if (initScreen === 'screen-lens' || initScreen === 'screen-response' || initScreen === 'screen-journal') {
+    state.ventText = demoThought;
+    document.getElementById('quote-label-body').textContent = demoThought.slice(0,80);
+    document.getElementById('resp-quote-body').textContent = demoThought.slice(0,80);
+    renderLensGrid();
+  }
+  if (initScreen === 'screen-response') {
+    state.selectedFigure = FIGURES[0];
+    document.getElementById('resp-portrait').src = FIGURES[0].portrait;
+    document.getElementById('resp-name').textContent = FIGURES[0].name;
+    document.getElementById('resp-body').textContent = 'The unexamined decision is not worth making. Before you choose, ask yourself: what do I truly value here? Strip away the noise of others\' expectations, and you will find the answer already lives within you.';
+    document.getElementById('resp-body').classList.remove('cursor');
+  }
+  if (initScreen === 'screen-journal') {
+    state.journal = [
+      { figure:FIGURES[0], thought:demoThought, timestamp:new Date().toLocaleDateString() },
+      { figure:FIGURES[5], thought:'Why does creative work feel so hard to start?', timestamp:new Date().toLocaleDateString() }
+    ];
+  }
+  if (initScreen) goTo(initScreen);
+  renderJournal();
+})();
+</script>
+</body>
+</html>

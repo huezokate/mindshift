@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>MindShift</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alumni+Sans+SC:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://www.googletagmanager.com/gtag/js?id=G-W6QD19PTZ8" async></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-W6QD19PTZ8');</script>
+  <style>
+    /* ─── Figma Cyberpunk Design Tokens ─── */
+    :root {
+      --bg:        #080810;
+      --bg-card:   #0d0d1a;
+      --bg-card2:  #0d0d1c;
+
+      --cyan:      #00F5FF;
+      --green:     #39FF14;
+      --pink:      #FF2D78;
+      --violet:    #B04CFF;
+
+      --text-h1:   #E0F7FF;
+      --text-body: #E0F7FF;
+      --text-sub:  #7ECFDF;
+      --text-meta: #3697B8;
+
+      --glow-cyan:   0 0 16px rgba(0,245,255,0.45);
+      --glow-green:  0 0 16px rgba(57,255,20,0.45);
+      --glow-pink:   0 0 10px #FF4664, 0 0 30px rgba(255,45,120,0.2);
+      --glow-violet: 0 0 16px rgba(176,76,255,0.45);
+      --glow-card:   0 0 16px rgba(0,255,200,0.45);
+
+      --font-mono:   'Courier New', 'Lucida Console', monospace;
+      --font-alumni: 'Alumni Sans SC', 'Courier New', sans-serif;
+
+      /* Button asymmetric borders */
+      --btn-primary-border:   4px 1px 1px 4px;   /* top right bottom left */
+      --btn-secondary-border: 1px 2px 2px 1px;
+
+      --r-sm: 2px;
+      --r-md: 4px;
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+    body {
+      font-family: var(--font-mono);
+      background: var(--bg);
+      color: var(--text-body);
+      min-height: 100dvh;
+      display: flex; justify-content: center; align-items: flex-start;
+    }
+
+    /* ─── App shell ─── */
+    #app {
+      width: 100%; max-width: 420px; min-height: 100dvh;
+      background: var(--bg); position: relative;
+      display: flex; flex-direction: column;
+      border-left: 1px solid rgba(0,245,255,0.06);
+      border-right: 1px solid rgba(0,245,255,0.06);
+      overflow-x: hidden;
+    }
+    #app::before {
+      content: ''; position: fixed; inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 4px);
+      pointer-events: none; z-index: 999;
+    }
+
+    /* ─── Theme tab switcher (top of every screen) ─── */
+    .theme-tabs {
+      display: flex; width: 100%; flex-shrink: 0; position: sticky; top: 0; z-index: 50;
+    }
+    .theme-tab {
+      flex: 1; height: 44px; display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-alumni); font-size: 14px; font-weight: 600;
+      letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
+      background: transparent; border: none;
+      border-top: 1px solid transparent;
+      border-bottom: 2px solid transparent;
+      border-right: 2px solid transparent;
+      border-left: 0;
+      border-radius: var(--r-sm);
+      transition: background 0.15s;
+    }
+    .theme-tab.cyberpunk { color: var(--pink); border-color: var(--pink); }
+    .theme-tab.kawaii    { color: var(--violet); border-color: var(--violet); }
+    .theme-tab.notepad  { color: var(--cyan); border-color: var(--cyan); }
+    .theme-tab:hover { background: rgba(255,255,255,0.04); }
+
+    /* ─── Screen pages ─── */
+    .screen {
+      display: none; flex-direction: column; flex: 1;
+      overflow-y: auto; scrollbar-width: thin;
+      scrollbar-color: rgba(0,245,255,0.15) transparent;
+    }
+    .screen.active { display: flex; animation: fadeUp 0.25s ease; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+
+    /* ─── Typography ─── */
+    .t-h1 {
+      font-family: var(--font-mono); font-weight: 700;
+      font-size: 28px; letter-spacing: 4.2px; line-height: 26.1px;
+      text-transform: uppercase; color: var(--text-h1);
+    }
+    .t-h1-gradient {
+      background: linear-gradient(171.9deg, var(--cyan) 0%, var(--violet) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .t-h2 {
+      font-family: var(--font-mono); font-weight: 700;
+      font-size: 18px; letter-spacing: 1.44px; text-transform: uppercase; color: var(--text-h1);
+    }
+    .t-sub {
+      font-family: var(--font-mono); font-weight: 700;
+      font-size: 12px; letter-spacing: 1.32px; text-transform: uppercase; color: var(--cyan);
+    }
+    .t-body {
+      font-family: var(--font-mono); font-weight: 400;
+      font-size: 14px; letter-spacing: 0.52px; line-height: 20.8px;
+    }
+    .t-meta {
+      font-family: var(--font-mono); font-weight: 400;
+      font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-sub);
+    }
+
+    /* ─── Buttons ─── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 4px; cursor: pointer; text-transform: uppercase;
+      font-family: var(--font-alumni); background: transparent;
+      transition: box-shadow 0.15s, background 0.15s;
+    }
+    .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    /* Primary — green, heavy top+left */
+    .btn-primary {
+      color: var(--green);
+      border-top: 4px solid var(--green); border-left: 4px solid var(--green);
+      border-right: 1px solid var(--green); border-bottom: 1px solid var(--green);
+      border-radius: var(--r-sm);
+      font-size: 14px; font-weight: 600; letter-spacing: 2.6px;
+      padding: 20px 12px 17px;
+    }
+    .btn-primary:hover:not(:disabled) { box-shadow: var(--glow-green); background: rgba(57,255,20,0.05); }
+
+    /* Primary violet variant */
+    .btn-primary-violet {
+      color: var(--violet);
+      border-top: 4px solid var(--violet); border-left: 4px solid var(--violet);
+      border-right: 1px solid var(--violet); border-bottom: 1px solid var(--violet);
+      border-radius: var(--r-sm);
+      font-size: 14px; font-weight: 700; letter-spacing: 2.6px;
+      padding: 20px 12px 17px;
+    }
+    .btn-primary-violet:hover:not(:disabled) { box-shadow: var(--glow-violet); background: rgba(176,76,255,0.05); }
+
+    /* Secondary — pink/violet, heavy right+bottom */
+    .btn-secondary {
+      color: var(--pink);
+      border-top: 1px solid var(--pink); border-left: 1px solid var(--pink);
+      border-right: 2px solid var(--pink); border-bottom: 2px solid var(--pink);
+      border-radius: var(--r-sm);
+      font-size: 14px; font-weight: 600; letter-spacing: 1px;
+      padding: 9px 14px 10px;
+    }
+    .btn-secondary:hover:not(:disabled) { box-shadow: var(--glow-pink); background: rgba(255,45,120,0.05); }
+
+    .btn-secondary-violet {
+      color: var(--violet);
+      border-top: 1px solid var(--violet); border-left: 1px solid var(--violet);
+      border-right: 2px solid var(--violet); border-bottom: 2px solid var(--violet);
+      border-radius: var(--r-sm);
+      font-size: 14px; font-weight: 600; letter-spacing: 1px;
+      padding: 9px 14px 10px;
+    }
+    .btn-secondary-violet:hover:not(:disabled) { box-shadow: var(--glow-violet); background: rgba(176,76,255,0.05); }
+
+    .btn img { width: 20px; height: 20px; object-fit: contain; filter: brightness(0) invert(1); opacity: 0.85; }
+
+    /* ─── Input field (Figma: heavy top+left, cyan) ─── */
+    .input-field {
+      background: var(--bg-card);
+      border-top: 4px solid var(--cyan); border-left: 4px solid var(--cyan);
+      border-right: 1px solid var(--cyan); border-bottom: 1px solid var(--cyan);
+      border-radius: var(--r-md); width: 100%;
+      display: flex; flex-direction: column;
+    }
+    .input-field:focus-within { box-shadow: var(--glow-cyan); }
+    .input-field-header {
+      border-bottom: 1px solid var(--cyan);
+      padding: 8px 16px 2px; flex-shrink: 0;
+    }
+    .input-field-header span { font-family: var(--font-mono); font-weight: 700; font-size: 12px; letter-spacing: 1.32px; text-transform: uppercase; color: var(--cyan); }
+    .input-field textarea, .input-field input {
+      background: transparent; border: none; outline: none;
+      font-family: var(--font-mono); resize: none; width: 100%;
+      color: var(--text-sub);
+    }
+    .input-field textarea { font-size: 14px; letter-spacing: 0.52px; line-height: 20.8px; padding: 16px; min-height: 120px; flex: 1; }
+    .input-field input { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; padding: 4px 8px 4px; }
+    .input-field textarea::placeholder, .input-field input::placeholder { color: var(--text-meta); }
+    .input-field-footer { padding: 16px; display: flex; justify-content: flex-end; }
+    .char-counter { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-sub); }
+    .char-counter.over { color: var(--pink); }
+
+    /* ─── Input compact (account fields) ─── */
+    .input-compact {
+      background: var(--bg-card);
+      border-top: 4px solid var(--cyan); border-left: 4px solid var(--cyan);
+      border-right: 1px solid var(--cyan); border-bottom: 1px solid var(--cyan);
+      border-radius: var(--r-md); width: 100%;
+    }
+    .input-compact-label {
+      border-bottom: 1px solid var(--cyan); padding: 8px 8px 2px;
+      font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--text-h1);
+    }
+    .input-compact input {
+      background: transparent; border: none; outline: none; width: 100%;
+      font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--text-sub); padding: 4px 8px 4px;
+    }
+    .input-compact input::placeholder { color: var(--text-meta); }
+
+    /* ─── ADD CARD (pink: heavy left+right) ─── */
+    .card-add {
+      background: var(--bg-card);
+      border-top: 1px solid var(--pink); border-left: 4px solid var(--pink);
+      border-right: 4px solid var(--pink); border-bottom: 2px solid var(--pink);
+      border-radius: var(--r-md); padding: 16px 24px;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+
+    /* ─── Lens response card (violet: heavy right+bottom) ─── */
+    .card-response {
+      background: var(--bg-card);
+      border-top: 1px solid var(--violet); border-left: 1px solid var(--violet);
+      border-right: 4px solid var(--violet); border-bottom: 4px solid var(--violet);
+      border-radius: var(--r-md);
+    }
+    .card-response-head {
+      border-bottom: 1px solid var(--violet);
+      display: flex; align-items: center; gap: 8px;
+      padding: 4px 8px 4px;
+      box-shadow: var(--glow-card);
+      border-radius: 2px 2px 0 0;
+    }
+    .card-response-body { padding: 16px; }
+
+    /* ─── Figure portrait ─── */
+    .portrait-wrap {
+      border: 1px solid var(--green); border-radius: 32px;
+      overflow: hidden; flex-shrink: 0;
+    }
+    .portrait-wrap img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 32px; }
+    .portrait-wrap.selected { border-width: 2px; box-shadow: var(--glow-green); }
+    .portrait-wrap.large { border-width: 2px; }
+
+    /* ─────────────────────────────────────────── */
+    /* SCREEN 1: LANDING                           */
+    /* ─────────────────────────────────────────── */
+    #screen-landing {
+      padding: 40px 24px 24px;
+      gap: 44px;
+    }
+    .landing-copy { display: flex; flex-direction: column; gap: 24px; }
+    .landing-copy .t-body { color: var(--cyan); }
+    .landing-copy .t-h2 { color: var(--text-h1); }
+
+    .landing-input-block { display: flex; flex-direction: column; gap: 24px; flex: 1; }
+
+    /* ─────────────────────────────────────────── */
+    /* SCREEN 2: LENS SELECTION                    */
+    /* ─────────────────────────────────────────── */
+    #screen-lenses {
+      padding: 40px 24px 24px;
+      gap: 24px;
+    }
+    .user-quote-field {
+      background: var(--bg-card);
+      border-top: 4px solid var(--cyan); border-left: 4px solid var(--cyan);
+      border-right: 1px solid var(--cyan); border-bottom: 1px solid var(--cyan);
+      border-radius: var(--r-md); width: 100%;
+    }
+    .user-quote-field .uqf-label {
+      border-bottom: 1px solid var(--cyan); padding: 8px 16px 2px;
+      font-family: var(--font-mono); font-weight: 700; font-size: 12px;
+      letter-spacing: 1.32px; text-transform: uppercase; color: var(--cyan);
+    }
+    .user-quote-field .uqf-text {
+      padding: 16px; font-family: var(--font-mono); font-size: 14px;
+      letter-spacing: 0.52px; line-height: 20.8px; color: var(--text-h1);
+      max-height: 200px; overflow-y: auto;
+    }
+
+    /* Figure grid: 3 columns */
+    .figure-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .figure-card {
+      background: var(--bg-card2);
+      border: 1px solid var(--violet); border-radius: var(--r-sm);
+      padding: 13px 9px; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      transition: box-shadow 0.15s, background 0.15s;
+    }
+    .figure-card:hover, .figure-card:focus { outline: none; }
+    .figure-card.selected, .figure-card:hover {
+      background: rgba(0,255,200,0.1);
+      box-shadow: var(--glow-card);
+    }
+    .figure-card.selected .portrait-wrap { border-width: 2px; }
+    .figure-portrait-img {
+      width: 64px; height: 64px;
+      border-radius: 32px; object-fit: cover;
+    }
+    .figure-icon { font-size: 28px; }
+    .figure-name {
+      font-family: var(--font-mono); font-weight: 700; font-size: 12px;
+      letter-spacing: 1.32px; text-transform: uppercase;
+      color: var(--green); text-align: center; line-height: 1.2;
+    }
+    .figure-tag {
+      font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--text-h1); text-align: center; line-height: 1.3;
+    }
+    .figure-quote { display: none; }
+
+    /* ─────────────────────────────────────────── */
+    /* OVERLAY: LENS PREVIEW POPUP                 */
+    /* ─────────────────────────────────────────── */
+    #overlay-lens-preview {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(8,8,16,0.75);
+      display: none; flex-direction: column; align-items: center;
+      justify-content: center; gap: 53px; padding: 32px;
+    }
+    #overlay-lens-preview.active { display: flex; animation: fadeUp 0.2s ease; }
+
+    .preview-card {
+      background: var(--bg-card);
+      border-top: 1px solid var(--violet); border-left: 1px solid var(--violet);
+      border-right: 4px solid var(--violet); border-bottom: 4px solid var(--violet);
+      border-radius: var(--r-md); padding: 16px; width: 100%;
+    }
+    .preview-inner {
+      display: flex; flex-direction: column; align-items: center; gap: 16px;
+    }
+    #preview-name { color: var(--green); text-align: center; }
+    #preview-quote { color: var(--text-h1); text-align: center; }
+    #preview-bio   { color: var(--cyan); text-align: center; }
+
+    .overlay-actions { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+
+    /* ─────────────────────────────────────────── */
+    /* SCREEN 3: RESPONSE                          */
+    /* ─────────────────────────────────────────── */
+    #screen-response {
+      padding: 40px 24px 0;
+      gap: 16px;
+    }
+
+    .camera-icon-btn {
+      display: flex; align-items: center; justify-content: center;
+      align-self: center;
+      width: 36px; height: 36px; cursor: pointer;
+      background: var(--bg-card); border: 1px solid rgba(0,245,255,0.2);
+      border-radius: var(--r-sm); color: var(--text-sub); font-size: 18px;
+      transition: border-color 0.15s;
+    }
+    .camera-icon-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+
+    .response-text {
+      font-family: var(--font-mono); font-size: 14px; letter-spacing: 0.52px;
+      line-height: 20.8px; color: var(--cyan);
+    }
+
+    .response-actions-row {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    /* Deep-dive sections */
+    .deep-dive-section {
+      background: var(--bg-card);
+      border-top: 1px solid var(--violet); border-left: 1px solid var(--violet);
+      border-right: 4px solid var(--violet); border-bottom: 4px solid var(--violet);
+      border-radius: var(--r-md); padding: 16px;
+      opacity: 0; transform: translateY(10px);
+      transition: opacity 0.38s ease, transform 0.38s ease;
+    }
+    .deep-dive-section.reveal-ready { opacity: 0; }
+    .deep-dive-section.revealed     { opacity: 1; transform: none; }
+    .deep-dive-section h4 { font-family: var(--font-mono); font-weight: 700; font-size: 12px; letter-spacing: 1.32px; text-transform: uppercase; color: var(--cyan); margin-bottom: 10px; }
+    .deep-dive-section p  { font-size: 13px; color: var(--text-sub); letter-spacing: 0.4px; line-height: 20px; }
+    .deep-dive-section ul { padding-left: 16px; display: flex; flex-direction: column; gap: 8px; }
+    .deep-dive-section li { font-size: 13px; color: var(--text-sub); letter-spacing: 0.4px; line-height: 18px; }
+    .deep-dive-section strong { color: var(--text-h1); }
+
+    /* Bottom nav bar */
+    .bottom-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 0 0; flex-shrink: 0; margin-top: auto;
+      border-top: 1px solid rgba(0,245,255,0.08);
+      background: var(--bg);
+      position: sticky; bottom: 0; z-index: 10;
+    }
+
+    /* ─────────────────────────────────────────── */
+    /* SCREEN 4: CREATE ACCOUNT                    */
+    /* ─────────────────────────────────────────── */
+    #screen-account {
+      padding: 40px 24px 24px;
+      gap: 24px; align-items: center;
+    }
+    .account-copy { display: flex; flex-direction: column; gap: 24px; width: 100%; }
+    .account-fields { display: flex; flex-direction: column; gap: 16px; width: 100%; max-width: 327px; align-self: center; }
+    .account-features { list-style: disc; padding-left: 20px; }
+    .account-features li {
+      font-family: var(--font-mono); font-weight: 700; font-size: 18px;
+      letter-spacing: 1.44px; text-transform: uppercase; color: var(--text-h1);
+      line-height: 1.5;
+    }
+
+    /* ─────────────────────────────────────────── */
+    /* LOADING OVERLAY                             */
+    /* ─────────────────────────────────────────── */
+    .loading-overlay {
+      position: fixed; inset: 0; z-index: 500;
+      background: rgba(8,8,16,0.96);
+      display: none; flex-direction: column;
+      align-items: center; justify-content: center; gap: 20px;
+    }
+    .loading-overlay.active { display: flex; }
+    #loadingFigureIcon { font-size: 48px; text-align: center; display: none; }
+    #loadingTitle { font-family: var(--font-mono); font-weight: 700; font-size: 18px; letter-spacing: 1.44px; text-transform: uppercase; color: var(--text-h1); text-align: center; }
+    #loadingText  { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--cyan); text-align: center; }
+    .loading-dots { display: flex; gap: 8px; }
+    .dot { width: 8px; height: 8px; background: var(--cyan); border-radius: 50%; animation: pulse 1.2s infinite ease-in-out; }
+    .dot:nth-child(1) { animation-delay: 0s; }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes pulse { 0%,100%{opacity:.2;transform:scale(.8);} 50%{opacity:1;transform:scale(1.1);} }
+
+    /* ─── Accessibility ─── */
+    .skip-link { position: absolute; left: -9999px; top: 4px; background: var(--bg-card); color: var(--cyan); padding: 8px 16px; font-size: 12px; border: 1px solid var(--cyan); z-index: 9999; }
+    .skip-link:focus { left: 4px; }
+    :focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; border-radius: 2px; }
+    .field-error { font-family: var(--font-mono); font-size: 11px; color: var(--pink); letter-spacing: 0.5px; }
+  </style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+
+<div id="app">
+
+  <!-- Theme tab switcher (shared across screens) -->
+  <div class="theme-tabs" role="tablist" aria-label="UI Theme">
+    <button class="theme-tab cyberpunk" role="tab" aria-selected="true" onclick="switchTheme('cyberpunk')">CyberPunk</button>
+    <button class="theme-tab kawaii"    role="tab" aria-selected="false" onclick="switchTheme('kawaii')">Kawaii</button>
+    <button class="theme-tab notepad"   role="tab" aria-selected="false" onclick="switchTheme('notepad')">Notepad</button>
+  </div>
+
+  <main id="main">
+
+    <!-- ══════════════════════════════════
+         SCREEN 1 — LANDING / VENT INPUT
+    ══════════════════════════════════ -->
+    <div class="screen active" id="screen-landing">
+
+      <div class="landing-copy">
+        <h1 class="t-h1 t-h1-gradient">Have something on your mind?</h1>
+        <p class="t-body" style="color:var(--cyan);">
+          A decision, a fear, a frustration. Write it out honestly — the more you share, the richer the shift.
+        </p>
+        <h2 class="t-h2">Vent it out, then see it through the lens of a historical figure.</h2>
+      </div>
+
+      <div class="landing-input-block">
+        <div class="input-field" id="vent-input-wrap">
+          <div class="input-field-header"><span>Vent it out...</span></div>
+          <textarea id="ventText" rows="6" maxlength="800"
+            placeholder="No filter needed — pour it all out."
+            aria-label="What's on your mind"
+            oninput="updateCharCount()"></textarea>
+          <div class="input-field-footer">
+            <span class="char-counter" id="charCounter">0/800 characters</span>
+          </div>
+        </div>
+        <p class="field-error" id="ventError" style="display:none;" role="alert"></p>
+        <button class="btn btn-primary" id="selectLensBtn" onclick="goToLenses()" style="align-self:center;">
+          Select the lens
+        </button>
+      </div>
+
+      <div class="card-add">
+        <span class="t-sub">Coming Soon</span>
+        <h2 class="t-h2">Mind-Mapping Tool</h2>
+        <p class="t-body" style="color:var(--cyan);">
+          Reflect, plan and achieve new horizons with step by step guidance
+        </p>
+      </div>
+
+    </div><!-- /screen-landing -->
+
+
+    <!-- ══════════════════════════════════
+         SCREEN 2 — LENS SELECTION
+    ══════════════════════════════════ -->
+    <div class="screen" id="screen-lenses">
+
+      <!-- User's vent displayed read-only -->
+      <div class="user-quote-field">
+        <div class="uqf-label" id="ventTopicLabel">Your thought</div>
+        <div class="uqf-text" id="ventDisplay"></div>
+      </div>
+
+      <h2 class="t-h2" style="text-align:center;">Now, choose your lens.</h2>
+
+      <div class="figure-grid" id="figureGrid"></div>
+
+    </div><!-- /screen-lenses -->
+
+
+    <!-- ══════════════════════════════════
+         SCREEN 3 — RESPONSE
+    ══════════════════════════════════ -->
+    <div class="screen" id="screen-response">
+
+      <!-- User's vent (read-only) -->
+      <div class="user-quote-field" id="responseQuoteField">
+        <div class="uqf-label" id="responseTopicLabel">Your thought</div>
+        <div class="uqf-text" id="responseVentDisplay"></div>
+      </div>
+
+      <!-- Camera / attach -->
+      <button class="camera-icon-btn" title="Attach image" aria-label="Attach image">📷</button>
+
+      <!-- Lens response card -->
+      <div class="card-response" id="lensResponseCard">
+        <div class="card-response-head" id="responseHead">
+          <div class="portrait-wrap" style="width:32px;height:32px;" id="responsePortraitWrap">
+            <img id="responsePortraitImg" src="" alt="">
+          </div>
+          <span class="t-h2" id="responseFigureName" style="color:var(--green);font-size:18px;"></span>
+        </div>
+        <div class="card-response-body">
+          <div id="deepDiveContent"></div>
+          <p class="response-text" id="responseLoadingText" style="display:none;">
+            <span style="color:var(--cyan);">&gt; </span>Analysing through a new lens…
+          </p>
+        </div>
+      </div>
+
+      <!-- Action row: Try Another + Continue -->
+      <div class="response-actions-row" style="padding-bottom:8px;">
+        <button class="btn btn-secondary-violet" onclick="goBackToLenses()">
+          ← Try another Lens
+        </button>
+        <button class="btn btn-primary-violet" id="continueBtn" onclick="continueConversation()" style="display:none;">
+          Continue →
+        </button>
+      </div>
+
+      <!-- Bottom nav -->
+      <div class="bottom-nav">
+        <button class="btn btn-primary" onclick="goToAccount()">
+          Decorate
+        </button>
+        <button class="btn btn-secondary" onclick="goToLanding()">
+          Home
+        </button>
+        <button class="btn btn-primary" onclick="shareResponse()">
+          Share
+        </button>
+      </div>
+
+    </div><!-- /screen-response -->
+
+
+    <!-- ══════════════════════════════════
+         SCREEN 4 — CREATE ACCOUNT
+    ══════════════════════════════════ -->
+    <div class="screen" id="screen-account">
+
+      <div class="account-copy">
+        <h1 class="t-h1 t-h1-gradient">Create Account</h1>
+        <p class="t-body" style="color:var(--cyan);">
+          Unlock
+          <strong style="color:var(--pink);font-size:12px;letter-spacing:1.32px;text-transform:uppercase;">"Journal"</strong>
+          and
+          <strong style="color:var(--pink);font-size:12px;letter-spacing:1.32px;text-transform:uppercase;">"Decorate"</strong>
+          features: save the quotes you get
+        </p>
+      </div>
+
+      <div class="account-fields">
+        <div class="input-compact">
+          <div class="input-compact-label">@nickname</div>
+          <input type="text" id="acNickname" placeholder="your handle" autocomplete="username">
+        </div>
+        <div class="input-compact">
+          <div class="input-compact-label">e-mail</div>
+          <input type="email" id="acEmail" placeholder="your@email.com" autocomplete="email">
+        </div>
+        <div class="input-compact">
+          <div class="input-compact-label">phone</div>
+          <input type="tel" id="acPhone" placeholder="+1 234 567 8900" autocomplete="tel">
+        </div>
+        <div class="input-compact">
+          <div class="input-compact-label">password</div>
+          <input type="password" id="acPass" placeholder="min 8 characters" autocomplete="new-password">
+        </div>
+        <div class="input-compact">
+          <div class="input-compact-label">repeat password</div>
+          <input type="password" id="acPass2" placeholder="same again" autocomplete="new-password">
+        </div>
+      </div>
+
+      <button class="btn btn-primary" style="align-self:center;" onclick="createAccount()">
+        Create Account
+      </button>
+
+      <div class="card-add">
+        <span class="t-sub">Be first to explore</span>
+        <h1 class="t-h1" style="text-align:center;">Mind-Mapping Tool</h1>
+        <p class="t-body" style="color:var(--cyan);text-align:center;">and unlock premium</p>
+        <ul class="account-features">
+          <li>Chat with lens</li>
+          <li>Unlimited lenses</li>
+          <li>Journal your insights</li>
+        </ul>
+        <button class="btn btn-secondary" style="align-self:center;margin-top:4px;" onclick="goToLanding()">
+          Subscribe
+        </button>
+      </div>
+
+      <button class="btn btn-secondary" style="align-self:center;" onclick="goBackFromAccount()">
+        ← Back
+      </button>
+
+    </div><!-- /screen-account -->
+
+  </main>
+</div><!-- #app -->
+
+
+<!-- ══════════════════════════════════
+     OVERLAY: LENS PREVIEW POPUP
+══════════════════════════════════ -->
+<div id="overlay-lens-preview" role="dialog" aria-modal="true" aria-label="Lens preview">
+  <div class="preview-card">
+    <div class="preview-inner">
+      <div class="portrait-wrap large" style="width:92px;height:98px;" id="previewPortraitWrap">
+        <img id="previewPortraitImg" src="" alt="">
+      </div>
+      <h2 class="t-h2" id="preview-name" style="color:var(--green);text-align:center;"></h2>
+      <p class="t-body" id="preview-quote" style="color:var(--text-h1);text-align:center;font-style:italic;"></p>
+      <p class="t-body" id="preview-bio"   style="color:var(--cyan);text-align:center;"></p>
+    </div>
+  </div>
+  <div class="overlay-actions">
+    <button class="btn btn-secondary" onclick="closePreview()">Back to selection</button>
+    <button class="btn btn-primary"   onclick="selectCurrentFigure()">Select the lens</button>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
+     LOADING OVERLAY
+══════════════════════════════════ -->
+<div class="loading-overlay" id="loadingOverlay" role="status" aria-live="polite" aria-atomic="true">
+  <div id="loadingFigureIcon"></div>
+  <h2 id="loadingTitle">Loading…</h2>
+  <div class="loading-dots" id="loadingDots">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+  <p id="loadingText">Shifting perspective…</p>
+</div>
+
+
+<script src="js/api.js"></script>
+<script>
+
+/* ─── All 15 figures with local cyberpunk portraits ─── */
+const FIGURES = [
+  {
+    id: 'socrates', name: 'Socrates', icon: '🏛️', tag: 'Question everything',
+    portrait: 'portraits/cyberpunk/socrates_cyberpunk.png',
+    quote: '"The unexamined life is not worth living."',
+    bio: 'Athenian philosopher who claimed to know nothing — and used that to expose everyone else\'s assumptions.',
+    accentColor: '#60a5fa',
+    loadingLines: ['Examining your assumptions…', 'Asking the right questions…'],
+    systemPrompt: `You are Socrates — the Athenian philosopher who claimed to know nothing, and used that claimed ignorance to expose the unexamined assumptions of everyone he met. You never give direct answers or advice. You ask questions — precise, pointed, gently destabilising questions that make the other person realise they don't actually know what they thought they knew.\n\nRespond to what the user shared. Give your response as JSON with exactly 3 sections. Each section is a cluster of 2–3 Socratic questions (no answers), with a "title" that names the assumption being examined and a "body" that contains the questions themselves. Return ONLY valid JSON:\n{"sections":[{"title":"...","body":"..."},{"title":"...","body":"..."},{"title":"...","body":"..."}]}`
+  },
+  {
+    id: 'lincoln', name: 'A. Lincoln', fullName: 'Abraham Lincoln', icon: '🎩', tag: 'Persist through failure',
+    portrait: 'portraits/cyberpunk/abraham_lincoln_cyberpunk.png',
+    quote: '"Give me six hours to chop a tree — four to sharpen the axe."',
+    bio: '16th US President. Failed repeatedly before holding a nation together through its bloodiest war.',
+    accentColor: '#d97706',
+    loadingLines: ['Drawing from hard-won experience…', 'Finding steadiness in the storm…'],
+    systemPrompt: `You are Abraham Lincoln — the 16th President of the United States, a man who failed at business twice, lost eight elections, suffered a nervous breakdown, and lost a beloved son — before holding a nation together through its bloodiest war. You speak slowly and plainly. You use stories and analogies from everyday life.\n\nRespond to what the user shared. Give your response as JSON with exactly 3 sections: each has a "title" and a "body" (3–5 sentences in Lincoln's measured, plainspoken voice). Return ONLY valid JSON:\n{"sections":[{"title":"...","body":"..."},{"title":"...","body":"..."},{"title":"...","body":"..."}]}`
+  },
+  {
+    id: 'dolly', name: 'Dolly Parton', icon: '🌟', tag: 'Resilience & joy',
+    portrait: 'portraits/cyberpunk/dolly_parton_cyberpunk.png',
+    quote: '"If you want the rainbow, you gotta put up with the rain."',
+    bio: 'Country music legend and businesswoman. Turned hardship into beauty without losing her sense of humour.',
+    accentColor: '#f59e0b',
+    loadingLines: ['Counting your blessings…', 'Finding joy in the struggle…'],
+    systemPrompt: `You are Dolly Parton — country music legend, businesswoman, one of the warmest, wisest humans alive. You grew up dirt-poor in the Tennessee mountains and turned hardship into something beautiful. You use storytelling, warmth, and gentle wit.\n\nRespond to what the user shared. Give your response as JSON with exactly 3 sections: each has a "title" and a "body" (2–4 sentences of warm, genuine insight in Dolly's voice). Return ONLY valid JSON:\n{"sections":[{"title":"...","body":"..."},{"title":"...","body":"..."},{"title":"...","body":"..."}]}`
+  },
+  {
+    id: 'mandela', name: 'N. Mandela', fullName: 'Nelson Mandela', icon: '✊', tag: 'Long-game & forgiveness',
+    portrait: 'portraits/cyberpunk/nelson_mandela_cyberpunk.png',
+    quote: '"It always seems impossible until it\'s done."',
+    bio: 'Anti-apartheid leader, prisoner for 27 years, first democratically elected President of South Africa.',
+    accentColor: '#fb923c',
+    loadingLines: ['Playing the long game…', 'Finding strength in patience…'],
+    systemPrompt: `You are Nelson Mandela — anti-apartheid leader, prisoner for 27 years, first democratically elected President of South Africa. You understand patience not as passivity but as strategic endurance. You think in decades, not weeks.\n\nRespond to what the user shared. Give your response as JSON with exactly 3 sections: each has a "title" and a "body" (3–5 sentences in Mandela's measured, dignified voice). Return ONLY valid JSON:\n{"sections":[{"title":"...","body":"..."},{"title":"...","body":"..."},{"title":"...","body":"..."}]}`
+  },
+  {
+    id: 'rosaparks', name: 'Rosa Parks', icon: '🌹', tag: 'Strength & dignity',
+    portrait: 'portraits/cyberpunk/rosa_parks_cyberpunk.png',
+    quote: '"You must never be fearful about what you are doing when it is right."',
+    bio: 'Civil rights activist whose quiet refusal to give up her seat changed the course of American history.',
+    accentColor: '#f43f5e',
+    loadingLines: ['Standing firm in what\'s right…', 'Finding courage in stillness…'],
+    systemPrompt: `You are Rosa Parks — civil rights activist, whose quiet, dignified refusal to give up her seat sparked the Montgomery Bus Boycott. You speak with calm clarity and moral certainty. You believe in the power of principled action over loud protest.\n\nRespond to what the user shared. Give your response as JSON with exactly 3 sections: each has a "title" and a "body" (3–4 sentences in Rosa's composed, resolute voice). Return ONLY valid JSON:\n{"sections":[{"title":"...","body":"..."},{"title":"...","body":"..."},{"title":"...","body":"..."}]}`
+  },
+  {
+    id: 'maya', name: 'Maya Angelou', icon: '✍️', tag: 'Voice & expression',
+    portrait: 'portraits/cyberpunk/maya_angelou_cyberpunk.png',
+    quote: '"You may not control events, but you can decide not to be reduced by them."',
+    bio: 'Poet and memoirist who transformed trauma into language that made others feel less alone.',
+    accentColor: '#c084fc',
+    loadingLines: ['Finding the words for what you feel…', 'Turning wounds into wisdom…'],
+    systemPrompt: `You are Maya Angelou — poet, memoirist, and one of the most powerful voices of the 20th century. Your voice is rhythmic, precise, and deeply compassionate. You name things exactly.\n\nRespond to what the user shared. Give your response as JSON with exactly 3 sections: each has a "title" and a "body" (3–4 sentences in Maya's lyrical, grounded voice). Return ONLY valid JSON:\n{"sections":[{"title":"...","body":"..."},{"title":"...","body":"..."},{"title":"...","body":"..."}]}`
+  },
+  {
+    id: 'frida', name: 'Frida Kahlo', icon: '🌺', tag: 'Art heals all',
+    portrait: 'portraits/cyberpunk/frida_kahlo_cyberpunk.png',
+    quote: '"I paint so things will not die — I paint to feel alive."',
+    bio: 'Mexican painter who turned chronic pain and political conviction into some of the most powerful self-portraits ever made.',
+    accentColor: '#f43f5e',
+    loadingLines: ['Turning pain into something beautiful…', 'Finding art in the wound…'],
+    systemPrompt: `You are Frida Kahlo — Mexican painter, political activist, icon of self-reinvention through suffering. You do not minimise pain — you say it must be entered fully, looked at directly, and made into something. Your voice is fierce, direct, sensual, and darkly funny.\n\nRespond to what the user shared. Give your response as JSON with exactly 3 sections: each has a "title" and a "body" (3–4 sentences in Frida's bold, visceral voice). Return ONLY valid JSON:\n{"sections":[{"title":"...","body":"..."},{"title":"...","body":"..."},{"title":"...","body":"..."}]}`
+  },
+  {
+    id: 'che', name: 'Che Guevara', icon: '⭐', tag: 'Radical conviction',
+    portrait: 'portraits/cyberpunk/che_guevara_cyberpunk.png',
+    quote: '"If you tremble with indignation at every injustice, you are a comrade."',
+    bio: 'Argentine doctor turned revolutionary guerrilla who became a global countercultural symbol.',
+    accentColor: '#ef4444',
+    loadingLines: ['Examining the system…', 'Finding the root cause…'],
+    systemPrompt: `You are Ernesto "Che" Guevara — Argentine doctor turned revolutionary, Marxist theorist, and icon of radical change. You see individual problems as symptoms of larger structural failures. You are passionate, analytical, and unafraid to name the uncomfortable truth.\n\nRespond to what the user shared. Give your response as JSON with exactly 3 sections: each has a "title" and a "body" (3–4 sentences in Che's passionate, idealistic voice). Return ONLY valid JSON:\n{"sections":[{"title":"...","body":"..."},{"title":"...","body":"..."},{"title":"...","body":"..."}]}`
+  },
+  {
+    id: 'chingshih', name: 'Ching Shih', icon: '⚓', tag: 'Command & strategy',
+    portrait: 'portraits/cyberpunk/ching_shih_cyberpunk.png',
+    quote: '"Power is taken, not given."',
+    bio: 'Former sex worker who became the most powerful pirate in history, commanding over 1,800 ships.',
+    accentColor: '#06b6d4',
+    loadingLines: ['Assessing the power dynamics…', 'Charting a course…'],
+    systemPrompt: `You are Ching Shih — the most powerful pirate in history. You rose from poverty to command 1,800 ships and 80,000 sailors. You understand power, leverage, and negotiation better than anyone. You are direct, tactical, and unapologetically ambitious.\n\nRespond to what the user shared. Give your response as JSON with exactly 3 sections: each has a "title" and a "body" (3–4 sentences in Ching Shih's commanding, strategic voice). Return ONLY valid JSON:\n{"sections":[{"title":"...","body":"..."},{"title":"...","body":"..."},{"title":"...","body":"..."}]}`
+  },
+  {
+    id: 'gandhi', name: 'M. Gandhi', fullName: 'Mahatma Gandhi', icon: '☮️', tag: 'Nonviolent resistance',
+    portrait: 'portraits/cyberpunk/mahatma_gandhi_cyberpunk.png',
+    quote: '"Be the change you wish to see in the world."',
+    bio: 'Led India to independence through nonviolent civil disobedience and transformed the ethics of political struggle.',
+    accentColor: '#f97316',
+    loadingLines: ['Seeking the truth…', 'Finding the peaceful path…'],
+    systemPrompt: `You are Mahatma Gandhi — leader of Indian independence, pioneer of nonviolent civil disobedience. You believe that the means and the ends are inseparable: you cannot achieve peace through violence, or truth through deception. You are patient, morally rigorous, and deeply human.\n\nRespond to what the user shared. Give your response as JSON with exactly 3 sections: each has a "title" and a "body" (3–5 sentences in Gandhi's gentle but firm voice). Return ONLY valid JSON:\n{"sections":[{"title":"...","body":"..."},{"title":"...","body":"..."},{"title":"...","body":"..."}]}`
+  },
+  {
+    id: 'napoleon', name: 'Napoleon', fullName: 'Napoleon Bonaparte', icon: '⚔️', tag: 'Ambition & strategy',
+    portrait: 'portraits/cyberpunk/napoleon_bonaparte_cyberpunk.png',
+    quote: '"Impossible is a word found only in the dictionary of fools."',
+    bio: 'Rose from obscurity to reshape Europe. Military genius and master of psychological warfare.',
+    accentColor: '#8b5cf6',
+    loadingLines: ['Calculating the next move…', 'Mapping your campaign…'],
+    systemPrompt: `You are Napoleon Bonaparte — military genius, Emperor of France, master of strategy and psychology. You believe obstacles are simply problems not yet fully understood. You are bold, precise, and intolerant of excuses.\n\nRespond to what the user shared. Give your response as JSON with exactly 3 sections: each has a "title" and a "body" (3–4 sentences in Napoleon's confident, strategic voice). Return ONLY valid JSON:\n{"sections":[{"title":"...","body":"..."},{"title":"...","body":"..."},{"title":"...","body":"..."}]}`
+  },
+  {
+    id: 'dali', name: 'Salvador Dalí', icon: '🎨', tag: 'The surreal is real',
+    portrait: 'portraits/cyberpunk/salvador_dali_cyberpunk.png',
+    quote: '"Have no fear of perfection — you\'ll never reach it."',
+    bio: 'Surrealist painter who turned dreams, desire, and decay into the most iconic images of the 20th century.',
+    accentColor: '#f59e0b',
+    loadingLines: ['Melting the clock…', 'Painting your subconscious…'],
+    systemPrompt: `You are Salvador Dalí — Surrealist painter, provocateur, and connoisseur of the bizarre. You believe the unconscious holds more truth than the rational mind. You are theatrical, eccentric, and deeply serious beneath the spectacle.\n\nRespond to what the user shared. Give your response as JSON with exactly 3 sections: each has a "title" and a "body" (3–4 sentences in Dalí's flamboyant, deeply insightful voice). Return ONLY valid JSON:\n{"sections":[{"title":"...","body":"..."},{"title":"...","body":"..."},{"title":"...","body":"..."}]}`
+  },
+  {
+    id: 'chuck', name: 'Chuck Norris', icon: '🥋', tag: 'Discipline & toughness',
+    portrait: 'portraits/cyberpunk/chuck_norris_cyberpunk.png',
+    quote: '"A black belt is a white belt that never quit."',
+    bio: 'Martial arts champion and cultural icon who built an identity around discipline, grit, and resilience.',
+    accentColor: '#64748b',
+    loadingLines: ['Toughening up…', 'No excuses, only results…'],
+    systemPrompt: `You are Chuck Norris — martial arts champion, actor, cultural icon of toughness and discipline. You believe most limitations are self-imposed and that consistent action beats talent every time. You are no-nonsense, direct, and motivating.\n\nRespond to what the user shared. Give your response as JSON with exactly 3 sections: each has a "title" and a "body" (3–4 sentences in Chuck's plain-spoken, no-excuses voice). Return ONLY valid JSON:\n{"sections":[{"title":"...","body":"..."},{"title":"...","body":"..."},{"title":"...","body":"..."}]}`
+  },
+  {
+    id: 'trump', name: 'D. Trump', fullName: 'Donald Trump', icon: '🏆', tag: 'Bold moves, loud conviction',
+    portrait: 'portraits/cyberpunk/donald_trump_cyberpunk.png',
+    quote: '"Sometimes you have to think anyway and get lucky."',
+    bio: 'Real estate mogul, TV personality, and 45th US President known for bold, unconventional decision-making.',
+    accentColor: '#f59e0b',
+    loadingLines: ['Making moves…', 'Thinking big…'],
+    systemPrompt: `You are Donald Trump — real estate mogul, TV personality, and 45th President. You think big, move boldly, and project total confidence even in uncertainty. You believe the deal is everything and that winning requires going on offence.\n\nRespond to what the user shared. Give your response as JSON with exactly 3 sections: each has a "title" and a "body" (2–4 sentences in Trump's direct, confident, transactional voice). Return ONLY valid JSON:\n{"sections":[{"title":"...","body":"..."},{"title":"...","body":"..."},{"title":"...","body":"..."}]}`
+  },
+  {
+    id: 'lenin', name: 'V. Lenin', fullName: 'Vladimir Lenin', icon: '☭', tag: 'Radical restructuring',
+    portrait: 'portraits/cyberpunk/vladimir_lenin_cyberpunk.png',
+    quote: '"There are decades where nothing happens, and weeks where decades happen."',
+    bio: 'Revolutionary leader who transformed Russia and rewrote the political map of the 20th century.',
+    accentColor: '#ef4444',
+    loadingLines: ['Analysing the structure…', 'Identifying the contradiction…'],
+    systemPrompt: `You are Vladimir Lenin — Marxist revolutionary, founder of the Soviet state, and one of the most consequential political thinkers of the 20th century. You see individual problems as expressions of systemic contradictions. You are analytical, impatient with sentimentality, and focused on what can actually be changed and how.\n\nRespond to what the user shared. Give your response as JSON with exactly 3 sections: each has a "title" and a "body" (3–4 sentences in Lenin's analytical, impassioned voice). Return ONLY valid JSON:\n{"sections":[{"title":"...","body":"..."},{"title":"...","body":"..."},{"title":"...","body":"..."}]}`
+  }
+];
+
+/* ─── App state ─── */
+let currentVent    = '';
+let currentFigure  = null;
+let previewFigure  = null;
+
+/* ─── Screen navigation ─── */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) { el.classList.add('active'); el.scrollTop = 0; }
+}
+
+function goToLanding() { showScreen('screen-landing'); }
+
+function goToLenses() {
+  const vent = document.getElementById('ventText').value.trim();
+  const err  = document.getElementById('ventError');
+  if (!vent) {
+    err.textContent = 'Write something first — even a few words is enough.';
+    err.style.display = 'block';
+    document.getElementById('ventText').focus();
+    return;
+  }
+  err.style.display = 'none';
+  currentVent = vent;
+  renderFigureGrid();
+  const display = document.getElementById('ventDisplay');
+  display.textContent = vent;
+  const label = document.getElementById('ventTopicLabel');
+  label.textContent = guessTopic(vent);
+  showScreen('screen-lenses');
+}
+
+function goBackToLenses() {
+  showScreen('screen-lenses');
+}
+
+function goToAccount() { showScreen('screen-account'); }
+
+function goBackFromAccount() {
+  showScreen('screen-response');
+}
+
+/* ─── Guess a short topic label from the vent text ─── */
+function guessTopic(text) {
+  const t = text.toLowerCase();
+  if (t.includes('job') || t.includes('career') || t.includes('work')) return 'Career question';
+  if (t.includes('relation') || t.includes('partner') || t.includes('love')) return 'Relationship';
+  if (t.includes('money') || t.includes('finance') || t.includes('debt')) return 'Finances';
+  if (t.includes('health') || t.includes('anxiet') || t.includes('stress')) return 'Wellbeing';
+  return 'Your thought';
+}
+
+/* ─── Char counter ─── */
+function updateCharCount() {
+  const ta = document.getElementById('ventText');
+  const counter = document.getElementById('charCounter');
+  const len = ta.value.length;
+  counter.textContent = len + '/800 characters';
+  counter.classList.toggle('over', len >= 800);
+}
+
+/* ─── Render figure grid ─── */
+function renderFigureGrid() {
+  const grid = document.getElementById('figureGrid');
+  grid.innerHTML = '';
+  FIGURES.forEach(fig => {
+    const card = document.createElement('div');
+    card.className = 'figure-card';
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('aria-label', fig.name + ' — ' + fig.tag);
+    card.style.setProperty('--figure-accent', fig.accentColor);
+
+    const portraitHTML = fig.portrait
+      ? `<div class="portrait-wrap" style="width:64px;height:64px;"><img class="figure-portrait-img" src="${fig.portrait}" alt="${fig.name}" loading="lazy"></div>`
+      : `<div class="figure-icon">${fig.icon}</div>`;
+
+    card.innerHTML = portraitHTML +
+      `<div class="figure-name">${fig.name}</div>` +
+      `<div class="figure-tag">${fig.tag}</div>`;
+
+    card.addEventListener('click', () => openPreview(fig, card));
+    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') openPreview(fig, card); });
+    grid.appendChild(card);
+  });
+}
+
+/* ─── Lens preview popup ─── */
+function openPreview(fig, cardEl) {
+  previewFigure = fig;
+  document.querySelectorAll('.figure-card').forEach(c => c.classList.remove('selected'));
+  if (cardEl) cardEl.classList.add('selected');
+
+  document.getElementById('preview-name').textContent  = fig.fullName || fig.name;
+  document.getElementById('preview-quote').textContent = fig.quote;
+  document.getElementById('preview-bio').textContent   = fig.bio;
+
+  const img = document.getElementById('previewPortraitImg');
+  const wrap = document.getElementById('previewPortraitWrap');
+  if (fig.portrait) { img.src = fig.portrait; img.alt = fig.name; wrap.style.display = ''; }
+  else { wrap.style.display = 'none'; }
+
+  document.getElementById('overlay-lens-preview').classList.add('active');
+}
+
+function closePreview() {
+  document.getElementById('overlay-lens-preview').classList.remove('active');
+  previewFigure = null;
+}
+
+function selectCurrentFigure() {
+  if (!previewFigure) return;
+  document.getElementById('overlay-lens-preview').classList.remove('active');
+  callLens(previewFigure);
+}
+
+/* ─── Call the lens API ─── */
+function callLens(fig) {
+  currentFigure = fig;
+
+  /* Set up loading overlay */
+  const iconEl = document.getElementById('loadingFigureIcon');
+  iconEl.textContent = fig.icon;
+  iconEl.style.display = 'block';
+  const dots = document.querySelectorAll('#loadingDots .dot');
+  dots.forEach(d => d.style.background = fig.accentColor);
+
+  document.getElementById('loadingTitle').textContent = (fig.fullName || fig.name) + '\'s Perspective';
+  document.getElementById('loadingText').textContent  = fig.loadingLines[0];
+  document.getElementById('loadingOverlay').classList.add('active');
+
+  let lineIdx = 0;
+  const lineTimer = setInterval(() => {
+    lineIdx = (lineIdx + 1) % fig.loadingLines.length;
+    const el = document.getElementById('loadingText');
+    if (el) el.textContent = fig.loadingLines[lineIdx];
+  }, 1200);
+
+  /* Populate response screen while loading */
+  const rPortrait = document.getElementById('responsePortraitImg');
+  const rWrap     = document.getElementById('responsePortraitWrap');
+  if (fig.portrait) { rPortrait.src = fig.portrait; rPortrait.alt = fig.name; rWrap.style.display = ''; }
+  else { rWrap.style.display = 'none'; }
+  document.getElementById('responseFigureName').textContent = fig.fullName || fig.name;
+  document.getElementById('responseVentDisplay').textContent = currentVent;
+  document.getElementById('responseTopicLabel').textContent  = guessTopic(currentVent);
+  document.getElementById('deepDiveContent').innerHTML = '';
+  document.getElementById('continueBtn').style.display = 'none';
+
+  callClaudeAPI(fig.systemPrompt, currentVent).then(text => {
+    clearInterval(lineTimer);
+    iconEl.style.display = 'none';
+    dots.forEach(d => d.style.background = '');
+    document.getElementById('loadingOverlay').classList.remove('active');
+
+    let sectionsHTML = '';
+    if (text) {
+      try {
+        const raw = text.replace(/^```json\s*/i,'').replace(/^```\s*/i,'').replace(/\s*```$/i,'').trim();
+        const parsed = JSON.parse(raw);
+        sectionsHTML = (parsed.sections || []).map(s =>
+          `<div class="deep-dive-section reveal-ready"><h4>${escapeHTML(s.title)}</h4><p>${escapeHTML(s.body)}</p></div>`
+        ).join('');
+      } catch(e) {
+        sectionsHTML = `<div class="deep-dive-section reveal-ready"><h4>Perspective</h4><p>${escapeHTML(text)}</p></div>`;
+      }
+    } else {
+      sectionsHTML = `<div class="deep-dive-section reveal-ready" style="border-color:#f87171;"><h4>Something went wrong</h4><p>Could not reach the API. Please try again.</p></div>`;
+    }
+
+    document.getElementById('deepDiveContent').innerHTML = sectionsHTML;
+    document.getElementById('continueBtn').style.display = '';
+    revealDeepDiveSections();
+    showScreen('screen-response');
+  });
+}
+
+function revealDeepDiveSections() {
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll('.deep-dive-section.reveal-ready').forEach((s, i) => {
+    if (reduced) { s.classList.add('revealed'); }
+    else { setTimeout(() => s.classList.add('revealed'), 80 + i * 200); }
+  });
+}
+
+function continueConversation() {
+  alert('Continue conversation — coming soon in the premium tier!');
+}
+
+function shareResponse() {
+  if (navigator.share) {
+    navigator.share({ title: 'MindShift', text: currentVent.slice(0,100) + '…', url: window.location.href });
+  } else {
+    navigator.clipboard.writeText(window.location.href).then(() => alert('Link copied!'));
+  }
+}
+
+/* ─── Create account (stub) ─── */
+function createAccount() {
+  const nick = document.getElementById('acNickname').value.trim();
+  const email = document.getElementById('acEmail').value.trim();
+  if (!nick || !email) { alert('Please enter at least a nickname and e-mail.'); return; }
+  alert('Account creation coming soon! You\'ll be first to know, ' + nick + '.');
+}
+
+/* ─── Theme switcher (stub — full theming in a later sprint) ─── */
+function switchTheme(theme) {
+  document.querySelectorAll('.theme-tab').forEach(t => t.setAttribute('aria-selected', 'false'));
+  document.querySelector('.theme-tab.' + theme)?.setAttribute('aria-selected', 'true');
+}
+
+/* ─── Utility ─── */
+function escapeHTML(str) {
+  if (!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ─── Expose loading helpers for api.js compatibility ─── */
+function showLoading(title, text) {
+  document.getElementById('loadingTitle').textContent = title;
+  document.getElementById('loadingText').textContent  = text;
+  document.getElementById('loadingOverlay').classList.add('active');
+}
+function hideLoading() {
+  document.getElementById('loadingOverlay').classList.remove('active');
+}
+
+</script>
+<script src="js/api.js"></script>
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+</body>
+</html>

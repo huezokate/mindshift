@@ -1,0 +1,479 @@
+/* Shared phone-frame wrapper */
+.ms-screen {
+  width: 390px;
+  min-height: 844px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* ── DARK ── */
+[data-theme="dark"] .ms-screen { background: #080810; }
+[data-theme="dark"] .ms-screen-label {
+  font-family: 'Courier New', monospace;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #3a5a65;
+  text-align: center;
+  padding: 6px 0 2px;
+}
+
+/* ── BRIGHT ── */
+[data-theme="bright"] .ms-screen { background: #f0e8ff; }
+[data-theme="bright"] .ms-screen-label {
+  font-size: 10px;
+  color: #b89fc7;
+  text-align: center;
+  padding: 6px 0 2px;
+}
+
+/* ── PAPER ── */
+[data-theme="paper"] .ms-screen { background: #faf7f2; }
+[data-theme="paper"] .ms-screen-label {
+  font-family: Georgia, serif;
+  font-size: 10px;
+  color: #a09890;
+  text-align: center;
+  padding: 6px 0 2px;
+  font-style: italic;
+}
+
+/* ── Nav back link ── */
+.ms-back {
+  padding: 60px 24px 0;
+  font-size: 14px;
+  cursor: pointer;
+}
+[data-theme="dark"]   .ms-back { color: #00f5ff; font-family: 'Courier New', monospace; }
+[data-theme="bright"] .ms-back { color: #c084fc; }
+[data-theme="paper"]  .ms-back { color: #7d9e7d; font-family: Georgia, serif; }
+
+/* ── Flow cards (Screen 1) ── */
+.ms-flow-card {
+  margin: 0 40px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ms-flow-card__emoji { font-size: 24px; }
+.ms-flow-card__title { font-size: 18px; font-weight: 700; margin: 0; }
+.ms-flow-card__body  { font-size: 13px; line-height: 1.55; margin: 0; }
+.ms-flow-card__cta   { font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 4px; }
+
+[data-theme="dark"] .ms-flow-card {
+  background: #0d0d1a;
+  border: 1px solid #1e1e40;
+  border-radius: 4px;
+  border-left: 3px solid #00f5ff;
+  font-family: 'Courier New', monospace;
+}
+[data-theme="dark"] .ms-flow-card__title { color: #e0f7ff; letter-spacing: 0.04em; }
+[data-theme="dark"] .ms-flow-card__body  { color: #7ecfdf; }
+[data-theme="dark"] .ms-flow-card__cta   { color: #00f5ff; letter-spacing: 0.06em; }
+
+[data-theme="bright"] .ms-flow-card {
+  background: #fff;
+  border: 2px solid #e8c8f0;
+  border-radius: 20px;
+  box-shadow: 0 4px 16px #c084fc1a;
+}
+[data-theme="bright"] .ms-flow-card__title { color: #3b1a5a; }
+[data-theme="bright"] .ms-flow-card__body  { color: #7c4da0; }
+[data-theme="bright"] .ms-flow-card__cta   { color: #c084fc; }
+
+[data-theme="paper"] .ms-flow-card {
+  background: #f5f0e8;
+  border: 1.5px solid #d4cbbf;
+  border-radius: 8px;
+  box-shadow: 3px 4px 0 #d4cbbf;
+  border-left: 4px solid #7d9e7d;
+}
+[data-theme="paper"] .ms-flow-card__title { color: #3d3530; font-family: Georgia, serif; }
+[data-theme="paper"] .ms-flow-card__body  { color: #6b5e56; }
+[data-theme="paper"] .ms-flow-card__cta   { color: #7d9e7d; font-family: Georgia, serif; }
+
+/* ── Wizard step dots ── */
+.ms-dots { display: flex; gap: 8px; align-items: center; justify-content: center; padding: 12px 0; }
+.ms-dot { width: 8px; height: 8px; border-radius: 50%; }
+.ms-dot--active { width: 24px; border-radius: 4px; }
+
+[data-theme="dark"]   .ms-dot          { background: #1e1e40; }
+[data-theme="dark"]   .ms-dot--active  { background: #00f5ff; }
+[data-theme="bright"] .ms-dot          { background: #e8c8f0; }
+[data-theme="bright"] .ms-dot--active  { background: #c084fc; }
+[data-theme="paper"]  .ms-dot          { background: #d4cbbf; }
+[data-theme="paper"]  .ms-dot--active  { background: #7d9e7d; }
+
+/* ── Textarea ── */
+.ms-textarea {
+  margin: 0 40px;
+  padding: 16px 20px;
+  font-size: 13px;
+  line-height: 1.6;
+  resize: none;
+  border: none;
+  outline: none;
+  font-family: inherit;
+}
+[data-theme="dark"] .ms-textarea {
+  background: #0d0d1a;
+  border: 1px solid #1e1e40;
+  border-radius: 4px;
+  color: #7ecfdf;
+  font-family: 'Courier New', monospace;
+}
+[data-theme="dark"] .ms-textarea::placeholder { color: #3a5a65; }
+[data-theme="bright"] .ms-textarea {
+  background: #fff;
+  border: 2px solid #e8c8f0;
+  border-radius: 16px;
+  color: #3b1a5a;
+}
+[data-theme="bright"] .ms-textarea::placeholder { color: #b89fc7; }
+[data-theme="paper"] .ms-textarea {
+  background: #f5f0e8;
+  border: 1.5px solid #d4cbbf;
+  border-radius: 6px;
+  color: #3d3530;
+  font-family: Georgia, serif;
+}
+[data-theme="paper"] .ms-textarea::placeholder { color: #a09890; }
+
+/* ── Canvas dot grid ── */
+.ms-canvas-area {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background-image: radial-gradient(circle, currentColor 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+[data-theme="dark"]   .ms-canvas-area { color: #1e1e40; }
+[data-theme="bright"] .ms-canvas-area { color: #e8c8f0; }
+[data-theme="paper"]  .ms-canvas-area { color: #d4cbbf; }
+
+/* ── Mind map node ── */
+.ms-node {
+  position: absolute;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.ms-node--hub {
+  padding: 12px 20px;
+  font-size: 14px;
+}
+
+[data-theme="dark"] .ms-node {
+  background: #0d0d1a;
+  border: 1px solid #1e1e40;
+  color: #e0f7ff;
+  font-family: 'Courier New', monospace;
+}
+[data-theme="dark"] .ms-node--hub {
+  border-color: #00f5ff;
+  box-shadow: 0 0 16px #00f5ff44;
+  color: #00f5ff;
+}
+[data-theme="dark"] .ms-node:not(.ms-node--hub):hover { border-color: #b04cff; }
+
+[data-theme="bright"] .ms-node {
+  background: #fff;
+  border: 2px solid #e8c8f0;
+  border-radius: 20px;
+  color: #3b1a5a;
+  box-shadow: 0 2px 12px #c084fc1a;
+}
+[data-theme="bright"] .ms-node--hub {
+  border-color: #c084fc;
+  background: #faf5ff;
+  box-shadow: 0 4px 20px #c084fc44;
+}
+
+[data-theme="paper"] .ms-node {
+  background: #f5f0e8;
+  border: 1.5px solid #d4cbbf;
+  color: #3d3530;
+  font-family: Georgia, serif;
+  box-shadow: 2px 3px 0 #d4cbbf;
+}
+[data-theme="paper"] .ms-node--hub {
+  border-color: #7d9e7d;
+  background: #eef4ee;
+  box-shadow: 3px 4px 0 #7d9e7d;
+  color: #7d9e7d;
+}
+
+/* ── Persona card (Screen 4) ── */
+.ms-persona-card {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ms-persona-card__emoji { font-size: 22px; }
+.ms-persona-card__name  { font-size: 14px; font-weight: 700; }
+.ms-persona-card__desc  { font-size: 11px; line-height: 1.5; }
+
+[data-theme="dark"] .ms-persona-card {
+  background: #0d0d1a;
+  border: 1px solid #1e1e40;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+}
+[data-theme="dark"] .ms-persona-card__name { color: #e0f7ff; letter-spacing: 0.04em; }
+[data-theme="dark"] .ms-persona-card__desc { color: #7ecfdf; }
+
+[data-theme="bright"] .ms-persona-card {
+  background: #fff;
+  border: 2px solid #e8c8f0;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px #c084fc1a;
+}
+[data-theme="bright"] .ms-persona-card__name { color: #3b1a5a; }
+[data-theme="bright"] .ms-persona-card__desc { color: #7c4da0; }
+
+[data-theme="paper"] .ms-persona-card {
+  background: #f5f0e8;
+  border: 1.5px solid #d4cbbf;
+  border-radius: 8px;
+  box-shadow: 2px 3px 0 #d4cbbf;
+  font-family: Georgia, serif;
+}
+[data-theme="paper"] .ms-persona-card__name { color: #3d3530; }
+[data-theme="paper"] .ms-persona-card__desc { color: #6b5e56; }
+
+/* ── Insight block (Screen 5) ── */
+.ms-insight-block {
+  margin: 0 40px 12px;
+  padding: 14px 16px;
+  border-radius: 6px;
+}
+.ms-insight-block__title { font-size: 13px; font-weight: 700; margin: 0 0 8px; }
+.ms-insight-block__body  { font-size: 12px; line-height: 1.6; margin: 0; }
+
+[data-theme="dark"] .ms-insight-block {
+  background: #0d0d1a;
+  border: 1px solid #1e1e40;
+  font-family: 'Courier New', monospace;
+}
+[data-theme="dark"] .ms-insight-block__title { color: #00f5ff; letter-spacing: 0.05em; }
+[data-theme="dark"] .ms-insight-block__body  { color: #7ecfdf; }
+
+[data-theme="bright"] .ms-insight-block {
+  background: #faf5ff;
+  border: 2px solid #e8c8f0;
+  border-radius: 16px;
+}
+[data-theme="bright"] .ms-insight-block__title { color: #7c3aed; }
+[data-theme="bright"] .ms-insight-block__body  { color: #7c4da0; }
+
+[data-theme="paper"] .ms-insight-block {
+  background: #f5f0e8;
+  border: 1.5px solid #d4cbbf;
+  font-family: Georgia, serif;
+  box-shadow: 2px 3px 0 #d4cbbf;
+}
+[data-theme="paper"] .ms-insight-block__title { color: #7d9e7d; }
+[data-theme="paper"] .ms-insight-block__body  { color: #6b5e56; }
+
+/* ── Primary CTA button ── */
+.ms-cta {
+  display: block;
+  text-align: center;
+  padding: 14px 20px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  width: calc(100% - 80px);
+  margin: 0 40px;
+}
+[data-theme="dark"] .ms-cta {
+  background: transparent;
+  border: 1px solid #00f5ff;
+  color: #00f5ff;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  box-shadow: 0 0 10px #00f5ff44;
+}
+[data-theme="bright"] .ms-cta {
+  background: #c084fc;
+  color: #fff;
+  border-radius: 999px;
+  box-shadow: 0 4px 16px #c084fc55;
+}
+[data-theme="paper"] .ms-cta {
+  background: #7d9e7d;
+  color: #faf7f2;
+  border-radius: 8px;
+  border: 1.5px solid #5a8a5a;
+  box-shadow: 2px 3px 0 #5a8a5a;
+  font-family: Georgia, serif;
+}
+
+/* ── Ghost CTA ── */
+.ms-cta-ghost {
+  background: transparent;
+  border: 1px solid;
+}
+[data-theme="dark"]   .ms-cta-ghost { border-color: #1e1e40; color: #7ecfdf; box-shadow: none; }
+[data-theme="bright"] .ms-cta-ghost { border-color: #e8c8f0; color: #c084fc; box-shadow: none; background: #fff; }
+[data-theme="paper"]  .ms-cta-ghost { border-color: #d4cbbf; color: #6b5e56; box-shadow: none; background: transparent; }
+
+/* ── Persona top bar ── */
+.ms-persona-bar {
+  padding: 16px 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+[data-theme="dark"] .ms-persona-bar {
+  background: #0d0d1a;
+  border-bottom: 1px solid #1e1e40;
+  color: #7ecfdf;
+  font-family: 'Courier New', monospace;
+}
+[data-theme="bright"] .ms-persona-bar {
+  background: #faf5ff;
+  border-bottom: 2px solid #e8c8f0;
+  color: #7c4da0;
+}
+[data-theme="paper"] .ms-persona-bar {
+  background: #eef4ee;
+  border-bottom: 1.5px solid #d4cbbf;
+  color: #6b5e56;
+  font-family: Georgia, serif;
+  font-style: italic;
+}
+
+/* ── Question context ── */
+.ms-question-ctx {
+  margin: 12px 40px;
+  padding: 12px 16px;
+  border-radius: 6px;
+}
+.ms-question-ctx__label { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; margin: 0 0 6px; }
+.ms-question-ctx__text  { font-size: 13px; margin: 0; line-height: 1.5; }
+
+[data-theme="dark"] .ms-question-ctx {
+  background: #0d0d1a;
+  border: 1px solid #1e1e40;
+  font-family: 'Courier New', monospace;
+}
+[data-theme="dark"] .ms-question-ctx__label { color: #3a5a65; }
+[data-theme="dark"] .ms-question-ctx__text  { color: #e0f7ff; }
+
+[data-theme="bright"] .ms-question-ctx {
+  background: #fdf2f8;
+  border: 2px solid #f9a8d4;
+  border-radius: 14px;
+}
+[data-theme="bright"] .ms-question-ctx__label { color: #b89fc7; }
+[data-theme="bright"] .ms-question-ctx__text  { color: #3b1a5a; }
+
+[data-theme="paper"] .ms-question-ctx {
+  background: #eef4ee;
+  border: 1.5px solid #a8c8a8;
+  font-family: Georgia, serif;
+}
+[data-theme="paper"] .ms-question-ctx__label { color: #a09890; }
+[data-theme="paper"] .ms-question-ctx__text  { color: #3d3530; font-style: italic; }
+
+/* ── Input field ── */
+.ms-input {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 13px;
+  border: none;
+  outline: none;
+  font-family: inherit;
+}
+[data-theme="dark"] .ms-input {
+  background: #080810;
+  border: 1px solid #1e1e40;
+  border-radius: 3px;
+  color: #e0f7ff;
+  font-family: 'Courier New', monospace;
+}
+[data-theme="dark"] .ms-input::placeholder { color: #3a5a65; }
+[data-theme="bright"] .ms-input {
+  background: #fff;
+  border: 2px solid #e8c8f0;
+  border-radius: 12px;
+  color: #3b1a5a;
+}
+[data-theme="bright"] .ms-input::placeholder { color: #b89fc7; }
+[data-theme="paper"] .ms-input {
+  background: #fff;
+  border: 1.5px solid #d4cbbf;
+  border-radius: 5px;
+  color: #3d3530;
+  font-family: Georgia, serif;
+}
+[data-theme="paper"] .ms-input::placeholder { color: #a09890; font-style: italic; }
+
+/* ── Zoom control ── */
+.ms-zoom {
+  position: absolute;
+  right: 14px;
+  bottom: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.ms-zoom button {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+}
+[data-theme="dark"] .ms-zoom { border: 1px solid #1e1e40; }
+[data-theme="dark"] .ms-zoom button { background: #0d0d1a; color: #7ecfdf; }
+[data-theme="bright"] .ms-zoom { border: 2px solid #e8c8f0; }
+[data-theme="bright"] .ms-zoom button { background: #fff; color: #c084fc; }
+[data-theme="paper"] .ms-zoom { border: 1.5px solid #d4cbbf; box-shadow: 2px 2px 0 #d4cbbf; }
+[data-theme="paper"] .ms-zoom button { background: #f5f0e8; color: #6b5e56; }
+
+/* ── Theme-adaptive text helpers used across screens ── */
+[data-theme="dark"] .ms-display-text  { color: #e0f7ff; font-family: 'Courier New', monospace; letter-spacing: 0.06em; }
+[data-theme="bright"] .ms-display-text { color: #3b1a5a; }
+[data-theme="paper"] .ms-display-text  { color: #3d3530; font-family: Georgia, serif; }
+
+[data-theme="dark"] .ms-subtitle-text  { color: #7ecfdf; font-family: 'Courier New', monospace; }
+[data-theme="bright"] .ms-subtitle-text { color: #7c4da0; }
+[data-theme="paper"] .ms-subtitle-text  { color: #6b5e56; font-family: Georgia, serif; }
+
+[data-theme="dark"] .ms-muted-text  { color: #7ecfdf; font-family: 'Courier New', monospace; }
+[data-theme="bright"] .ms-muted-text { color: #7c4da0; }
+[data-theme="paper"] .ms-muted-text  { color: #6b5e56; font-family: Georgia, serif; }
+
+[data-theme="dark"] .ms-step-label  { color: #3a5a65; font-family: 'Courier New', monospace; }
+[data-theme="bright"] .ms-step-label { color: #b89fc7; }
+[data-theme="paper"] .ms-step-label  { color: #a09890; font-family: Georgia, serif; }
+
+[data-theme="dark"] h2, [data-theme="dark"] h3 {
+  color: #e0f7ff;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.04em;
+}
+[data-theme="bright"] h2, [data-theme="bright"] h3 { color: #3b1a5a; }
+[data-theme="paper"] h2, [data-theme="paper"] h3   { color: #3d3530; font-family: Georgia, serif; }

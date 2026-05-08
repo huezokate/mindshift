@@ -1,0 +1,64 @@
+.ms-text { margin: 0; }
+
+/* ─── dark theme ─── */
+[data-theme="dark"] .ms-text {
+  font-family: var(--font-display);
+  color: var(--text-primary);
+}
+[data-theme="dark"] .ms-text--display {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+[data-theme="dark"] .ms-text--heading { font-size: 18px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+[data-theme="dark"] .ms-text--body    { font-size: 13px; color: var(--text-secondary); line-height: 1.6; letter-spacing: 0.04em; }
+[data-theme="dark"] .ms-text--caption { font-size: 10px; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; }
+[data-theme="dark"] .ms-text--label   { font-size: 11px; color: var(--accent-1); letter-spacing: 0.12em; text-transform: uppercase; }
+[data-theme="dark"] .ms-text--muted   { color: var(--text-muted); }
+[data-theme="dark"] .ms-text--accent  { color: var(--accent-1); }
+
+/* ─── bright theme ─── */
+[data-theme="bright"] .ms-text {
+  font-family: var(--font-body);
+  color: var(--text-primary);
+}
+[data-theme="bright"] .ms-text--display {
+  font-size: 28px;
+  font-weight: 800;
+  font-family: var(--font-display);
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.01em;
+}
+[data-theme="bright"] .ms-text--heading { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+[data-theme="bright"] .ms-text--body    { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+[data-theme="bright"] .ms-text--caption { font-size: 11px; color: var(--text-muted); }
+[data-theme="bright"] .ms-text--label   { font-size: 11px; font-weight: 700; color: var(--accent-1); text-transform: uppercase; letter-spacing: 0.08em; }
+[data-theme="bright"] .ms-text--muted   { color: var(--text-muted); }
+[data-theme="bright"] .ms-text--accent  { color: var(--accent-2); }
+
+/* ─── paper theme ─── */
+[data-theme="paper"] .ms-text {
+  font-family: var(--font-body);
+  color: var(--text-primary);
+}
+[data-theme="paper"] .ms-text--display {
+  font-size: 26px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+[data-theme="paper"] .ms-text--heading { font-size: 17px; font-weight: 700; font-family: var(--font-display); }
+[data-theme="paper"] .ms-text--body    { font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
+[data-theme="paper"] .ms-text--caption { font-size: 11px; color: var(--text-muted); font-style: italic; }
+[data-theme="paper"] .ms-text--label   { font-size: 11px; font-weight: 600; color: var(--accent-1); letter-spacing: 0.05em; text-transform: uppercase; }
+[data-theme="paper"] .ms-text--muted   { color: var(--text-muted); }
+[data-theme="paper"] .ms-text--accent  { color: var(--accent-1); }

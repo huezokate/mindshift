@@ -1,0 +1,3064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MindShift V100</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Alumni+Sans+SC:wght@400;600;700&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400&family=Nunito+Sans:wght@400;600;700;800&family=Fredoka:wght@400;500;600&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+
+/* ════════════════════════════════════════════════
+   1. THEME VARIABLES
+════════════════════════════════════════════════ */
+
+[data-theme="cyberpunk"] {
+  --bg:        #080810;
+  --bg-card:   #0D0D1A;
+  --bg-card2:  #0D0D1C;
+  --c1:        #00F5FF;   /* cyan  — borders, labels */
+  --c2:        #39FF14;   /* green — primary CTA, figure names */
+  --c3:        #FF2D78;   /* pink  — secondary, warnings */
+  --c4:        #B04CFF;   /* violet— response card, popup */
+  --text-h:    #E0F7FF;
+  --text-b:    #7ECFDF;
+  --text-m:    #3697B8;
+  --font-h:    'Courier Prime', 'Courier New', monospace;
+  --font-b:    'Courier Prime', 'Courier New', monospace;
+  --font-ui:   'Alumni Sans SC', 'Courier New', sans-serif;
+  --r:         2px;
+  --r-card:    4px;
+  --glow-c1:   0 0 16px rgba(0,245,255,0.4);
+  --glow-c2:   0 0 16px rgba(57,255,20,0.4);
+  --glow-c3:   0 0 10px rgba(255,45,120,0.4);
+  --glow-c4:   0 0 16px rgba(176,76,255,0.4);
+  --overlay-bg: rgba(8,8,16,0.9);
+}
+
+[data-theme="kawaii"] {
+  --bg:        #ffafd6;
+  --bg-card:   #ffffff;
+  --bg-card2:  #e5fcfa;
+  --c1:        #8b5cf6;   /* violet — primary */
+  --c2:        #ff2d78;   /* pink   — highlight */
+  --c3:        #5b8dee;   /* blue   — secondary */
+  --c4:        #2dff78;   /* green  — accent */
+  --text-h:    #0D0D1C;
+  --text-b:    #3a3560;
+  --text-m:    #9490b8;
+  --font-h:    'Nunito', system-ui, sans-serif;
+  --font-b:    'Nunito', system-ui, sans-serif;
+  --font-ui:   'Nunito', system-ui, sans-serif;
+  --r:         16px;
+  --r-card:    20px;
+  --glow-c1:   0 4px 20px rgba(139,92,246,0.25);
+  --glow-c2:   0 4px 20px rgba(255,45,120,0.25);
+  --glow-c3:   0 4px 20px rgba(91,141,238,0.25);
+  --glow-c4:   0 4px 20px rgba(45,255,120,0.25);
+  --overlay-bg: rgba(237,242,255,0.92);
+}
+
+[data-theme="notepad"] {
+  --bg:        #faf7f2;
+  --bg-card:   #ffffff;
+  --bg-card2:  #f7f4ef;
+  --c1:        #4a8855;   /* forest green — primary */
+  --c2:        #3a6fa8;   /* ink blue     — secondary */
+  --c3:        #c0605a;   /* warm red     — destructive */
+  --c4:        #5a4e47;   /* warm dark    — text */
+  --text-h:    #1c1916;
+  --text-b:    #5a4e47;
+  --text-m:    #9b8f87;
+  --font-h:    'Lora', Georgia, serif;
+  --font-b:    'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --r:         4px;
+  --r-card:    6px;
+  --glow-c1:   0 2px 8px rgba(74,136,85,0.2);
+  --glow-c2:   0 2px 8px rgba(58,111,168,0.2);
+  --glow-c3:   0 2px 8px rgba(192,96,90,0.2);
+  --glow-c4:   0 2px 8px rgba(90,78,71,0.15);
+  --overlay-bg: rgba(253,253,251,0.95);
+}
+
+/* ════════════════════════════════════════════════
+   2. RESET + BASE
+════════════════════════════════════════════════ */
+
+*, *::before, *::after {
+  box-sizing: border-box; margin: 0; padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  height: 100%; overflow: hidden;
+  background: #080810;
+}
+
+body {
+  display: flex; justify-content: center; align-items: flex-start;
+  font-family: var(--font-b);
+  transition: background 0.35s ease;
+}
+
+button { cursor: pointer; font-family: inherit; background: none; border: none; }
+input, textarea { font-family: inherit; outline: none; resize: none; }
+
+/* ════════════════════════════════════════════════
+   3. APP SHELL
+════════════════════════════════════════════════ */
+
+#app {
+  width: 100%; max-width: 420px;
+  height: 100dvh; height: 100vh;
+  background: var(--bg);
+  position: relative;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  transition: background 0.35s ease;
+}
+
+/* Cyberpunk scan-line overlay */
+[data-theme="cyberpunk"] #app::after {
+  content: '';
+  position: absolute; inset: 0; pointer-events: none; z-index: 900;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 2px,
+    rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px
+  );
+}
+
+/* Kawaii dot pattern */
+[data-theme="kawaii"] #app::before {
+  content: '';
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background-image: radial-gradient(circle, rgba(139,92,246,0.12) 1.5px, transparent 1.5px);
+  background-size: 28px 28px;
+}
+
+/* Notepad ruled lines */
+[data-theme="notepad"] #app::before {
+  content: '';
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background-image: repeating-linear-gradient(
+    transparent, transparent 27px, rgba(58,111,168,0.08) 27px, rgba(58,111,168,0.08) 28px
+  );
+}
+
+/* ════════════════════════════════════════════════
+   4. THEME PILL SELECTOR (horizontal scroll)
+════════════════════════════════════════════════ */
+
+.theme-picker {
+  flex-shrink: 0; overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; padding: 10px 16px;
+  transition: background 0.35s, border-color 0.35s;
+}
+.theme-picker::-webkit-scrollbar { display: none; }
+.theme-picker-inner { display: flex; gap: 8px; width: max-content; align-items: center; }
+
+[data-theme="cyberpunk"] .theme-picker {
+  background: var(--bg-card); border-bottom: 1px solid rgba(0,245,255,0.08);
+}
+[data-theme="kawaii"] .theme-picker {
+  background: var(--bg-card); border-bottom: 2px solid rgba(139,92,246,0.12);
+  box-shadow: 0 2px 12px rgba(139,92,246,0.06);
+}
+[data-theme="notepad"] .theme-picker {
+  background: var(--bg-card); border-bottom: 1.5px solid #e8e0d5;
+}
+
+.theme-pill {
+  padding: 6px 18px; border-radius: 20px; white-space: nowrap;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;
+  font-family: var(--font-ui); cursor: pointer;
+  transition: color 0.2s, background 0.2s, border-color 0.2s, box-shadow 0.2s;
+  border: 1.5px solid transparent;
+}
+
+[data-theme="cyberpunk"] .theme-pill {
+  color: var(--text-m); background: transparent; border-color: rgba(0,245,255,0.15);
+}
+[data-theme="cyberpunk"] .theme-pill[aria-selected="true"] {
+  color: var(--c3); border-color: var(--c3); background: rgba(255,45,120,0.07);
+  box-shadow: 0 0 10px rgba(255,45,120,0.25);
+}
+[data-theme="cyberpunk"] .theme-pill:hover:not([aria-selected="true"]) { background: rgba(255,255,255,0.03); }
+
+[data-theme="kawaii"] .theme-pill {
+  color: var(--text-m); background: transparent; border-color: rgba(139,92,246,0.2);
+}
+[data-theme="kawaii"] .theme-pill[aria-selected="true"] {
+  color: #fff; background: var(--c1); border-color: var(--c1);
+  box-shadow: 0 4px 14px rgba(139,92,246,0.35);
+}
+[data-theme="kawaii"] .theme-pill:hover:not([aria-selected="true"]) { background: rgba(139,92,246,0.06); }
+
+[data-theme="notepad"] .theme-pill {
+  color: var(--text-m); background: transparent; border-color: #d4cbbf;
+  font-family: var(--font-b); font-weight: 500;
+}
+[data-theme="notepad"] .theme-pill[aria-selected="true"] {
+  color: var(--c1); border-color: var(--c1); background: rgba(74,136,85,0.07);
+}
+[data-theme="notepad"] .theme-pill:hover:not([aria-selected="true"]) { background: var(--bg-card2); }
+
+/* ════════════════════════════════════════════════
+   5. SCREENS
+════════════════════════════════════════════════ */
+
+main { flex: 1; position: relative; overflow: hidden; }
+
+.screen {
+  display: none; flex-direction: column;
+  position: absolute; inset: 0;
+  background: var(--bg);
+  overflow-y: auto; overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin; scrollbar-color: rgba(128,128,128,0.2) transparent;
+  padding: 32px 24px 24px;
+  gap: 24px;
+  z-index: 1;
+}
+.screen.active { display: flex; animation: fadeUp 0.25s ease; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ════════════════════════════════════════════════
+   6. TYPOGRAPHY
+════════════════════════════════════════════════ */
+
+.t-h1 { font-family: var(--font-h); color: var(--text-h); line-height: 1.15; }
+.t-h2 { font-family: var(--font-h); color: var(--text-h); }
+.t-sub { color: var(--text-m); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
+.t-body { font-family: var(--font-b); color: var(--text-b); line-height: 1.6; font-size: 14px; }
+.t-meta { font-family: var(--font-b); color: var(--text-m); font-size: 11px; }
+
+/* Cyberpunk type specifics */
+[data-theme="cyberpunk"] .t-h1 {
+  font-weight: 700; font-size: 26px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--c1); -webkit-text-fill-color: var(--c1);
+  text-shadow: 0 0 22px rgba(0,245,255,0.45);
+}
+[data-theme="cyberpunk"] .t-h2 {
+  font-weight: 700; font-size: 18px; letter-spacing: 1.44px; text-transform: uppercase;
+  color: var(--c2); text-shadow: 0 0 12px rgba(57,255,20,0.35);
+  -webkit-text-fill-color: var(--c2);
+}
+[data-theme="cyberpunk"] .t-sub { font-family: var(--font-h); color: var(--c1); }
+[data-theme="cyberpunk"] .t-body { color: var(--text-b); }
+
+/* Kawaii type specifics */
+[data-theme="kawaii"] .t-h1 {
+  font-weight: 900; font-size: 26px; color: var(--text-h);
+  -webkit-text-fill-color: var(--text-h);
+}
+[data-theme="kawaii"] .t-h2 {
+  font-weight: 800; font-size: 18px; color: var(--c1);
+  -webkit-text-fill-color: var(--c1);
+}
+[data-theme="kawaii"] .t-sub { font-weight: 700; color: var(--c1); }
+
+/* Notepad type specifics */
+[data-theme="notepad"] .t-h1 {
+  font-weight: 700; font-size: 24px; color: var(--text-h);
+  -webkit-text-fill-color: var(--text-h);
+}
+[data-theme="notepad"] .t-h2 {
+  font-weight: 700; font-size: 18px; color: var(--c1);
+  -webkit-text-fill-color: var(--c1);
+}
+[data-theme="notepad"] .t-sub { font-family: var(--font-b); color: var(--text-m); }
+
+/* ════════════════════════════════════════════════
+   7. BUTTONS — base
+════════════════════════════════════════════════ */
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 6px; cursor: pointer; text-transform: uppercase;
+  font-family: var(--font-ui); font-weight: 700;
+  transition: box-shadow 0.15s, background 0.15s, opacity 0.15s;
+  white-space: nowrap;
+}
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.35; pointer-events: none; }
+
+/* Primary — CTA / confirm */
+[data-theme="cyberpunk"] .btn-primary {
+  color: #39FF14; background: transparent;
+  border-top: 4px solid #39FF14; border-left: 4px solid #39FF14;
+  border-right: 1px solid #39FF14; border-bottom: 1px solid #39FF14;
+  border-radius: 2px;
+  font-family: 'Alumni Sans SC', sans-serif; font-size: 14px;
+  font-weight: 600; letter-spacing: 3px;
+  padding: 14px 18px 12px;
+}
+[data-theme="cyberpunk"] .btn-primary:hover { box-shadow: var(--glow-c2); background: rgba(57,255,20,0.05); }
+
+[data-theme="kawaii"] .btn-primary {
+  color: #270007; background: #ffe2ac;
+  border-top: 1px solid #400b14; border-left: 2px solid #400b14;
+  border-right: 4px solid #400b14; border-bottom: 1px solid #400b14;
+  border-radius: 32px;
+  box-shadow: inset 4px 0 0 rgba(64,11,20,0.5);
+  font-family: 'Fredoka', sans-serif; font-weight: 500;
+  font-size: 14px; letter-spacing: 0.2px;
+  padding: 14px 24px;
+}
+[data-theme="kawaii"] .btn-primary:hover { background: #ffd98a; }
+
+[data-theme="notepad"] .btn-primary {
+  color: #1e1e40; background: #fff;
+  border: 1.5px solid #1e1e40; border-radius: 8px;
+  box-shadow: 2px 3px 0 #1e1e40;
+  font-family: 'Inter', sans-serif; font-weight: 500;
+  font-size: 14px; letter-spacing: -1px;
+  padding: 14px 20px;
+}
+[data-theme="notepad"] .btn-primary:hover { box-shadow: 3px 4px 0 #1e1e40; }
+
+/* Secondary */
+[data-theme="cyberpunk"] .btn-secondary {
+  color: #ff2d78; background: transparent;
+  border-top: 1px solid #ff2d78; border-left: 1px solid #ff2d78;
+  border-right: 2px solid #ff2d78; border-bottom: 2px solid #ff2d78;
+  border-radius: 2px;
+  font-family: 'Alumni Sans SC', sans-serif; font-size: 14px;
+  font-weight: 600; letter-spacing: 3px;
+  padding: 10px 16px;
+}
+[data-theme="cyberpunk"] .btn-secondary:hover { box-shadow: var(--glow-c3); background: rgba(255,45,120,0.05); }
+
+[data-theme="kawaii"] .btn-secondary {
+  color: #270007; background: #e5fcfa;
+  border-top: 1px solid #400b14; border-left: 2px solid #400b14;
+  border-right: 4px solid #400b14; border-bottom: 1px solid #400b14;
+  border-radius: 32px;
+  box-shadow: inset 4px 0 0 #49dbc8;
+  font-family: 'Fredoka', sans-serif; font-weight: 500;
+  font-size: 14px; letter-spacing: 0.2px;
+  padding: 10px 20px;
+}
+[data-theme="kawaii"] .btn-secondary:hover { background: #d0f8f4; }
+
+[data-theme="notepad"] .btn-secondary {
+  color: #7d9e7d; background: transparent;
+  border-top: 1px solid #7d9e7d; border-bottom: 1px solid #7d9e7d;
+  border-left: none; border-right: none; border-radius: 0;
+  font-family: 'Inter', sans-serif; font-weight: 500;
+  font-size: 14px; letter-spacing: -1px;
+  padding: 8px 12px;
+}
+[data-theme="notepad"] .btn-secondary:hover { color: #4a8855; border-color: #4a8855; }
+
+/* Tertiary / ghost (response action buttons) */
+[data-theme="cyberpunk"] .btn-ghost {
+  color: var(--c4); background: transparent;
+  border-top: 1px solid var(--c4); border-left: 1px solid var(--c4);
+  border-right: 4px solid var(--c4); border-bottom: 4px solid var(--c4);
+  border-radius: var(--r); font-size: 11px; letter-spacing: 1px;
+  padding: 8px 14px;
+}
+[data-theme="cyberpunk"] .btn-ghost:hover { box-shadow: var(--glow-c4); background: rgba(176,76,255,0.05); }
+
+[data-theme="kawaii"] .btn-ghost {
+  color: var(--c1); background: rgba(139,92,246,0.08);
+  border: 2px solid rgba(139,92,246,0.3); border-radius: 20px;
+  font-size: 12px; letter-spacing: 0.3px; padding: 8px 14px;
+}
+[data-theme="kawaii"] .btn-ghost:hover { background: rgba(139,92,246,0.15); }
+
+[data-theme="notepad"] .btn-ghost {
+  color: var(--text-b); background: var(--bg-card2);
+  border: 1px solid #d4cbbf; border-radius: var(--r);
+  font-size: 12px; letter-spacing: 0.3px; padding: 8px 14px;
+  font-family: var(--font-b); text-transform: none; font-weight: 500;
+}
+[data-theme="notepad"] .btn-ghost:hover { background: #ede8e1; }
+
+/* ════════════════════════════════════════════════
+   8. INPUT FIELD — VENT TEXTAREA
+════════════════════════════════════════════════ */
+
+.vent-field { width: 100%; display: flex; flex-direction: column; }
+
+/* Cyberpunk input */
+[data-theme="cyberpunk"] .vent-field {
+  background: #0D0D1A;
+  border-top: 4px solid #00F5FF; border-left: 4px solid #00F5FF;
+  border-right: 1px solid #00F5FF; border-bottom: 1px solid #00F5FF;
+  border-radius: 4px; overflow: hidden;
+}
+[data-theme="cyberpunk"] .vent-label {
+  border-bottom: 1px solid #00F5FF; padding: 8px 14px 4px;
+  font-family: 'Courier Prime', monospace; font-weight: 700;
+  font-size: 12px; letter-spacing: 1.32px; text-transform: uppercase;
+  color: #00F5FF; text-align: center;
+}
+[data-theme="cyberpunk"] .vent-field textarea {
+  background: transparent; color: #7ECFDF;
+  font-family: 'Courier Prime', monospace;
+  font-size: 14px; letter-spacing: 0.52px; line-height: 1.7;
+  padding: 14px; min-height: 160px; border: none;
+  height: auto; overflow: hidden; resize: none;
+}
+[data-theme="cyberpunk"] .vent-field textarea::placeholder { color: #3697B8; }
+[data-theme="cyberpunk"] .vent-footer {
+  padding: 4px 8px; border-top: 1px solid #00F5FF;
+  display: flex; justify-content: flex-end;
+}
+[data-theme="cyberpunk"] .char-counter { color: #7ECFDF; font-family: 'Courier Prime', monospace; letter-spacing: 1px; }
+
+/* Kawaii input */
+[data-theme="kawaii"] .vent-field {
+  background: #fff;
+  border-top: 1px solid #270007; border-left: 2px solid #270007;
+  border-right: 4px solid #270007; border-bottom: 1px solid #270007;
+  border-radius: 32px; overflow: hidden;
+  box-shadow: inset 4px 0 0 #49dbc8;
+}
+[data-theme="kawaii"] .vent-label {
+  background: #e5fcfa;
+  padding: 8px 16px 6px;
+  font-family: 'Nunito Sans', 'Nunito', sans-serif; font-weight: 700;
+  font-size: 12px; letter-spacing: 0.52px; text-transform: uppercase;
+  color: #270007; text-align: center;
+  border-bottom: 1px solid #270007;
+}
+[data-theme="kawaii"] .vent-field textarea {
+  background: transparent; color: #270007;
+  font-family: 'Nunito Sans', 'Nunito', sans-serif;
+  font-size: 14px; line-height: 1.7; letter-spacing: 0.52px;
+  padding: 12px 16px; min-height: 160px; border: none;
+  height: auto; overflow: hidden; resize: none;
+}
+[data-theme="kawaii"] .vent-field textarea::placeholder { color: rgba(39,0,7,0.35); }
+[data-theme="kawaii"] .vent-footer {
+  padding: 4px 16px; border-top: 1px solid #270007;
+  display: flex; justify-content: flex-end;
+}
+[data-theme="kawaii"] .char-counter { color: #400b14; font-family: 'Nunito Sans', 'Nunito', sans-serif; letter-spacing: 0.6px; }
+
+/* Notepad input */
+[data-theme="notepad"] .vent-field {
+  background: #fff;
+  border: 1.5px solid #3a6fa8; border-left: 4px solid #3a6fa8;
+  border-radius: 8px; overflow: hidden;
+  box-shadow: 3px 4px 0 #d4cbbf;
+}
+[data-theme="notepad"] .vent-label {
+  background: #fff;
+  padding: 8px 16px 4px;
+  font-family: 'Inter', sans-serif; font-weight: 600;
+  font-size: 12px; letter-spacing: 0.55px; text-transform: uppercase;
+  color: #3a6fa8; text-align: center;
+  border-bottom: 1.5px solid #3a6fa8;
+}
+[data-theme="notepad"] .vent-field textarea {
+  background: transparent; color: #1e1e40;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px; line-height: 1.8; letter-spacing: 0.18px;
+  padding: 12px 16px; min-height: 160px; border: none;
+  height: auto; overflow: hidden; resize: none;
+}
+[data-theme="notepad"] .vent-field textarea::placeholder { color: rgba(30,30,64,0.35); }
+[data-theme="notepad"] .vent-footer {
+  padding: 4px 8px; border-top: 1.5px solid #3a6fa8;
+  display: flex; justify-content: flex-end;
+}
+[data-theme="notepad"] .char-counter { color: #3a6fa8; font-family: 'Inter', sans-serif; letter-spacing: 0.2px; }
+
+.char-counter { font-size: 10px; letter-spacing: 0.5px; color: var(--text-m); }
+.char-counter.over { color: var(--c3); }
+.field-error {
+  font-size: 11px; color: var(--c3); letter-spacing: 0.3px;
+  max-height: 0; opacity: 0; overflow: hidden;
+  transition: max-height 0.2s ease, opacity 0.2s ease;
+}
+.field-error.visible { max-height: 2.5em; opacity: 1; }
+
+/* ════════════════════════════════════════════════
+   9. COMING SOON / ADD CARD
+════════════════════════════════════════════════ */
+
+.add-card { padding: 16px 24px; display: flex; flex-direction: column; gap: 8px; }
+
+[data-theme="cyberpunk"] .add-card {
+  background: #0D0D1A;
+  border-top: 1px solid #ff2d78; border-left: 4px solid #ff2d78;
+  border-right: 4px solid #ff2d78; border-bottom: 2px solid #ff2d78;
+  border-radius: 4px;
+}
+[data-theme="kawaii"] .add-card {
+  background: #fff;
+  border-top: 1px solid #400b14; border-left: 2px solid #400b14;
+  border-right: 4px solid #400b14; border-bottom: 1px solid #400b14;
+  border-radius: 32px;
+  box-shadow: inset 4px 0 0 rgba(64,11,20,0.5);
+  align-items: center; text-align: center;
+}
+[data-theme="notepad"] .add-card {
+  background: #fff;
+  border-top: 1.5px solid #c0605a; border-left: 4px solid #c0605a;
+  border-right: 1.5px solid #c0605a; border-bottom: 1.5px solid #c0605a;
+  border-radius: 8px;
+  box-shadow: 3px 4px 0 #d4cbbf;
+}
+
+/* ════════════════════════════════════════════════
+   10. USER QUOTE FIELD (read-only on lens/response screens)
+════════════════════════════════════════════════ */
+
+.quote-field { width: 100%; }
+
+[data-theme="cyberpunk"] .quote-field {
+  background: var(--bg-card);
+  border-top: 4px solid var(--c1); border-left: 4px solid var(--c1);
+  border-right: 1px solid var(--c1); border-bottom: 1px solid var(--c1);
+  border-radius: var(--r-card); overflow: hidden;
+}
+[data-theme="kawaii"] .quote-field {
+  background: var(--bg-card);
+  border: 2px solid rgba(139,92,246,0.25); border-radius: 20px;
+  overflow: hidden; box-shadow: 0 4px 14px rgba(139,92,246,0.08);
+}
+[data-theme="notepad"] .quote-field {
+  background: var(--bg-card);
+  border: 1.5px solid #d4cbbf; border-left: 4px solid var(--c2);
+  border-radius: var(--r-card); overflow: hidden;
+}
+
+.quote-label {
+  padding: 8px 14px 4px; font-size: 10px; letter-spacing: 1px;
+  text-transform: uppercase; font-weight: 700;
+}
+[data-theme="cyberpunk"] .quote-label {
+  font-family: var(--font-h); color: var(--c1);
+  border-bottom: 1px solid rgba(0,245,255,0.2);
+}
+[data-theme="kawaii"] .quote-label {
+  color: var(--c1); border-bottom: 1px solid rgba(139,92,246,0.12);
+}
+[data-theme="notepad"] .quote-label {
+  font-family: var(--font-h); font-style: italic; font-weight: 400;
+  font-size: 11px; color: var(--text-m); border-bottom: 1px solid #e8e0d5;
+}
+
+.quote-text {
+  padding: 12px 14px; font-size: 13px; line-height: 1.65; color: var(--text-h);
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden;
+}
+[data-theme="cyberpunk"] .quote-text { font-family: var(--font-h); }
+[data-theme="notepad"]   .quote-text { font-family: var(--font-h); font-style: italic; }
+
+/* ════════════════════════════════════════════════
+   11. FIGURE GRID (lens selection screen)
+════════════════════════════════════════════════ */
+
+.figure-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+}
+
+.figure-card {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 7px; padding: 12px 6px; cursor: pointer;
+  transition: box-shadow 0.18s, background 0.18s, transform 0.18s;
+  -webkit-tap-highlight-color: transparent;
+}
+.figure-card:active { transform: scale(0.95); }
+
+[data-theme="cyberpunk"] .figure-card {
+  background: var(--bg-card2);
+  border: 1px solid rgba(176,76,255,0.35); border-radius: var(--r);
+}
+[data-theme="cyberpunk"] .figure-card:hover,
+[data-theme="cyberpunk"] .figure-card.selected {
+  border-color: var(--c1); background: rgba(0,245,255,0.05);
+  box-shadow: 0 0 14px rgba(0,245,255,0.22);
+}
+[data-theme="kawaii"] .figure-card {
+  background: var(--bg-card);
+  border: 2px solid rgba(139,92,246,0.12); border-radius: 18px;
+  box-shadow: 0 2px 8px rgba(139,92,246,0.05);
+}
+[data-theme="kawaii"] .figure-card:hover,
+[data-theme="kawaii"] .figure-card.selected {
+  border-color: var(--c1); box-shadow: 0 6px 18px rgba(139,92,246,0.2);
+}
+[data-theme="notepad"] .figure-card {
+  background: var(--bg-card);
+  border: 1px solid #d4cbbf; border-radius: var(--r-card);
+}
+[data-theme="notepad"] .figure-card:hover,
+[data-theme="notepad"] .figure-card.selected {
+  border-color: var(--c1); box-shadow: var(--glow-c1);
+}
+
+.figure-portrait {
+  width: 58px; height: 58px; object-fit: cover; flex-shrink: 0;
+}
+[data-theme="cyberpunk"] .figure-portrait { border-radius: 29px; border: 1.5px solid var(--c2); }
+[data-theme="cyberpunk"] .figure-card.selected .figure-portrait { border-width: 2px; box-shadow: var(--glow-c2); }
+[data-theme="kawaii"]    .figure-portrait { border-radius: 12px; border: 2px solid rgba(139,92,246,0.18); }
+[data-theme="kawaii"]    .figure-card.selected .figure-portrait { border-color: var(--c1); }
+[data-theme="notepad"]   .figure-portrait { border-radius: 50%; border: 1.5px solid #d4cbbf; }
+[data-theme="notepad"]   .figure-card.selected .figure-portrait { border-color: var(--c1); }
+
+.figure-name {
+  font-size: 10px; font-weight: 700; text-align: center; line-height: 1.2;
+  letter-spacing: 0.6px; text-transform: uppercase;
+}
+[data-theme="cyberpunk"] .figure-name { font-family: var(--font-h); color: var(--c2); letter-spacing: 1px; }
+[data-theme="kawaii"]    .figure-name { color: var(--c1); letter-spacing: 0.2px; }
+[data-theme="notepad"]   .figure-name { color: var(--text-h); font-family: var(--font-b); }
+
+.figure-tag {
+  font-size: 9px; letter-spacing: 0.2px; text-align: center;
+  line-height: 1.3; color: var(--text-m);
+}
+[data-theme="cyberpunk"] .figure-tag { font-family: var(--font-h); color: var(--text-m); text-transform: uppercase; font-size: 8px; }
+[data-theme="notepad"]   .figure-tag { font-style: italic; font-size: 10px; }
+
+.portrait-fallback {
+  width: 58px; height: 58px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-card2); color: var(--c1);
+  font-size: 14px; font-weight: 700; letter-spacing: 1px;
+  border: 1px solid var(--c1);
+}
+[data-theme="cyberpunk"] .portrait-fallback { border-radius: 29px; font-family: var(--font-h); }
+[data-theme="kawaii"]    .portrait-fallback { border-radius: 12px; }
+[data-theme="notepad"]   .portrait-fallback { border-radius: 50%; }
+
+/* ════════════════════════════════════════════════
+   11b. PREVIEW CARD SWIPER (inside popup overlay)
+════════════════════════════════════════════════ */
+
+.preview-card-track {
+  display: flex; gap: 12px;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory; scrollbar-width: none;
+  padding: 4px 0 8px;
+  /* negative margin to let cards peek at edges past the sheet padding */
+  margin-left: -20px; margin-right: -20px;
+  padding-left: 20px; padding-right: 20px;
+}
+.preview-card-track::-webkit-scrollbar { display: none; }
+
+.preview-card-item {
+  flex-shrink: 0; scroll-snap-align: center;
+  width: calc(100% - 40px); /* peek effect: shows ~20px of adjacent cards */
+  display: flex; flex-direction: column; align-items: center;
+  gap: 12px; padding: 20px 16px;
+  transition: opacity 0.2s;
+}
+.preview-card-item:not(.active-card) { opacity: 0.55; }
+
+[data-theme="cyberpunk"] .preview-card-item {
+  background: var(--bg-card2);
+  border: 1px solid rgba(176,76,255,0.5); border-radius: var(--r-card);
+}
+[data-theme="cyberpunk"] .preview-card-item.active-card {
+  border-color: var(--c1); box-shadow: 0 0 20px rgba(0,245,255,0.18);
+}
+[data-theme="kawaii"] .preview-card-item {
+  background: var(--bg-card);
+  border: 2px solid rgba(139,92,246,0.18); border-radius: 20px;
+}
+[data-theme="kawaii"] .preview-card-item.active-card {
+  border-color: var(--c1); box-shadow: 0 8px 28px rgba(139,92,246,0.18);
+}
+[data-theme="notepad"] .preview-card-item {
+  background: var(--bg-card);
+  border: 1.5px solid #d4cbbf; border-radius: var(--r-card);
+}
+[data-theme="notepad"] .preview-card-item.active-card {
+  border-color: var(--c1); box-shadow: var(--glow-c1);
+}
+
+.preview-card-portrait {
+  width: 88px; height: 88px; object-fit: cover; flex-shrink: 0;
+}
+[data-theme="cyberpunk"] .preview-card-portrait { border-radius: 44px; border: 2px solid var(--c2); box-shadow: var(--glow-c2); }
+[data-theme="kawaii"]    .preview-card-portrait { border-radius: 20px; border: 2px solid var(--c1); box-shadow: var(--glow-c1); }
+[data-theme="notepad"]   .preview-card-portrait { border-radius: 50%; border: 2px solid var(--c2); }
+
+.preview-card-name {
+  font-size: 16px; font-weight: 700; text-align: center;
+}
+[data-theme="cyberpunk"] .preview-card-name { font-family: var(--font-h); color: var(--c2); letter-spacing: 1.2px; text-transform: uppercase; text-shadow: var(--glow-c2); }
+[data-theme="kawaii"]    .preview-card-name { color: var(--c1); }
+[data-theme="notepad"]   .preview-card-name { font-family: var(--font-h); color: var(--c2); }
+
+.preview-card-quote {
+  font-size: 12px; line-height: 1.6; text-align: center;
+  font-style: italic; color: var(--text-h);
+}
+.preview-card-bio {
+  font-size: 11px; line-height: 1.55; text-align: center; color: var(--text-b);
+}
+.preview-card-fallback {
+  width: 88px; height: 88px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-card2); color: var(--c1);
+  font-size: 20px; font-weight: 700; border: 2px solid var(--c1);
+}
+[data-theme="cyberpunk"] .preview-card-fallback { border-radius: 44px; font-family: var(--font-h); }
+[data-theme="kawaii"]    .preview-card-fallback { border-radius: 20px; }
+[data-theme="notepad"]   .preview-card-fallback { border-radius: 50%; }
+
+/* ════════════════════════════════════════════════
+   12. RESPONSE CARD
+════════════════════════════════════════════════ */
+
+.response-card { width: 100%; }
+
+[data-theme="cyberpunk"] .response-card {
+  background: var(--bg-card);
+  border-top: 1px solid var(--c4); border-left: 1px solid var(--c4);
+  border-right: 4px solid var(--c4); border-bottom: 4px solid var(--c4);
+  border-radius: var(--r-card);
+}
+[data-theme="kawaii"] .response-card {
+  background: var(--bg-card);
+  border: 2px solid rgba(139,92,246,0.2); border-radius: 20px;
+  box-shadow: 0 6px 24px rgba(139,92,246,0.12);
+}
+[data-theme="notepad"] .response-card {
+  background: var(--bg-card);
+  border: 1.5px solid #d4cbbf; border-top: 3px solid var(--c2);
+  border-radius: var(--r-card); box-shadow: 0 2px 8px rgba(196,184,170,0.2);
+}
+
+.response-head {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+}
+
+[data-theme="cyberpunk"] .response-head {
+  border-bottom: 1px solid rgba(176,76,255,0.3);
+  box-shadow: 0 0 16px rgba(0,255,200,0.1);
+}
+[data-theme="kawaii"] .response-head {
+  border-bottom: 1px solid rgba(139,92,246,0.1);
+}
+[data-theme="notepad"] .response-head {
+  border-bottom: 1px solid #e8e0d5;
+}
+
+.response-portrait {
+  width: 36px; height: 36px; object-fit: cover; flex-shrink: 0;
+}
+[data-theme="cyberpunk"] .response-portrait {
+  border-radius: 18px; border: 1px solid var(--c2);
+}
+[data-theme="kawaii"] .response-portrait {
+  border-radius: 10px; border: 2px solid rgba(139,92,246,0.3);
+}
+[data-theme="notepad"] .response-portrait {
+  border-radius: 50%; border: 1.5px solid #d4cbbf;
+}
+
+.response-figure-name { font-size: 15px; font-weight: 700; }
+[data-theme="cyberpunk"] .response-figure-name {
+  font-family: var(--font-h); color: var(--c2); letter-spacing: 1px; text-transform: uppercase;
+  text-shadow: var(--glow-c2);
+}
+[data-theme="kawaii"] .response-figure-name { color: var(--c1); }
+[data-theme="notepad"] .response-figure-name { font-family: var(--font-h); color: var(--c2); }
+
+.response-body { padding: 16px 14px; display: flex; flex-direction: column; gap: 14px; }
+
+.response-section {
+  opacity: 0; transform: translateY(8px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.response-section.revealed { opacity: 1; transform: none; }
+
+.response-section-title {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.8px;
+  text-transform: uppercase; margin-bottom: 6px;
+}
+[data-theme="cyberpunk"] .response-section-title { font-family: var(--font-h); color: var(--c1); letter-spacing: 1.2px; }
+[data-theme="kawaii"]    .response-section-title { color: var(--c1); }
+[data-theme="notepad"]   .response-section-title { font-family: var(--font-b); color: var(--c2); }
+
+.response-section-body {
+  font-size: 13px; line-height: 1.7;
+}
+[data-theme="cyberpunk"] .response-section-body { font-family: var(--font-h); color: var(--text-b); }
+[data-theme="kawaii"]    .response-section-body { color: var(--text-b); }
+[data-theme="notepad"]   .response-section-body { font-family: var(--font-h); font-style: italic; color: var(--text-b); }
+
+/* ════════════════════════════════════════════════
+   13. BOTTOM NAV (response screen)
+════════════════════════════════════════════════ */
+
+.bottom-nav {
+  display: flex; align-items: stretch;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+[data-theme="cyberpunk"] .bottom-nav {
+  border-top: 1px solid rgba(0,245,255,0.08); background: var(--bg);
+}
+[data-theme="kawaii"] .bottom-nav {
+  border-top: 2px solid rgba(139,92,246,0.1);
+  background: var(--bg-card); box-shadow: 0 -4px 16px rgba(139,92,246,0.06);
+}
+[data-theme="notepad"] .bottom-nav {
+  border-top: 1.5px solid #e8e0d5; background: var(--bg-card);
+}
+
+.bottom-nav .btn {
+  flex: 1; height: 64px; flex-direction: column; gap: 3px;
+  font-size: 10px; letter-spacing: 0.5px; border-radius: 0; border: none;
+  text-transform: none; padding: 0;
+}
+.bottom-nav .btn svg, .bottom-nav .btn .nav-icon { font-size: 20px; }
+
+[data-theme="cyberpunk"] .bottom-nav .btn-primary {
+  color: var(--c2); border: none;
+  border-right: 1px solid rgba(0,245,255,0.08);
+  padding: 0;
+}
+[data-theme="cyberpunk"] .bottom-nav .btn-secondary {
+  color: var(--c3); border: none;
+  border-right: 1px solid rgba(0,245,255,0.08);
+  padding: 0;
+}
+[data-theme="kawaii"] .bottom-nav .btn-primary {
+  color: var(--c1); border: none; background: transparent; box-shadow: none;
+  border-radius: 0; padding: 0;
+}
+[data-theme="kawaii"] .bottom-nav .btn-secondary {
+  color: var(--c2); border: none; background: transparent; box-shadow: none;
+  border-radius: 0; padding: 0;
+}
+[data-theme="notepad"] .bottom-nav .btn-primary {
+  color: var(--c1); border: none; background: transparent;
+  border-radius: 0; padding: 0; text-transform: none;
+}
+[data-theme="notepad"] .bottom-nav .btn-secondary {
+  color: var(--c2); border: none; background: transparent;
+  border-radius: 0; padding: 0; text-transform: none;
+}
+.bottom-nav .btn:hover { background: rgba(128,128,128,0.06); }
+
+/* ════════════════════════════════════════════════
+   14. PREVIEW OVERLAY (lens popup)
+════════════════════════════════════════════════ */
+
+#overlay-preview {
+  position: absolute; inset: 0; z-index: 200;
+  background: var(--overlay-bg);
+  display: none; flex-direction: column;
+  justify-content: flex-end; gap: 0; padding: 0;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  overflow: hidden;
+}
+#overlay-preview.open {
+  display: flex; animation: fadeUp 0.22s ease;
+}
+.preview-sheet {
+  background: var(--bg-card); border-radius: 24px 24px 0 0;
+  padding: 24px 20px 24px; display: flex; flex-direction: column; gap: 16px;
+  max-height: 92dvh; overflow: hidden;
+}
+[data-theme="cyberpunk"] .preview-sheet {
+  border-top: 2px solid var(--c4); background: var(--bg-card);
+  border-radius: 0; border-left: none; border-right: none;
+  box-shadow: 0 -8px 32px rgba(176,76,255,0.2);
+}
+[data-theme="kawaii"] .preview-sheet {
+  border-top: 2px solid rgba(139,92,246,0.3);
+  box-shadow: 0 -8px 32px rgba(139,92,246,0.15);
+}
+[data-theme="notepad"] .preview-sheet {
+  border-top: 2px solid var(--c2);
+  box-shadow: 0 -4px 16px rgba(196,184,170,0.3);
+}
+
+.preview-drag-handle {
+  width: 36px; height: 4px; border-radius: 2px;
+  background: var(--text-m); opacity: 0.3;
+  align-self: center; margin-bottom: 4px; flex-shrink: 0;
+}
+
+.preview-disclaimer {
+  font-size: 11px; text-align: center; color: var(--text-m);
+  padding-bottom: 4px;
+}
+[data-theme="cyberpunk"] .preview-disclaimer { font-family: var(--font-h); letter-spacing: 0.5px; }
+
+/* Strip carousel inside overlay */
+.preview-carousel-row {
+  display: flex; flex-direction: column; gap: 0;
+  border-top: 1px solid rgba(128,128,128,0.1);
+  padding-top: 12px; padding-bottom: 20px; flex-shrink: 0;
+}
+.preview-carousel-row .lens-carousel { padding-bottom: 4px; }
+
+.preview-card { width: 100%; }
+
+.preview-inner { display: flex; flex-direction: row; align-items: center; gap: 16px; }
+
+.preview-portrait {
+  width: 72px; height: 72px; object-fit: cover; flex-shrink: 0;
+}
+[data-theme="cyberpunk"] .preview-portrait {
+  border-radius: 36px; border: 2px solid var(--c2); box-shadow: var(--glow-c2);
+}
+[data-theme="kawaii"] .preview-portrait {
+  border-radius: 16px; border: 2px solid var(--c1); box-shadow: var(--glow-c1);
+}
+[data-theme="notepad"] .preview-portrait {
+  border-radius: 50%; border: 2px solid var(--c2);
+}
+
+.preview-text-block { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
+
+.preview-name { font-size: 17px; font-weight: 700; }
+[data-theme="cyberpunk"] .preview-name {
+  font-family: var(--font-h); color: var(--c2); letter-spacing: 1.2px; text-transform: uppercase;
+  text-shadow: var(--glow-c2);
+}
+[data-theme="kawaii"] .preview-name { color: var(--c1); }
+[data-theme="notepad"] .preview-name { font-family: var(--font-h); color: var(--c2); }
+
+.preview-quote {
+  font-size: 12px; line-height: 1.55;
+  font-style: italic; color: var(--text-h);
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.preview-bio {
+  font-size: 11px; line-height: 1.55; color: var(--text-b);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+.preview-actions {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding-bottom: 16px;
+}
+
+/* ════════════════════════════════════════════════
+   15. LOADING OVERLAY
+════════════════════════════════════════════════ */
+
+#overlay-loading {
+  position: absolute; inset: 0; z-index: 500;
+  display: none; flex-direction: column;
+  align-items: center; justify-content: center; gap: 18px;
+}
+#overlay-loading.open {
+  display: flex;
+}
+
+[data-theme="cyberpunk"] #overlay-loading { background: rgba(8,8,16,0.97); }
+[data-theme="kawaii"]    #overlay-loading { background: rgba(237,242,255,0.97); }
+[data-theme="notepad"]   #overlay-loading { background: rgba(253,253,251,0.97); }
+
+.loading-portrait {
+  width: 72px; height: 72px; object-fit: cover;
+  animation: loadingPulse 1.8s ease-in-out infinite;
+}
+[data-theme="cyberpunk"] .loading-portrait {
+  border-radius: 36px; border: 2px solid var(--c1); box-shadow: 0 0 24px rgba(0,245,255,0.5);
+}
+[data-theme="kawaii"] .loading-portrait {
+  border-radius: 16px; border: 2px solid var(--c1); box-shadow: var(--glow-c1);
+}
+[data-theme="notepad"] .loading-portrait {
+  border-radius: 50%; border: 2px solid var(--c2);
+}
+@keyframes loadingPulse {
+  0%, 100% { opacity: 0.7; transform: scale(0.95); }
+  50%       { opacity: 1;   transform: scale(1.05); }
+}
+
+.loading-title {
+  font-size: 16px; font-weight: 700; text-align: center; color: var(--text-h);
+}
+[data-theme="cyberpunk"] .loading-title {
+  font-family: var(--font-h); letter-spacing: 1.4px; text-transform: uppercase;
+}
+.loading-subtitle {
+  font-size: 11px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-m);
+  text-align: center;
+}
+[data-theme="cyberpunk"] .loading-subtitle { font-family: var(--font-h); color: var(--c1); }
+[data-theme="kawaii"] .loading-subtitle { font-weight: 700; color: var(--c1); }
+
+.loading-dots { display: flex; gap: 8px; }
+.ldot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--c1);
+  animation: ldotPulse 1.3s infinite ease-in-out;
+}
+.ldot:nth-child(1) { animation-delay: 0s; }
+.ldot:nth-child(2) { animation-delay: 0.18s; }
+.ldot:nth-child(3) { animation-delay: 0.36s; }
+@keyframes ldotPulse {
+  0%, 100% { opacity: 0.2; transform: scale(0.75); }
+  50%       { opacity: 1;   transform: scale(1.15); }
+}
+
+/* ════════════════════════════════════════════════
+   16. SCREEN-SPECIFIC LAYOUTS
+════════════════════════════════════════════════ */
+
+/* Landing — scrollable, content drives height */
+#screen-landing { gap: 28px; padding-bottom: 48px; }
+.landing-copy { display: flex; flex-direction: column; gap: 14px; }
+
+/* Lenses */
+#screen-lenses { gap: 16px; padding-bottom: 32px; }
+
+/* Share preview */
+#screen-share { gap: 0; align-items: stretch; }
+.share-canvas {
+  flex: 1; position: relative; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: flex-end;
+}
+.share-quote-block {
+  padding: 24px; display: flex; flex-direction: column; gap: 12px;
+  background: rgba(0,0,0,0.6);
+}
+[data-theme="kawaii"] .share-quote-block { background: rgba(237,242,255,0.85); }
+[data-theme="notepad"] .share-quote-block { background: rgba(253,253,251,0.9); }
+
+.share-watermark {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  font-size: 40px; font-weight: 900; letter-spacing: 6px; text-transform: uppercase;
+  color: rgba(255,255,255,0.08); pointer-events: none; white-space: nowrap;
+  font-family: var(--font-h);
+}
+[data-theme="kawaii"] .share-watermark { color: rgba(139,92,246,0.07); font-family: var(--font-h); }
+[data-theme="notepad"] .share-watermark { color: rgba(90,78,71,0.07); }
+
+.share-social-row {
+  display: flex; gap: 12px; padding: 16px 24px; justify-content: center;
+  flex-shrink: 0; flex-wrap: wrap;
+}
+.share-social-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+  color: var(--text-m); cursor: pointer;
+  padding: 8px 12px; border-radius: var(--r-card);
+  background: var(--bg-card); border: 1px solid rgba(128,128,128,0.15);
+  transition: background 0.15s;
+}
+.share-social-btn .social-icon { font-size: 22px; }
+.share-social-btn:hover { background: var(--bg-card2); }
+.share-upsell {
+  font-size: 11px; text-align: center; color: var(--text-m);
+  padding: 0 24px 16px; cursor: pointer; text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Response — scrollable content + pinned footer */
+#screen-response { gap: 0; padding: 0; }
+.resp-scroll-area {
+  flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  display: flex; flex-direction: column; gap: 16px;
+  padding: 32px 24px 20px;
+  scrollbar-width: thin; scrollbar-color: rgba(128,128,128,0.2) transparent;
+}
+#screen-response .action-icon-row {
+  flex-shrink: 0; padding: 8px 24px 0;
+}
+.response-action-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+
+/* Account */
+#screen-account { gap: 24px; align-items: center; }
+.account-fields { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 327px; }
+.compact-input { width: 100%; }
+
+[data-theme="cyberpunk"] .compact-input {
+  background: var(--bg-card);
+  border-top: 4px solid var(--c1); border-left: 4px solid var(--c1);
+  border-right: 1px solid var(--c1); border-bottom: 1px solid var(--c1);
+  border-radius: var(--r);
+}
+[data-theme="cyberpunk"] .compact-label {
+  font-family: var(--font-h); font-size: 9px; letter-spacing: 1.2px; color: var(--c1);
+  text-transform: uppercase; padding: 6px 10px 2px; border-bottom: 1px solid rgba(0,245,255,0.2);
+}
+[data-theme="cyberpunk"] .compact-input input {
+  background: transparent; color: var(--text-m); width: 100%; border: none;
+  font-family: var(--font-h); font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+  padding: 4px 10px 6px;
+}
+[data-theme="kawaii"] .compact-input {
+  background: var(--bg-card);
+  border: 2px solid rgba(139,92,246,0.2); border-radius: 14px; overflow: hidden;
+}
+[data-theme="kawaii"] .compact-label {
+  font-size: 10px; font-weight: 800; color: var(--c1); text-transform: uppercase;
+  letter-spacing: 0.5px; padding: 8px 14px 2px; border-bottom: 1px solid rgba(139,92,246,0.1);
+}
+[data-theme="kawaii"] .compact-input input {
+  background: transparent; color: var(--text-h); width: 100%; border: none;
+  font-size: 13px; padding: 4px 14px 8px;
+}
+[data-theme="notepad"] .compact-input {
+  background: var(--bg-card);
+  border: 1.5px solid #d4cbbf; border-radius: var(--r); overflow: hidden;
+}
+[data-theme="notepad"] .compact-label {
+  font-family: var(--font-h); font-style: italic; font-size: 11px; color: var(--text-m);
+  padding: 6px 12px 2px; border-bottom: 1px solid #e8e0d5;
+}
+[data-theme="notepad"] .compact-input input {
+  background: transparent; color: var(--text-h); width: 100%; border: none;
+  font-size: 13px; padding: 4px 12px 6px;
+}
+.compact-input input::placeholder { opacity: 0.5; }
+
+/* ════════════════════════════════════════════════
+   17. THEME TRANSITION ANIMATION
+════════════════════════════════════════════════ */
+
+#app.theme-out {
+  filter: blur(3px);
+  opacity: 0.5;
+  transform: scale(0.987);
+  transition: filter 0.16s ease, opacity 0.16s ease, transform 0.16s ease !important;
+}
+#app.theme-in {
+  filter: none;
+  opacity: 1;
+  transform: none;
+  transition: filter 0.2s ease, opacity 0.2s ease, transform 0.2s ease !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  #app.theme-out, #app.theme-in {
+    transition: none !important; filter: none; opacity: 1; transform: none;
+  }
+}
+
+/* ════════════════════════════════════════════════
+   18. LOADING DOT PERSONALITIES
+════════════════════════════════════════════════ */
+
+/* Cyberpunk: vertical cursor blink */
+[data-theme="cyberpunk"] .ldot {
+  border-radius: 0; width: 2px; height: 16px; background: var(--c1);
+  animation: cyberCursor 0.85s infinite step-end;
+}
+[data-theme="cyberpunk"] .ldot:nth-child(2) { animation-delay: 0.28s; }
+[data-theme="cyberpunk"] .ldot:nth-child(3) { animation-delay: 0.56s; }
+@keyframes cyberCursor { 0%,49%{opacity:1;} 50%,100%{opacity:0;} }
+
+/* Kawaii: bouncing color dots */
+[data-theme="kawaii"] .ldot {
+  animation: kawaiiBounce 0.75s infinite ease-in-out;
+}
+[data-theme="kawaii"] .ldot:nth-child(1) { background:#ff2d78; animation-delay:0s; }
+[data-theme="kawaii"] .ldot:nth-child(2) { background:#8b5cf6; animation-delay:0.15s; }
+[data-theme="kawaii"] .ldot:nth-child(3) { background:#5b8dee; animation-delay:0.3s; }
+@keyframes kawaiiBounce {
+  0%,100%{ transform:translateY(0) scale(1); }
+  40%    { transform:translateY(-10px) scale(1.15); }
+}
+
+/* Notepad: gentle fade, no movement */
+[data-theme="notepad"] .ldot {
+  background: var(--text-m);
+  animation: notepadFade 1.4s infinite ease-in-out;
+  transform: none;
+}
+[data-theme="notepad"] .ldot:nth-child(2) { animation-delay: 0.28s; }
+[data-theme="notepad"] .ldot:nth-child(3) { animation-delay: 0.56s; }
+@keyframes notepadFade { 0%,100%{opacity:0.2;} 50%{opacity:0.75;} }
+
+/* ════════════════════════════════════════════════
+   19. PORTRAIT FALLBACK + LENS BADGE
+════════════════════════════════════════════════ */
+
+.portrait-fallback {
+  width: 64px; height: 64px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-card2); color: var(--c1);
+  font-size: 15px; font-weight: 700; letter-spacing: 1px;
+  border: 1px solid var(--c1);
+}
+[data-theme="cyberpunk"] .portrait-fallback { border-radius: 32px; font-family: var(--font-h); }
+[data-theme="kawaii"]    .portrait-fallback { border-radius: 14px; }
+[data-theme="notepad"]   .portrait-fallback { border-radius: 50%; }
+
+.lens-count-badge {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+  padding: 4px 14px; border-radius: 20px;
+  background: var(--bg-card); border: 1px solid var(--text-m);
+  color: var(--text-m); align-self: center; text-align: center;
+}
+[data-theme="cyberpunk"] .lens-count-badge {
+  font-family: var(--font-h); color: var(--c1); border-color: var(--c1);
+  letter-spacing: 1px; text-transform: uppercase; font-size: 10px;
+}
+[data-theme="kawaii"] .lens-count-badge { color: var(--c1); border-color: rgba(139,92,246,0.4); }
+[data-theme="notepad"] .lens-count-badge { font-family: var(--font-b); }
+
+/* ════════════════════════════════════════════════
+   20. RESPONSE ACTION ROW (icon+label buttons)
+════════════════════════════════════════════════ */
+
+.action-icon-row {
+  display: flex; gap: 8px; justify-content: center;
+}
+.action-btn {
+  flex: 1; min-height: 52px; flex-direction: column; gap: 2px;
+  font-size: 10px; letter-spacing: 0.5px;
+}
+.action-icon { font-size: 18px; line-height: 1; }
+
+/* Tap target fix for btn-ghost */
+.btn-ghost { min-height: 44px; min-width: 44px; }
+
+/* ════════════════════════════════════════════════
+   21. ACCESSIBILITY
+════════════════════════════════════════════════ */
+
+.skip-link {
+  position: absolute; left: -9999px; top: 4px;
+  background: var(--bg-card); color: var(--c1);
+  padding: 8px 16px; font-size: 12px; z-index: 9999;
+}
+.skip-link:focus { left: 4px; }
+:focus-visible { outline: 2px solid var(--c1); outline-offset: 3px; border-radius: 2px; }
+
+/* ════════════════════════════════════════════════
+   22. TOAST NOTIFICATION
+════════════════════════════════════════════════ */
+
+.app-toast {
+  position: absolute; bottom: 80px; left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: var(--bg-card); color: var(--text-h);
+  border: 1px solid var(--text-m); border-radius: 20px;
+  padding: 9px 22px; font-size: 12px; font-weight: 600;
+  white-space: nowrap; z-index: 300; pointer-events: none;
+  opacity: 0; transition: opacity 0.22s ease, transform 0.22s ease;
+}
+.app-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+[data-theme="cyberpunk"] .app-toast {
+  font-family: var(--font-h); color: var(--c4); border-color: var(--c4);
+  letter-spacing: 1px; font-size: 11px;
+}
+[data-theme="kawaii"] .app-toast {
+  border-color: var(--c1); color: var(--c1); border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(139,92,246,0.2);
+}
+[data-theme="notepad"] .app-toast {
+  font-family: var(--font-b); border-color: var(--c1); color: var(--c1);
+}
+
+/* ════════════════════════════════════════════════
+   23. LENS SCREEN BACK BUTTON ROW
+════════════════════════════════════════════════ */
+
+.lens-nav-row {
+  display: flex; align-items: center;
+  justify-content: space-between; gap: 12px; flex-wrap: wrap;
+}
+.lens-nav-row .btn-ghost {
+  padding: 6px 12px; font-size: 11px; min-height: 36px; min-width: auto;
+}
+
+/* Smooth theme transition */
+#app, #app * {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: 0.28s;
+  transition-timing-function: ease;
+}
+/* Exclude portrait images from transitions to avoid flicker */
+#app img { transition: none; }
+#app .screen, #app .response-section { transition: none; }
+
+/* ════════════════════════════════════════════════
+   24. WELCOME SCREEN (theme-aware)
+════════════════════════════════════════════════ */
+
+#screen-welcome {
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+  padding: 48px 24px 40px;
+  gap: 0;
+  overflow: hidden;
+}
+
+.welcome-card {
+  padding: 40px 24px 32px;
+  display: flex; flex-direction: column; align-items: center; gap: 18px;
+}
+
+[data-theme="cyberpunk"] .welcome-card {
+  border: 1.5px solid rgba(176,76,255,0.6); border-radius: 4px;
+}
+[data-theme="kawaii"] .welcome-card {
+  border: 2px solid rgba(139,92,246,0.3); border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(139,92,246,0.1);
+}
+[data-theme="notepad"] .welcome-card {
+  border: 1.5px solid #c8bfb4; border-left: 4px solid var(--c1); border-radius: 6px;
+}
+
+.welcome-logo { color: var(--c2); font-size: 28px; font-weight: 700; text-align: center; }
+[data-theme="cyberpunk"] .welcome-logo {
+  font-family: 'Courier Prime', monospace;
+  text-shadow: var(--glow-c2); letter-spacing: 4px;
+}
+[data-theme="kawaii"] .welcome-logo { font-family: var(--font-h); color: var(--c1); }
+[data-theme="notepad"] .welcome-logo { font-family: var(--font-h); color: var(--c2); }
+
+.welcome-tagline {
+  color: var(--c1);
+  font-size: 13px; font-weight: 700;
+  text-align: center; line-height: 1.5;
+}
+[data-theme="cyberpunk"] .welcome-tagline {
+  font-family: 'Courier Prime', monospace; color: var(--c2);
+  letter-spacing: 1px; text-transform: uppercase;
+}
+[data-theme="kawaii"] .welcome-tagline { font-weight: 800; }
+[data-theme="notepad"] .welcome-tagline { font-family: var(--font-h); font-style: italic; }
+
+.welcome-body {
+  color: var(--text-b);
+  font-size: 13px; line-height: 1.7; text-align: center;
+}
+[data-theme="cyberpunk"] .welcome-body {
+  font-family: 'Courier Prime', monospace; color: var(--c2);
+}
+
+.welcome-enter-btn {
+  color: var(--c1);
+  border: 1.5px solid var(--c1);
+  border-radius: var(--r-card, 4px);
+  background: transparent;
+  font-size: 13px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 14px 18px 12px;
+  cursor: pointer;
+  transition: box-shadow 0.15s, background 0.15s;
+}
+[data-theme="cyberpunk"] .welcome-enter-btn {
+  font-family: 'Courier Prime', monospace;
+  color: #39FF14; border-top: 4px solid #39FF14; border-left: 4px solid #39FF14;
+  border-right: 1px solid #39FF14; border-bottom: 1px solid #39FF14;
+  border-radius: 2px;
+}
+[data-theme="cyberpunk"] .welcome-enter-btn:hover {
+  box-shadow: 0 0 16px rgba(57,255,20,0.4); background: rgba(57,255,20,0.05);
+}
+[data-theme="kawaii"] .welcome-enter-btn {
+  color: #ff2d78; border-color: #ff2d78; border-radius: 40px; font-family: var(--font-h);
+}
+[data-theme="kawaii"] .welcome-enter-btn:hover { background: rgba(255,45,120,0.06); }
+[data-theme="notepad"] .welcome-enter-btn {
+  color: #4a8855; border-color: #4a8855; font-family: var(--font-h);
+}
+[data-theme="notepad"] .welcome-enter-btn:hover { background: rgba(74,136,85,0.06); }
+.welcome-enter-btn:active { transform: scale(0.97); }
+
+.welcome-disclaimer {
+  text-align: center;
+  display: flex; flex-direction: column; gap: 8px;
+  padding-top: 32px;
+}
+
+.welcome-disclaimer-label { color: var(--c3); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+[data-theme="cyberpunk"] .welcome-disclaimer-label { font-family: 'Courier Prime', monospace; }
+
+.welcome-disclaimer-body { color: var(--text-b); font-size: 12px; line-height: 1.7; }
+[data-theme="cyberpunk"] .welcome-disclaimer-body { font-family: 'Courier Prime', monospace; color: var(--c2); }
+
+.welcome-disclaimer-em { color: var(--c2); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+[data-theme="cyberpunk"] .welcome-disclaimer-em { font-family: 'Courier Prime', monospace; text-transform: uppercase; }
+
+/* ════════════════════════════════════════════════
+   25. HERO CARD (landing screen)
+════════════════════════════════════════════════ */
+
+.hero-card {
+  padding: 16px 24px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+[data-theme="cyberpunk"] .hero-card {
+  background: #0D0D1A;
+  border-top: 1px solid #ff2d78; border-left: 4px solid #ff2d78;
+  border-right: 4px solid #ff2d78; border-bottom: 2px solid #ff2d78;
+  border-radius: 4px;
+}
+[data-theme="kawaii"] .hero-card {
+  background: #fff;
+  border-top: 1px solid #400b14; border-left: 2px solid #400b14;
+  border-right: 4px solid #400b14; border-bottom: 1px solid #400b14;
+  border-radius: 32px;
+  box-shadow: inset 4px 0 0 rgba(64,11,20,0.5);
+  align-items: center; text-align: center;
+}
+[data-theme="notepad"] .hero-card {
+  background: #fff;
+  border-top: 1.5px solid #c0605a; border-left: 4px solid #c0605a;
+  border-right: 1.5px solid #c0605a; border-bottom: 1.5px solid #c0605a;
+  border-radius: 8px;
+  box-shadow: 3px 4px 0 #d4cbbf;
+}
+
+.hero-heading { font-weight: 700; text-transform: uppercase; }
+
+[data-theme="cyberpunk"] .hero-heading {
+  font-family: 'Courier Prime', monospace;
+  font-size: 18px; color: #eeffea;
+  letter-spacing: 1.44px;
+}
+[data-theme="kawaii"] .hero-heading {
+  font-family: 'Nunito Sans', 'Nunito', sans-serif;
+  font-size: 28px; font-weight: 700; color: #ff50c5;
+}
+[data-theme="notepad"] .hero-heading {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 18px; color: #3a6fa8; letter-spacing: 1.2px;
+}
+
+.hero-body { font-size: 14px; line-height: 1.6; }
+
+[data-theme="cyberpunk"] .hero-body {
+  font-family: 'Courier Prime', monospace;
+  color: #00F5FF; letter-spacing: 0.52px;
+}
+[data-theme="kawaii"] .hero-body {
+  font-family: 'Nunito Sans', 'Nunito', sans-serif;
+  color: #270007; letter-spacing: 0.52px; text-align: center;
+}
+[data-theme="notepad"] .hero-body {
+  font-family: 'Inter', sans-serif;
+  color: #1e1e40; letter-spacing: 0.18px;
+}
+
+/* ════════════════════════════════════════════════
+   26. ADD-CARD EXTENDED CONTENT
+════════════════════════════════════════════════ */
+
+/* add-card sub-label "Coming Soon" */
+.add-card .t-sub {
+  font-size: 12px; font-weight: 700; letter-spacing: 0.52px; text-transform: uppercase;
+}
+[data-theme="cyberpunk"] .add-card .t-sub { font-family: 'Courier Prime', monospace; color: #00F5FF; letter-spacing: 1.32px; }
+[data-theme="kawaii"]    .add-card .t-sub { font-family: 'Nunito Sans','Nunito',sans-serif; color: #400b14; }
+[data-theme="notepad"]   .add-card .t-sub { font-family: 'Inter',sans-serif; font-weight: 600; color: #3a6fa8; letter-spacing: 0.55px; }
+
+.add-card-title { font-size: 18px; font-weight: 700; text-transform: uppercase; }
+[data-theme="cyberpunk"] .add-card-title { font-family: 'Courier Prime', monospace; color: #eeffea; letter-spacing: 1.44px; }
+[data-theme="kawaii"]    .add-card-title { font-family: 'Nunito Sans','Nunito',sans-serif; color: #ff50c5; text-align: center; }
+[data-theme="notepad"]   .add-card-title { font-family: Georgia,'Times New Roman',serif; color: #3a6fa8; letter-spacing: 1.2px; }
+
+.add-card-body  { font-size: 14px; line-height: 1.5; }
+[data-theme="cyberpunk"] .add-card-body { font-family: 'Courier Prime', monospace; color: #00F5FF; letter-spacing: 0.52px; }
+[data-theme="kawaii"]    .add-card-body { font-family: 'Nunito Sans','Nunito',sans-serif; color: #270007; letter-spacing: 0.52px; text-align: center; }
+[data-theme="notepad"]   .add-card-body { font-family: 'Inter',sans-serif; color: #1e1e40; letter-spacing: 0.18px; }
+
+.add-card-cats {
+  font-size: 10px; text-transform: uppercase; line-height: 1.5;
+}
+[data-theme="cyberpunk"] .add-card-cats { font-family: 'Courier Prime',monospace; color: #eeffea; letter-spacing: 1px; }
+[data-theme="kawaii"]    .add-card-cats { font-family: 'Nunito Sans','Nunito',sans-serif; color: #400b14; letter-spacing: 0.6px; text-align: center; }
+[data-theme="notepad"]   .add-card-cats { font-family: 'Inter',sans-serif; color: #3a6fa8; letter-spacing: 0.2px; }
+
+.add-card-waitlist {
+  font-size: 14px; text-align: center; letter-spacing: 0.52px;
+}
+[data-theme="cyberpunk"] .add-card-waitlist { font-family: 'Courier Prime',monospace; color: #39FF14; }
+[data-theme="kawaii"]    .add-card-waitlist { font-family: 'Nunito Sans','Nunito',sans-serif; color: #270007; }
+[data-theme="notepad"]   .add-card-waitlist { font-family: 'Inter',sans-serif; color: #c0605a; }
+
+.add-card-signup { align-self: center; margin-top: 4px; }
+
+/* ════════════════════════════════════════════════
+   27. THEME SELECTION MODAL OVERLAY
+════════════════════════════════════════════════ */
+
+/* ════════════════════════════════════════════════
+   UI SELECTION SCREEN (carousel)
+════════════════════════════════════════════════ */
+
+#screen-ui-select { padding: 0; gap: 0; overflow: hidden; position: relative; }
+
+/* Portrait grid background — fills with themed portrait images, blurred */
+.ui-select-bg {
+  position: absolute; inset: 0; z-index: 0;
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 6px; padding: 6px;
+  opacity: 0.18; filter: blur(3px) saturate(0.8);
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+.ui-select-bg img { width: 100%; aspect-ratio: 1; object-fit: cover; }
+
+/* Everything else in ui-select must sit above the bg */
+.ui-select-header, .ui-select-track, .ui-select-footer { position: relative; z-index: 1; }
+
+.ui-select-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px 8px; flex-shrink: 0;
+}
+.ui-select-header-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  color: rgba(255,255,255,0.35); font-family: 'Courier Prime', monospace;
+}
+.ui-select-back {
+  font-size: 13px; color: rgba(255,255,255,0.45); border: none;
+  background: none; cursor: pointer; padding: 4px 0;
+}
+
+.ui-select-track {
+  flex: 1; display: flex; align-items: center;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory; scrollbar-width: none;
+  gap: 16px;
+  /* center first/last card */
+  padding-left: max(16px, calc(50% - 170px));
+  padding-right: max(16px, calc(50% - 170px));
+}
+.ui-select-track::-webkit-scrollbar { display: none; }
+
+.ui-select-card {
+  flex-shrink: 0; scroll-snap-align: center;
+  width: 340px; max-width: calc(100vw - 48px);
+  display: flex; flex-direction: column; align-items: center;
+  gap: 18px; padding: 40px 28px 32px;
+  text-align: center;
+}
+
+/* Cyberpunk card */
+.ui-select-card[data-theme-id="cyberpunk"] {
+  background: #0D0D1A; border: 1.5px solid rgba(176,76,255,0.65);
+  border-radius: 4px; box-shadow: 0 0 40px rgba(176,76,255,0.12);
+}
+.ui-select-card[data-theme-id="cyberpunk"] .ui-select-card-name {
+  font-family: 'Courier Prime', monospace; font-size: 26px; font-weight: 700;
+  letter-spacing: 3px; color: #39FF14; text-shadow: 0 0 16px rgba(57,255,20,0.4);
+}
+.ui-select-card[data-theme-id="cyberpunk"] .ui-select-card-tagline {
+  font-family: 'Courier Prime', monospace; font-size: 15px; font-weight: 700;
+  line-height: 1.75; color: #00F5FF;
+}
+.ui-select-card[data-theme-id="cyberpunk"] .ui-select-card-desc {
+  font-family: 'Courier Prime', monospace; font-size: 12px;
+  line-height: 1.65; color: #7ECFDF;
+}
+.ui-select-card[data-theme-id="cyberpunk"] .ui-select-card-btn {
+  background: transparent; border: 1.5px solid #39FF14; color: #39FF14;
+  font-family: 'Courier Prime', monospace; font-size: 12px; font-weight: 700;
+  letter-spacing: 1.5px; padding: 13px 36px; cursor: pointer; border-radius: 2px;
+  transition: box-shadow 0.18s, background 0.18s;
+}
+.ui-select-card[data-theme-id="cyberpunk"] .ui-select-card-btn:hover {
+  box-shadow: 0 0 16px rgba(57,255,20,0.4); background: rgba(57,255,20,0.06);
+}
+
+/* Kawaii card */
+.ui-select-card[data-theme-id="kawaii"] {
+  background: #fff; border: 2.5px solid #111;
+  border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+}
+.ui-select-card[data-theme-id="kawaii"] .ui-select-card-name {
+  font-family: 'Nunito', sans-serif; font-size: 26px; font-weight: 900;
+  color: #ff2d78;
+}
+.ui-select-card[data-theme-id="kawaii"] .ui-select-card-tagline {
+  font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700;
+  line-height: 1.75; color: #ff2d78;
+}
+.ui-select-card[data-theme-id="kawaii"] .ui-select-card-desc {
+  font-family: 'Nunito', sans-serif; font-size: 12px;
+  line-height: 1.65; color: #3a3560;
+}
+.ui-select-card[data-theme-id="kawaii"] .ui-select-card-btn {
+  background: #ff2d78; border: none; color: #fff;
+  font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800;
+  padding: 13px 36px; cursor: pointer; border-radius: 24px;
+  transition: box-shadow 0.18s, transform 0.12s;
+}
+.ui-select-card[data-theme-id="kawaii"] .ui-select-card-btn:hover {
+  box-shadow: 0 4px 20px rgba(255,45,120,0.4); transform: translateY(-1px);
+}
+
+/* Notepad card */
+.ui-select-card[data-theme-id="notepad"] {
+  background: #faf7f2; border: 1.5px solid #c8bfb4;
+  border-left: 4px solid #4a8855; border-radius: 8px;
+  box-shadow: 3px 4px 0 #d4cbbf;
+}
+.ui-select-card[data-theme-id="notepad"] .ui-select-card-name {
+  font-family: 'Lora', Georgia, serif; font-size: 24px; font-weight: 700;
+  color: #3a6fa8;
+}
+.ui-select-card[data-theme-id="notepad"] .ui-select-card-tagline {
+  font-family: 'Lora', Georgia, serif; font-size: 14px; font-weight: 600;
+  line-height: 1.75; font-style: italic; color: #4a8855;
+}
+.ui-select-card[data-theme-id="notepad"] .ui-select-card-desc {
+  font-family: 'Inter', sans-serif; font-size: 12px;
+  line-height: 1.65; color: #5a4e47;
+}
+.ui-select-card[data-theme-id="notepad"] .ui-select-card-btn {
+  background: transparent; border: 1.5px solid #3a6fa8; color: #3a6fa8;
+  font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
+  padding: 13px 36px; cursor: pointer; border-radius: 4px;
+  transition: background 0.18s, box-shadow 0.18s;
+}
+.ui-select-card[data-theme-id="notepad"] .ui-select-card-btn:hover {
+  background: rgba(58,111,168,0.07); box-shadow: 0 2px 8px rgba(58,111,168,0.2);
+}
+
+/* Footer: arrows + dots */
+.ui-select-footer {
+  display: flex; align-items: center; justify-content: center;
+  gap: 20px; padding: 16px 24px 32px; flex-shrink: 0;
+}
+.ui-select-arrow {
+  background: none; border: none; cursor: pointer; font-size: 30px;
+  color: rgba(255,255,255,0.3); padding: 4px 8px; line-height: 1;
+  transition: color 0.15s;
+}
+.ui-select-arrow:hover { color: rgba(255,255,255,0.65); }
+.ui-select-dots { display: flex; gap: 10px; align-items: center; }
+.ui-select-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: rgba(255,255,255,0.22); transition: background 0.2s, transform 0.2s;
+}
+.ui-select-dot.active { background: #fff; transform: scale(1.35); }
+
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+
+<div id="app" data-theme="cyberpunk">
+
+  <main id="main">
+
+    <!-- ══════════════════ SCREEN: WELCOME ══════════════════ -->
+    <div class="screen active" id="screen-welcome">
+      <div class="welcome-card">
+        <div class="welcome-logo">MINDSHIFT</div>
+        <div class="welcome-tagline" id="welcomeTagline">FOR THE OVERTHINKERS, THE STUCK ONES,<br>AND ANYONE WHO JUST NEEDS A FRESH ANGLE.</div>
+        <p class="welcome-body">A perspective-shifting space for anyone who's ever thought "I know, but also… do I?" MindShift helps you explore what you already know from angles you haven't tried yet.</p>
+        <button class="welcome-enter-btn" onclick="showScreen('screen-ui-select'); initUISelect();">ENTER THE SPACE</button>
+      </div>
+
+      <div class="welcome-disclaimer">
+        <div class="welcome-disclaimer-label">A FEW THINGS BEFORE WE BEGIN:</div>
+        <p class="welcome-disclaimer-body">MindShift is a space for reflection, not a substitute for professional mental health support.</p>
+        <div class="welcome-disclaimer-em">NOTHING HERE IS CLINICAL ADVICE.</div>
+      </div>
+    </div><!-- /screen-welcome -->
+
+
+    <!-- ══════════════════ SCREEN: UI SELECTION ══════════════════ -->
+    <div class="screen" id="screen-ui-select">
+
+      <!-- Blurred portrait grid background (populated by JS) -->
+      <div class="ui-select-bg" id="uiSelectBg" aria-hidden="true"></div>
+
+      <div class="ui-select-header">
+        <button class="ui-select-back" onclick="showScreen('screen-welcome')" aria-label="Back">← Back</button>
+        <span class="ui-select-header-label">CHOOSE YOUR STYLE</span>
+        <span style="width:56px;"></span><!-- spacer -->
+      </div>
+
+      <div class="ui-select-track" id="uiSelectTrack">
+
+        <!-- Set A (before) -->
+        <div class="ui-select-card" data-theme-id="cyberpunk">
+          <div class="ui-select-card-name">CYBERPUNK</div>
+          <div class="ui-select-card-tagline">Neon edges.<br>Dark depths.<br>Maximum signal.</div>
+          <p class="ui-select-card-desc">Hack your mind in a high-contrast terminal aesthetic built for focus and intensity. For the ones who think in code and dream in electric light.</p>
+          <button class="ui-select-card-btn" onclick="chooseUITheme('cyberpunk')">CHOOSE</button>
+        </div>
+        <div class="ui-select-card" data-theme-id="kawaii">
+          <div class="ui-select-card-name">KAWAII</div>
+          <div class="ui-select-card-tagline">Soft edges.<br>Bright energy.<br>Good vibes only.</div>
+          <p class="ui-select-card-desc">A playful, candy-colored skin that makes self-growth feel like a treat. For the ones who know joy is the best motivator.</p>
+          <button class="ui-select-card-btn" onclick="chooseUITheme('kawaii')">CHOOSE</button>
+        </div>
+        <div class="ui-select-card" data-theme-id="notepad">
+          <div class="ui-select-card-name">NOTEPAD</div>
+          <div class="ui-select-card-tagline">Clean lines.<br>Clear thinking.<br>No noise.</div>
+          <p class="ui-select-card-desc">A distraction-free, paper-light interface that gets out of your way. For the ones who believe clarity is the sharpest tool.</p>
+          <button class="ui-select-card-btn" onclick="chooseUITheme('notepad')">CHOOSE</button>
+        </div>
+
+        <!-- Set B (center — start here) -->
+        <div class="ui-select-card" data-theme-id="cyberpunk">
+          <div class="ui-select-card-name">CYBERPUNK</div>
+          <div class="ui-select-card-tagline">Neon edges.<br>Dark depths.<br>Maximum signal.</div>
+          <p class="ui-select-card-desc">Hack your mind in a high-contrast terminal aesthetic built for focus and intensity. For the ones who think in code and dream in electric light.</p>
+          <button class="ui-select-card-btn" onclick="chooseUITheme('cyberpunk')">CHOOSE</button>
+        </div>
+        <div class="ui-select-card" data-theme-id="kawaii">
+          <div class="ui-select-card-name">KAWAII</div>
+          <div class="ui-select-card-tagline">Soft edges.<br>Bright energy.<br>Good vibes only.</div>
+          <p class="ui-select-card-desc">A playful, candy-colored skin that makes self-growth feel like a treat. For the ones who know joy is the best motivator.</p>
+          <button class="ui-select-card-btn" onclick="chooseUITheme('kawaii')">CHOOSE</button>
+        </div>
+        <div class="ui-select-card" data-theme-id="notepad">
+          <div class="ui-select-card-name">NOTEPAD</div>
+          <div class="ui-select-card-tagline">Clean lines.<br>Clear thinking.<br>No noise.</div>
+          <p class="ui-select-card-desc">A distraction-free, paper-light interface that gets out of your way. For the ones who believe clarity is the sharpest tool.</p>
+          <button class="ui-select-card-btn" onclick="chooseUITheme('notepad')">CHOOSE</button>
+        </div>
+
+        <!-- Set C (after) -->
+        <div class="ui-select-card" data-theme-id="cyberpunk">
+          <div class="ui-select-card-name">CYBERPUNK</div>
+          <div class="ui-select-card-tagline">Neon edges.<br>Dark depths.<br>Maximum signal.</div>
+          <p class="ui-select-card-desc">Hack your mind in a high-contrast terminal aesthetic built for focus and intensity. For the ones who think in code and dream in electric light.</p>
+          <button class="ui-select-card-btn" onclick="chooseUITheme('cyberpunk')">CHOOSE</button>
+        </div>
+        <div class="ui-select-card" data-theme-id="kawaii">
+          <div class="ui-select-card-name">KAWAII</div>
+          <div class="ui-select-card-tagline">Soft edges.<br>Bright energy.<br>Good vibes only.</div>
+          <p class="ui-select-card-desc">A playful, candy-colored skin that makes self-growth feel like a treat. For the ones who know joy is the best motivator.</p>
+          <button class="ui-select-card-btn" onclick="chooseUITheme('kawaii')">CHOOSE</button>
+        </div>
+        <div class="ui-select-card" data-theme-id="notepad">
+          <div class="ui-select-card-name">NOTEPAD</div>
+          <div class="ui-select-card-tagline">Clean lines.<br>Clear thinking.<br>No noise.</div>
+          <p class="ui-select-card-desc">A distraction-free, paper-light interface that gets out of your way. For the ones who believe clarity is the sharpest tool.</p>
+          <button class="ui-select-card-btn" onclick="chooseUITheme('notepad')">CHOOSE</button>
+        </div>
+
+      </div>
+
+      <div class="ui-select-footer">
+        <button class="ui-select-arrow" onclick="scrollUISelect(-1)" aria-label="Previous">&#8249;</button>
+        <div class="ui-select-dots">
+          <span class="ui-select-dot active" data-dot="0"></span>
+          <span class="ui-select-dot" data-dot="1"></span>
+          <span class="ui-select-dot" data-dot="2"></span>
+        </div>
+        <button class="ui-select-arrow" onclick="scrollUISelect(1)" aria-label="Next">&#8250;</button>
+      </div>
+
+    </div><!-- /screen-ui-select -->
+
+
+    <!-- ══════════════════ SCREEN: LANDING ══════════════════ -->
+    <div class="screen" id="screen-landing">
+
+      <div class="hero-card">
+        <h1 class="hero-heading">GET IT OFF YOUR CHEST</h1>
+        <p class="hero-body">Let it all out — then see it through the eyes of someone who lived through years of history.</p>
+      </div>
+
+      <div class="vent-field" id="vent-wrap">
+        <div class="vent-label">DUMP IT ALL HERE:</div>
+        <textarea id="ventText" maxlength="800"
+          aria-label="What's on your mind"
+          placeholder="START TYPING..."
+          oninput="updateCharCount()"></textarea>
+        <div class="vent-footer">
+          <span class="char-counter" id="charCounter">0/800 CHARACTERS</span>
+        </div>
+      </div>
+
+      <p class="field-error" id="ventError" role="alert"></p>
+
+      <button class="btn btn-primary" style="align-self:center;" onclick="goToLenses()">
+        SELECT THE LENS
+      </button>
+
+      <div class="add-card">
+        <span class="t-sub">Coming soon</span>
+        <h2 class="t-h2 add-card-title">Mind-Mapping Tool</h2>
+        <p class="t-body add-card-body">Reflect, plan and achieve new horizons with step-by-step guidance.</p>
+        <p class="add-card-cats">CAREER, HEALTH AND WELLNESS, CREATIVITY, PERSONAL DEVELOPMENT, RELATIONSHIPS, TRAVEL &amp; FINANCES</p>
+        <p class="add-card-waitlist">Get on the waitlist to be the first to know</p>
+        <button class="btn btn-secondary add-card-signup" onclick="goToAccount()">Sign Up</button>
+      </div>
+
+    </div><!-- /screen-landing -->
+
+
+    <!-- ══════════════════ SCREEN: LENS SELECTION ══════════════════ -->
+    <div class="screen" id="screen-lenses">
+
+      <div class="quote-field">
+        <div class="quote-label" id="lensTopicLabel">Your thought</div>
+        <div class="quote-text" id="lensVentDisplay"></div>
+      </div>
+
+      <div class="lens-nav-row">
+        <button class="btn btn-ghost" onclick="goToLanding()" aria-label="Back to vent">← Back</button>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <h2 class="t-h2 section-title" id="pickLensHeading">Who do you want to hear from?</h2>
+          <div class="lens-count-badge" id="lensCountBadge" style="display:none;"></div>
+        </div>
+      </div>
+
+      <div class="figure-grid" id="figureGrid"></div>
+
+    </div><!-- /screen-lenses -->
+
+
+    <!-- ══════════════════ SCREEN: RESPONSE ══════════════════ -->
+    <div class="screen" id="screen-response">
+
+      <div class="resp-scroll-area">
+        <div class="quote-field">
+          <div class="quote-label" id="respTopicLabel">Your thought</div>
+          <div class="quote-text" id="respVentDisplay"></div>
+        </div>
+
+        <div class="response-card">
+          <div class="response-head">
+            <img class="response-portrait" id="respPortrait" src="" alt="">
+            <span class="response-figure-name" id="respFigureName"></span>
+          </div>
+          <div class="response-body" id="respBody">
+            <!-- Sections inserted by JS -->
+          </div>
+        </div>
+      </div>
+
+      <div class="action-icon-row">
+        <button class="btn btn-ghost action-btn" onclick="goToAccount()" aria-label="Keep it">
+          <span class="action-icon">📖</span><span>Keep it</span>
+        </button>
+        <button class="btn btn-ghost action-btn" onclick="goToAccount()" aria-label="Make it yours">
+          <span class="action-icon">🎨</span><span>Make it yours</span>
+        </button>
+        <button class="btn btn-ghost action-btn" onclick="goToSharePreview()" aria-label="Share it">
+          <span class="action-icon">↗</span><span>Share it</span>
+        </button>
+      </div>
+
+      <div class="bottom-nav">
+        <button class="btn btn-primary" onclick="goToLenses()">
+          <span class="nav-icon">⊙</span>
+          <span>Different lens</span>
+        </button>
+        <button class="btn btn-secondary" onclick="goToLanding()">
+          <span class="nav-icon">⌂</span>
+          <span>Start over</span>
+        </button>
+        <button class="btn btn-primary" onclick="continueConversation()">
+          <span class="nav-icon">→</span>
+          <span>Go deeper</span>
+        </button>
+      </div>
+
+    </div><!-- /screen-response -->
+
+
+    <!-- ══════════════════ SCREEN: ACCOUNT ══════════════════ -->
+    <div class="screen" id="screen-account">
+
+      <h1 class="t-h1" style="text-align:center;">Your shifts deserve saving</h1>
+      <p class="t-body" style="text-align:center;">
+        Unlock your <strong>Journal</strong> and share without the big watermark. 5 perspectives per day, 3 problems.
+      </p>
+
+      <div class="account-fields">
+        <div class="compact-input">
+          <div class="compact-label">@nickname</div>
+          <input type="text" id="acNick" placeholder="what should we call you" autocomplete="username">
+        </div>
+        <div class="compact-input">
+          <div class="compact-label">e-mail</div>
+          <input type="email" id="acEmail" placeholder="your@email.com" autocomplete="email">
+        </div>
+        <div class="compact-input">
+          <div class="compact-label">confirm e-mail</div>
+          <input type="email" id="acEmailConfirm" placeholder="same again" autocomplete="email">
+        </div>
+      </div>
+
+      <p class="t-meta" style="text-align:center;padding:0 8px;">
+        We won't spam you — only new feature announcements, roughly once a month.
+      </p>
+
+      <button class="btn btn-primary" onclick="createAccount()">Save my shifts</button>
+
+      <div class="add-card">
+        <span class="t-sub">Coming soon</span>
+        <h2 class="t-h2" style="font-size:17px;text-align:center;">Go further</h2>
+        <p class="t-body" style="font-size:13px;">Unlimited lenses · Chat mode · Watermark-free shares</p>
+        <button class="btn btn-secondary" style="align-self:center;margin-top:6px;" onclick="goToLanding()">Get notified first</button>
+      </div>
+
+      <div style="display:flex;gap:12px;align-self:center;flex-wrap:wrap;justify-content:center;">
+        <button class="btn btn-ghost" onclick="goBackFromAccount()">← Back</button>
+        <button class="btn btn-ghost" id="skipGateBtn" onclick="skipAccountGate()" style="display:none;">Keep exploring →</button>
+      </div>
+
+    </div><!-- /screen-account -->
+
+
+    <!-- ══════════════════ SCREEN: SHARE PREVIEW ══════════════════ -->
+    <div class="screen" id="screen-share">
+
+      <div class="share-canvas" id="shareCanvas">
+        <div class="share-watermark">MindShift</div>
+        <div class="share-quote-block">
+          <div class="quote-field" style="margin:0;">
+            <div class="quote-label" id="shareTopicLabel">Your thought</div>
+            <div class="quote-text" id="shareVentDisplay"></div>
+          </div>
+          <div class="response-card">
+            <div class="response-head">
+              <img class="response-portrait" id="sharePortrait" src="" alt="">
+              <span class="response-figure-name" id="shareFigureName"></span>
+            </div>
+            <div class="response-body" id="shareRespBody" style="padding:12px 14px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="share-social-row">
+        <button class="share-social-btn" onclick="shareResponse()">
+          <span class="social-icon">↗</span><span>Share</span>
+        </button>
+        <button class="share-social-btn" onclick="saveToCamera()">
+          <span class="social-icon">⬇</span><span>Save</span>
+        </button>
+        <button class="share-social-btn" onclick="goToAccount()">
+          <span class="social-icon">📖</span><span>Journal</span>
+        </button>
+      </div>
+
+      <p class="share-upsell" onclick="goToAccount()">
+        Minimize watermark by creating a free account →
+      </p>
+
+      <div class="bottom-nav">
+        <button class="btn btn-secondary" onclick="showScreen('screen-response')">
+          <span class="nav-icon">←</span>
+          <span>Back</span>
+        </button>
+        <button class="btn btn-primary" onclick="goToLanding()">
+          <span class="nav-icon">⌂</span>
+          <span>Start over</span>
+        </button>
+      </div>
+
+    </div><!-- /screen-share -->
+
+  </main>
+
+</div><!-- #app -->
+
+
+<!-- ══════════════════ OVERLAY: LENS PREVIEW (bottom sheet) ══════════════════ -->
+<div id="overlay-preview" role="dialog" aria-modal="true" aria-label="Lens preview">
+  <div class="preview-sheet">
+    <div class="preview-drag-handle"></div>
+
+    <!-- Horizontal card swiper — all figures rendered by JS -->
+    <div class="preview-card-track" id="previewCardTrack"></div>
+
+    <div class="preview-actions">
+      <button class="btn btn-secondary" onclick="closePreview()">← All lenses</button>
+      <button class="btn btn-primary" id="confirmLensBtn" onclick="confirmLens()">Hear from them</button>
+    </div>
+
+    <p class="preview-disclaimer" id="previewDisclaimer"></p>
+  </div>
+</div>
+
+
+<!-- ══════════════════ OVERLAY: LOADING ══════════════════ -->
+<div id="overlay-loading" role="status" aria-live="polite" aria-atomic="true">
+  <img class="loading-portrait" id="loadingPortrait" src="" alt="">
+  <div class="loading-title" id="loadingTitle">Loading…</div>
+  <div class="loading-dots">
+    <div class="ldot"></div><div class="ldot"></div><div class="ldot"></div>
+  </div>
+  <div class="loading-subtitle" id="loadingSubtitle">Shifting perspective…</div>
+</div>
+
+
+
+<script>
+/* ════════════════════════════════════════════════
+   FIGURES DATA (15 lenses, all 3 portrait sets)
+════════════════════════════════════════════════ */
+
+const FIGURES = [
+  {
+    id: 'socrates', name: 'Socrates', fullName: 'Socrates',
+    tag: 'Question everything',
+    portraits: {
+      cyberpunk: '../portraits/cyberpunk/socrates_cyberpunk.png',
+      kawaii:    '../portraits/kawaii/Socrates_Kawaii.png',
+      notepad:   '../portraits/notepad/socrates_ notepad.png'
+    },
+    quote: '"The unexamined life is not worth living."',
+    bio: 'Athenian philosopher who used radical questioning to expose everyone\'s hidden assumptions.',
+    loadingLine: 'Examining your assumptions…',
+    mock: {
+      sections: [
+        { title: 'What do you actually know?', body: 'Before we proceed — what do you believe you know about this situation? And how certain are you that you know it? The first step to clarity is distinguishing what you have truly examined from what you have merely assumed.' },
+        { title: 'Whose voice is that?', body: 'When you feel the pressure you are describing — whose expectations are speaking? Are these your values, or ones you inherited without ever questioning them? Have you tested whether they actually hold up under scrutiny?' },
+        { title: 'What would you choose in private?', body: 'Strip away the judgement, the social consequences, the approval. If the choice were entirely invisible to others — what would you actually do? And does that answer surprise you?' }
+      ]
+    }
+  },
+  {
+    id: 'lincoln', name: 'A. Lincoln', fullName: 'Abraham Lincoln',
+    tag: 'Persist through failure',
+    portraits: {
+      cyberpunk: '../portraits/cyberpunk/abraham_lincoln_cyberpunk.png',
+      kawaii:    '../portraits/kawaii/Lincoln_Kawaii_v2.png',
+      notepad:   '../portraits/notepad/abraham_lincoln_ notepad.png'
+    },
+    quote: '"Give me six hours to chop down a tree — four to sharpen the axe."',
+    bio: '16th US President. Failed repeatedly before holding a nation together through its bloodiest war.',
+    loadingLine: 'Drawing from hard-won experience…',
+    mock: {
+      sections: [
+        { title: 'Every failure is schooling', body: 'I failed in business twice, lost eight elections, suffered a nervous breakdown — and still became President. Each setback taught me something the victory never could have. The question is not whether you have failed. The question is what you have been willing to learn.' },
+        { title: 'Preparation outlasts panic', body: 'When a crisis arrives, most people reach for speed. But speed without preparation is just noise. The time you spend now — thinking clearly, sharpening your understanding — is the four hours on the axe. The chopping goes much faster after.' },
+        { title: 'Patience is not passivity', body: 'I waited years before the right moment arrived for what needed to be done. That waiting was not weakness — it was strategy. Patience and persistence are different from resignation. One is active; the other is surrender.' }
+      ]
+    }
+  },
+  {
+    id: 'dolly', name: 'Dolly Parton', fullName: 'Dolly Parton',
+    tag: 'Resilience & joy',
+    portraits: {
+      cyberpunk: '../portraits/cyberpunk/dolly_parton_cyberpunk.png',
+      kawaii:    '../portraits/kawaii/DollyParton_Kawaii.png',
+      notepad:   '../portraits/notepad/dolly_parton_ notepad.png'
+    },
+    quote: '"If you want the rainbow, you gotta put up with the rain."',
+    bio: 'Country music legend and businesswoman. Turned hardship into beauty without losing her warmth.',
+    loadingLine: 'Counting your blessings…',
+    mock: {
+      sections: [
+        { title: 'Honey, you are more resilient than you think', body: 'I grew up dirt-poor in a one-room cabin with eleven brothers and sisters, and I never stopped finding something to be grateful for. Not because life was easy — it wasn\'t — but because gratitude kept me soft when the world wanted me to go hard.' },
+        { title: 'Your story is your superpower', body: 'People used to look down on where I came from. I turned every single bit of it into songs. Whatever you are struggling with right now — that struggle is not a weakness in you. It is material. It is the story that\'s going to help somebody else one day.' },
+        { title: 'Find the joy in the middle of the mess', body: 'You don\'t have to wait until everything is fixed to feel good. I never did. Find one small thing today that makes you smile, even if it\'s tiny. Joy is not a reward for surviving the hard part. It is the fuel you need to get through it.' }
+      ]
+    }
+  },
+  {
+    id: 'mandela', name: 'N. Mandela', fullName: 'Nelson Mandela',
+    tag: 'Long-game & forgiveness',
+    portraits: {
+      cyberpunk: '../portraits/cyberpunk/nelson_mandela_cyberpunk.png',
+      kawaii:    '../portraits/kawaii/NelsonMandela_Kawaii.png',
+      notepad:   '../portraits/notepad/nelson_mandela_ notepad.png'
+    },
+    quote: '"It always seems impossible until it is done."',
+    bio: 'Anti-apartheid leader, imprisoned for 27 years, became South Africa\'s first democratically elected President.',
+    loadingLine: 'Playing the long game…',
+    mock: {
+      sections: [
+        { title: 'Twenty-seven years is a long time to think', body: 'I had twenty-seven years on Robben Island to understand one thing: resentment is a prison you build for yourself. The moment I chose to see my captors as human beings — flawed and afraid — was the moment I became truly free. Bitterness would have destroyed me long before release.' },
+        { title: 'The long view changes everything', body: 'What feels catastrophic today may be the necessary prologue to what you are actually building. I did not plan my presidency in weeks — I planned it in decades. When the timeframe expands, so does your capacity to endure what is in front of you.' },
+        { title: 'Courage is acting despite the fear', body: 'I was afraid many times. Anyone who says they are not afraid is either lying or not paying attention. Courage is not the absence of fear — it is the decision that something else matters more. What is it, for you, that matters more?' }
+      ]
+    }
+  },
+  {
+    id: 'rosaparks', name: 'Rosa Parks', fullName: 'Rosa Parks',
+    tag: 'Strength & dignity',
+    portraits: {
+      cyberpunk: '../portraits/cyberpunk/rosa_parks_cyberpunk.png',
+      kawaii:    '../portraits/kawaii/RosaParks_Kawaii.png',
+      notepad:   '../portraits/notepad/rosa_parks_ notepad.png'
+    },
+    quote: '"You must never be fearful about what you are doing when it is right."',
+    bio: 'Civil rights activist whose quiet refusal changed the course of American history.',
+    loadingLine: 'Standing firm in what\'s right…',
+    mock: {
+      sections: [
+        { title: 'Quiet is not small', body: 'People think of my refusal as a sudden act. It was not. It was the culmination of years of quiet conviction, of doing the right thing when no one was watching. The loudest statement I ever made was staying still and saying no. You do not need noise to have power.' },
+        { title: 'Know your line', body: 'Every person has a line — a place past which they will not go, regardless of the cost. The trouble is that most people don\'t know where their line is until they\'ve already crossed it. I knew mine. What is yours? Where does it sit, and are you living in front of it or behind it?' },
+        { title: 'Dignity is non-negotiable', body: 'You cannot be diminished by someone else if you know your own worth. I was not angry that night — I was clear. Clarity is much more powerful than anger. When you know what you stand for, no one can take your seat — even if they legally can.' }
+      ]
+    }
+  },
+  {
+    id: 'maya', name: 'Maya Angelou', fullName: 'Maya Angelou',
+    tag: 'Voice & expression',
+    portraits: {
+      cyberpunk: '../portraits/cyberpunk/maya_angelou_cyberpunk.png',
+      kawaii:    '../portraits/kawaii/MayaAngelou_Kawaii.png',
+      notepad:   '../portraits/notepad/maya_angelou_ notepad.png'
+    },
+    quote: '"You may not control events, but you can decide not to be reduced by them."',
+    bio: 'Poet and memoirist who transformed trauma into language that made others feel less alone.',
+    loadingLine: 'Finding the words for what you feel…',
+    mock: {
+      sections: [
+        { title: 'Name what is happening', body: 'The act of naming something gives you a relationship with it — and a relationship means you are no longer subject to it in the dark. I wrote about things that would have destroyed me if I had kept them inside. What have you not yet been able to say out loud?' },
+        { title: 'You have survived 100% of your hardest days', body: 'I was mute for five years as a child. I lived through things I could not speak about for decades. And still I came. Not despite those things — but carrying them, transformed. You are still here. That is not nothing. That is everything.' },
+        { title: 'Your story belongs to you', body: 'No one else gets to decide what your experience means. Interpretation is an act of power. The moment you put language around what you have been through, you claim it — you stop it from claiming you. Write it down. Even just for yourself.' }
+      ]
+    }
+  },
+  {
+    id: 'frida', name: 'Frida Kahlo', fullName: 'Frida Kahlo',
+    tag: 'Art heals all',
+    portraits: {
+      cyberpunk: '../portraits/cyberpunk/frida_kahlo_cyberpunk.png',
+      kawaii:    '../portraits/kawaii/FridaKahlo_Kawaii.png',
+      notepad:   '../portraits/notepad/frida_kahlo_ notepad.png'
+    },
+    quote: '"I paint so things will not die — I paint to feel alive."',
+    bio: 'Mexican painter who turned chronic pain and political conviction into powerful self-portraits.',
+    loadingLine: 'Turning pain into something beautiful…',
+    mock: {
+      sections: [
+        { title: 'Enter the pain directly', body: 'Do not flinch from what you are feeling. I spent years painting my own suffering — my broken spine, my miscarriages, my shattered heart — because looking away made it worse. The pain does not get smaller when you avoid it. It gets larger, stranger, more monstrous. Look at it.' },
+        { title: 'Make something from it', body: 'I could have spent my bedridden years in pure agony. Instead I had a mirror mounted to the ceiling above my bed and I painted myself. Not because I was narcissistic — because I was the subject I knew best, and making something from suffering is the most defiant act there is.' },
+        { title: 'Your truth is your art', body: 'You do not have to paint. But you do have to express — somehow, in some form — what is real inside you. Expression is not decoration. It is survival. Find the medium and use it. Your interior life is not something to manage. It is something to inhabit.' }
+      ]
+    }
+  },
+  {
+    id: 'che', name: 'Che Guevara', fullName: 'Ernesto "Che" Guevara',
+    tag: 'Radical conviction',
+    portraits: {
+      cyberpunk: '../portraits/cyberpunk/che_guevara_cyberpunk.png',
+      kawaii:    '../portraits/kawaii/CheGuevara_Kawaii.png',
+      notepad:   '../portraits/notepad/che_guevara_ notepad.png'
+    },
+    quote: '"If you tremble with indignation at every injustice, you are a comrade."',
+    bio: 'Argentine doctor turned revolutionary guerrilla and global countercultural symbol.',
+    loadingLine: 'Examining the system…',
+    mock: {
+      sections: [
+        { title: 'The personal is structural', body: 'What you are experiencing is not merely a personal problem. Every individual struggle is a symptom of larger forces — economic, social, institutional. Before you can solve what\'s in front of you, you must ask: who benefits from things being this way? That question changes everything.' },
+        { title: 'Comfort is not neutrality', body: 'There is no such thing as doing nothing. When you accept the conditions imposed on you without resistance, you become part of the mechanism that perpetuates them. The question is not whether to act — it is whether you will act with intention, or by default.' },
+        { title: 'Conviction is a resource', body: 'I crossed a continent on a motorcycle with almost nothing — no money, no guarantee, only the certainty that I needed to understand the world I had been born into. Conviction will take you further than resources. What do you believe in strongly enough to be uncomfortable for?' }
+      ]
+    }
+  },
+  {
+    id: 'chingshih', name: 'Ching Shih', fullName: 'Ching Shih',
+    tag: 'Command & strategy',
+    portraits: {
+      cyberpunk: '../portraits/cyberpunk/ching_shih_cyberpunk.png',
+      kawaii:    '../portraits/kawaii/ChingShih_Kawaii.png',
+      notepad:   '../portraits/notepad/ching_shih_ notepad.png'
+    },
+    quote: '"Power is taken — not given."',
+    bio: 'Rose from poverty to command 1,800 ships and 80,000 sailors — the most powerful pirate in history.',
+    loadingLine: 'Assessing the power dynamics…',
+    mock: {
+      sections: [
+        { title: 'Read the room before you move', body: 'I took command of the Red Flag Fleet within days of my husband\'s death — not because I was entitled to it, but because I moved before anyone else decided what to do with the situation. Timing is the difference between a takeover and a takeover attempt. When is the window open in your situation?' },
+        { title: 'Rules protect those who write them', body: 'I created a code for my fleet — specific, fair, and ruthlessly enforced. Not because I was soft, but because predictable rules keep large organisations moving. What rules govern your situation, and who wrote them? Are they protecting the powerful or enabling the capable?' },
+        { title: 'Negotiate from strength you already have', body: 'When the Chinese government sent fleets to destroy me and failed, I came to the negotiating table — but on my terms. I kept my ships, kept my money, and walked away intact. Never negotiate from weakness if you can build your leverage first. What leverage do you actually have that you haven\'t used?' }
+      ]
+    }
+  },
+  {
+    id: 'gandhi', name: 'M. Gandhi', fullName: 'Mahatma Gandhi',
+    tag: 'Nonviolent resistance',
+    portraits: {
+      cyberpunk: '../portraits/cyberpunk/mahatma_gandhi_cyberpunk.png',
+      kawaii:    '../portraits/kawaii/Gandhi_Kawaii.png',
+      notepad:   '../portraits/notepad/mahatma_gandhi_ notepad.png'
+    },
+    quote: '"Be the change you wish to see in the world."',
+    bio: 'Led India to independence through nonviolent civil disobedience.',
+    loadingLine: 'Seeking the peaceful path…',
+    mock: {
+      sections: [
+        { title: 'The means and the end are one', body: 'You cannot achieve peace through violence, or truth through deception. Whatever methods you use to pursue your goal will shape the goal itself — and will shape you. I refused to separate what I was doing from how I was doing it. Are your methods consistent with the world you are trying to create?' },
+        { title: 'Begin with yourself', body: 'I was asked once what my message was. I said: my life is my message. Everything I asked of others, I first asked of myself. This is not a small thing — it is the hardest thing. But no change of consequence has ever come from demanding it of others while exempting yourself.' },
+        { title: 'Patience is strategic, not passive', body: 'The salt march was 240 miles. We did not rush. We stopped at every village. We were not performing patience — we were using it as a weapon, forcing the empire to respond to something it could not easily suppress. Your restraint, when deliberate, is not weakness. It is power in another form.' }
+      ]
+    }
+  },
+  {
+    id: 'napoleon', name: 'Napoleon', fullName: 'Napoleon Bonaparte',
+    tag: 'Ambition & strategy',
+    portraits: {
+      cyberpunk: '../portraits/cyberpunk/napoleon_bonaparte_cyberpunk.png',
+      kawaii:    '../portraits/kawaii/Napoleon_Kawaii.png',
+      notepad:   '../portraits/notepad/napoleon_bonaparte_ notepad.png'
+    },
+    quote: '"Impossible is a word found only in the dictionary of fools."',
+    bio: 'Rose from obscurity to reshape Europe. Military genius and master of psychological warfare.',
+    loadingLine: 'Calculating the next move…',
+    mock: {
+      sections: [
+        { title: 'Intelligence is a force multiplier', body: 'I won battles before they started by knowing the terrain better than my enemies, by studying everything. Your situation is not different from a campaign — it has terrain, it has opposing forces, it has chokepoints. How well do you actually know the ground you are fighting on?' },
+        { title: 'Speed defeats perfection', body: 'I made decisions fast — not recklessly, but decisively. A plan executed with seventy percent information beats a perfect plan arrived at too late. Most people lose not because they chose wrong but because they waited until they had certainty, which never came. What is the decision you are already delaying?' },
+        { title: 'Manage perception as carefully as reality', body: 'Morale is a force — I would estimate it at three-to-one against the physical. Your adversaries, your allies, your own mind — all of them respond to the story you project as much as to the facts on the ground. What story are you currently telling, and is it the one you intend?' }
+      ]
+    }
+  },
+  {
+    id: 'dali', name: 'Salvador Dalí', fullName: 'Salvador Dalí',
+    tag: 'The surreal is real',
+    portraits: {
+      cyberpunk: '../portraits/cyberpunk/salvador_dali_cyberpunk.png',
+      kawaii:    '../portraits/kawaii/SalvadorDali_Kawaii.png',
+      notepad:   '../portraits/notepad/salvador_dali_ notepad.png'
+    },
+    quote: '"Have no fear of perfection — you will never reach it."',
+    bio: 'Surrealist painter who turned dreams, desire and decay into the 20th century\'s most iconic images.',
+    loadingLine: 'Melting the clock…',
+    mock: {
+      sections: [
+        { title: 'The unconscious is not wrong', body: 'I would fall asleep with a key in my hand, and the moment I drifted off, the key would fall and wake me — carrying images from the liminal state before sleep. Your anxieties and obsessions are not pathological. They are data. What keeps appearing in your mind when you stop trying to control it?' },
+        { title: 'Make the irrational visible', body: 'I painted impossible things with photographic precision — not to escape reality, but to make the invisible parts of reality visible. What is the irrational element in your situation that everyone is pretending is not there? Name it. It will stop controlling you once it is seen.' },
+        { title: 'Eccentricity is protective', body: 'I was eccentric deliberately — because eccentricity creates distance, and distance gives you room to see what the conformists cannot. If you have been called strange or excessive, consider that those words may be the sound of someone who cannot see what you see. That is their limitation, not yours.' }
+      ]
+    }
+  },
+  {
+    id: 'chuck', name: 'Chuck Norris', fullName: 'Chuck Norris',
+    tag: 'Discipline & toughness',
+    portraits: {
+      cyberpunk: '../portraits/cyberpunk/chuck_norris_cyberpunk.png',
+      kawaii:    '../portraits/kawaii/ChuckNorris_Kawaii.png',
+      notepad:   '../portraits/notepad/chuck_norris_ notepad.png'
+    },
+    quote: '"A black belt is a white belt that never quit."',
+    bio: 'Martial arts champion and cultural icon who built an identity around discipline and grit.',
+    loadingLine: 'No excuses — only results…',
+    mock: {
+      sections: [
+        { title: 'Show up when it is hard', body: 'I trained every single day — not when I felt motivated, not when conditions were right. Every day. That\'s the deal. Motivation is unreliable. Discipline is a decision you make once and then execute. The secret is there is no secret: you just have to do the thing, especially when you don\'t want to.' },
+        { title: 'Stop explaining, start doing', body: 'I see a lot of people who are great at describing what they would do under better circumstances. The circumstances don\'t get better. You get stronger. The conditions you are waiting for are not coming. What can you do with what you have, where you are, right now today?' },
+        { title: 'Pain is a signal, not a stop sign', body: 'In training you learn to read pain — this kind means stop, this kind means keep going. Most of the pain people avoid is the second kind: the discomfort of growth, of doing something hard, of being bad at something before you get good. That pain is the training. Do not run from it.' }
+      ]
+    }
+  },
+  {
+    id: 'trump', name: 'D. Trump', fullName: 'Donald Trump',
+    tag: 'Bold moves, loud conviction',
+    portraits: {
+      cyberpunk: '../portraits/cyberpunk/donald_trump_cyberpunk.png',
+      kawaii:    '../portraits/kawaii/Trump_Kawaii.png',
+      notepad:   '../portraits/notepad/donald_trump_ notepad.png'
+    },
+    quote: '"Sometimes you have to think anyway and get lucky."',
+    bio: 'Real estate mogul and 45th US President, known for bold, unconventional decision-making.',
+    loadingLine: 'Thinking big…',
+    mock: {
+      sections: [
+        { title: 'Think bigger than the problem', body: 'Most people look at a problem and see a problem. I look at a problem and see a deal. What are the assets in this situation that nobody else is seeing? Everything has leverage. The question is whether you are willing to see it and use it.' },
+        { title: 'Go on offence', body: 'You cannot win playing defence. I know — I have had huge losses, bankruptcies, critics on every side. Every time, the way back was not to be careful. It was to make a move, make noise, control the narrative. What is the offensive play available to you right now?' },
+        { title: 'Brand yourself or be branded', body: 'People are going to say something about you. The only question is whether it\'s your story or theirs. I put my name on everything — for better or worse — because I understood that visibility is a resource. What is the story you want told about what you are doing?' }
+      ]
+    }
+  },
+  {
+    id: 'lenin', name: 'V. Lenin', fullName: 'Vladimir Lenin',
+    tag: 'Radical restructuring',
+    portraits: {
+      cyberpunk: '../portraits/cyberpunk/vladimir_lenin_cyberpunk.png',
+      kawaii:    '../portraits/kawaii/Lenin_Kawaii_v2.png',
+      notepad:   '../portraits/notepad/vladimir_lenin_ notepad.png'
+    },
+    quote: '"There are decades where nothing happens, and weeks where decades happen."',
+    bio: 'Revolutionary leader who transformed Russia and rewrote the political map of the 20th century.',
+    loadingLine: 'Analysing the structure…',
+    mock: {
+      sections: [
+        { title: 'Identify the contradiction', body: 'Every situation contains within it a fundamental tension — a force pushing for change and a structure resisting it. Before you can act effectively, you must identify this contradiction precisely. Not your emotional reaction to it — the structural fact of it. What exactly is in conflict here, and why?' },
+        { title: 'The moment of crisis is the moment of possibility', body: 'I waited years in exile for the moment when the old structure would become unmanageable. When it came, everything moved at once. What appears to be chaos or crisis is often the moment when what was impossible yesterday becomes inevitable today. Are you positioned to move when the window opens?' },
+        { title: 'Organisation is the real weapon', body: 'Will and anger are abundant. Organisation is rare. The difference between a revolution and a riot is not the intensity of feeling — it is the quality of preparation, the clarity of goals, the discipline of execution. What is your plan, and how specifically will you execute it?' }
+      ]
+    }
+  }
+];
+
+/* ════════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════════ */
+
+let currentTheme     = 'cyberpunk';
+let currentVent      = '';
+let previewFigure    = null;
+let currentFigure    = null;
+let previousScreen   = 'screen-landing';
+let pendingFigure    = null;
+let selectedFigureId = null;
+
+const THEME_COPY = {
+  cyberpunk: {
+    h1:              'GET IT OFF YOUR CHEST',
+    heroBody:        'Let it all out — then see it through the eyes of someone who lived through years of history.',
+    ventLabel:       'VENT IT OUT...',
+    ventPlaceholder: 'START TYPING...',
+    cta:             'SELECT THE LENS',
+    pickLens:        'WHO DO YOU WANT TO HEAR FROM?',
+    charMax:         800,
+    themeModalName:  'CYBERPUNK',
+    themeModalTagline: 'Neon edges.\nDark depths.\nMaximum signal.',
+    themeModalDesc:  'Hack your mind in a high-contrast terminal aesthetic built for focus and intensity. For the ones who think in code and dream in electric light.'
+  },
+  kawaii: {
+    h1:              'GET IT OFF YOUR CHEST',
+    heroBody:        'Let it all out — then see it through the eyes of someone who lived through years of history.',
+    ventLabel:       'DUMP IT ALL HERE:',
+    ventPlaceholder: 'START TYPING...',
+    cta:             'SELECT THE LENS',
+    pickLens:        'who do you want to hear from?',
+    charMax:         800,
+    themeModalName:  'KAWAII',
+    themeModalTagline: 'Soft edges.\nBright energy.\nGood vibes only.',
+    themeModalDesc:  'A playful, candy-colored skin that makes self-growth feel like a treat. For the ones who know joy is the best motivator.'
+  },
+  notepad: {
+    h1:              'GET IT OFF YOUR CHEST',
+    heroBody:        'Let it all out — then see it through the eyes of someone who lived through years of history.',
+    ventLabel:       'DUMP IT ALL HERE:',
+    ventPlaceholder: 'START TYPING...',
+    cta:             'SELECT THE LENS',
+    pickLens:        'Who would you like to hear from?',
+    charMax:         800,
+    themeModalName:  'NOTEPAD',
+    themeModalTagline: 'Clean lines.\nClear thinking.\nNo noise.',
+    themeModalDesc:  'A distraction-free, paper-light interface that gets out of your way. For the ones who believe clarity is the sharpest tool.'
+  }
+};
+
+/* ════════════════════════════════════════════════
+   HAPTICS
+════════════════════════════════════════════════ */
+
+function triggerHaptic(pattern) {
+  if (typeof navigator.vibrate === 'function') navigator.vibrate(pattern);
+}
+
+/* ════════════════════════════════════════════════
+   THEME COPY
+════════════════════════════════════════════════ */
+
+function applyThemeCopy(theme) {
+  const c = THEME_COPY[theme];
+  if (!c) return;
+  // hero card
+  const heroH = document.querySelector('.hero-heading');
+  if (heroH) heroH.textContent = c.h1;
+  const heroB = document.querySelector('.hero-body');
+  if (heroB) heroB.textContent = c.heroBody;
+  // vent field
+  const lbl = document.querySelector('.vent-label');
+  if (lbl) lbl.textContent = c.ventLabel;
+  const ta = document.getElementById('ventText');
+  if (ta) { ta.placeholder = c.ventPlaceholder; ta.maxLength = c.charMax; }
+  // CTA
+  const cta = document.querySelector('#screen-landing .btn-primary');
+  if (cta) cta.textContent = c.cta;
+  // lens screen heading
+  const pick = document.getElementById('pickLensHeading');
+  if (pick) pick.textContent = c.pickLens;
+  updateCharCount();
+}
+
+/* ════════════════════════════════════════════════
+   THEME TRANSITION
+════════════════════════════════════════════════ */
+
+function runThemeTransition(cb) {
+  const app = document.getElementById('app');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduced) { cb(); return; }
+  app.classList.add('theme-out');
+  setTimeout(() => {
+    cb();
+    app.classList.remove('theme-out');
+    app.classList.add('theme-in');
+    setTimeout(() => app.classList.remove('theme-in'), 220);
+  }, 160);
+}
+
+/* ════════════════════════════════════════════════
+   THEME SWITCHING
+════════════════════════════════════════════════ */
+
+function switchTheme(theme) {
+  if (theme === currentTheme) return;
+  triggerHaptic(10);
+
+  runThemeTransition(() => {
+    currentTheme = theme;
+    const app = document.getElementById('app');
+    app.setAttribute('data-theme', theme);
+
+    document.querySelectorAll('.theme-pill').forEach(pill => {
+      pill.setAttribute('aria-selected', pill.dataset.themeTarget === theme ? 'true' : 'false');
+    });
+
+    document.querySelectorAll('[data-portrait-id]').forEach(img => {
+      const fig = FIGURES.find(f => f.id === img.dataset.portraitId);
+      if (fig) img.src = fig.portraits[theme] || fig.portraits.cyberpunk;
+    });
+
+    /* previewCardTrack portrait images are updated by the [data-portrait-id] loop above */
+    if (currentFigure) {
+      document.getElementById('respPortrait').src = currentFigure.portraits[theme] || currentFigure.portraits.cyberpunk;
+    }
+
+    applyThemeCopy(theme);
+  });
+}
+
+/* ════════════════════════════════════════════════
+   SCREEN NAVIGATION
+════════════════════════════════════════════════ */
+
+function showScreen(id) {
+  const screens = document.querySelectorAll('.screen');
+  screens.forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) {
+    el.classList.add('active');
+    el.scrollTop = 0;
+    const scrollArea = el.querySelector('.resp-scroll-area');
+    if (scrollArea) scrollArea.scrollTop = 0;
+  }
+}
+
+function goToLanding() {
+  selectedFigureId = null;
+  const ta = document.getElementById('ventText');
+  if (ta) ta.value = '';
+  updateCharCount();
+  document.getElementById('ventError')?.classList.remove('visible');
+  showScreen('screen-landing');
+}
+
+function goToLenses() {
+  const vent = document.getElementById('ventText').value.trim();
+  const err  = document.getElementById('ventError');
+
+  if (!vent) {
+    err.textContent = 'Write something first — even a sentence is enough.';
+    err.classList.add('visible');
+    document.getElementById('ventText').focus();
+    return;
+  }
+  err.classList.remove('visible');
+  triggerHaptic(20);
+  currentVent = vent;
+
+  document.getElementById('lensVentDisplay').textContent = vent;
+  document.getElementById('lensTopicLabel').textContent  = guessTopic(vent);
+
+  renderGrid();
+  updateLensBadge();
+  previousScreen = document.querySelector('.screen.active')?.id || 'screen-landing';
+  showScreen('screen-lenses');
+}
+
+function goToAccount() {
+  previousScreen = document.querySelector('.screen.active')?.id || 'screen-response';
+  showScreen('screen-account');
+}
+
+function goBackFromAccount() {
+  showScreen(previousScreen || 'screen-response');
+}
+
+/* ════════════════════════════════════════════════
+   CHAR COUNTER
+════════════════════════════════════════════════ */
+
+function updateCharCount() {
+  const ta = document.getElementById('ventText');
+  const el = document.getElementById('charCounter');
+  const len = ta.value.length;
+  const max = parseInt(ta.maxLength) || 800;
+  el.textContent = len + '/' + max + ' CHARACTERS';
+  el.classList.toggle('over', len >= max);
+  /* auto-grow: expand height with content so landing page scrolls */
+  ta.style.height = 'auto';
+  ta.style.height = ta.scrollHeight + 'px';
+}
+
+/* ════════════════════════════════════════════════
+   TOPIC GUESSER
+════════════════════════════════════════════════ */
+
+function guessTopic(t) {
+  const lc = t.toLowerCase();
+  if (lc.match(/job|career|work|boss|resign|fired/)) return 'Career question';
+  if (lc.match(/relat|partner|love|broke ?up|divorce/)) return 'Relationship';
+  if (lc.match(/money|financ|debt|afford|broke/)) return 'Finances';
+  if (lc.match(/health|anx|stress|depress|anxious/)) return 'Wellbeing';
+  if (lc.match(/decision|choose|choice|option/)) return 'Decision';
+  return 'Your thought';
+}
+
+/* ════════════════════════════════════════════════
+   DAILY LENS LIMIT (localStorage, resets midnight)
+════════════════════════════════════════════════ */
+
+const DAILY_FREE_LIMIT = 3;
+
+function getTodayKey() {
+  return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+}
+
+function getDailyCount() {
+  try {
+    const raw = localStorage.getItem('ms_daily');
+    if (!raw) return 0;
+    const { date, count } = JSON.parse(raw);
+    if (date !== getTodayKey()) return 0;
+    return count || 0;
+  } catch(_) { return 0; }
+}
+
+function incrementDailyCount() {
+  try {
+    const count = getDailyCount() + 1;
+    localStorage.setItem('ms_daily', JSON.stringify({ date: getTodayKey(), count }));
+    return count;
+  } catch(_) { return 1; }
+}
+
+function isGateSkipped() {
+  return sessionStorage.getItem('gateSkipped') === '1';
+}
+
+/* ════════════════════════════════════════════════
+   RENDER FIGURE GRID (lens selection screen)
+════════════════════════════════════════════════ */
+
+function renderGrid() {
+  const grid = document.getElementById('figureGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  FIGURES.forEach(fig => {
+    const card = document.createElement('button');
+    card.className = 'figure-card' + (fig.id === selectedFigureId ? ' selected' : '');
+    card.type = 'button';
+    card.setAttribute('aria-label', fig.fullName + ' — ' + fig.tag);
+    card.dataset.figId = fig.id;
+
+    const src = fig.portraits[currentTheme] || fig.portraits.cyberpunk;
+    const img = document.createElement('img');
+    img.className = 'figure-portrait';
+    img.dataset.portraitId = fig.id;
+    img.src = src; img.alt = fig.fullName; img.loading = 'lazy';
+    img.onerror = function() {
+      this.style.display = 'none';
+      const fb = document.createElement('div');
+      fb.className = 'portrait-fallback';
+      fb.textContent = (fig.name.match(/\b\w/g) || []).slice(0,2).join('').toUpperCase();
+      this.parentNode.insertBefore(fb, this);
+    };
+
+    const name = document.createElement('div');
+    name.className = 'figure-name';
+    name.textContent = fig.name;
+
+    const tag = document.createElement('div');
+    tag.className = 'figure-tag';
+    tag.textContent = fig.tag;
+
+    card.appendChild(img); card.appendChild(name); card.appendChild(tag);
+    card.addEventListener('click', () => { triggerHaptic(10); openPreview(fig); });
+    grid.appendChild(card);
+  });
+}
+
+/* ════════════════════════════════════════════════
+   PREVIEW CARD SWIPER (inside popup)
+════════════════════════════════════════════════ */
+
+let _swiperScrollTimer = null;
+
+function renderPreviewSwiper(startFig) {
+  const track = document.getElementById('previewCardTrack');
+  if (!track) return;
+  track.innerHTML = '';
+
+  FIGURES.forEach((fig, idx) => {
+    const item = document.createElement('div');
+    item.className = 'preview-card-item' + (fig.id === startFig.id ? ' active-card' : '');
+    item.dataset.figId = fig.id;
+    item.dataset.idx = idx;
+
+    const src = fig.portraits[currentTheme] || fig.portraits.cyberpunk;
+    const img = document.createElement('img');
+    img.className = 'preview-card-portrait';
+    img.src = src; img.alt = fig.fullName; img.loading = 'lazy';
+    img.onerror = function() {
+      this.style.display = 'none';
+      const fb = document.createElement('div');
+      fb.className = 'preview-card-fallback';
+      fb.textContent = (fig.name.match(/\b\w/g) || []).slice(0,2).join('').toUpperCase();
+      this.parentNode.insertBefore(fb, this);
+    };
+
+    const name = document.createElement('div');
+    name.className = 'preview-card-name';
+    name.textContent = fig.fullName;
+
+    const quote = document.createElement('p');
+    quote.className = 'preview-card-quote';
+    quote.textContent = fig.quote;
+
+    const bio = document.createElement('p');
+    bio.className = 'preview-card-bio';
+    bio.textContent = fig.bio;
+
+    item.appendChild(img); item.appendChild(name); item.appendChild(quote); item.appendChild(bio);
+    track.appendChild(item);
+  });
+
+  /* Snap to startFig instantly, then attach scroll detection */
+  requestAnimationFrame(() => {
+    const startIdx = FIGURES.findIndex(f => f.id === startFig.id);
+    const items = track.querySelectorAll('.preview-card-item');
+    if (items[startIdx]) {
+      const el = items[startIdx];
+      track.scrollLeft = el.offsetLeft - (track.offsetWidth - el.offsetWidth) / 2;
+    }
+    attachSwiperListener(track);
+  });
+}
+
+function attachSwiperListener(track) {
+  track.addEventListener('scroll', function onScroll() {
+    clearTimeout(_swiperScrollTimer);
+    _swiperScrollTimer = setTimeout(() => {
+      const centerX = track.scrollLeft + track.offsetWidth / 2;
+      let closest = null, minDist = Infinity;
+      track.querySelectorAll('.preview-card-item').forEach(item => {
+        const dist = Math.abs((item.offsetLeft + item.offsetWidth / 2) - centerX);
+        if (dist < minDist) { minDist = dist; closest = item; }
+      });
+      if (closest) {
+        const fig = FIGURES.find(f => f.id === closest.dataset.figId);
+        if (fig && fig.id !== (previewFigure && previewFigure.id)) {
+          track.querySelectorAll('.preview-card-item').forEach(el => el.classList.remove('active-card'));
+          closest.classList.add('active-card');
+          updatePreviewMeta(fig);
+        }
+      }
+    }, 80);
+  }, { passive: true });
+}
+
+/* ════════════════════════════════════════════════
+   PREVIEW POPUP
+════════════════════════════════════════════════ */
+
+function openPreview(fig) {
+  previewFigure = fig;
+  selectedFigureId = fig.id;
+  renderPreviewSwiper(fig);
+  updatePreviewMeta(fig);
+  document.getElementById('overlay-preview').classList.add('open');
+}
+
+function updatePreviewMeta(fig) {
+  previewFigure = fig;
+  selectedFigureId = fig.id;
+
+  /* Personalise CTA */
+  const btn = document.getElementById('confirmLensBtn');
+  if (btn) btn.textContent = 'Hear from ' + fig.name;
+
+  /* Update disclaimer with daily count */
+  const dailyCount = getDailyCount();
+  const disclaimer = document.getElementById('previewDisclaimer');
+  if (disclaimer) {
+    if (isGateSkipped()) {
+      disclaimer.textContent = '';
+    } else {
+      const remaining = Math.max(0, DAILY_FREE_LIMIT - dailyCount);
+      disclaimer.textContent = remaining > 0
+        ? remaining + ' of ' + DAILY_FREE_LIMIT + ' free perspectives today · Create account for more'
+        : 'You\'ve had your 3 today — come back tomorrow or create an account';
+    }
+  }
+
+  /* Highlight selected card in the grid */
+  document.querySelectorAll('.figure-card').forEach(c => {
+    c.classList.toggle('selected', c.dataset.figId === fig.id);
+  });
+}
+
+function closePreview() {
+  document.getElementById('overlay-preview').classList.remove('open');
+  previewFigure = null;
+}
+
+function confirmLens() {
+  if (!previewFigure) return;
+  triggerHaptic(20);
+
+  const dailyCount = getDailyCount();
+  if (dailyCount >= DAILY_FREE_LIMIT && !isGateSkipped()) {
+    document.getElementById('overlay-preview').classList.remove('open');
+    pendingFigure = previewFigure;
+    showAccountGate();
+    return;
+  }
+
+  document.getElementById('overlay-preview').classList.remove('open');
+  incrementDailyCount();
+  updateLensBadge();
+  callLens(previewFigure);
+}
+
+function showAccountGate() {
+  document.getElementById('skipGateBtn').style.display = '';
+  previousScreen = 'screen-lenses';
+  showScreen('screen-account');
+}
+
+function skipAccountGate() {
+  sessionStorage.setItem('gateSkipped', '1');
+  document.getElementById('skipGateBtn').style.display = 'none';
+  updateLensBadge();
+  const fig = pendingFigure;
+  pendingFigure = null;
+  if (fig) { incrementDailyCount(); callLens(fig); }
+  else showScreen('screen-lenses');
+}
+
+function updateLensBadge() {
+  const badge = document.getElementById('lensCountBadge');
+  if (!badge) return;
+  const count = getDailyCount();
+  if (count === 0) { badge.style.display = 'none'; return; }
+  badge.style.display = '';
+  if (isGateSkipped()) { badge.textContent = 'Unlimited ✓'; return; }
+  const remaining = Math.max(0, DAILY_FREE_LIMIT - count);
+  badge.textContent = remaining > 0 ? remaining + ' of 3 today' : '3 of 3 used today';
+}
+
+function continueConversation() {
+  showToast('Chat mode coming in premium ✦');
+}
+
+function showToast(msg) {
+  let toast = document.getElementById('appToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'appToast';
+    toast.className = 'app-toast';
+    document.getElementById('app').appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => toast.classList.remove('show'), 2600);
+}
+
+/* ════════════════════════════════════════════════
+   CALL LENS (loading + response)
+════════════════════════════════════════════════ */
+
+function callLens(fig) {
+  currentFigure = fig;
+
+  /* Loading overlay */
+  const portrait = fig.portraits[currentTheme] || fig.portraits.cyberpunk;
+  document.getElementById('loadingPortrait').src  = portrait;
+  document.getElementById('loadingPortrait').alt  = fig.fullName;
+  document.getElementById('loadingTitle').textContent    = fig.fullName + '\'s Perspective';
+  document.getElementById('loadingSubtitle').textContent = fig.loadingLine;
+  document.getElementById('overlay-loading').classList.add('open');
+
+  /* Populate response screen header */
+  document.getElementById('respPortrait').src          = portrait;
+  document.getElementById('respPortrait').alt          = fig.fullName;
+  document.getElementById('respFigureName').textContent = fig.fullName;
+  document.getElementById('respVentDisplay').textContent = currentVent;
+  document.getElementById('respTopicLabel').textContent  = guessTopic(currentVent);
+  document.getElementById('respBody').innerHTML = '';
+
+  /* Try real API first, fall back to mock */
+  const apiPromise = (typeof callClaudeAPI === 'function')
+    ? callClaudeAPI(buildSystemPrompt(fig), currentVent).catch(() => null)
+    : Promise.resolve(null);
+
+  /* Show result after a minimum 1.8s loading feel */
+  const minDelay = new Promise(res => setTimeout(res, 1800));
+
+  Promise.all([apiPromise, minDelay]).then(([apiText]) => {
+    document.getElementById('overlay-loading').classList.remove('open');
+    renderResponse(fig, apiText);
+    showScreen('screen-response');
+  });
+}
+
+function buildSystemPrompt(fig) {
+  return `You are ${fig.fullName}. Respond to what the user shared. Give your response as JSON with exactly 3 sections, each with a "title" and a "body". Return ONLY valid JSON: {"sections":[{"title":"...","body":"..."},{"title":"...","body":"..."},{"title":"...","body":"..."}]}`;
+}
+
+function renderResponse(fig, apiText) {
+  let sections = fig.mock.sections; /* default to mock */
+
+  if (apiText) {
+    try {
+      const raw = apiText.replace(/^```json\s*/i,'').replace(/^```\s*/i,'').replace(/\s*```$/i,'').trim();
+      const parsed = JSON.parse(raw);
+      if (parsed.sections && parsed.sections.length) sections = parsed.sections;
+    } catch(_) { /* use mock */ }
+  }
+
+  const body = document.getElementById('respBody');
+  body.innerHTML = sections.map(s =>
+    `<div class="response-section">
+       <div class="response-section-title">${escapeHTML(s.title)}</div>
+       <div class="response-section-body">${escapeHTML(s.body)}</div>
+     </div>`
+  ).join('');
+
+  /* Stagger reveal */
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const sectionEls = body.querySelectorAll('.response-section');
+  const lastDelay = 80 + (sectionEls.length - 1) * 200;
+  sectionEls.forEach((el, i) => {
+    if (prefersReduced) { el.classList.add('revealed'); }
+    else { setTimeout(() => el.classList.add('revealed'), 80 + i * 200); }
+  });
+  if (!prefersReduced) setTimeout(() => triggerHaptic([10, 50, 10]), lastDelay + 120);
+}
+
+/* ════════════════════════════════════════════════
+   SHARE / ACCOUNT
+════════════════════════════════════════════════ */
+
+function shareResponse() {
+  const text = `MindShift — ${currentFigure?.fullName || ''} on: "${currentVent.slice(0,80)}…"`;
+  if (navigator.share) {
+    navigator.share({ title: 'MindShift', text, url: window.location.href }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(text + '\n' + window.location.href)
+      .then(() => alert('Copied to clipboard!'))
+      .catch(() => alert('Share: ' + window.location.href));
+  }
+}
+
+function createAccount() {
+  const nick    = document.getElementById('acNick').value.trim();
+  const email   = document.getElementById('acEmail').value.trim();
+  const confirm = document.getElementById('acEmailConfirm').value.trim();
+  if (!nick || !email) { showToast('Enter a nickname and e-mail to continue'); return; }
+  if (email !== confirm) { showToast('E-mails don\'t match — double-check'); return; }
+  showToast('You\'re on the list, ' + nick + ' — we\'ll be in touch ✦');
+  setTimeout(() => showScreen('screen-landing'), 1800);
+}
+
+function goToSharePreview() {
+  if (!currentFigure) return;
+  /* Mirror response content to share screen */
+  document.getElementById('shareTopicLabel').textContent  = document.getElementById('respTopicLabel').textContent;
+  document.getElementById('shareVentDisplay').textContent = currentVent;
+  document.getElementById('sharePortrait').src            = currentFigure.portraits[currentTheme] || currentFigure.portraits.cyberpunk;
+  document.getElementById('sharePortrait').alt            = currentFigure.fullName;
+  document.getElementById('shareFigureName').textContent  = currentFigure.fullName;
+  document.getElementById('shareRespBody').innerHTML      = document.getElementById('respBody').innerHTML;
+  showScreen('screen-share');
+}
+
+function saveToCamera() {
+  showToast('Save to camera roll — coming soon ✦');
+}
+
+/* ════════════════════════════════════════════════
+   UTILITY
+════════════════════════════════════════════════ */
+
+function escapeHTML(str) {
+  if (!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+            .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+/* ════════════════════════════════════════════════
+   WELCOME TAGLINES (per-theme)
+════════════════════════════════════════════════ */
+
+const WELCOME_TAGLINES = {
+  cyberpunk: [
+    'FOR THE OVERTHINKERS, THE STUCK ONES,\nAND ANYONE WHO JUST NEEDS A FRESH ANGLE.',
+    "YOU'RE NOT LOST.\nJUST LOOKING AT THE MAP UPSIDE DOWN.",
+  ],
+  kawaii: [
+    'for the overthinkers, the stuck ones,\nand anyone who just needs a fresh angle ✨',
+    "you're not lost.\njust looking at the map upside down 💭",
+  ],
+  notepad: [
+    'For the overthinkers, the stuck ones,\nand anyone who just needs a fresh angle.',
+    "You're not lost.\nJust looking at the map upside down.",
+  ]
+};
+
+/* ════════════════════════════════════════════════
+   UI SELECTION CAROUSEL
+════════════════════════════════════════════════ */
+
+const UI_THEMES = ['cyberpunk', 'kawaii', 'notepad'];
+let _uiScrollTimer = null;
+const _UI_BG_COLORS = { cyberpunk: '#080810', kawaii: '#ffafd6', notepad: '#faf7f2' };
+
+function updateUISelectBg(themeId) {
+  const bg = document.getElementById('uiSelectBg');
+  const screen = document.getElementById('screen-ui-select');
+  if (!bg || !screen) return;
+  bg.innerHTML = '';
+  FIGURES.forEach(fig => {
+    const img = document.createElement('img');
+    img.src = fig.portraits[themeId] || fig.portraits.cyberpunk;
+    img.alt = '';
+    img.loading = 'lazy';
+    bg.appendChild(img);
+  });
+  screen.style.background = _UI_BG_COLORS[themeId] || '#080810';
+}
+
+function _uiGetCentered(track) {
+  const centerX = track.scrollLeft + track.offsetWidth / 2;
+  let closest = null, minDist = Infinity, closestIdx = 0;
+  track.querySelectorAll('.ui-select-card').forEach((card, i) => {
+    const dist = Math.abs((card.offsetLeft + card.offsetWidth / 2) - centerX);
+    if (dist < minDist) { minDist = dist; closest = card; closestIdx = i; }
+  });
+  return { card: closest, idx: closestIdx };
+}
+
+function _uiScrollToIdx(track, idx, smooth) {
+  const cards = track.querySelectorAll('.ui-select-card');
+  const card = cards[idx];
+  if (!card) return;
+  const left = card.offsetLeft - (track.offsetWidth - card.offsetWidth) / 2;
+  if (smooth) {
+    track.scrollTo({ left, behavior: 'smooth' });
+  } else {
+    track.scrollLeft = left;
+  }
+}
+
+function initUISelect() {
+  const track = document.getElementById('uiSelectTrack');
+  if (!track) return;
+
+  /* Start at center set (indices 3-5) matching current theme */
+  const themeIdx = UI_THEMES.indexOf(currentTheme);
+  const startIdx = 3 + (themeIdx >= 0 ? themeIdx : 0);
+
+  requestAnimationFrame(() => {
+    _uiScrollToIdx(track, startIdx, false);
+    updateUISelectDots(themeIdx >= 0 ? themeIdx : 0);
+    updateUISelectBg(currentTheme);
+  });
+
+  /* Attach scroll listener only once */
+  if (!track._uiListenerAttached) {
+    track._uiListenerAttached = true;
+    track.addEventListener('scroll', function() {
+      clearTimeout(_uiScrollTimer);
+      _uiScrollTimer = setTimeout(() => {
+        const { card, idx: centeredIdx } = _uiGetCentered(track);
+        if (!card) return;
+
+        const themeId = card.dataset.themeId;
+        updateUISelectDots(centeredIdx % 3);
+        switchTheme(themeId);
+        updateUISelectBg(themeId);
+
+        /* Infinite scroll: silently jump to equivalent card in center set */
+        if (centeredIdx < 3 || centeredIdx > 5) {
+          const equivalentIdx = (centeredIdx % 3) + 3;
+          _uiScrollToIdx(track, equivalentIdx, false);
+        }
+      }, 80);
+    }, { passive: true });
+  }
+}
+
+function scrollUISelect(direction) {
+  const track = document.getElementById('uiSelectTrack');
+  if (!track) return;
+  const { idx: centeredIdx } = _uiGetCentered(track);
+  const cards = track.querySelectorAll('.ui-select-card');
+  const targetIdx = Math.max(0, Math.min(cards.length - 1, centeredIdx + direction));
+  _uiScrollToIdx(track, targetIdx, true);
+}
+
+function updateUISelectDots(activeIdx) {
+  document.querySelectorAll('.ui-select-dot').forEach((dot, i) => {
+    dot.classList.toggle('active', i === activeIdx);
+  });
+}
+
+function chooseUITheme(themeId) {
+  switchTheme(themeId);
+  showScreen('screen-landing');
+}
+
+/* Close preview on overlay backdrop click */
+document.getElementById('overlay-preview').addEventListener('click', function(e) {
+  if (e.target === this) closePreview();
+});
+
+/* Keyboard: close overlays on Escape */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (document.getElementById('overlay-preview').classList.contains('open')) closePreview();
+  }
+});
+
+/* Pick random theme for this session (no localStorage — resets each visit) */
+(function() {
+  const SESSION_THEMES = ['cyberpunk', 'kawaii', 'notepad'];
+  const sessionTheme = SESSION_THEMES[Math.floor(Math.random() * SESSION_THEMES.length)];
+  switchTheme(sessionTheme);
+
+  /* Set tagline from this session's theme */
+  const el = document.getElementById('welcomeTagline');
+  if (el) {
+    const lines = WELCOME_TAGLINES[sessionTheme] || WELCOME_TAGLINES.cyberpunk;
+    const line = lines[Math.floor(Math.random() * lines.length)];
+    el.innerHTML = line.replace(/\n/g, '<br>');
+  }
+})();
+
+/* Apply initial theme copy on load */
+applyThemeCopy(currentTheme);
+
+/* Show welcome screen on load */
+showScreen('screen-welcome');
+
+</script>
+
+<!-- Optional: try to use the real API if running on Cloudflare Pages -->
+<script>
+async function callClaudeAPI(systemPrompt, userPrompt) {
+  try {
+    const res = await fetch('/functions/generate-response', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ systemPrompt, userPrompt })
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data?.content?.[0]?.text || null;
+  } catch(_) { return null; }
+}
+</script>
+
+</body>
+</html>
