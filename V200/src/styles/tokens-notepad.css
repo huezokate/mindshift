@@ -62,14 +62,26 @@ html[data-theme="notepad"] {
   --fig-desc:        rgba(30,30,64,0.5);
 
   /* Input / textarea — white, blue left accent border */
-  --input-bg:      #ffffff;
-  --input-bt:      1.5px solid #3a6fa8;
-  --input-bl:      4px solid #3a6fa8;
-  --input-br:      1.5px solid #3a6fa8;
-  --input-bb:      1.5px solid #3a6fa8;
-  --input-radius:  8px;
-  --input-divider: rgba(58,111,168,0.2);
-  --input-shadow:  none;
+  --input-bg:            #ffffff;
+  --input-bt:            1.5px solid #3a6fa8;
+  --input-bl:            4px solid #3a6fa8;
+  --input-br:            1.5px solid #3a6fa8;
+  --input-bb:            1.5px solid #3a6fa8;
+  --input-radius:        8px;
+  --input-divider:       rgba(58,111,168,0.2);
+  --input-shadow:        none;
+  --input-header-bg:     #f0efe9;
+  --input-header-shadow: none;
+
+  /* Secondary button — cream bg, no shadow */
+  --btn-secondary-bg:     #f0efe9;
+  --btn-secondary-shadow: none;
+  --btn-secondary-color:  #1e1e40;
+
+  /* Figure avatar */
+  --fig-avatar-border: 1.5px solid #3a6fa8;
+  --fig-avatar-shadow: none;
+  --fig-avatar-grad:   linear-gradient(135deg, #e8eef5 0%, #eee8f5 100%);
 
   /* CTA button — white bg, dark border, offset drop-shadow */
   --btn-bg:             #ffffff;

@@ -1,39 +1,99 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
-import { FIGURES } from '@/lib/figures'
-import ThemeSwitcher from '@/components/ThemeSwitcher'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useUser } from '@clerk/nextjs'
+import { FIGURES, getFigureImg } from '@/lib/figures'
+import { useTheme } from '@/lib/theme'
+
+const ANON_DAILY_LIMIT = 3
+
+function getAnonLensesToday(): number {
+  const today = new Date().toISOString().split('T')[0]
+  if (localStorage.getItem('ms_anon_date') !== today) {
+    localStorage.setItem('ms_anon_date', today)
+    localStorage.setItem('ms_anon_lenses', '0')
+    return 0
+  }
+  return parseInt(localStorage.getItem('ms_anon_lenses') ?? '0')
+}
+
+function incrementAnonLenses() {
+  const today = new Date().toISOString().split('T')[0]
+  localStorage.setItem('ms_anon_date', today)
+  const current = parseInt(localStorage.getItem('ms_anon_lenses') ?? '0')
+  localStorage.setItem('ms_anon_lenses', String(current + 1))
+}
+
+const MAX_CHARS = 800
+
+const STOP = new Set(['i','a','the','is','it','and','or','but','to','my','me','you','we','they','am','are','was','be','have','has','had','do','does','did','will','would','could','should','of','in','on','at','for','with','by','from','up','out','that','this','an','not','what','so','all','as','just','about','if','there','when','who','which','than','then','into','can','how','more','their','your','its','our','her','his','im','ive','dont','keep','like','very','really','maybe','even','every','some','been','one','see','feel','get','got','know','think','want','need','just','much','also','still','going','make','always','never','something','anything','because','really','around','second'])
+
+const PREFIXES = ['Contemplating', 'Ruminating on', 'Reflecting on']
+
+function getVentLabel(vent: string): string {
+  const words = vent.toLowerCase().replace(/[^a-z\s]/g, '').split(/\s+/).filter(w => w.length > 3 && !STOP.has(w))
+  const keyword = [...new Set(words)][0]
+  if (!keyword) return 'Dump it all here:'
+  const prefix = PREFIXES[vent.length % PREFIXES.length]
+  return `${prefix} ${keyword}`
+}
 
 const DEMO_VENT =
   'I keep second-guessing my career choice. Everyone around me seems so sure about what they\'re doing, but I\'m constantly wondering if I chose the right path. Maybe I need a completely fresh perspective on all of this.'
 
 export default function LensPage() {
   const router = useRouter()
+  const { theme } = useTheme()
+  const { isSignedIn } = useUser()
   const [vent, setVent] = useState(DEMO_VENT)
   const [selected, setSelected] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [limitError, setLimitError] = useState<string | null>(null)
+  const [previewIndex, setPreviewIndex] = useState<number | null>(null)
 
   useEffect(() => {
     const stored = sessionStorage.getItem('ms_vent')
     if (stored) setVent(stored)
   }, [])
 
-  async function handleGetPerspective() {
-    if (!selected) return
+  async function handleGetPerspective(figureId: string) {
+    if (loading) return
+    setLimitError(null)
+
+    // Anonymous limit check (client-side)
+    if (!isSignedIn && getAnonLensesToday() >= ANON_DAILY_LIMIT) {
+      setLimitError('You\'ve used your 3 free lenses today. Create a free account to get more.')
+      return
+    }
+
     setLoading(true)
-    const figure = FIGURES.find(f => f.id === selected)!
+    setSelected(figureId)
+    const figure = FIGURES.find(f => f.id === figureId)!
     sessionStorage.setItem('ms_figure_id', figure.id)
     sessionStorage.setItem('ms_figure_name', figure.name)
-    sessionStorage.setItem('ms_figure_img', figure.img)
+
+    const isNewQuote = !sessionStorage.getItem('ms_session_id')
+
     try {
       const res = await fetch('/api/generate-response', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: vent, figureId: figure.id, systemPrompt: figure.systemPrompt }),
+        body: JSON.stringify({ prompt: vent, figureId: figure.id, systemPrompt: figure.systemPrompt, isNewQuote }),
       })
+
+      if (res.status === 429) {
+        const data = await res.json()
+        setLimitError(data.error)
+        setLoading(false)
+        setSelected(null)
+        return
+      }
+
       const data = await res.json()
       sessionStorage.setItem('ms_response', data.response ?? 'No response received.')
+
+      if (!isSignedIn) incrementAnonLenses()
     } catch {
       sessionStorage.setItem(
         'ms_response',
@@ -43,60 +103,107 @@ export default function LensPage() {
     router.push('/app/response')
   }
 
-  const selectedFigure = FIGURES.find(f => f.id === selected)
+  const previewing = previewIndex !== null ? FIGURES[previewIndex] : null
+
+  function prevPreview() {
+    setPreviewIndex(i => i === null ? null : (i - 1 + FIGURES.length) % FIGURES.length)
+  }
+
+  function nextPreview() {
+    setPreviewIndex(i => i === null ? null : (i + 1) % FIGURES.length)
+  }
 
   return (
-    <div className="min-h-dvh flex flex-col items-center" style={{ background: 'var(--bg)' }}>
+    <div className="min-h-dvh flex flex-col items-center relative" style={{ background: 'var(--bg)' }}>
       <div className="flex flex-col gap-6 w-full" style={{ maxWidth: 440, padding: '40px 24px 32px' }}>
 
-        {/* User's quote card */}
+        {/* Vent preview — read-only */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col w-full"
+          className="flex flex-col w-full overflow-hidden"
           style={{
-            background: 'var(--card-bg)',
-            borderTop: 'var(--card-bt)',
-            borderLeft: 'var(--card-bl)',
-            borderRight: 'var(--card-br)',
-            borderBottom: 'var(--card-bb)',
-            borderRadius: 'var(--card-radius)',
-            maxHeight: 180,
-            overflow: 'hidden',
-            boxShadow: 'var(--card-shadow)',
+            borderTop: 'var(--input-bt)',
+            borderLeft: 'var(--input-bl)',
+            borderRight: 'var(--input-br)',
+            borderBottom: 'var(--input-bb)',
+            borderRadius: 'var(--input-radius)',
+            boxShadow: 'var(--input-shadow, var(--card-shadow))',
             filter: 'var(--card-filter, none)',
           }}
         >
           <div
-            className="flex items-center"
-            style={{ borderBottom: `1px solid var(--input-divider)`, padding: '8px 16px 4px' }}
+            className="flex items-center justify-center"
+            style={{
+              background: 'var(--input-header-bg)',
+              padding: '10px 16px',
+              borderBottom: '1px solid var(--input-divider)',
+            }}
           >
             <p
-              className="uppercase"
-              style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 12, letterSpacing: 1.32, lineHeight: '14px', color: 'var(--cyan)' }}
+              className="text-center uppercase"
+              style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 11, letterSpacing: 0.8, lineHeight: '14px', color: 'var(--text-body)' }}
             >
-              Your perspective:
+              {getVentLabel(vent)}
             </p>
           </div>
-          <div style={{ padding: '12px 16px', overflowY: 'auto' }}>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 13, letterSpacing: 0.52, lineHeight: '20px', color: 'var(--text-body)' }}>
+          <div style={{ background: 'var(--input-bg)', padding: '12px 16px' }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, letterSpacing: 0.5, lineHeight: '20px', color: 'var(--text-body)' }}>
               {vent}
+            </p>
+          </div>
+          <div className="flex justify-end" style={{ background: 'var(--input-bg)', borderTop: '1px solid var(--input-divider)', padding: '4px 12px' }}>
+            <p className="uppercase" style={{ fontFamily: 'var(--font-body)', fontSize: 10, letterSpacing: 1, lineHeight: '12px', color: 'var(--text-sub)' }}>
+              {vent.length}/{MAX_CHARS} characters
             </p>
           </div>
         </motion.div>
 
-        {/* Pick a Lens heading */}
+        {/* Limit error */}
+        {limitError && (
+          <div
+            style={{
+              background: 'var(--card-bg)',
+              border: '1px solid var(--pink)',
+              borderRadius: 'var(--card-radius)',
+              padding: '12px 16px',
+            }}
+          >
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--pink)', lineHeight: '18px', textAlign: 'center' }}>
+              {limitError}
+            </p>
+            {!isSignedIn && (
+              <button
+                onClick={() => router.push('/sign-up')}
+                className="w-full uppercase text-center mt-3"
+                style={{
+                  fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 12,
+                  letterSpacing: 'var(--btn-letter-spacing, 2px)',
+                  color: 'var(--btn-color)', background: 'var(--btn-bg)',
+                  borderTop: 'var(--btn-bt)', borderLeft: 'var(--btn-bl)',
+                  borderRight: 'var(--btn-br)', borderBottom: 'var(--btn-bb)',
+                  borderRadius: 'var(--btn-radius)', padding: '10px',
+                  cursor: 'pointer',
+                }}
+              >
+                Create free account
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Choose label */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.1 }}
           className="text-center uppercase"
-          style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 18, letterSpacing: 1.44, lineHeight: '20px', color: 'var(--text-body)' }}
+          style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 12, letterSpacing: 1.3, lineHeight: '14px', color: 'var(--violet)' }}
         >
-          Pick a Lens
+          Choose:
         </motion.p>
 
-        {/* Figure grid — 3 columns */}
+        {/* Figure grid — tap to open detail overlay */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -109,73 +216,36 @@ export default function LensPage() {
             return (
               <motion.button
                 key={fig.id}
-                onClick={() => setSelected(isSelected ? null : fig.id)}
+                onClick={() => setPreviewIndex(i)}
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.04 + i * 0.025 }}
                 whileTap={{ scale: 0.95 }}
                 className="flex flex-col items-center gap-2 transition-all"
                 style={{
-                  background: isSelected ? 'var(--fig-bg-sel)' : 'var(--fig-bg)',
+                  background: 'var(--fig-bg)',
                   border: isSelected ? 'var(--fig-border-sel)' : 'var(--fig-border)',
                   borderRadius: 'var(--fig-radius)',
-                  padding: '12px 8px',
+                  padding: '10px 8px',
                   boxShadow: isSelected ? 'var(--fig-shadow-sel)' : 'none',
                   cursor: 'pointer',
-                  overflow: 'hidden',
                 }}
               >
-                {/* Initial letter area */}
                 <div
-                  className="w-full flex items-center justify-center"
+                  className="flex items-center justify-center flex-shrink-0 overflow-hidden"
                   style={{
-                    background: 'var(--fig-area-bg)',
-                    borderRadius: 'calc(var(--fig-radius) - 2px)',
-                    height: 60,
-                    marginBottom: 2,
+                    width: 76, height: 76, borderRadius: '50%',
+                    background: 'var(--fig-avatar-grad)',
+                    border: 'var(--fig-avatar-border)',
+                    boxShadow: 'var(--fig-avatar-shadow)',
                   }}
                 >
-                  <span
-                    style={{
-                      fontFamily: 'var(--font-display)',
-                      fontWeight: 700,
-                      fontSize: 24,
-                      color: isSelected ? 'var(--fig-initial-sel)' : 'var(--fig-initial)',
-                    }}
-                  >
-                    {fig.name[0]}
-                  </span>
+                  <img src={getFigureImg(fig, theme)} alt={fig.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%', display: 'block' }} />
                 </div>
-
-                {/* Name */}
-                <p
-                  className="w-full text-center uppercase"
-                  style={{
-                    fontFamily: 'var(--font-display)',
-                    fontWeight: 700,
-                    fontSize: 10,
-                    letterSpacing: 1,
-                    lineHeight: '13px',
-                    color: isSelected ? 'var(--fig-name-sel)' : 'var(--fig-name-unsel)',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
+                <p className="w-full text-center uppercase" style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 10, letterSpacing: 1, lineHeight: '13px', color: isSelected ? 'var(--fig-name-sel)' : 'var(--fig-name-unsel)' }}>
                   {fig.name}
                 </p>
-
-                {/* Descriptor */}
-                <p
-                  className="w-full text-center"
-                  style={{
-                    fontFamily: 'var(--font-body)',
-                    fontSize: 8,
-                    letterSpacing: 0.6,
-                    lineHeight: '11px',
-                    color: 'var(--fig-desc)',
-                  }}
-                >
+                <p className="w-full text-center uppercase" style={{ fontFamily: 'var(--font-body)', fontSize: 8, letterSpacing: 0.6, lineHeight: '11px', color: 'var(--fig-desc)' }}>
                   {fig.descriptor}
                 </p>
               </motion.button>
@@ -183,44 +253,141 @@ export default function LensPage() {
           })}
         </motion.div>
 
-        {/* Theme switcher */}
-        <div className="flex justify-center">
-          <ThemeSwitcher />
-        </div>
-
-        {/* CTA — appears when figure is selected */}
-        {selected && (
-          <motion.button
-            key={selected}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            onClick={handleGetPerspective}
-            disabled={loading}
-            whileTap={{ scale: 0.97 }}
-            className="w-full uppercase text-center transition-all"
-            style={{
-              fontFamily: 'var(--font-btn)',
-              fontWeight: 600,
-              fontSize: 13,
-              letterSpacing: 'var(--btn-letter-spacing, 3px)',
-              color: loading ? 'var(--btn-dis-color)' : 'var(--btn-color)',
-              background: loading ? 'transparent' : 'var(--btn-bg)',
-              borderTop: 'var(--btn-bt)',
-              borderLeft: 'var(--btn-bl)',
-              borderRight: 'var(--btn-br)',
-              borderBottom: 'var(--btn-bb)',
-              borderRadius: 'var(--btn-radius)',
-              padding: '17px 12px',
-              boxShadow: loading ? 'none' : 'var(--btn-shadow)',
-              filter: loading ? 'none' : 'var(--btn-filter, none)',
-              cursor: loading ? 'wait' : 'pointer',
-            }}
-          >
-            {loading ? 'Loading perspective...' : `Get ${selectedFigure?.name}'s take`}
-          </motion.button>
-        )}
-
       </div>
+
+      {/* Lens detail overlay */}
+      <AnimatePresence>
+        {previewing && (
+          <motion.div
+            key="overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            className="fixed inset-0 z-50 flex items-center justify-center"
+            style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(2px)', padding: '24px' }}
+            onClick={() => setPreviewIndex(null)}
+          >
+            {/* Left arrow */}
+            <button
+              onClick={e => { e.stopPropagation(); prevPreview() }}
+              className="absolute left-3 flex items-center justify-center flex-shrink-0"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--cyan)', fontSize: 40, fontWeight: 700, lineHeight: 1, padding: '8px', zIndex: 51 }}
+              aria-label="Previous figure"
+            >
+              ‹
+            </button>
+
+            {/* Detail card */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={previewing.id}
+                initial={{ opacity: 0, scale: 0.94, y: 8 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.94, y: 8 }}
+                transition={{ duration: 0.16 }}
+                onClick={e => e.stopPropagation()}
+                className="flex flex-col items-center gap-4 w-full"
+                style={{
+                  maxWidth: 320,
+                  background: 'var(--card-bg)',
+                  borderTop: 'var(--card-bt)',
+                  borderLeft: 'var(--card-bl)',
+                  borderRight: 'var(--card-br)',
+                  borderBottom: 'var(--card-bb)',
+                  borderRadius: 'var(--card-radius)',
+                  padding: '28px 20px 20px',
+                  boxShadow: 'var(--card-shadow)',
+                }}
+              >
+                {/* Portrait */}
+                <div
+                  className="overflow-hidden flex-shrink-0"
+                  style={{
+                    width: 120, height: 120, borderRadius: '50%',
+                    background: 'var(--fig-avatar-grad)',
+                    border: 'var(--fig-avatar-border)',
+                    boxShadow: 'var(--fig-avatar-shadow)',
+                  }}
+                >
+                  <img src={getFigureImg(previewing, theme)} alt={previewing.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%', display: 'block' }} />
+                </div>
+
+                {/* Name */}
+                <p className="uppercase text-center" style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 18, letterSpacing: 1.5, lineHeight: '22px', color: 'var(--violet)' }}>
+                  {previewing.name}
+                </p>
+
+                {/* Era */}
+                <p className="text-center uppercase" style={{ fontFamily: 'var(--font-body)', fontSize: 10, letterSpacing: 1, color: 'var(--text-sub)', marginTop: -8 }}>
+                  {previewing.era}
+                </p>
+
+                {/* Quote */}
+                <p className="text-center" style={{ fontFamily: 'var(--font-body)', fontSize: 13, lineHeight: '20px', color: 'var(--text-body)', fontStyle: 'italic' }}>
+                  &ldquo;{previewing.quote}&rdquo;
+                </p>
+
+                {/* Bio */}
+                <p className="text-center" style={{ fontFamily: 'var(--font-body)', fontSize: 13, lineHeight: '20px', color: 'var(--text-body)' }}>
+                  {previewing.bio}
+                </p>
+
+                {/* Action buttons */}
+                <div className="flex gap-3 w-full" style={{ marginTop: 4 }}>
+                  <button
+                    onClick={() => setPreviewIndex(null)}
+                    className="flex-1 uppercase text-center"
+                    style={{
+                      fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 13,
+                      letterSpacing: 'var(--btn-letter-spacing, 2px)',
+                      color: 'var(--btn-secondary-color, var(--text-body))',
+                      background: 'var(--btn-secondary-bg)',
+                      borderTop: 'var(--btn-bt)', borderLeft: 'var(--btn-bl)',
+                      borderRight: 'var(--btn-br)', borderBottom: 'var(--btn-bb)',
+                      borderRadius: 'var(--btn-radius)', padding: '12px 8px',
+                      boxShadow: 'var(--btn-secondary-shadow)', cursor: 'pointer',
+                    }}
+                  >
+                    ← Back
+                  </button>
+                  <button
+                    onClick={() => {
+                      setPreviewIndex(null)
+                      handleGetPerspective(previewing.id)
+                    }}
+                    disabled={loading}
+                    className="flex-1 uppercase text-center"
+                    style={{
+                      fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 13,
+                      letterSpacing: 'var(--btn-letter-spacing, 2px)',
+                      color: 'var(--btn-color)',
+                      background: 'var(--btn-bg)',
+                      borderTop: 'var(--btn-bt)', borderLeft: 'var(--btn-bl)',
+                      borderRight: 'var(--btn-br)', borderBottom: 'var(--btn-bb)',
+                      borderRadius: 'var(--btn-radius)', padding: '12px 8px',
+                      boxShadow: 'var(--btn-shadow)', cursor: loading ? 'wait' : 'pointer',
+                      opacity: loading ? 0.6 : 1,
+                    }}
+                  >
+                    {loading ? 'Loading…' : 'Select'}
+                  </button>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Right arrow */}
+            <button
+              onClick={e => { e.stopPropagation(); nextPreview() }}
+              className="absolute right-3 flex items-center justify-center flex-shrink-0"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--cyan)', fontSize: 40, fontWeight: 700, lineHeight: 1, padding: '8px', zIndex: 51 }}
+              aria-label="Next figure"
+            >
+              ›
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

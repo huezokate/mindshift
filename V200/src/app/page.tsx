@@ -1,8 +1,6 @@
 'use client'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import ThemeSwitcher from '@/components/ThemeSwitcher'
-
 const fade = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }
 const stagger = { show: { transition: { staggerChildren: 0.12 } } }
 
@@ -12,18 +10,6 @@ export default function WelcomePage() {
       className="min-h-dvh flex flex-col items-center justify-center relative overflow-hidden"
       style={{ background: 'var(--bg)', padding: '40px 24px' }}
     >
-      {/* Ambient glow blobs — cyberpunk only, hidden by CSS in other themes */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div
-          className="absolute -top-32 left-1/2 -translate-x-1/2 rounded-full blur-3xl"
-          style={{ width: 600, height: 400, opacity: 0.1, background: 'radial-gradient(circle, var(--cyan), transparent 70%)' }}
-        />
-        <div
-          className="absolute bottom-0 right-0 rounded-full blur-3xl"
-          style={{ width: 400, height: 300, opacity: 0.08, background: 'radial-gradient(circle, var(--violet), transparent 70%)' }}
-        />
-      </div>
-
       <motion.div
         variants={stagger}
         initial="hidden"
@@ -52,10 +38,10 @@ export default function WelcomePage() {
             className="text-center uppercase"
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 36,
-              letterSpacing: 6,
+              fontWeight: 700,
+              fontSize: 28,
+              letterSpacing: 4,
               color: 'var(--cyan)',
-              textShadow: 'var(--glow-cyan)',
               lineHeight: 1,
             }}
           >
@@ -68,10 +54,10 @@ export default function WelcomePage() {
             style={{
               fontFamily: 'var(--font-body)',
               fontWeight: 700,
-              fontSize: 11,
+              fontSize: 12,
               letterSpacing: 1.4,
               lineHeight: '14px',
-              color: 'var(--green)',
+              color: 'var(--violet)',
             }}
           >
             You&apos;re not lost.
@@ -84,10 +70,10 @@ export default function WelcomePage() {
             className="text-center"
             style={{
               fontFamily: 'var(--font-body)',
-              fontSize: 13,
+              fontSize: 14,
               letterSpacing: 0.5,
               lineHeight: '20px',
-              color: 'var(--text-sub)',
+              color: 'var(--text-body)',
             }}
           >
             A perspective-shifting space for anyone who&apos;s ever thought &ldquo;I know, but also… do I?&rdquo;
@@ -97,12 +83,12 @@ export default function WelcomePage() {
 
           <motion.div variants={fade}>
             <Link
-              href="/app/onboarding"
+              href="/app/theme-select"
               className="inline-block text-center uppercase transition-opacity hover:opacity-80 active:scale-95"
               style={{
                 fontFamily: 'var(--font-btn)',
                 fontWeight: 600,
-                fontSize: 13,
+                fontSize: 14,
                 letterSpacing: 'var(--btn-letter-spacing, 3px)',
                 color: 'var(--btn-color)',
                 background: 'var(--btn-bg)',
@@ -121,27 +107,22 @@ export default function WelcomePage() {
           </motion.div>
         </motion.div>
 
-        {/* Theme switcher */}
-        <motion.div variants={fade} className="flex justify-center">
-          <ThemeSwitcher />
-        </motion.div>
-
         {/* Disclaimer */}
         <motion.div variants={fade} className="flex flex-col gap-3 w-full text-center">
           <p
             className="uppercase"
-            style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 11, letterSpacing: 1.3, lineHeight: '14px', color: 'var(--cyan)' }}
+            style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 12, letterSpacing: 1.3, lineHeight: '14px', color: 'var(--violet)' }}
           >
             A few things before we begin:
           </p>
           <p
-            style={{ fontFamily: 'var(--font-body)', fontSize: 12, letterSpacing: 0.5, lineHeight: '18px', color: 'var(--text-sub)' }}
+            style={{ fontFamily: 'var(--font-body)', fontSize: 14, letterSpacing: 0.5, lineHeight: '20px', color: 'var(--text-body)' }}
           >
             MindShift is a space for reflection, not a substitute for professional mental health support.
           </p>
           <p
             className="uppercase"
-            style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 11, letterSpacing: 1.3, lineHeight: '14px', color: 'var(--text-sub)' }}
+            style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 12, letterSpacing: 1.3, lineHeight: '14px', color: 'var(--violet)' }}
           >
             Nothing here is clinical advice.
           </p>

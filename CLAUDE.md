@@ -15,14 +15,24 @@ Everything in `discovery/` is archived experiments — do not reference or modif
 
 | Layer | Technology |
 |---|---|
-| Framework | Next.js (App Router, TypeScript) |
-| Styling | Tailwind + CSS custom properties (3 theme token sets) |
-| Auth + Billing | Clerk (auth) + Clerk Billing Beta (subscriptions — no Stripe) |
+| Framework | Next.js 16 (App Router, TypeScript) |
+| Styling | Tailwind v4 + CSS custom properties (3 theme token sets) |
+| Auth + Billing | Clerk v7 (auth) + Clerk Billing Beta (subscriptions) |
 | Database | Supabase (Postgres) |
-| AI / Lenses | Google Vertex AI — Gemini 2.0 Flash |
+| AI / Lenses | Google Gemini 2.0 Flash (`@google/generative-ai`) |
 | Email | Resend |
-| Hosting | Google Cloud Run (containerized, auto-scales to zero) |
-| Container Registry | Google Artifact Registry |
+| Hosting | Cloudflare Pages |
+| DNS | Cloudflare |
+
+## User Tiers
+
+| Tier | Clerk state | Limits |
+|---|---|---|
+| Anonymous | Not signed in | 3 lenses/day (localStorage) |
+| Free | Signed in, plan key `free_user` | 3 quotes/day, 5 lenses/quote (Supabase usage_log) |
+| Pro | Signed in, plan key `unlock_all_lenses_monthly` ($8.99/mo) | Unlimited |
+
+Tier logic lives in `V200/src/lib/user-tier.ts`. Usage tracking in `V200/src/lib/usage.ts` + `usage_log` table.
 
 ## Design System
 
@@ -34,19 +44,68 @@ Three fully-designed theme systems in Figma — components are complete, screens
 Figma: https://www.figma.com/design/Mubv0Ghdm2SPxF42JVsX8M/MindShift?node-id=414-4628
 Theme tokens live in `V200/src/styles/tokens*.css`. Applied via `data-theme` attribute on `<html>`.
 
-## App Routes (V200)
+## App Routes
 
 ```
-/                       Welcome screen + theme switcher
-/app/onboarding         Vent input (user writes their problem)
-/app/lens               Figure selection carousel
-/app/response           AI response in chosen figure's voice
-/app/mindmap            Mind map canvas (coming later)
-/(auth)/sign-in         Clerk sign-in
-/(auth)/sign-up         Clerk sign-up
-/api/generate-response  POST — calls Gemini, returns figure response
-/api/send-email         POST — Resend email dispatch
+/                         Welcome screen + theme switcher
+/app/onboarding           Vent input (protected)
+/app/lens                 Figure selection (protected)
+/app/response             AI response + Save button (protected)
+/app/journal              Journal — saved sessions with lens cards (protected)
+/(auth)/sign-in           Clerk sign-in
+/(auth)/sign-up           Clerk sign-up
+/api/generate-response    POST — calls Gemini, enforces tier limits, tracks usage
+/api/save-response        POST — upserts vent_session + lens_response to Supabase
+/api/journal              GET  — fetches user's sessions + lens responses
+/api/send-email           POST — Resend email dispatch
 ```
+
+Auth middleware lives in `V200/src/proxy.ts` (Next.js 16 uses proxy.ts, not middleware.ts).
+All `/app/*` routes are protected — unauthenticated users are redirected to `/sign-in`.
+
+## Supabase Schema
+
+```sql
+-- One row per vent session (created on explicit Save)
+create table vent_sessions (
+  id         uuid primary key default gen_random_uuid(),
+  user_id    text not null,
+  vent_text  text not null,
+  theme      text not null default 'cyberpunk',
+  created_at timestamptz default now()
+);
+
+-- One row per lens applied to a session
+create table lens_responses (
+  id            uuid primary key default gen_random_uuid(),
+  session_id    uuid not null references vent_sessions(id) on delete cascade,
+  user_id       text not null,
+  figure_id     text not null,
+  response_text text not null,
+  created_at    timestamptz default now(),
+  unique (session_id, figure_id)
+);
+
+-- Daily usage tracking for signed-in users
+create table usage_log (
+  user_id     text not null,
+  date        date not null default current_date,
+  quote_count int  not null default 0,
+  lens_count  int  not null default 0,
+  primary key (user_id, date)
+);
+
+-- RLS helper (Clerk JWT sub → user_id)
+create or replace function requesting_user_id() returns text
+  language sql stable
+  as $$ select nullif(current_setting('request.jwt.claims', true)::json->>'sub', '')::text $$;
+
+-- RLS enabled on all tables, policies restrict to owning user
+```
+
+Migration files (run manually in Supabase SQL editor):
+- `V200/supabase/migrations/001_journal.sql` — vent_sessions + lens_responses + RLS
+- usage_log table added separately (see above SQL)
 
 ## Environment Variables
 
@@ -66,7 +125,7 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 
-# Google Vertex AI
+# Google Gemini
 GOOGLE_GEMINI_API_KEY=
 
 # Resend
@@ -74,74 +133,27 @@ RESEND_API_KEY=
 RESEND_FROM_EMAIL=hello@mindshift.app
 
 # App
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-```
-
-## GCP Setup (for reference)
-
-- Project: connect via `gcloud auth login` + `gcloud config set project <PROJECT_ID>`
-- Gemini calls go via `@google/generative-ai` SDK using `GOOGLE_GEMINI_API_KEY`
-- Deployment: `docker build → Artifact Registry push → Cloud Run deploy`
-- Cloud Run service has env vars set directly in the service config (not committed)
-
-## Supabase Schema (target)
-
-Option A — one vent session, multiple lens responses as child records.
-Journal shows the vent once with all lens cards beneath it. User can re-open an old vent and apply another lens.
-
-```sql
--- Users are managed by Clerk; user_id = Clerk userId
-
--- One row per vent session
-create table vent_sessions (
-  id uuid primary key default gen_random_uuid(),
-  user_id text not null,
-  vent_text text not null,
-  theme text not null,
-  created_at timestamptz default now()
-);
-
--- One row per lens applied to a session
-create table lens_responses (
-  id uuid primary key default gen_random_uuid(),
-  session_id uuid not null references vent_sessions(id) on delete cascade,
-  user_id text not null,
-  figure_id text not null,
-  response_text text not null,
-  created_at timestamptz default now()
-);
-
--- RLS: users can only access their own rows (apply to both tables)
--- alter table vent_sessions enable row level security;
--- alter table lens_responses enable row level security;
-```
-
-## App Routes (V200)
-
-```
-/                         Welcome screen + theme switcher
-/app/onboarding           Vent input
-/app/lens                 Figure selection carousel
-/app/response             AI response + Save button
-/app/journal              Journal — list of vent sessions with lens cards
-/(auth)/sign-in           Clerk sign-in
-/(auth)/sign-up           Clerk sign-up
-/api/generate-response    POST — calls Gemini, returns figure response
-/api/save-response        POST — saves vent session + lens response to Supabase
-/api/send-email           POST — Resend email dispatch
+NEXT_PUBLIC_APP_URL=https://minds-shift.com
 ```
 
 ## Key Files
 
 ```
-V200/src/app/api/generate-response/route.ts   AI lens call (Gemini)
-V200/src/app/api/save-response/route.ts        Save vent+lens to Supabase
-V200/src/app/app/journal/page.tsx              Journal page
-V200/src/lib/figures.ts                        Figure definitions + system prompts
-V200/src/styles/tokens.css                     Cyberpunk tokens (default)
-V200/src/styles/tokens-kawaii.css              Kawaii tokens
-V200/src/styles/tokens-notepad.css             Notepad tokens
+V200/src/proxy.ts                              Auth middleware (Clerk, protects /app/*)
+V200/src/lib/user-tier.ts                      getUserTier() — anonymous/free/pro
+V200/src/lib/usage.ts                          getUsageToday() / trackUsage()
+V200/src/lib/supabase.ts                       getSupabase() / getSupabaseAdmin()
+V200/src/lib/figures.ts                        Figure definitions + Gemini system prompts
 V200/src/lib/theme.tsx                         Theme context + data-theme switching
+V200/src/app/api/generate-response/route.ts    Gemini call + tier enforcement + usage tracking
+V200/src/app/api/save-response/route.ts        Upsert vent session + lens response
+V200/src/app/api/journal/route.ts              Fetch user journal (sessions + responses)
+V200/src/app/app/journal/page.tsx              Journal page (server component)
+V200/src/components/SessionCard.tsx            Expand/collapse session card (client)
+V200/src/components/LensResponseCard.tsx       Lens response sub-card (client)
+V200/src/styles/tokens.css                     Cyberpunk theme tokens
+V200/src/styles/tokens-kawaii.css              Kawaii theme tokens
+V200/src/styles/tokens-notepad.css             Notepad theme tokens
 ```
 
 ## Directory Conventions
@@ -151,6 +163,7 @@ docs/active/tickets/    Ticket files (markdown with YAML frontmatter)
 docs/active/stories/    Story files (same frontmatter pattern)
 docs/active/work/       Work artifacts, one subdirectory per ticket ID
 discovery/              Archived V1/experimental files — read-only reference
+V200/supabase/          SQL migration files (run manually in Supabase SQL editor)
 ```
 
 ---

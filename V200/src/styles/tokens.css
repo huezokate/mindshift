@@ -77,6 +77,18 @@
   --input-radius: 4px;
   --input-divider: var(--cyan);
   --input-shadow: none;
+  --input-header-bg: rgba(0,245,255,0.06);
+  --input-header-shadow: none;
+
+  /* Secondary button */
+  --btn-secondary-bg:     transparent;
+  --btn-secondary-shadow: 0 0 10px rgba(0,245,255,0.12);
+  --btn-secondary-color:  var(--cyan);
+
+  /* Figure avatar */
+  --fig-avatar-border: 2px solid var(--green);
+  --fig-avatar-shadow: 0 0 12px rgba(57,255,20,0.3);
+  --fig-avatar-grad:   linear-gradient(135deg, rgba(0,245,255,0.1) 0%, rgba(176,76,255,0.1) 100%);
 
   /* CTA button */
   --btn-bg: transparent;
