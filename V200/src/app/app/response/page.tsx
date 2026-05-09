@@ -78,7 +78,7 @@ export default function ResponsePage() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="flex flex-col w-full flex-1"
+          className="flex flex-col w-full"
           style={{
             background: 'var(--card-bg)',
             borderTop: 'var(--card-bt)',
@@ -86,7 +86,6 @@ export default function ResponsePage() {
             borderRight: 'var(--card-br)',
             borderBottom: 'var(--card-bb)',
             borderRadius: 'var(--card-radius)',
-            minHeight: 300,
             boxShadow: 'var(--card-shadow)',
             filter: 'var(--card-filter, none)',
           }}
@@ -105,7 +104,7 @@ export default function ResponsePage() {
               perspective.exe
             </p>
           </div>
-          <div className="px-4 py-4 flex-1">
+          <div className="px-4 py-4">
             <p
               style={{ fontFamily: 'var(--font-body)', fontSize: 13, letterSpacing: 0.52, lineHeight: '22px', color: 'var(--text-body)' }}
             >
