@@ -47,19 +47,22 @@ html[data-theme="kawaii"] {
   --hcard-radius:  32px;
   --hcard-padding: 20px 24px;
 
-  /* Figure selector cards */
-  --fig-bg:          #ffffff;
-  --fig-bg-sel:      #fff0f8;
-  --fig-border:      1px solid rgba(64,11,20,0.15);
-  --fig-border-sel:  2px solid #ff50c5;
-  --fig-radius:      16px;
-  --fig-shadow-sel:  inset 2px 0 0 0 #ff50c5;
-  --fig-area-bg:     #e5fcfa;
-  --fig-initial:     rgba(64,11,20,0.3);
-  --fig-initial-sel: #ff50c5;
-  --fig-name-unsel:  #270007;
-  --fig-name-sel:    #ff50c5;
-  --fig-desc:        rgba(39,0,7,0.4);
+  /* Figure selector cards — lens grid */
+  --fig-bg:             #ffffff;
+  --fig-bg-sel:         #fff0f8;
+  --fig-border:         2px solid #400b14;
+  --fig-border-sel:     2px solid #ff50c5;
+  --fig-radius:         32px;
+  --fig-shadow-sel:     inset 2px 0 0 0 #ff50c5;
+  --fig-area-bg:        #e5fcfa;
+  --fig-initial:        rgba(64,11,20,0.3);
+  --fig-initial-sel:    #ff50c5;
+  --fig-name-unsel:     #7e2091;
+  --fig-name-sel:       #ff50c5;
+  --fig-desc:           #9490b8;
+  --fig-avatar-border:  2px solid #ff50c5;
+  --fig-avatar-shadow:  0px 2px 8px 0px rgba(130,100,240,0.13);
+  --fig-avatar-grad:    linear-gradient(135deg, #c8dcf9 0%, #d9c8f9 100%);
 
   /* Input / textarea — white, dark asymmetric border + teal inset shadow */
   --input-bg:      #ffffff;
@@ -70,6 +73,15 @@ html[data-theme="kawaii"] {
   --input-radius:  32px;
   --input-divider: rgba(39,0,7,0.15);
   --input-shadow:  inset 4px 0 0 0 #49dbc8;
+
+  /* Input header — mint teal background */
+  --input-header-bg: #e5fcfa;
+  --input-header-shadow: inset 4px 0 0 0 #49dbc8;
+
+  /* Secondary button — mint bg, teal shadow */
+  --btn-secondary-bg:     #e5fcfa;
+  --btn-secondary-shadow: inset 4px 0 0 0 #49dbc8;
+  --btn-secondary-color:  #270007;
 
   /* CTA button — warm yellow, dark text, Fredoka */
   --btn-bg:             #ffe2ac;
