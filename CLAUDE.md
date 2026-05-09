@@ -4,6 +4,8 @@
 
 MindShift — a perspective-shifting app that lets users vent a problem, pick a historical figure "lens", and receive an AI-generated response in that figure's voice. Three visual themes: Cyberpunk, Kawaii, Notepad.
 
+**Domain:** minds-shift.com (production) · localhost:3000 (dev)
+
 ## Primary Working Directory
 
 `V200/` — Next.js app. All active development happens here.
