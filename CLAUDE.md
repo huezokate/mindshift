@@ -84,31 +84,57 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 ## Supabase Schema (target)
 
+Option A — one vent session, multiple lens responses as child records.
+Journal shows the vent once with all lens cards beneath it. User can re-open an old vent and apply another lens.
+
 ```sql
 -- Users are managed by Clerk; user_id = Clerk userId
-create table perspectives (
+
+-- One row per vent session
+create table vent_sessions (
   id uuid primary key default gen_random_uuid(),
   user_id text not null,
   vent_text text not null,
-  figure_id text not null,
-  response_text text not null,
   theme text not null,
   created_at timestamptz default now()
 );
 
-create table journal_entries (
+-- One row per lens applied to a session
+create table lens_responses (
   id uuid primary key default gen_random_uuid(),
+  session_id uuid not null references vent_sessions(id) on delete cascade,
   user_id text not null,
-  perspective_id uuid references perspectives(id),
-  note text,
+  figure_id text not null,
+  response_text text not null,
   created_at timestamptz default now()
 );
+
+-- RLS: users can only access their own rows (apply to both tables)
+-- alter table vent_sessions enable row level security;
+-- alter table lens_responses enable row level security;
+```
+
+## App Routes (V200)
+
+```
+/                         Welcome screen + theme switcher
+/app/onboarding           Vent input
+/app/lens                 Figure selection carousel
+/app/response             AI response + Save button
+/app/journal              Journal — list of vent sessions with lens cards
+/(auth)/sign-in           Clerk sign-in
+/(auth)/sign-up           Clerk sign-up
+/api/generate-response    POST — calls Gemini, returns figure response
+/api/save-response        POST — saves vent session + lens response to Supabase
+/api/send-email           POST — Resend email dispatch
 ```
 
 ## Key Files
 
 ```
 V200/src/app/api/generate-response/route.ts   AI lens call (Gemini)
+V200/src/app/api/save-response/route.ts        Save vent+lens to Supabase
+V200/src/app/app/journal/page.tsx              Journal page
 V200/src/lib/figures.ts                        Figure definitions + system prompts
 V200/src/styles/tokens.css                     Cyberpunk tokens (default)
 V200/src/styles/tokens-kawaii.css              Kawaii tokens
