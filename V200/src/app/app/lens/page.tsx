@@ -6,23 +6,27 @@ import { useUser } from '@clerk/nextjs'
 import { FIGURES, getFigureImg } from '@/lib/figures'
 import { useTheme } from '@/lib/theme'
 
-const ANON_DAILY_LIMIT = 3
-
-function getAnonLensesToday(): number {
+// Returns 'vents' if daily vent limit hit, 'lenses' if per-vent lens limit hit, null if OK
+function checkAnonLimits(ventText: string): 'vents' | 'lenses' | null {
   const today = new Date().toISOString().split('T')[0]
-  if (localStorage.getItem('ms_anon_date') !== today) {
-    localStorage.setItem('ms_anon_date', today)
-    localStorage.setItem('ms_anon_lenses', '0')
-    return 0
-  }
-  return parseInt(localStorage.getItem('ms_anon_lenses') ?? '0')
+  const storedDate = localStorage.getItem('ms_anon_date')
+  const storedVentKey = localStorage.getItem('ms_anon_vent_key')
+  const storedLenses = parseInt(localStorage.getItem('ms_anon_vent_lenses') ?? '0')
+  const ventKey = ventText.slice(0, 100)
+
+  if (storedDate !== today) return null // new day, reset will happen on track
+  if (storedVentKey === ventKey) return storedLenses >= 3 ? 'lenses' : null
+  if (storedVentKey) return 'vents' // different vent, same day
+  return null // first vent of the day
 }
 
-function incrementAnonLenses() {
+function trackAnonLens(ventText: string) {
   const today = new Date().toISOString().split('T')[0]
+  const ventKey = ventText.slice(0, 100)
+  const isNewVent = localStorage.getItem('ms_anon_date') !== today || localStorage.getItem('ms_anon_vent_key') !== ventKey
   localStorage.setItem('ms_anon_date', today)
-  const current = parseInt(localStorage.getItem('ms_anon_lenses') ?? '0')
-  localStorage.setItem('ms_anon_lenses', String(current + 1))
+  localStorage.setItem('ms_anon_vent_key', ventKey)
+  localStorage.setItem('ms_anon_vent_lenses', isNewVent ? '1' : String(parseInt(localStorage.getItem('ms_anon_vent_lenses') ?? '0') + 1))
 }
 
 const MAX_CHARS = 800
@@ -62,9 +66,16 @@ export default function LensPage() {
     setLimitError(null)
 
     // Anonymous limit check (client-side)
-    if (!isSignedIn && getAnonLensesToday() >= ANON_DAILY_LIMIT) {
-      setLimitError('You\'ve used your 3 free lenses today. Create a free account to get more.')
-      return
+    if (!isSignedIn) {
+      const limitType = checkAnonLimits(vent)
+      if (limitType === 'lenses') {
+        setLimitError('You\'ve used all 3 lenses on this vent. Create a free account for more.')
+        return
+      }
+      if (limitType === 'vents') {
+        setLimitError('You\'ve used your free vent for today. Create a free account for 3 vents per day.')
+        return
+      }
     }
 
     setLoading(true)
@@ -93,7 +104,7 @@ export default function LensPage() {
       const data = await res.json()
       sessionStorage.setItem('ms_response', data.response ?? 'No response received.')
 
-      if (!isSignedIn) incrementAnonLenses()
+      if (!isSignedIn) trackAnonLens(vent)
     } catch {
       sessionStorage.setItem(
         'ms_response',
