@@ -82,8 +82,12 @@
 
   /* Secondary button */
   --btn-secondary-bg:     transparent;
-  --btn-secondary-shadow: 0 0 10px rgba(0,245,255,0.12);
-  --btn-secondary-color:  var(--cyan);
+  --btn-secondary-shadow: none;
+  --btn-secondary-color:  var(--pink);
+  --btn-secondary-bt:     1px solid var(--pink);
+  --btn-secondary-bl:     1px solid var(--pink);
+  --btn-secondary-br:     2px solid var(--pink);
+  --btn-secondary-bb:     2px solid var(--pink);
 
   /* Figure avatar */
   --fig-avatar-border: 2px solid var(--green);
@@ -103,6 +107,10 @@
   --btn-letter-spacing: 3px;
   --btn-dis-color: rgba(255,255,255,0.2);
   --btn-dis-border: rgba(255,255,255,0.1);
+
+  /* Lens response card */
+  --lens-header-bg: rgba(0,245,255,0.04);
+  --lens-quote-color: var(--cyan);
 
   /* Theme switcher */
   --sw-bg: rgba(0,0,0,0.3);

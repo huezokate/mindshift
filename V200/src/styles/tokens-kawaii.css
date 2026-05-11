@@ -78,10 +78,14 @@ html[data-theme="kawaii"] {
   --input-header-bg: #e5fcfa;
   --input-header-shadow: inset 4px 0 0 0 #49dbc8;
 
-  /* Secondary button — mint bg, teal shadow */
+  /* Secondary button — mint bg, teal shadow, same dark borders as primary */
   --btn-secondary-bg:     #e5fcfa;
   --btn-secondary-shadow: inset 4px 0 0 0 #49dbc8;
   --btn-secondary-color:  #270007;
+  --btn-secondary-bt:     var(--btn-bt);
+  --btn-secondary-bl:     var(--btn-bl);
+  --btn-secondary-br:     var(--btn-br);
+  --btn-secondary-bb:     var(--btn-bb);
 
   /* CTA button — warm yellow, dark text, Fredoka */
   --btn-bg:             #ffe2ac;
@@ -96,6 +100,11 @@ html[data-theme="kawaii"] {
   --btn-letter-spacing: 2px;
   --btn-dis-color:      rgba(39,0,7,0.3);
   --btn-dis-border:     rgba(64,11,20,0.2);
+
+  /* Lens response card header background (light lavender-pink) */
+  --lens-header-bg: #ffe1ff;
+  /* Lens response card quote text color (deep magenta) */
+  --lens-quote-color: #cf006f;
 
   /* Theme switcher — pill style */
   --sw-bg:           rgba(255,255,255,0.4);

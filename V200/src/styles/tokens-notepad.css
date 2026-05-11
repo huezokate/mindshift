@@ -73,10 +73,14 @@ html[data-theme="notepad"] {
   --input-header-bg:     #f0efe9;
   --input-header-shadow: none;
 
-  /* Secondary button — cream bg, no shadow */
+  /* Secondary button — cream bg, no shadow, same borders as primary */
   --btn-secondary-bg:     #f0efe9;
   --btn-secondary-shadow: none;
   --btn-secondary-color:  #1e1e40;
+  --btn-secondary-bt:     var(--btn-bt);
+  --btn-secondary-bl:     var(--btn-bl);
+  --btn-secondary-br:     var(--btn-br);
+  --btn-secondary-bb:     var(--btn-bb);
 
   /* Figure avatar */
   --fig-avatar-border: 1.5px solid #3a6fa8;
@@ -96,6 +100,10 @@ html[data-theme="notepad"] {
   --btn-letter-spacing: -1px;
   --btn-dis-color:      rgba(30,30,64,0.3);
   --btn-dis-border:     rgba(30,30,64,0.2);
+
+  /* Lens response card */
+  --lens-header-bg: #fef5f5;
+  --lens-quote-color: var(--cyan);
 
   /* Theme switcher — flat / brutalist tabs */
   --sw-bg:           transparent;

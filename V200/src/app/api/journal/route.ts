@@ -2,15 +2,22 @@ import { NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 
-export async function GET() {
+const PAGE_SIZE = 10
+
+export async function GET(req: Request) {
   const { userId } = await auth()
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  const { searchParams } = new URL(req.url)
+  const offset = Math.max(0, parseInt(searchParams.get('offset') ?? '0', 10))
+  const limit = Math.min(50, parseInt(searchParams.get('limit') ?? String(PAGE_SIZE), 10))
+
   const db = getSupabaseAdmin()
 
-  const { data: sessions, error } = await db
+  // Fetch one extra to know if there are more pages
+  const { data, error } = await db
     .from('vent_sessions')
     .select(`
       id,
@@ -26,11 +33,15 @@ export async function GET() {
     `)
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
-    .limit(50)
+    .range(offset, offset + limit)  // limit+1 rows to detect next page
 
   if (error) {
     return NextResponse.json({ error: 'Failed to fetch journal.' }, { status: 500 })
   }
 
-  return NextResponse.json({ sessions: sessions ?? [] })
+  const rows = data ?? []
+  const hasMore = rows.length > limit
+  const sessions = hasMore ? rows.slice(0, limit) : rows
+
+  return NextResponse.json({ sessions, hasMore })
 }
