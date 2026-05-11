@@ -107,7 +107,7 @@ export default function ResponsePage() {
 
   async function handleSave() {
     if (!isSignedIn) {
-      router.push('/sign-in?redirect_url=' + encodeURIComponent('/app/response'))
+      router.push('/sign-in?reason=save&redirect_url=' + encodeURIComponent('/app/response'))
       return
     }
     if (saveState === 'saving' || saveState === 'saved') return

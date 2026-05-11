@@ -53,7 +53,7 @@ export default function LensPage() {
   const [vent, setVent] = useState(DEMO_VENT)
   const [selected, setSelected] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const [limitError, setLimitError] = useState<string | null>(null)
+  const [limitError, setLimitError] = useState<'lenses' | 'vents' | null>(null)
   const [previewIndex, setPreviewIndex] = useState<number | null>(null)
 
   useEffect(() => {
@@ -69,11 +69,11 @@ export default function LensPage() {
     if (!isSignedIn) {
       const limitType = checkAnonLimits(vent)
       if (limitType === 'lenses') {
-        setLimitError('You\'ve used all 3 lenses on this vent. Create a free account for more.')
+        setLimitError('lenses')
         return
       }
       if (limitType === 'vents') {
-        setLimitError('You\'ve used your free vent for today. Create a free account for 3 vents per day.')
+        setLimitError('vents')
         return
       }
     }
@@ -177,29 +177,32 @@ export default function LensPage() {
               background: 'var(--card-bg)',
               border: '1px solid var(--pink)',
               borderRadius: 'var(--card-radius)',
-              padding: '12px 16px',
+              padding: '16px',
             }}
           >
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--pink)', lineHeight: '18px', textAlign: 'center' }}>
-              {limitError}
+            <p style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 13, color: 'var(--pink)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>
+              {limitError === 'lenses' ? 'Lens limit reached' : 'Daily limit reached'}
             </p>
-            {!isSignedIn && (
-              <button
-                onClick={() => router.push('/sign-up')}
-                className="w-full uppercase text-center mt-3"
-                style={{
-                  fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 12,
-                  letterSpacing: 'var(--btn-letter-spacing, 2px)',
-                  color: 'var(--btn-color)', background: 'var(--btn-bg)',
-                  borderTop: 'var(--btn-bt)', borderLeft: 'var(--btn-bl)',
-                  borderRight: 'var(--btn-br)', borderBottom: 'var(--btn-bb)',
-                  borderRadius: 'var(--btn-radius)', padding: '10px',
-                  cursor: 'pointer',
-                }}
-              >
-                Create free account
-              </button>
-            )}
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--text-sub)', lineHeight: '18px', marginBottom: 12 }}>
+              {limitError === 'lenses'
+                ? 'You\'ve applied 3 lenses to this vent. Create a free account for 5 lenses per vent.'
+                : 'You\'ve used your free vent for today. Create a free account for 3 vents per day.'}
+            </p>
+            <button
+              onClick={() => router.push(`/sign-up?reason=${limitError}_limit`)}
+              className="w-full uppercase text-center"
+              style={{
+                fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 12,
+                letterSpacing: 'var(--btn-letter-spacing, 2px)',
+                color: 'var(--btn-color)', background: 'var(--btn-bg)',
+                borderTop: 'var(--btn-bt)', borderLeft: 'var(--btn-bl)',
+                borderRight: 'var(--btn-br)', borderBottom: 'var(--btn-bb)',
+                borderRadius: 'var(--btn-radius)', padding: '10px',
+                cursor: 'pointer',
+              }}
+            >
+              Create free account →
+            </button>
           </div>
         )}
 
