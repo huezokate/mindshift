@@ -7,6 +7,7 @@ import type { JournalEntry } from '@/lib/journal-types'
 
 type Props = {
   entry: JournalEntry
+  onDelete?: (id: string) => void
 }
 
 function GlobeIcon() {
@@ -45,10 +46,12 @@ function ShareCount({ n }: { n: number }) {
   )
 }
 
-export default function EntryCard({ entry }: Props) {
+export default function EntryCard({ entry, onDelete }: Props) {
   const [expanded, setExpanded] = useState(false)
   const [isPublic, setIsPublic] = useState(entry.is_public)
   const [busy, setBusy] = useState(false)
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const { theme } = useTheme()
   const isKawaii = theme === 'kawaii'
   const isCyberpunk = theme === 'cyberpunk'
@@ -60,6 +63,23 @@ export default function EntryCard({ entry }: Props) {
     .filter((f): f is NonNullable<typeof f> => f != null)
 
   const totalShares = entry.lens_responses.reduce((n, lr) => n + (lr.shares?.length ?? 0), 0)
+
+  async function handleDelete() {
+    if (deleting) return
+    setDeleting(true)
+    try {
+      const res = await fetch(`/api/journal-v2/entries/${entry.id}`, { method: 'DELETE' })
+      if (res.ok) {
+        onDelete?.(entry.id)
+      } else {
+        setDeleting(false)
+        setConfirmingDelete(false)
+      }
+    } catch {
+      setDeleting(false)
+      setConfirmingDelete(false)
+    }
+  }
 
   async function togglePrivacy() {
     if (busy) return
@@ -364,6 +384,7 @@ export default function EntryCard({ entry }: Props) {
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             marginTop: 14, paddingTop: 10, borderTop: '1px solid rgba(127,127,127,0.2)',
+            gap: 8, flexWrap: 'wrap',
           }}>
             {privacyToggle}
             <span style={{
@@ -372,6 +393,52 @@ export default function EntryCard({ entry }: Props) {
             }}>
               {new Date(entry.created_at).toLocaleDateString()}
             </span>
+          </div>
+          <div style={{ marginTop: 10, display: 'flex', justifyContent: 'flex-end' }}>
+            {!confirmingDelete ? (
+              <button type="button" onClick={() => setConfirmingDelete(true)}
+                style={{
+                  background: 'transparent', border: 'none',
+                  color: 'var(--text-meta)',
+                  fontFamily: 'var(--font-body)', fontSize: 10,
+                  letterSpacing: '0.8px', textTransform: 'uppercase',
+                  cursor: 'pointer', padding: 4,
+                }}>
+                Delete entry
+              </button>
+            ) : (
+              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                <span style={{
+                  fontFamily: 'var(--font-body)', fontSize: 10,
+                  color: 'var(--pink)', letterSpacing: '0.8px',
+                  textTransform: 'uppercase',
+                }}>
+                  Delete?
+                </span>
+                <button type="button" onClick={() => setConfirmingDelete(false)}
+                  disabled={deleting}
+                  style={{
+                    background: 'transparent', border: '1px solid var(--text-meta)',
+                    color: 'var(--text-sub)',
+                    fontFamily: 'var(--font-btn)', fontSize: 10, fontWeight: 600,
+                    letterSpacing: '1px', textTransform: 'uppercase',
+                    padding: '4px 8px', borderRadius: 2, cursor: 'pointer',
+                  }}>
+                  Cancel
+                </button>
+                <button type="button" onClick={handleDelete} disabled={deleting}
+                  style={{
+                    background: 'transparent', border: '1px solid var(--pink)',
+                    color: 'var(--pink)',
+                    fontFamily: 'var(--font-btn)', fontSize: 10, fontWeight: 600,
+                    letterSpacing: '1px', textTransform: 'uppercase',
+                    padding: '4px 8px', borderRadius: 2,
+                    cursor: deleting ? 'wait' : 'pointer',
+                  }}>
+                  {deleting ? 'Deleting…' : 'Yes, delete'}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

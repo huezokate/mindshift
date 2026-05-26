@@ -155,7 +155,11 @@ export default function JournalV2Client({ initialEntries, initialHasMore }: Prop
       )}
 
       {entries.map(entry => (
-        <EntryCard key={entry.id} entry={entry} />
+        <EntryCard
+          key={entry.id}
+          entry={entry}
+          onDelete={id => setEntries(prev => prev.filter(e => e.id !== id))}
+        />
       ))}
 
       {hasMore && (
