@@ -39,6 +39,8 @@ Build window: 18:32 → 18:57 PDT, Mon May 25 2026 (~25 min plus iteration cycle
 - **Cycle 2** — replaced the entry-level share dot with a count chip ("↗ 2"); made the private badge quiet (default state shouldn't shout); added timestamps to share badges ("Instagram · 3d ago"); added Esc-to-close + body-scroll lock + focus-on-mount to ShareSheet; added per-button sub-line expectations
 - **Cycle 3** — fixed an IntersectionObserver variable shadow that broke pagination offset; added a Postgres schema probe to the seed route that returns 412 with a clear "run the migration" message instead of silently inserting zero rows; typed Supabase query shapes instead of `any`; download filename now includes figure id + timestamp; refactored `TabBtn` out of render-time component creation
 - **Cycle 4** — added DELETE endpoint + two-step inline confirm UI (kept out of the collapsed feed to avoid accidental taps); built `/journal-preview` and visually verified all three themes end-to-end
+- **Cycle 5** — adaptive font scaling in QuoteCardCanvas so long responses fit without ellipsis; portrait load timeout so a slow CDN can't hang the share flow; Tab focus trap on ShareSheet
+- **Cycle 6** (post self-review by an outside subagent) — **blocker fixes**: the seed used to wipe ALL user entries (now uses an `is_demo` flag and only deletes demo rows); favorites filter was applied after pagination and silently killed infinite scroll (now an INNER join in SQL); Copy-link and Facebook share pointed at a URL that just redirects to sign-in (now honest copy + downloads the PNG alongside the FB sharer); titleDisplay ellipsis only when truncated; `crypto.randomUUID` for share keys to avoid double-tap collisions; ShareSheet revokes every Blob URL it minted, not just the last one; switched schema-probe to Postgres error code 42703 instead of message substring
 
 ## What's incomplete
 
@@ -56,15 +58,19 @@ Build window: 18:32 → 18:57 PDT, Mon May 25 2026 (~25 min plus iteration cycle
 4. **Swap v1 → v2** — once approved, rename `journal-v2` routes to `journal` and delete the old `SessionCard` / `LensResponseCard` / `JournalClient` / `/api/journal/route.ts`. Diff should be small.
 5. **Delete `/journal-preview`** — was only for visual QA; not for production
 
-## Commit list (local, not pushed)
+## Commit list (local, not pushed — 10 commits)
 
 ```
-89a4812 fix(journal-v2): lint cleanup + observer shadow + schema probe in seed
-29b4743 feat(journal-v2): UI + share quote card + research doc
-6e0db23 feat(journal-v2): API routes for entries, privacy, favorites, share log, seed
-b64b2e5 feat(journal-v2): schema + types + 10-entry demo seed
-+ delete-entry commit
-+ /journal-preview QA route commit
+fix(journal-v2): blockers from self-review            ← seed wipes only is_demo rows, fav filter in SQL, etc.
+polish(journal-v2): adaptive font, image timeout, Tab focus trap
+docs(journal-v2): preview-route footer
+docs(journal-v2): session summary
+chore(journal-v2): visual-QA preview route (no auth, no DB)
+feat(journal-v2): delete entry endpoint + inline confirm UI
+fix(journal-v2): lint cleanup + observer shadow + schema probe in seed
+feat(journal-v2): UI + share quote card + research doc
+feat(journal-v2): API routes for entries, privacy, favorites, share log, seed
+feat(journal-v2): schema + types + 10-entry demo seed
 ```
 
 ## How to try it locally
