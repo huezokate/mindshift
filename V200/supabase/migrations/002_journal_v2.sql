@@ -5,6 +5,9 @@
 alter table vent_sessions
   add column if not exists is_public boolean not null default false;
 
+alter table vent_sessions
+  add column if not exists is_demo boolean not null default false;
+
 alter table lens_responses
   add column if not exists is_favorite boolean not null default false;
 

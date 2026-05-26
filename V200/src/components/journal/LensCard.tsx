@@ -82,7 +82,12 @@ export default function LensCard({ response, ventText, isEntryPublic }: Props) {
   }
 
   function onShared(platform: SharePlatform) {
-    setShares(prev => [...prev, { id: `local-${Date.now()}`, platform, shared_at: new Date().toISOString() }])
+    // crypto.randomUUID avoids React key collisions when shares fire in
+    // the same millisecond (e.g. user double-taps a share button).
+    const id = typeof crypto !== 'undefined' && 'randomUUID' in crypto
+      ? crypto.randomUUID()
+      : `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+    setShares(prev => [...prev, { id, platform, shared_at: new Date().toISOString() }])
   }
 
   const shareBadges = shares.length > 0 && (

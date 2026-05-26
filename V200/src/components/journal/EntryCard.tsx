@@ -56,7 +56,12 @@ export default function EntryCard({ entry, onDelete }: Props) {
   const isKawaii = theme === 'kawaii'
   const isCyberpunk = theme === 'cyberpunk'
 
-  const titleDisplay = entry.vent_text.split(' ').slice(0, 5).join(' ').toUpperCase() + '…'
+  const titleWords = entry.vent_text.split(/\s+/).filter(Boolean)
+  const titleDisplay = (
+    titleWords.length <= 5
+      ? titleWords.join(' ')
+      : titleWords.slice(0, 5).join(' ') + '…'
+  ).toUpperCase()
 
   const figs = entry.lens_responses
     .map(lr => FIGURES.find(f => f.id === lr.figure_id))

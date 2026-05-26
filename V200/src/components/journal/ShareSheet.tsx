@@ -19,7 +19,9 @@ export default function ShareSheet({
   figureId,
   responseText,
   ventText,
-  isEntryPublic,
+  // isEntryPublic intentionally unused: copy-link is gated on a future
+  // public per-entry route, not on this flag (see copyLink handler).
+  isEntryPublic: _isEntryPublic,
   onClose,
   onShared,
 }: Props) {
@@ -30,10 +32,23 @@ export default function ShareSheet({
   const [status, setStatus] = useState<string | null>(null)
   // `building` is derived from pngUrl, so toggling state on render isn't needed.
   const building = !pngUrl
+  // Track every Blob URL we mint so we can revoke them on unmount or
+  // when a new render replaces them — prevents the leak that would
+  // otherwise occur on rapid input toggles.
+  const allUrlsRef = useRef<string[]>([])
 
   const themeKey = (theme === 'kawaii' || theme === 'notepad') ? theme : 'cyberpunk'
   const closeBtnRef = useRef<HTMLButtonElement>(null)
   const dialogRef = useRef<HTMLDivElement>(null)
+
+  // Revoke every Blob URL we created when the sheet unmounts.
+  useEffect(() => {
+    const urls = allUrlsRef.current
+    return () => {
+      for (const u of urls) URL.revokeObjectURL(u)
+      urls.length = 0
+    }
+  }, [])
 
   // Esc to close + lock body scroll + focus on mount + simple Tab focus trap
   useEffect(() => {
@@ -77,7 +92,6 @@ export default function ShareSheet({
 
   useEffect(() => {
     let cancelled = false
-    let revokedUrl: string | null = null
     renderQuoteCard({
       figureId,
       responseText,
@@ -88,7 +102,7 @@ export default function ShareSheet({
       .then(blob => {
         if (cancelled) return
         const url = URL.createObjectURL(blob)
-        revokedUrl = url
+        allUrlsRef.current.push(url)
         setPngBlob(blob)
         setPngUrl(url)
       })
@@ -97,7 +111,6 @@ export default function ShareSheet({
       })
     return () => {
       cancelled = true
-      if (revokedUrl) URL.revokeObjectURL(revokedUrl)
     }
   }, [figureId, responseText, themeKey, ventText, includeVent])
 
@@ -148,28 +161,24 @@ export default function ShareSheet({
   }
 
   async function shareFacebook() {
-    const url = isEntryPublic
-      ? `${window.location.origin}/app/journal-v2`
-      : 'https://minds-shift.com'
-    const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`
+    // Facebook's sharer scrapes Open Graph tags from the linked URL. The
+    // public per-entry route doesn't exist yet (out of scope for v1), so
+    // we share the marketing site URL. The PNG is downloaded alongside
+    // so the user can attach it manually.
+    downloadPng()
+    const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent('https://minds-shift.com')}`
     window.open(fbUrl, '_blank', 'noopener')
     await logShare('facebook')
-    setStatus('Facebook sharer opened in a new tab.')
+    setStatus('Image saved and Facebook sharer opened. Attach the image in the new tab.')
   }
 
   async function copyLink() {
-    if (!isEntryPublic) {
-      setStatus("This entry is private. Make it public first to share a link.")
-      return
-    }
-    const url = `${window.location.origin}/app/journal-v2`
-    try {
-      await navigator.clipboard.writeText(url)
-      await logShare('link')
-      setStatus('Link copied.')
-    } catch {
-      setStatus('Copy failed.')
-    }
+    // There is no public per-entry route yet — copying /app/journal-v2
+    // would just send the recipient to a sign-in screen with no context.
+    // Keep this button visible but honest about what it does.
+    setStatus(
+      'A public link to share individual entries isn’t ready yet. Use Download or Native share to send the quote card.'
+    )
   }
 
   function downloadPng() {
@@ -300,8 +309,8 @@ export default function ShareSheet({
           <ShareButton label="Share…" sub="your device's share sheet" onClick={shareNative} disabled={!pngBlob} />
           <ShareButton label="Instagram" sub="saves image, opens app" onClick={shareInstagram} disabled={!pngBlob} />
           <ShareButton label="TikTok" sub="saves image, opens app" onClick={shareTikTok} disabled={!pngBlob} />
-          <ShareButton label="Facebook" sub="opens sharer in new tab" onClick={shareFacebook} />
-          <ShareButton label="Copy link" sub={isEntryPublic ? 'shareable URL' : 'public entries only'} onClick={copyLink} />
+          <ShareButton label="Facebook" sub="saves image, opens sharer" onClick={shareFacebook} />
+          <ShareButton label="Copy link" sub="public links coming soon" onClick={copyLink} />
           <ShareButton label="Download" sub="save the PNG" onClick={downloadPng} disabled={!pngBlob} />
         </div>
 

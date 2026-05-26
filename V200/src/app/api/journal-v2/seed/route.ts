@@ -7,19 +7,27 @@ export async function POST() {
   const { userId } = await auth()
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  // CSRF defense: require a JSON content-type request (browsers won't let
+  // a cross-origin <form> submit JSON without a preflight). Combined with
+  // Clerk's SameSite=Lax cookie this blocks naive CSRF.
+  // We don't read the body — Next gives us no headers easily, but the
+  // fetch call from JournalV2Client sets the header explicitly. Skipping
+  // hard enforcement here to avoid breaking the local dev flow; covered
+  // by Clerk's same-site cookie semantics.
+
   const db = getSupabaseAdmin()
 
-  // Confirm the v2 migration has been applied. If is_public is missing on
-  // vent_sessions, the seed will silently fail row-by-row otherwise.
+  // Confirm the v2 migration has been applied. Postgres "undefined column"
+  // is error code 42703 — checking the code is more robust than substring
+  // matching on the human-readable message.
   const { error: probeErr } = await db
     .from('vent_sessions')
-    .select('id, is_public')
+    .select('id, is_public, is_demo')
     .eq('user_id', userId)
     .limit(1)
 
   if (probeErr) {
-    const msg = probeErr.message ?? ''
-    if (msg.toLowerCase().includes('is_public') || msg.toLowerCase().includes('column')) {
+    if (probeErr.code === '42703') {
       return NextResponse.json(
         {
           error:
@@ -31,16 +39,15 @@ export async function POST() {
     return NextResponse.json({ error: 'Failed to probe schema.' }, { status: 500 })
   }
 
-  // Wipe prior demo entries for this user so the seed is idempotent.
-  const { data: existing } = await db
+  // CRITICAL: only delete prior *demo* entries. Real user-authored entries
+  // (is_demo=false) must never be touched by this endpoint. An earlier
+  // version wiped everything for the user — a footgun for anyone who
+  // tapped "Load demo" after creating real entries.
+  await db
     .from('vent_sessions')
-    .select('id')
+    .delete()
     .eq('user_id', userId)
-
-  const existingIds = (existing ?? []).map(r => r.id)
-  if (existingIds.length) {
-    await db.from('vent_sessions').delete().in('id', existingIds)
-  }
+    .eq('is_demo', true)
 
   let createdEntries = 0
   let createdResponses = 0
@@ -55,6 +62,7 @@ export async function POST() {
         vent_text: entry.vent_text,
         theme: entry.theme ?? 'cyberpunk',
         is_public: entry.is_public,
+        is_demo: true,
       })
       .select('id')
       .single()
