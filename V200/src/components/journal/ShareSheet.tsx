@@ -33,11 +33,37 @@ export default function ShareSheet({
 
   const themeKey = (theme === 'kawaii' || theme === 'notepad') ? theme : 'cyberpunk'
   const closeBtnRef = useRef<HTMLButtonElement>(null)
+  const dialogRef = useRef<HTMLDivElement>(null)
 
-  // Esc to close + lock body scroll + focus the close button on mount
+  // Esc to close + lock body scroll + focus on mount + simple Tab focus trap
   useEffect(() => {
+    const dialog = dialogRef.current
+    const focusables = () =>
+      dialog
+        ? Array.from(
+            dialog.querySelectorAll<HTMLElement>(
+              'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            )
+          )
+        : []
+
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape') {
+        onClose()
+        return
+      }
+      if (e.key !== 'Tab') return
+      const items = focusables()
+      if (items.length === 0) return
+      const first = items[0]
+      const last = items[items.length - 1]
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
     }
     document.addEventListener('keydown', onKey)
     const prevOverflow = document.body.style.overflow
@@ -175,6 +201,7 @@ export default function ShareSheet({
       }}
     >
       <div
+        ref={dialogRef}
         onClick={e => e.stopPropagation()}
         style={{
           width: '100%',

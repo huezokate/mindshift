@@ -80,18 +80,18 @@ function wrapText(
 }
 
 async function loadImage(src: string): Promise<HTMLImageElement | null> {
-  try {
+  return new Promise(resolve => {
     const img = new Image()
+    // Cross-origin isn't needed for same-origin /portraits/, but setting it
+    // doesn't hurt — and absence would taint the canvas if we ever pulled
+    // from a CDN. The onload/onerror pair guarantees the promise settles.
     img.crossOrigin = 'anonymous'
+    img.onload = () => resolve(img)
+    img.onerror = () => resolve(null)
     img.src = src
-    await new Promise<void>((resolve, reject) => {
-      img.onload = () => resolve()
-      img.onerror = () => reject(new Error('img load failed'))
-    })
-    return img
-  } catch {
-    return null
-  }
+    // Hard timeout: don't let one slow image hang the whole share flow.
+    setTimeout(() => resolve(null), 4000)
+  })
 }
 
 export type QuoteCardOptions = {
@@ -185,13 +185,20 @@ export async function renderQuoteCard(opts: QuoteCardOptions): Promise<Blob> {
     cursorY += avatarSize + 56
   }
 
-  // Response body
+  // Response body — scale font down for very long responses so the
+  // full quote fits without an ellipsis. Bands chosen by character
+  // count rather than rendered line count to avoid an iterative
+  // re-layout loop.
   const bodyMaxW = cardW - 112
+  const len = responseText.length
+  const bodyFontSize = len < 220 ? 44 : len < 380 ? 38 : len < 550 ? 32 : 28
+  const lineH = Math.round(bodyFontSize * 1.36)
   ctx.fillStyle = palette.textBody
-  ctx.font = `400 44px ${fonts.body}`
+  ctx.font = `400 ${bodyFontSize}px ${fonts.body}`
+
   const lines = wrapText(ctx, '“' + responseText + '”', bodyMaxW)
-  const lineH = 60
-  const maxBodyLines = Math.floor((cardH - (cursorY - cardY) - 200) / lineH)
+  const reservedBottom = 200
+  const maxBodyLines = Math.max(1, Math.floor((cardH - (cursorY - cardY) - reservedBottom) / lineH))
   const shownLines = lines.slice(0, maxBodyLines)
   if (lines.length > maxBodyLines && shownLines.length) {
     const last = shownLines[shownLines.length - 1]
