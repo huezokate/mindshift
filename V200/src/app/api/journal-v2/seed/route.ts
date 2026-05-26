@@ -9,6 +9,28 @@ export async function POST() {
 
   const db = getSupabaseAdmin()
 
+  // Confirm the v2 migration has been applied. If is_public is missing on
+  // vent_sessions, the seed will silently fail row-by-row otherwise.
+  const { error: probeErr } = await db
+    .from('vent_sessions')
+    .select('id, is_public')
+    .eq('user_id', userId)
+    .limit(1)
+
+  if (probeErr) {
+    const msg = probeErr.message ?? ''
+    if (msg.toLowerCase().includes('is_public') || msg.toLowerCase().includes('column')) {
+      return NextResponse.json(
+        {
+          error:
+            'Database schema for Journal v2 is missing. Run supabase/migrations/002_journal_v2.sql in the Supabase SQL editor, then try again.',
+        },
+        { status: 412 }
+      )
+    }
+    return NextResponse.json({ error: 'Failed to probe schema.' }, { status: 500 })
+  }
+
   // Wipe prior demo entries for this user so the seed is idempotent.
   const { data: existing } = await db
     .from('vent_sessions')

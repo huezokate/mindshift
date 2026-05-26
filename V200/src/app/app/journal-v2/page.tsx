@@ -3,7 +3,25 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import JournalV2Client from '@/components/journal/JournalV2Client'
-import type { JournalEntry } from '@/lib/journal-types'
+import type { JournalEntry, LensShare, SharePlatform } from '@/lib/journal-types'
+
+type RawShare = { id: string; platform: SharePlatform; shared_at: string }
+type RawLens = {
+  id: string
+  figure_id: string
+  response_text: string
+  is_favorite: boolean
+  created_at: string
+  lens_shares: RawShare[] | null
+}
+type RawSession = {
+  id: string
+  vent_text: string
+  theme: string
+  is_public: boolean
+  created_at: string
+  lens_responses: RawLens[] | null
+}
 
 const PAGE_SIZE = 10
 
@@ -98,22 +116,22 @@ export default async function JournalV2Page() {
     .order('created_at', { ascending: false })
     .range(0, PAGE_SIZE)
 
-  const rawRows = (data ?? []) as any[]
+  const rawRows = (data ?? []) as unknown as RawSession[]
   const normalized: JournalEntry[] = rawRows.map(s => ({
     id: s.id,
     vent_text: s.vent_text,
     theme: s.theme,
     is_public: !!s.is_public,
     created_at: s.created_at,
-    lens_responses: (s.lens_responses ?? []).map((lr: any) => ({
+    lens_responses: (s.lens_responses ?? []).map(lr => ({
       id: lr.id,
       figure_id: lr.figure_id,
       response_text: lr.response_text,
       is_favorite: !!lr.is_favorite,
       created_at: lr.created_at,
-      shares: (lr.lens_shares ?? [])
+      shares: ((lr.lens_shares ?? []) as LensShare[])
         .slice()
-        .sort((a: any, b: any) => a.shared_at.localeCompare(b.shared_at)),
+        .sort((a, b) => a.shared_at.localeCompare(b.shared_at)),
     })),
   }))
 
@@ -140,7 +158,7 @@ export default async function JournalV2Page() {
             fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--text-sub)',
             marginTop: 6, letterSpacing: '0.4px',
           }}>
-            Save it. Star what helps. Share what's worth saying out loud.
+            Save it. Star what helps. Share what&apos;s worth saying out loud.
           </p>
         </div>
 

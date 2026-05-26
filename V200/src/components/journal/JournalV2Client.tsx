@@ -10,6 +10,39 @@ type Props = {
   initialHasMore: boolean
 }
 
+type TabBtnProps = {
+  value: JournalFilter
+  label: string
+  current: JournalFilter
+  onSelect: (v: JournalFilter) => void
+}
+
+function TabBtn({ value, label, current, onSelect }: TabBtnProps) {
+  const active = current === value
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(value)}
+      style={{
+        flex: 1,
+        padding: '8px 12px',
+        background: 'transparent',
+        border: 'none',
+        borderBottom: active ? '2px solid var(--cyan)' : '2px solid transparent',
+        color: active ? 'var(--cyan)' : 'var(--text-meta)',
+        fontFamily: 'var(--font-btn)',
+        fontWeight: 600,
+        fontSize: 12,
+        letterSpacing: '1.5px',
+        textTransform: 'uppercase',
+        cursor: 'pointer',
+      }}
+    >
+      {label}
+    </button>
+  )
+}
+
 export default function JournalV2Client({ initialEntries, initialHasMore }: Props) {
   const [entries, setEntries] = useState<JournalEntry[]>(initialEntries)
   const [hasMore, setHasMore] = useState(initialHasMore)
@@ -38,24 +71,24 @@ export default function JournalV2Client({ initialEntries, initialHasMore }: Prop
     }
   }, [])
 
-  useEffect(() => {
-    // re-fetch from server when filter changes (after initial render)
-    fetchPage(filter, 0, true)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter])
+  const handleSelectFilter = useCallback((next: JournalFilter) => {
+    if (next === filter) return
+    setFilter(next)
+    fetchPage(next, 0, true)
+  }, [filter, fetchPage])
 
   useEffect(() => {
     const sentinel = sentinelRef.current
     if (!sentinel || !hasMore) return
     const obs = new IntersectionObserver(
-      entries => {
-        if (entries[0].isIntersecting) fetchPage(filter, /* offset */ entries.length, false)
+      ioEntries => {
+        if (ioEntries[0].isIntersecting) fetchPage(filter, entries.length, false)
       },
       { rootMargin: '300px' }
     )
     obs.observe(sentinel)
     return () => obs.disconnect()
-  }, [hasMore, filter, fetchPage])
+  }, [hasMore, filter, fetchPage, entries.length])
 
   async function runSeed() {
     if (seeding) return
@@ -67,7 +100,7 @@ export default function JournalV2Client({ initialEntries, initialHasMore }: Prop
       if (!res.ok) {
         setSeedMsg(data?.error ?? 'Seed failed.')
       } else {
-        setSeedMsg(`Seeded ${data.createdEntries} entries.`)
+        setSeedMsg(`Loaded ${data.createdEntries} demo entries.`)
         await fetchPage(filter, 0, true)
       }
     } catch {
@@ -77,37 +110,11 @@ export default function JournalV2Client({ initialEntries, initialHasMore }: Prop
     }
   }
 
-  const TabBtn = ({ value, label }: { value: JournalFilter; label: string }) => {
-    const active = filter === value
-    return (
-      <button
-        type="button"
-        onClick={() => setFilter(value)}
-        style={{
-          flex: 1,
-          padding: '8px 12px',
-          background: 'transparent',
-          border: 'none',
-          borderBottom: active ? '2px solid var(--cyan)' : '2px solid transparent',
-          color: active ? 'var(--cyan)' : 'var(--text-meta)',
-          fontFamily: 'var(--font-btn)',
-          fontWeight: 600,
-          fontSize: 12,
-          letterSpacing: '1.5px',
-          textTransform: 'uppercase',
-          cursor: 'pointer',
-        }}
-      >
-        {label}
-      </button>
-    )
-  }
-
   return (
     <div className="flex flex-col gap-4">
       <div style={{ display: 'flex', borderBottom: '1px solid rgba(127,127,127,0.15)' }}>
-        <TabBtn value="all" label="All entries" />
-        <TabBtn value="favorites" label="Favorites" />
+        <TabBtn value="all" label="All entries" current={filter} onSelect={handleSelectFilter} />
+        <TabBtn value="favorites" label="Favorites" current={filter} onSelect={handleSelectFilter} />
       </div>
 
       {entries.length === 0 && !loading && (
@@ -118,7 +125,7 @@ export default function JournalV2Client({ initialEntries, initialHasMore }: Prop
           }}>
             {filter === 'favorites'
               ? 'Nothing saved yet. Tap the star on a lens response to keep it here.'
-              : 'Nothing here yet. Save your first perspective, or seed a demo to look around.'}
+              : 'Nothing here yet. Save your first perspective, or load a demo to look around.'}
           </p>
           {filter === 'all' && (
             <button
@@ -136,7 +143,7 @@ export default function JournalV2Client({ initialEntries, initialHasMore }: Prop
                 textTransform: 'uppercase',
               }}
             >
-              {seeding ? 'Loading demo…' : 'Try a 10-entry demo'}
+              {seeding ? 'Loading demo…' : 'Load 10-entry demo'}
             </button>
           )}
           {seedMsg && (

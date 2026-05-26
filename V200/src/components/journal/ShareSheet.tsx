@@ -27,8 +27,9 @@ export default function ShareSheet({
   const [pngUrl, setPngUrl] = useState<string | null>(null)
   const [pngBlob, setPngBlob] = useState<Blob | null>(null)
   const [includeVent, setIncludeVent] = useState(false)
-  const [building, setBuilding] = useState(true)
   const [status, setStatus] = useState<string | null>(null)
+  // `building` is derived from pngUrl, so toggling state on render isn't needed.
+  const building = !pngUrl
 
   const themeKey = (theme === 'kawaii' || theme === 'notepad') ? theme : 'cyberpunk'
   const closeBtnRef = useRef<HTMLButtonElement>(null)
@@ -49,8 +50,8 @@ export default function ShareSheet({
   }, [onClose])
 
   useEffect(() => {
+    let cancelled = false
     let revokedUrl: string | null = null
-    setBuilding(true)
     renderQuoteCard({
       figureId,
       responseText,
@@ -59,14 +60,17 @@ export default function ShareSheet({
       includeVent,
     })
       .then(blob => {
+        if (cancelled) return
         const url = URL.createObjectURL(blob)
         revokedUrl = url
         setPngBlob(blob)
         setPngUrl(url)
-        setBuilding(false)
       })
-      .catch(() => setBuilding(false))
+      .catch(() => {
+        /* keep building=true (derived) so user sees the spinner */
+      })
     return () => {
+      cancelled = true
       if (revokedUrl) URL.revokeObjectURL(revokedUrl)
     }
   }, [figureId, responseText, themeKey, ventText, includeVent])
@@ -144,9 +148,10 @@ export default function ShareSheet({
 
   function downloadPng() {
     if (!pngUrl) return
+    const safeFig = figureId.replace(/[^a-z0-9-]/gi, '')
     const a = document.createElement('a')
     a.href = pngUrl
-    a.download = 'mindshift-quote.png'
+    a.download = `mindshift-${safeFig || 'quote'}-${Date.now()}.png`
     document.body.appendChild(a)
     a.click()
     a.remove()
