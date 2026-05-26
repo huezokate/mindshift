@@ -125,6 +125,15 @@ export default function JournalPreviewPage() {
             <EntryCard key={entry.id} entry={entry} />
           ))}
         </div>
+
+        <p style={{
+          fontFamily: 'var(--font-body)', fontSize: 10, color: 'var(--text-meta)',
+          marginTop: 32, textAlign: 'center', letterSpacing: '0.5px',
+        }}>
+          Tap an entry to see the expanded view, the favorite star, the share
+          history, and the share-sheet modal. None of those mutate state on
+          this preview route.
+        </p>
       </div>
     </div>
   )
