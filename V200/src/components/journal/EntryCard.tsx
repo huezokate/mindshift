@@ -52,6 +52,7 @@ export default function EntryCard({ entry, onDelete }: Props) {
   const [busy, setBusy] = useState(false)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const { theme } = useTheme()
   const isKawaii = theme === 'kawaii'
   const isCyberpunk = theme === 'cyberpunk'
@@ -72,6 +73,7 @@ export default function EntryCard({ entry, onDelete }: Props) {
   async function handleDelete() {
     if (deleting) return
     setDeleting(true)
+    setError(null)
     try {
       const res = await fetch(`/api/journal-v2/entries/${entry.id}`, { method: 'DELETE' })
       if (res.ok) {
@@ -79,16 +81,19 @@ export default function EntryCard({ entry, onDelete }: Props) {
       } else {
         setDeleting(false)
         setConfirmingDelete(false)
+        setError('Delete failed. Try again?')
       }
     } catch {
       setDeleting(false)
       setConfirmingDelete(false)
+      setError('Delete failed. Try again?')
     }
   }
 
   async function togglePrivacy() {
     if (busy) return
     setBusy(true)
+    setError(null)
     const next = !isPublic
     setIsPublic(next)
     try {
@@ -97,9 +102,13 @@ export default function EntryCard({ entry, onDelete }: Props) {
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ is_public: next }),
       })
-      if (!res.ok) setIsPublic(!next)
+      if (!res.ok) {
+        setIsPublic(!next)
+        setError("Couldn't update privacy. Try again?")
+      }
     } catch {
       setIsPublic(!next)
+      setError("Couldn't update privacy. Try again?")
     } finally {
       setBusy(false)
     }
@@ -399,6 +408,24 @@ export default function EntryCard({ entry, onDelete }: Props) {
               {new Date(entry.created_at).toLocaleDateString()}
             </span>
           </div>
+          {error && (
+            <div
+              role="alert"
+              aria-live="polite"
+              style={{
+                marginTop: 10,
+                padding: '6px 10px',
+                background: 'rgba(255,45,120,0.08)',
+                borderLeft: '2px solid var(--pink)',
+                fontFamily: 'var(--font-body)',
+                fontSize: 11,
+                color: 'var(--pink)',
+                letterSpacing: '0.4px',
+              }}
+            >
+              {error}
+            </div>
+          )}
           <div style={{ marginTop: 10, display: 'flex', justifyContent: 'flex-end' }}>
             {!confirmingDelete ? (
               <button type="button" onClick={() => setConfirmingDelete(true)}

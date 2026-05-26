@@ -19,9 +19,8 @@ export default function ShareSheet({
   figureId,
   responseText,
   ventText,
-  // isEntryPublic intentionally unused: copy-link is gated on a future
-  // public per-entry route, not on this flag (see copyLink handler).
-  isEntryPublic: _isEntryPublic,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- copy-link gating moved to a future public per-entry route; keeping the prop for an API-stable handoff
+  isEntryPublic,
   onClose,
   onShared,
 }: Props) {

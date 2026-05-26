@@ -61,10 +61,12 @@ export default function LensCard({ response, ventText, isEntryPublic }: Props) {
   const [shares, setShares] = useState(response.shares ?? [])
   const [shareOpen, setShareOpen] = useState(false)
   const [busy, setBusy] = useState(false)
+  const [favError, setFavError] = useState<string | null>(null)
 
   async function toggleFavorite() {
     if (busy) return
     setBusy(true)
+    setFavError(null)
     const next = !isFavorite
     setIsFavorite(next)
     try {
@@ -73,9 +75,13 @@ export default function LensCard({ response, ventText, isEntryPublic }: Props) {
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ is_favorite: next }),
       })
-      if (!res.ok) setIsFavorite(!next)
+      if (!res.ok) {
+        setIsFavorite(!next)
+        setFavError("Couldn't save. Try again?")
+      }
     } catch {
       setIsFavorite(!next)
+      setFavError("Couldn't save. Try again?")
     } finally {
       setBusy(false)
     }
@@ -89,6 +95,22 @@ export default function LensCard({ response, ventText, isEntryPublic }: Props) {
       : `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
     setShares(prev => [...prev, { id, platform, shared_at: new Date().toISOString() }])
   }
+
+  const errorRow = favError && (
+    <p
+      role="alert"
+      aria-live="polite"
+      style={{
+        marginTop: 8,
+        fontFamily: 'var(--font-body)',
+        fontSize: 11,
+        color: 'var(--pink)',
+        letterSpacing: '0.4px',
+      }}
+    >
+      {favError}
+    </p>
+  )
 
   const shareBadges = shares.length > 0 && (
     <div style={{
@@ -204,6 +226,7 @@ export default function LensCard({ response, ventText, isEntryPublic }: Props) {
               {response.response_text}
             </p>
             {shareBadges}
+            {errorRow}
           </div>
         </div>
         {shareOpen && (
@@ -281,6 +304,7 @@ export default function LensCard({ response, ventText, isEntryPublic }: Props) {
               {response.response_text}
             </p>
             {shareBadges}
+            {errorRow}
           </div>
         </div>
         {shareOpen && (
@@ -344,6 +368,7 @@ export default function LensCard({ response, ventText, isEntryPublic }: Props) {
             {response.response_text}
           </p>
           {shareBadges}
+            {errorRow}
         </div>
       </div>
       {shareOpen && (
