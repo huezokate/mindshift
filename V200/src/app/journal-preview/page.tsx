@@ -11,39 +11,62 @@ const NOW = '2026-05-25T18:00:00Z'
 const HOUR_AGO = '2026-05-25T17:00:00Z'
 const DAY_AGO = '2026-05-24T18:00:00Z'
 
-const ENTRIES: JournalEntry[] = [
+const SAMPLE_LENSES = [
   {
-    id: 'preview-1',
+    id: 'preview-r-lincoln',
+    figure_id: 'a-lincoln',
+    response_text:
+      "A man who works himself to the bone for those who will not share the load is not a partner — he is a draft horse. Begin with one Tuesday. Just one.",
+    is_favorite: true,
+    created_at: HOUR_AGO,
+    shares: [{ id: 'preview-share-1', platform: 'instagram' as const, shared_at: DAY_AGO }],
+  },
+  {
+    id: 'preview-r-dolly',
+    figure_id: 'dolly-parton',
+    response_text:
+      "Honey, you can love your work and still go home at six. That isn't quitting on it — that's keeping enough of yourself to come back tomorrow.",
+    is_favorite: false,
+    created_at: HOUR_AGO,
+    shares: [],
+  },
+  {
+    id: 'preview-r-gandhi',
+    figure_id: 'm-gandhi',
+    response_text:
+      "Resentment grows quietly in the soil of unspoken needs. Speak. Not in anger, but plainly.",
+    is_favorite: false,
+    created_at: HOUR_AGO,
+    shares: [],
+  },
+]
+
+const ENTRIES: JournalEntry[] = [
+  // Collapsed entry WITH lenses — verifies the new green share-out icon on
+  // the left of the lens button row matches the Figma collapsed design.
+  {
+    id: 'preview-collapsed-with-lens',
+    vent_text:
+      "Third Tuesday in a row I've worked until 11. I love the project but I'm starting to resent the team.",
+    theme: 'cyberpunk',
+    is_public: false,
+    created_at: HOUR_AGO,
+    lens_responses: SAMPLE_LENSES,
+  },
+  // Expanded — verifies MINDSHIFT decorative row, italic quote on lens card,
+  // horizontal scroll between multiple lenses.
+  {
+    id: 'preview-expanded',
     vent_text:
       "Third Tuesday in a row I've worked until 11. I love the project but I'm starting to resent the team for not pulling their weight.",
     theme: 'cyberpunk',
     is_public: false,
     created_at: HOUR_AGO,
-    lens_responses: [
-      {
-        id: 'preview-1-r1',
-        figure_id: 'a-lincoln',
-        response_text:
-          "A man who works himself to the bone for those who will not share the load is not a partner — he is a draft horse. Begin with one Tuesday. Just one.",
-        is_favorite: true,
-        created_at: HOUR_AGO,
-        shares: [
-          { id: 'preview-share-1', platform: 'instagram', shared_at: DAY_AGO },
-        ],
-      },
-      {
-        id: 'preview-1-r2',
-        figure_id: 'dolly-parton',
-        response_text:
-          "Honey, you can love your work and still go home at six. That isn't quitting on it — that's keeping enough of yourself to come back tomorrow.",
-        is_favorite: false,
-        created_at: HOUR_AGO,
-        shares: [],
-      },
-    ],
+    lens_responses: SAMPLE_LENSES,
   },
+  // Public, no lens — verifies the green PUBLIC badge and "no lens yet" fallback.
   {
-    id: 'preview-2',
+    id: 'preview-public-empty',
     vent_text:
       "Quitting my corporate job in two weeks. Terrified. Excited. Mostly terrified.",
     theme: 'cyberpunk',
@@ -121,8 +144,15 @@ export default function JournalPreviewPage() {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {ENTRIES.map(entry => (
-            <EntryCard key={entry.id} entry={entry} />
+          {/* The middle entry starts expanded so QA can verify the MINDSHIFT
+              decorative row, the lens-card quote/text styling, and the
+              horizontal scroll between lenses without clicking. */}
+          {ENTRIES.map((entry, i) => (
+            <EntryCard
+              key={entry.id}
+              entry={entry}
+              initialExpanded={i === 1}
+            />
           ))}
         </div>
 

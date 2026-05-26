@@ -8,6 +8,7 @@ import type { JournalEntry } from '@/lib/journal-types'
 type Props = {
   entry: JournalEntry
   onDelete?: (id: string) => void
+  initialExpanded?: boolean
 }
 
 function GlobeIcon() {
@@ -23,6 +24,27 @@ function LockIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{ display: 'block' }}>
       <path d="M18 8h-1V6A5 5 0 0 0 7 6v2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2zM9 6a3 3 0 0 1 6 0v2H9V6z" />
+    </svg>
+  )
+}
+
+// The green share-out icon that anchors the left of the cyberpunk lens row.
+// Matches the Figma "ios_share" symbol — bottom rectangle with an up-arrow.
+function ShareOutIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden style={{ display: 'block' }}>
+      <path d="M12 2.5L7.5 7H11v9h2V7h3.5L12 2.5z" />
+      <path d="M3 13.5V20c0 .83.67 1.5 1.5 1.5h15c.83 0 1.5-.67 1.5-1.5V13.5h-2V20H5v-6.5H3z" />
+    </svg>
+  )
+}
+
+// Pink/violet mind-icon that sits between the two MINDSHIFT wordmarks in
+// the expanded-entry decorative row.
+function MindIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden style={{ display: 'block' }}>
+      <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7z" />
     </svg>
   )
 }
@@ -46,8 +68,8 @@ function ShareCount({ n }: { n: number }) {
   )
 }
 
-export default function EntryCard({ entry, onDelete }: Props) {
-  const [expanded, setExpanded] = useState(false)
+export default function EntryCard({ entry, onDelete, initialExpanded = false }: Props) {
+  const [expanded, setExpanded] = useState(initialExpanded)
   const [isPublic, setIsPublic] = useState(entry.is_public)
   const [busy, setBusy] = useState(false)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
@@ -208,8 +230,9 @@ export default function EntryCard({ entry, onDelete }: Props) {
             borderTop: '1px solid var(--violet)', borderLeft: '1px solid var(--violet)',
             borderRight: '4px solid var(--violet)', borderBottom: '4px solid var(--violet)',
             borderRadius: 'var(--card-radius)',
-            padding: figs.length === 0 ? '12px 16px' : '8px 16px 4px',
-            display: 'flex', alignItems: 'center', justifyContent: figs.length === 0 ? 'center' : 'flex-end',
+            padding: figs.length === 0 ? '12px 16px' : '8px 16px',
+            display: 'flex', alignItems: 'center',
+            justifyContent: figs.length === 0 ? 'center' : 'space-between',
             width: '100%', cursor: 'pointer',
           }}>
             {figs.length === 0 ? (
@@ -220,20 +243,31 @@ export default function EntryCard({ entry, onDelete }: Props) {
                 Open · No lens yet
               </span>
             ) : (
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                {figs.map((fig, i) => (
-                  <div key={i} style={{
-                    width: 48, height: 48, borderRadius: '50%',
-                    border: '1px solid var(--green)',
-                    background: 'var(--fig-avatar-grad)',
-                    overflow: 'hidden', flexShrink: 0,
-                    marginRight: i < figs.length - 1 ? -4 : 0,
-                    position: 'relative', zIndex: i + 1,
-                  }}>
-                    {fig.imgCyberpunk && <img src={fig.imgCyberpunk} alt={fig.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
-                  </div>
-                ))}
-              </div>
+              <>
+                {/* Green share-out icon on the left — Figma 469:4023. Decorative
+                    here (taps the whole row to expand); per-lens share lives
+                    inside the expanded view. */}
+                <span style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  width: 40, height: 40, color: 'var(--green)',
+                }}>
+                  <ShareOutIcon />
+                </span>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  {figs.map((fig, i) => (
+                    <div key={i} style={{
+                      width: 48, height: 48, borderRadius: '50%',
+                      border: '1px solid var(--green)',
+                      background: 'var(--fig-avatar-grad)',
+                      overflow: 'hidden', flexShrink: 0,
+                      marginRight: i < figs.length - 1 ? -4 : 0,
+                      position: 'relative', zIndex: i + 1,
+                    }}>
+                      {fig.imgCyberpunk && <img src={fig.imgCyberpunk} alt={fig.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+                    </div>
+                  ))}
+                </div>
+              </>
             )}
           </button>
         </div>
@@ -483,16 +517,65 @@ export default function EntryCard({ entry, onDelete }: Props) {
           No lens applied to this entry yet.
         </p>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {entry.lens_responses.map(lr => (
+        <>
+          {/* MINDSHIFT [mind icon] MINDSHIFT decorative row — Figma 483:2793.
+              Pure decoration that anchors the transition from the vent card
+              to the lens responses below. */}
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '0 4px',
+          }}>
+            <p style={{
+              fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 18,
+              letterSpacing: '1.44px', lineHeight: '20px',
+              color: 'var(--cyan)', textTransform: 'uppercase', margin: 0,
+            }}>MindShift</p>
+            <div style={{
+              width: 48, height: 48, borderRadius: '50%',
+              border: '2px solid var(--green)', background: 'var(--bg)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0, color: 'var(--pink)',
+            }}>
+              <MindIcon />
+            </div>
+            <p style={{
+              fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 18,
+              letterSpacing: '1.44px', lineHeight: '20px',
+              color: 'var(--violet)', textTransform: 'uppercase', margin: 0,
+            }}>MindShift</p>
+          </div>
+          {/* Horizontal scroll if more than one lens — matches Figma 469:4395
+              (three lens cards in a row, swipe to see the next). Single-lens
+              entries render full-width without scroll plumbing. */}
+          {entry.lens_responses.length === 1 ? (
             <LensCard
-              key={lr.id}
-              response={lr}
+              response={entry.lens_responses[0]}
               ventText={entry.vent_text}
               isEntryPublic={isPublic}
             />
-          ))}
-        </div>
+          ) : (
+            <div style={{
+              display: 'flex', gap: 12, overflowX: 'auto',
+              scrollSnapType: 'x mandatory',
+              WebkitOverflowScrolling: 'touch',
+              paddingBottom: 4,
+              // hide scrollbar so the scroll feels native on mobile
+              scrollbarWidth: 'none',
+            }}>
+              {entry.lens_responses.map(lr => (
+                <div key={lr.id} style={{
+                  flex: '0 0 100%', scrollSnapAlign: 'start',
+                }}>
+                  <LensCard
+                    response={lr}
+                    ventText={entry.vent_text}
+                    isEntryPublic={isPublic}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </>
       )}
     </div>
   )

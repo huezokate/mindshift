@@ -219,9 +219,19 @@ export default function LensCard({ response, ventText, isEntryPublic }: Props) {
             {headerActions}
           </div>
           <div style={{ padding: 16 }}>
+            {fig?.quote && (
+              <p style={{
+                fontFamily: 'var(--font-body)', fontStyle: 'italic',
+                fontSize: 13, lineHeight: '18px', letterSpacing: '0.4px',
+                color: 'var(--cyan)', textAlign: 'center',
+                margin: '0 0 12px 0',
+              }}>
+                &ldquo;{fig.quote}&rdquo;
+              </p>
+            )}
             <p style={{
               fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '20px',
-              letterSpacing: '0.52px', color: 'var(--cyan)', margin: 0,
+              letterSpacing: '0.52px', color: 'var(--text-sub)', margin: 0,
             }}>
               {response.response_text}
             </p>
