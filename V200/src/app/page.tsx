@@ -5,7 +5,8 @@ import { getSupabase } from '@/lib/supabase'
 
 const APP_BASE = process.env.NEXT_PUBLIC_APP_URL ?? ''
 const TRY_URL = `${APP_BASE}/app/onboarding`
-const CONTACT_EMAIL = 'ux@katehuezo.com'
+const WAITLIST_CONTACT = 'hello@minds-shift.com'
+const BUSINESS_CONTACT = 'kate@minds-shift.com'
 
 const fade = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }
 const stagger = { show: { transition: { staggerChildren: 0.1 } } }
@@ -271,7 +272,7 @@ function Waitlist() {
         </Body>
         <WaitlistForm />
         <div style={{ marginTop: 8 }}>
-          <SecondaryLink href={`mailto:${CONTACT_EMAIL}`}>Let&apos;s talk →</SecondaryLink>
+          <SecondaryLink href={`mailto:${WAITLIST_CONTACT}`}>Let&apos;s talk →</SecondaryLink>
         </div>
       </div>
     </Section>
@@ -447,7 +448,7 @@ function Investors() {
         </ul>
 
         <div>
-          <SecondaryLink href={`mailto:${CONTACT_EMAIL}`}>Let&apos;s talk →</SecondaryLink>
+          <SecondaryLink href={`mailto:${BUSINESS_CONTACT}`}>Let&apos;s talk →</SecondaryLink>
         </div>
       </div>
     </Section>
