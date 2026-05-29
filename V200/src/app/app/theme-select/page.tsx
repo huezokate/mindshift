@@ -1,9 +1,11 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FIGURES, getFigureImg } from '@/lib/figures'
 import { useTheme, type Theme } from '@/lib/theme'
+
+const ACK_KEY = 'ms_disclaimer_ack'
 
 const THEMES: { id: Theme; name: string; tagline: string; description: string }[] = [
   {
@@ -35,6 +37,13 @@ export default function ThemeSelectPage() {
 
   const currentIndex = THEMES.findIndex(t => t.id === theme)
   const [index, setIndex] = useState(currentIndex >= 0 ? currentIndex : 1)
+  const [acknowledged, setAcknowledged] = useState(false)
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && localStorage.getItem(ACK_KEY) === '1') {
+      setAcknowledged(true)
+    }
+  }, [])
 
   const current = THEMES[index]
 
@@ -51,8 +60,18 @@ export default function ThemeSelectPage() {
   }
 
   function handleSelect() {
+    if (!acknowledged) return
     setTheme(current.id)
     router.push('/app/onboarding')
+  }
+
+  function toggleAck() {
+    const next = !acknowledged
+    setAcknowledged(next)
+    if (typeof window !== 'undefined') {
+      if (next) localStorage.setItem(ACK_KEY, '1')
+      else localStorage.removeItem(ACK_KEY)
+    }
   }
 
   return (
@@ -211,25 +230,113 @@ export default function ThemeSelectPage() {
               {current.description}
             </p>
 
+            {/* Disclaimer block */}
+            <div
+              className="w-full flex flex-col gap-2"
+              style={{
+                padding: '12px 14px',
+                borderTop: 'var(--hcard-bt)',
+                borderLeft: 'var(--hcard-bl)',
+                borderRight: 'var(--hcard-br)',
+                borderBottom: 'var(--hcard-bb)',
+                borderRadius: 'var(--hcard-radius)',
+                background: 'var(--hcard-bg)',
+              }}
+            >
+              <p
+                className="uppercase"
+                style={{
+                  fontFamily: 'var(--font-body)',
+                  fontWeight: 700,
+                  fontSize: 11,
+                  letterSpacing: 0.5,
+                  lineHeight: '14px',
+                  color: 'var(--cyan)',
+                }}
+              >
+                A few things before we begin:
+              </p>
+              <p
+                style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 12,
+                  lineHeight: '18px',
+                  letterSpacing: 0.3,
+                  color: 'var(--text-body)',
+                }}
+              >
+                MindShift is a space for reflection, not a substitute for professional mental health support.
+              </p>
+              <p
+                className="uppercase"
+                style={{
+                  fontFamily: 'var(--font-body)',
+                  fontWeight: 700,
+                  fontSize: 11,
+                  letterSpacing: 0.5,
+                  lineHeight: '14px',
+                  color: 'var(--violet)',
+                }}
+              >
+                Nothing here is clinical advice.
+              </p>
+
+              {/* Acknowledgement checkbox */}
+              <label
+                className="flex items-center gap-2 cursor-pointer select-none"
+                style={{ marginTop: 4 }}
+              >
+                <input
+                  type="checkbox"
+                  checked={acknowledged}
+                  onChange={toggleAck}
+                  className="cursor-pointer"
+                  style={{
+                    width: 16,
+                    height: 16,
+                    accentColor: 'var(--cyan)',
+                    flexShrink: 0,
+                  }}
+                />
+                <span
+                  className="uppercase"
+                  style={{
+                    fontFamily: 'var(--font-body)',
+                    fontWeight: 700,
+                    fontSize: 11,
+                    letterSpacing: 0.5,
+                    lineHeight: '14px',
+                    color: 'var(--text-body)',
+                  }}
+                >
+                  I understand
+                </span>
+              </label>
+            </div>
+
             {/* SELECT UI button */}
             <button
               onClick={handleSelect}
-              className="uppercase transition-opacity hover:opacity-80 active:scale-95"
+              disabled={!acknowledged}
+              className="uppercase transition-opacity active:scale-95"
               style={{
                 fontFamily: 'var(--font-btn)',
                 fontWeight: 600,
                 fontSize: 14,
                 letterSpacing: 'var(--btn-letter-spacing, 2px)',
-                color: 'var(--btn-secondary-color, var(--text-body))',
-                background: 'var(--btn-secondary-bg)',
-                borderTop: 'var(--btn-bt)',
-                borderLeft: 'var(--btn-bl)',
-                borderRight: 'var(--btn-br)',
-                borderBottom: 'var(--btn-bb)',
+                color: acknowledged
+                  ? 'var(--btn-secondary-color, var(--text-body))'
+                  : 'var(--btn-dis-color)',
+                background: acknowledged ? 'var(--btn-secondary-bg)' : 'transparent',
+                borderTop: acknowledged ? 'var(--btn-bt)' : '1px solid var(--btn-dis-border)',
+                borderLeft: acknowledged ? 'var(--btn-bl)' : '1px solid var(--btn-dis-border)',
+                borderRight: acknowledged ? 'var(--btn-br)' : '1px solid var(--btn-dis-border)',
+                borderBottom: acknowledged ? 'var(--btn-bb)' : '1px solid var(--btn-dis-border)',
                 borderRadius: 'var(--btn-radius)',
                 padding: '14px 40px',
-                boxShadow: 'var(--btn-secondary-shadow)',
-                cursor: 'pointer',
+                boxShadow: acknowledged ? 'var(--btn-secondary-shadow)' : 'none',
+                cursor: acknowledged ? 'pointer' : 'not-allowed',
+                opacity: acknowledged ? 1 : 0.85,
               }}
             >
               Select UI
