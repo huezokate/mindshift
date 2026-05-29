@@ -33,18 +33,24 @@ Check pro client-side: `useUser()` + check `has({ plan: 'unlock_all_lenses_month
 
 ## Routes
 
-| Route | Purpose |
-|---|---|
-| `/` | Public landing page |
-| `/sign-in` `/sign-up` | Clerk auth |
-| `/app/onboarding` | Vent input (protected) |
-| `/app/lens` | Figure selection (protected) |
-| `/app/response` | AI response + Save button (protected) |
-| `/app/journal` | Saved journal — server component (protected) |
-| `POST /api/generate-response` | Gemini call + tier enforcement + usage tracking |
-| `POST /api/save-response` | Upsert vent_session + lens_response |
-| `GET /api/journal` | Fetch sessions + lens_responses for user |
-| `POST /api/send-email` | Resend email dispatch |
+Marketing landing at apex (`minds-shift.com/`), product at subdomain (`app.minds-shift.com/app/*`). `src/proxy.ts` enforces host-aware redirects between the two.
+
+| Route | Purpose | Auth |
+|---|---|---|
+| `/` | Marketing landing + waitlist signup (Supabase anon insert) | none |
+| `/sign-in` `/sign-up` | Clerk auth | none |
+| `/app/onboarding` | Vent input | anon-friendly (free tier) |
+| `/app/lens` | Figure selection | anon-friendly |
+| `/app/response` | AI response + Save button | anon-friendly |
+| `/app/theme-select` | Theme picker | anon-friendly |
+| `/app/journal` | Saved journal — server component | **Clerk-protected** |
+| `POST /api/generate-response` | Gemini call + tier enforcement + usage tracking | server-checked |
+| `POST /api/save-response` | Upsert vent_session + lens_response | server-checked |
+| `GET /api/journal` | Fetch sessions + lens_responses for user | server-checked |
+| `POST /api/send-email` | Resend email dispatch | Clerk-protected |
+| `POST /api/webhook/stripe` | Stripe billing webhook | sig-verified |
+
+Only `/app/journal` requires Clerk sign-in. Everything else in `/app/*` is anon-friendly (the free tier). The root `CLAUDE.md` has more on host routing + the full domain split.
 
 ## Figma Reference
 

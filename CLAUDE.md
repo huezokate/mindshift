@@ -4,7 +4,7 @@
 
 MindShift — a perspective-shifting app that lets users vent a problem, pick a historical figure "lens", and receive an AI-generated response in that figure's voice. Three visual themes: Cyberpunk, Kawaii, Notepad.
 
-**Domain:** minds-shift.com (production) · localhost:3000 (dev)
+**Domains:** `minds-shift.com` (marketing landing) · `app.minds-shift.com` (the product) · `localhost:3000` (dev — no host split locally)
 
 ## Primary Working Directory
 
@@ -21,8 +21,10 @@ Everything in `discovery/` is archived experiments — do not reference or modif
 | Database | Supabase (Postgres) |
 | AI / Lenses | Google Gemini 2.0 Flash (`@google/generative-ai`) |
 | Email | Resend |
-| Hosting | Cloudflare Pages |
-| DNS | Cloudflare |
+| Hosting | Vercel |
+| DNS | Cloudflare (DNS-only / gray cloud — do NOT enable CF proxy; conflicts with Vercel SSL) |
+| Email (receive) | iCloud+ Custom Email Domain — `kate@`, `hello@`, `test@minds-shift.com` |
+| Email (send) | Resend, verified domain, `hello@minds-shift.com` from-address |
 
 ## User Tiers
 
@@ -46,22 +48,30 @@ Theme tokens live in `V200/src/styles/tokens*.css`. Applied via `data-theme` att
 
 ## App Routes
 
-```
-/                         Welcome screen + theme switcher
-/app/onboarding           Vent input (protected)
-/app/lens                 Figure selection (protected)
-/app/response             AI response + Save button (protected)
-/app/journal              Journal — saved sessions with lens cards (protected)
-/(auth)/sign-in           Clerk sign-in
-/(auth)/sign-up           Clerk sign-up
-/api/generate-response    POST — calls Gemini, enforces tier limits, tracks usage
-/api/save-response        POST — upserts vent_session + lens_response to Supabase
-/api/journal              GET  — fetches user's sessions + lens responses
-/api/send-email           POST — Resend email dispatch
-```
+Marketing landing at apex, product at subdomain. Host routing is enforced by `V200/src/proxy.ts`:
 
-Auth middleware lives in `V200/src/proxy.ts` (Next.js 16 uses proxy.ts, not middleware.ts).
-All `/app/*` routes are protected — unauthenticated users are redirected to `/sign-in`.
+- `minds-shift.com/` → marketing landing (waitlist form posts directly to Supabase via anon-insert RLS)
+- `minds-shift.com/app/*` → 308 redirect to `app.minds-shift.com/app/*`
+- `minds-shift.com/sign-in` and `/sign-up` → 308 redirect to subdomain (so Clerk flows happen on the app host)
+- `app.minds-shift.com/` → 308 redirect to `/app/onboarding`
+- Localhost / Vercel preview hosts skip the redirects (exact-match on prod hostnames only)
+
+| Path | Purpose | Auth |
+|---|---|---|
+| `/` | Marketing landing + waitlist signup | none |
+| `/app/onboarding` | Vent input | anon-friendly (free tier) |
+| `/app/lens` | Figure selection | anon-friendly |
+| `/app/response` | AI response + Save button | anon-friendly |
+| `/app/theme-select` | Theme picker | anon-friendly |
+| `/app/journal` | Saved sessions with lens cards | **Clerk-protected** |
+| `/sign-in`, `/sign-up` | Clerk auth | none |
+| `POST /api/generate-response` | Gemini call + tier enforcement + usage tracking | server-checked |
+| `POST /api/save-response` | Upsert vent_session + lens_response | server-checked |
+| `GET /api/journal` | Fetch user's sessions + lens responses | server-checked |
+| `POST /api/send-email` | Resend email dispatch | Clerk-protected |
+| `POST /api/webhook/stripe` | Stripe billing webhook | sig-verified |
+
+**Only `/app/journal` requires sign-in.** Anon users can vent → pick lens → see response → screenshot (the "free tier"); journaling requires sign-in because it persists to Supabase keyed on user_id. The CLAUDE.md previously claimed all `/app/*` were protected — that was always wrong.
 
 ## Supabase Schema
 
@@ -101,10 +111,25 @@ create or replace function requesting_user_id() returns text
   as $$ select nullif(current_setting('request.jwt.claims', true)::json->>'sub', '')::text $$;
 
 -- RLS enabled on all tables, policies restrict to owning user
+
+-- Public waitlist signup (marketing landing). Anon-insert allowed; reads blocked.
+create extension if not exists citext;
+create table waitlist (
+  id         uuid primary key default gen_random_uuid(),
+  email      citext not null unique,
+  source     text,
+  created_at timestamptz not null default now()
+);
+alter table waitlist enable row level security;
+create policy "waitlist_anon_insert" on waitlist for insert with check (true);
 ```
 
-Migration files (run manually in Supabase SQL editor):
+**Supabase project ref:** `wwszertnwbsdwbkzrupk` (one project on the account).
+
+Migration files (apply manually in Supabase SQL editor OR via the Supabase MCP `apply_migration`):
 - `V200/supabase/migrations/001_journal.sql` — vent_sessions + lens_responses + RLS
+- `V200/supabase/migrations/002_journal_v2.sql` — privacy, favorites, share log
+- `V200/supabase/migrations/003_waitlist.sql` — citext email + source upgrade on existing waitlist table
 - usage_log table added separately (see above SQL)
 
 ## Environment Variables
@@ -130,10 +155,13 @@ GOOGLE_GEMINI_API_KEY=
 
 # Resend
 RESEND_API_KEY=
-RESEND_FROM_EMAIL=hello@mindshift.app
+RESEND_FROM_EMAIL=hello@minds-shift.com
 
-# App
-NEXT_PUBLIC_APP_URL=https://minds-shift.com
+# Clerk webhook (welcome email on user.created — not yet wired)
+CLERK_WEBHOOK_SIGNING_SECRET=
+
+# App (note the subdomain — used to build canonical app links from emails, landing CTA, etc.)
+NEXT_PUBLIC_APP_URL=https://app.minds-shift.com
 ```
 
 ## Key Files
