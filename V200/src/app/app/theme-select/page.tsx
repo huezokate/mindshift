@@ -31,6 +31,19 @@ const THEMES: { id: Theme; name: string; tagline: string; description: string }[
   },
 ]
 
+// Reusable Figma-matched card style (node 397:3658 — LensePreviewCard).
+// Uses existing --card-* tokens which already encode the asymmetric border / radius / shadow.
+const cardStyle: React.CSSProperties = {
+  background: 'var(--card-bg)',
+  borderTop: 'var(--card-bt)',
+  borderLeft: 'var(--card-bl)',
+  borderRight: 'var(--card-br)',
+  borderBottom: 'var(--card-bb)',
+  borderRadius: 'var(--card-radius)',
+  boxShadow: 'var(--card-shadow)',
+  filter: 'var(--card-filter, none)',
+}
+
 export default function ThemeSelectPage() {
   const router = useRouter()
   const { theme, setTheme } = useTheme()
@@ -38,6 +51,7 @@ export default function ThemeSelectPage() {
   const currentIndex = THEMES.findIndex(t => t.id === theme)
   const [index, setIndex] = useState(currentIndex >= 0 ? currentIndex : 1)
   const [acknowledged, setAcknowledged] = useState(false)
+  const [expanded, setExpanded] = useState(false)
 
   useEffect(() => {
     if (typeof window !== 'undefined' && localStorage.getItem(ACK_KEY) === '1') {
@@ -48,18 +62,18 @@ export default function ThemeSelectPage() {
   const current = THEMES[index]
 
   function prev() {
-    const next = (index - 1 + THEMES.length) % THEMES.length
-    setIndex(next)
-    setTheme(THEMES[next].id)
+    const n = (index - 1 + THEMES.length) % THEMES.length
+    setIndex(n)
+    setTheme(THEMES[n].id)
   }
 
   function next() {
-    const next = (index + 1) % THEMES.length
-    setIndex(next)
-    setTheme(THEMES[next].id)
+    const n = (index + 1) % THEMES.length
+    setIndex(n)
+    setTheme(THEMES[n].id)
   }
 
-  function handleSelect() {
+  function handleEnter() {
     if (!acknowledged) return
     setTheme(current.id)
     router.push('/app/onboarding')
@@ -152,18 +166,176 @@ export default function ThemeSelectPage() {
         ))}
       </div>
 
-      {/* 30% bg-colour overlay — dims grid, creates depth behind modal */}
+      {/* Bg-colour overlay — dims figure grid for depth */}
       <div
         className="absolute inset-0 z-[5]"
-        style={{ background: 'var(--bg)', opacity: 0.3 }}
+        style={{ background: 'var(--bg)', opacity: 0.55 }}
         aria-hidden="true"
       />
 
-      {/* Foreground: centered modal card */}
+      {/* Foreground column */}
       <div
-        className="relative z-10 flex items-center justify-center min-h-dvh"
-        style={{ padding: '24px' }}
+        className="relative z-10 flex flex-col items-center min-h-dvh"
+        style={{ padding: '32px 24px', gap: 20 }}
       >
+        {/* HERO CARD — wordmark + tagline + disclaimer ack */}
+        <div
+          className="w-full flex flex-col items-center"
+          style={{ ...cardStyle, maxWidth: 376, padding: '24px 24px', gap: 14 }}
+        >
+          <p
+            className="uppercase text-center"
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontWeight: 700,
+              fontSize: 28,
+              letterSpacing: 3,
+              lineHeight: '32px',
+              color: 'var(--violet)',
+              margin: 0,
+            }}
+          >
+            MindShift
+          </p>
+          <p
+            className="text-center"
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 13,
+              letterSpacing: 0.4,
+              lineHeight: '18px',
+              color: 'var(--text-body)',
+              margin: 0,
+            }}
+          >
+            For the overthinkers, the stuck ones, and anyone who just needs a fresh angle.
+          </p>
+
+          {/* Divider */}
+          <div
+            style={{
+              width: '100%',
+              height: 1,
+              background: 'var(--input-divider, rgba(0,0,0,0.08))',
+            }}
+            aria-hidden="true"
+          />
+
+          {/* Disclaimer ack — progressive disclosure */}
+          <label className="flex items-start gap-3 cursor-pointer select-none w-full">
+            <input
+              type="checkbox"
+              checked={acknowledged}
+              onChange={toggleAck}
+              className="cursor-pointer"
+              style={{
+                width: 16,
+                height: 16,
+                accentColor: 'var(--cyan)',
+                flexShrink: 0,
+                marginTop: 2,
+              }}
+            />
+            <span
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: 12,
+                lineHeight: '18px',
+                letterSpacing: 0.3,
+                color: 'var(--text-body)',
+              }}
+            >
+              I understand MindShift is a space for reflection, not clinical advice.{' '}
+              <button
+                type="button"
+                onClick={e => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  setExpanded(v => !v)
+                }}
+                aria-expanded={expanded}
+                className="underline transition-opacity hover:opacity-70"
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: 'var(--cyan)',
+                  fontFamily: 'inherit',
+                  fontSize: 'inherit',
+                  letterSpacing: 'inherit',
+                  padding: 0,
+                }}
+              >
+                {expanded ? 'Show less' : 'Learn more'}
+              </button>
+            </span>
+          </label>
+
+          <AnimatePresence initial={false}>
+            {expanded && (
+              <motion.div
+                key="disclaimer-detail"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+                style={{ overflow: 'hidden', width: '100%' }}
+              >
+                <div
+                  className="flex flex-col gap-2"
+                  style={{
+                    padding: '10px 14px',
+                    borderLeft: '2px solid var(--cyan)',
+                    marginLeft: 28,
+                  }}
+                >
+                  <p
+                    className="uppercase"
+                    style={{
+                      fontFamily: 'var(--font-body)',
+                      fontWeight: 700,
+                      fontSize: 10,
+                      letterSpacing: 0.5,
+                      lineHeight: '14px',
+                      color: 'var(--cyan)',
+                      margin: 0,
+                    }}
+                  >
+                    A few things before we begin
+                  </p>
+                  <p
+                    style={{
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 12,
+                      lineHeight: '18px',
+                      letterSpacing: 0.3,
+                      color: 'var(--text-body)',
+                      margin: 0,
+                    }}
+                  >
+                    MindShift is a space for reflection, not a substitute for professional mental health support. The lenses are creative re-framings, not therapy. If you&apos;re in crisis, please reach out to a qualified professional or a crisis line.
+                  </p>
+                  <p
+                    className="uppercase"
+                    style={{
+                      fontFamily: 'var(--font-body)',
+                      fontWeight: 700,
+                      fontSize: 10,
+                      letterSpacing: 0.5,
+                      lineHeight: '14px',
+                      color: 'var(--violet)',
+                      margin: 0,
+                    }}
+                  >
+                    Nothing here is clinical advice.
+                  </p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* THEME PICKER CARD — the active decision */}
         <AnimatePresence mode="wait">
           <motion.div
             key={current.id}
@@ -171,21 +343,9 @@ export default function ThemeSelectPage() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.96 }}
             transition={{ duration: 0.2 }}
-            className="flex flex-col items-center gap-5 w-full"
-            style={{
-              maxWidth: 360,
-              background: 'var(--card-bg)',
-              borderTop: 'var(--card-bt)',
-              borderLeft: 'var(--card-bl)',
-              borderRight: 'var(--card-br)',
-              borderBottom: 'var(--card-bb)',
-              borderRadius: 'var(--card-radius)',
-              padding: '32px 24px 24px',
-              boxShadow: 'var(--card-shadow)',
-              filter: 'var(--card-filter, none)',
-            }}
+            className="w-full flex flex-col items-center"
+            style={{ ...cardStyle, maxWidth: 376, padding: '24px 24px 20px', gap: 16 }}
           >
-            {/* Theme name */}
             <p
               className="uppercase text-center"
               style={{
@@ -195,12 +355,12 @@ export default function ThemeSelectPage() {
                 letterSpacing: 2,
                 lineHeight: '22px',
                 color: 'var(--violet)',
+                margin: 0,
               }}
             >
               {current.name}
             </p>
 
-            {/* Tagline */}
             <p
               className="text-center"
               style={{
@@ -211,12 +371,12 @@ export default function ThemeSelectPage() {
                 lineHeight: '22px',
                 color: 'var(--cyan)',
                 whiteSpace: 'pre-line',
+                margin: 0,
               }}
             >
               {current.tagline}
             </p>
 
-            {/* Description */}
             <p
               className="text-center"
               style={{
@@ -225,125 +385,13 @@ export default function ThemeSelectPage() {
                 letterSpacing: 0.5,
                 lineHeight: '20px',
                 color: 'var(--text-body)',
+                margin: 0,
               }}
             >
               {current.description}
             </p>
 
-            {/* Disclaimer block */}
-            <div
-              className="w-full flex flex-col gap-2"
-              style={{
-                padding: '12px 14px',
-                borderTop: 'var(--hcard-bt)',
-                borderLeft: 'var(--hcard-bl)',
-                borderRight: 'var(--hcard-br)',
-                borderBottom: 'var(--hcard-bb)',
-                borderRadius: 'var(--hcard-radius)',
-                background: 'var(--hcard-bg)',
-              }}
-            >
-              <p
-                className="uppercase"
-                style={{
-                  fontFamily: 'var(--font-body)',
-                  fontWeight: 700,
-                  fontSize: 11,
-                  letterSpacing: 0.5,
-                  lineHeight: '14px',
-                  color: 'var(--cyan)',
-                }}
-              >
-                A few things before we begin:
-              </p>
-              <p
-                style={{
-                  fontFamily: 'var(--font-body)',
-                  fontSize: 12,
-                  lineHeight: '18px',
-                  letterSpacing: 0.3,
-                  color: 'var(--text-body)',
-                }}
-              >
-                MindShift is a space for reflection, not a substitute for professional mental health support.
-              </p>
-              <p
-                className="uppercase"
-                style={{
-                  fontFamily: 'var(--font-body)',
-                  fontWeight: 700,
-                  fontSize: 11,
-                  letterSpacing: 0.5,
-                  lineHeight: '14px',
-                  color: 'var(--violet)',
-                }}
-              >
-                Nothing here is clinical advice.
-              </p>
-
-              {/* Acknowledgement checkbox */}
-              <label
-                className="flex items-center gap-2 cursor-pointer select-none"
-                style={{ marginTop: 4 }}
-              >
-                <input
-                  type="checkbox"
-                  checked={acknowledged}
-                  onChange={toggleAck}
-                  className="cursor-pointer"
-                  style={{
-                    width: 16,
-                    height: 16,
-                    accentColor: 'var(--cyan)',
-                    flexShrink: 0,
-                  }}
-                />
-                <span
-                  className="uppercase"
-                  style={{
-                    fontFamily: 'var(--font-body)',
-                    fontWeight: 700,
-                    fontSize: 11,
-                    letterSpacing: 0.5,
-                    lineHeight: '14px',
-                    color: 'var(--text-body)',
-                  }}
-                >
-                  I understand
-                </span>
-              </label>
-            </div>
-
-            {/* SELECT UI button */}
-            <button
-              onClick={handleSelect}
-              disabled={!acknowledged}
-              className="uppercase transition-opacity active:scale-95"
-              style={{
-                fontFamily: 'var(--font-btn)',
-                fontWeight: 600,
-                fontSize: 14,
-                letterSpacing: 'var(--btn-letter-spacing, 2px)',
-                color: acknowledged
-                  ? 'var(--btn-secondary-color, var(--text-body))'
-                  : 'var(--btn-dis-color)',
-                background: acknowledged ? 'var(--btn-secondary-bg)' : 'transparent',
-                borderTop: acknowledged ? 'var(--btn-bt)' : '1px solid var(--btn-dis-border)',
-                borderLeft: acknowledged ? 'var(--btn-bl)' : '1px solid var(--btn-dis-border)',
-                borderRight: acknowledged ? 'var(--btn-br)' : '1px solid var(--btn-dis-border)',
-                borderBottom: acknowledged ? 'var(--btn-bb)' : '1px solid var(--btn-dis-border)',
-                borderRadius: 'var(--btn-radius)',
-                padding: '14px 40px',
-                boxShadow: acknowledged ? 'var(--btn-secondary-shadow)' : 'none',
-                cursor: acknowledged ? 'pointer' : 'not-allowed',
-                opacity: acknowledged ? 1 : 0.85,
-              }}
-            >
-              Select UI
-            </button>
-
-            {/* Navigation row */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4" style={{ marginTop: 4 }}>
               <button
                 onClick={prev}
                 className="flex items-center justify-center transition-opacity hover:opacity-70"
@@ -362,7 +410,6 @@ export default function ThemeSelectPage() {
               >
                 ‹
               </button>
-
               <p
                 className="uppercase"
                 style={{
@@ -372,11 +419,11 @@ export default function ThemeSelectPage() {
                   letterSpacing: 1.5,
                   lineHeight: '14px',
                   color: 'var(--text-sub)',
+                  margin: 0,
                 }}
               >
                 Pick your interface
               </p>
-
               <button
                 onClick={next}
                 className="flex items-center justify-center transition-opacity hover:opacity-70"
@@ -398,6 +445,34 @@ export default function ThemeSelectPage() {
             </div>
           </motion.div>
         </AnimatePresence>
+
+        {/* PRIMARY CTA — solid filled, never transparent */}
+        <button
+          onClick={handleEnter}
+          disabled={!acknowledged}
+          className="w-full uppercase transition-colors active:scale-95"
+          style={{
+            maxWidth: 376,
+            fontFamily: 'var(--font-btn)',
+            fontWeight: 600,
+            fontSize: 14,
+            letterSpacing: 'var(--btn-letter-spacing, 3px)',
+            color: acknowledged ? 'var(--violet)' : 'var(--text-sub)',
+            // Hardcoded solid fills so the button never lets the figure grid show through,
+            // regardless of theme. Kawaii cream-yellow when active, neutral grey when disabled.
+            backgroundColor: acknowledged ? '#ffe2ac' : '#e8e4dc',
+            borderTop: 'var(--card-bt)',
+            borderLeft: 'var(--card-bl)',
+            borderRight: 'var(--card-br)',
+            borderBottom: 'var(--card-bb)',
+            borderRadius: 'var(--btn-radius, 32px)',
+            padding: '17px 12px',
+            boxShadow: 'var(--card-shadow)',
+            cursor: acknowledged ? 'pointer' : 'not-allowed',
+          }}
+        >
+          Enter MindShift
+        </button>
       </div>
     </div>
   )
