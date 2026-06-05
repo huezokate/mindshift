@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTheme } from '@/lib/theme'
 
 export default function MindmapLanding() {
@@ -10,6 +10,18 @@ export default function MindmapLanding() {
   useEffect(() => {
     setTheme('notepad')
   }, [setTheme])
+
+  // Has the user already built a map? Stubbed via localStorage until the
+  // Supabase goals query lands in iteration 2. `null` = not yet known (avoids
+  // an SSR/first-paint flash of the wrong state).
+  const [hasMap, setHasMap] = useState<boolean | null>(null)
+  useEffect(() => {
+    try {
+      setHasMap(localStorage.getItem('mindshift_has_map') === '1')
+    } catch {
+      setHasMap(false)
+    }
+  }, [])
 
   return (
     <div
@@ -47,7 +59,7 @@ export default function MindmapLanding() {
             margin: 0,
           }}
         >
-          Plan a year that&rsquo;s actually yours.
+          {hasMap ? 'Welcome back.' : 'Plan a life that’s actually yours.'}
         </h1>
         <p
           style={{
@@ -58,24 +70,37 @@ export default function MindmapLanding() {
             marginTop: 8,
           }}
         >
-          Pick one part of your life. Tell us what you want. We&rsquo;ll draft milestones together
-          and check in with you each week.
+          {hasMap
+            ? 'Browse your map, or take a few minutes to reflect on the week.'
+            : 'Pick the parts of your life you want to move. Tell us what you want. We’ll draft milestones together and check in with you each week.'}
         </p>
       </div>
 
-      <div className="w-full flex flex-col" style={{ maxWidth: 420, gap: 16 }}>
-        <LandingCard
-          href="/app/mindmap/new"
-          eyebrow="Start"
-          title="Begin a year"
-          body="Choose a life area, share your wish, and shape your year of milestones."
-        />
-        <LandingCard
-          href="/app/mindmap/reflect"
-          eyebrow="This Sunday"
-          title="Weekly reflection"
-          body="Three questions. About seven minutes. The thing that makes the plan work."
-        />
+      {/* Before a map exists: a single create CTA. After: browse + reflect. */}
+      <div className="w-full flex flex-col" style={{ maxWidth: 420, gap: 16, minHeight: 200 }}>
+        {hasMap === null ? null : hasMap ? (
+          <>
+            <LandingCard
+              href="/app/mindmap/browse"
+              eyebrow="Overview"
+              title="Browse the map"
+              body="See every area of life, the goals stacked under each, and how far along you are."
+            />
+            <LandingCard
+              href="/app/mindmap/reflect"
+              eyebrow="This Sunday"
+              title="Weekly reflection"
+              body="Three questions. About seven minutes. The thing that makes the plan work."
+            />
+          </>
+        ) : (
+          <LandingCard
+            href="/app/mindmap/new"
+            eyebrow="Start"
+            title="Create your mindmap"
+            body="Set your horizon, choose the areas of life you want to move, and shape your milestones."
+          />
+        )}
       </div>
     </div>
   )

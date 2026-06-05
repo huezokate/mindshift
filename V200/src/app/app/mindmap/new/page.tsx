@@ -6,15 +6,64 @@ import { useTheme } from '@/lib/theme'
 
 // ─── Sample data ───────────────────────────────────────────────────────────
 
-const CATEGORIES: { id: string; label: string; tagline: string; mark: string }[] = [
-  { id: 'career',        label: 'Career',               tagline: 'Direction, craft, impact',         mark: '✎' },
-  { id: 'health',        label: 'Health & Wellness',    tagline: 'Body, mind, energy',               mark: '⌇' },
-  { id: 'creativity',    label: 'Creativity',           tagline: 'Make, play, express',              mark: '✶' },
-  { id: 'personal',      label: 'Personal Development', tagline: 'Know yourself, grow',              mark: '◯' },
-  { id: 'relationships', label: 'Relationships',        tagline: 'Connect, deepen, repair',          mark: '✦' },
-  { id: 'travel',        label: 'Travel',               tagline: 'Explore, wander, return',          mark: '✈' },
-  { id: 'finances',      label: 'Finances',             tagline: 'Security, freedom, generosity',    mark: '$' },
+// `prompt` is a fuller, leading subtext (shown on the stacked area cards) —
+// not just descriptive words, so each card invites the user in.
+const CATEGORIES: { id: string; label: string; mark: string; prompt: string }[] = [
+  { id: 'career',        label: 'Career',               mark: '✎', prompt: 'Map out the direction, craft, and impact you want — and set it up for real progress.' },
+  { id: 'health',        label: 'Health & Fitness',     mark: '⌇', prompt: 'Build the body, mind, and energy you want to carry through the rest of it.' },
+  { id: 'creativity',    label: 'Creativity',           mark: '✶', prompt: 'Make more of the things only you would make. Play, express, ship.' },
+  { id: 'personal',      label: 'Personal Development', mark: '◯', prompt: 'Get to know yourself a little better and grow on purpose, not by accident.' },
+  { id: 'relationships', label: 'Relationships',        mark: '✦', prompt: 'Deepen the bonds that matter — connect, repair, and show up for people.' },
+  { id: 'travel',        label: 'Travel',               mark: '✈', prompt: 'Plan the places you want to wander to, and come back changed.' },
+  { id: 'finances',      label: 'Finances',             mark: '$', prompt: 'Build security and freedom so money serves the life you want.' },
 ]
+
+// Plan horizon — discrete snap points for the duration slider.
+// `noun` is used inside headings ("Your year of …") so the copy reads cleanly.
+const HORIZONS: { months: number; label: string; noun: string; short: string }[] = [
+  { months: 0,  label: 'A day',          noun: 'day',          short: 'day' },
+  { months: 1,  label: 'A month',        noun: 'month',        short: 'mo'  },
+  { months: 12, label: 'A year',         noun: 'year',         short: 'yr'  },
+  { months: 60, label: 'A 5-year plan',  noun: '5-year plan',  short: '5yr' },
+]
+const DEFAULT_HORIZON_INDEX = 2 // A year
+
+// ─── WOOP answers (per area) ───────────────────────────────────────────────
+
+type WoopData = {
+  wish: string
+  obstacle: string
+  outcome: string
+  identity: string
+}
+
+const BLANK_WOOP: WoopData = { wish: '', obstacle: '', outcome: '', identity: '' }
+
+// Prefilled demo content — used only when a single area is selected, so the
+// happy-path demo flows quickly. Multi-area accordions start blank.
+const SAMPLE_WOOP: WoopData = {
+  wish:
+    'I want to transition into a product management role — I keep telling myself I am "not quite ready" but the truth is I have been avoiding starting.',
+  obstacle:
+    'I tell myself I need to know more before I start. Reading replaces doing. I get scared of being seen as a beginner.',
+  outcome:
+    'I have interviewed for at least a few PM roles, even if I haven\'t taken one yet. I have stopped pretending and started doing.',
+  identity: 'a product thinker who learns by shipping and talking to users',
+}
+
+function getWoop(
+  byArea: Record<string, WoopData>,
+  areaId: string,
+  selectedCount: number
+): WoopData {
+  const stored = byArea[areaId]
+  if (stored) return stored
+  return selectedCount === 1 ? SAMPLE_WOOP : BLANK_WOOP
+}
+
+function woopReady(w: WoopData): boolean {
+  return w.wish.trim().length > 20 && w.obstacle.trim().length > 5
+}
 
 type Candidate = {
   id: string
@@ -124,26 +173,34 @@ export default function NewGoalPage() {
   useEffect(() => { setTheme('notepad') }, [setTheme])
 
   const [step, setStep] = useState<Step>('category')
-  const [category, setCategory] = useState<string>('')
-  const [wish, setWish] = useState(
-    'I want to transition into a product management role this year — I keep telling myself I am "not quite ready" but I think the truth is I have been avoiding starting.'
-  )
-  const [bestOutcome, setBestOutcome] = useState(
-    'By next December I have interviewed for at least a few PM roles, even if I haven\'t taken one yet. I feel like I have stopped pretending and started doing.'
-  )
-  const [obstacle, setObstacle] = useState(
-    'I tell myself I need to know more before I start. Reading replaces doing. I get scared of being seen as a beginner.'
-  )
-  const [identity, setIdentity] = useState(
-    'a product thinker who learns by shipping and talking to users'
-  )
+  const [categoryIds, setCategoryIds] = useState<string[]>([])
+  const [horizonIndex, setHorizonIndex] = useState<number>(DEFAULT_HORIZON_INDEX)
+  // WOOP answers are kept per selected area so multi-area plans get their own
+  // inputs (rendered as an accordion in step 2).
+  const [woopByArea, setWoopByArea] = useState<Record<string, WoopData>>({})
   const [selectedIds, setSelectedIds] = useState<string[]>([])
 
   function toggleSelected(id: string) {
     setSelectedIds(s => (s.includes(id) ? s.filter(x => x !== id) : [...s, id]))
   }
 
+  function toggleCategory(id: string) {
+    setCategoryIds(s => (s.includes(id) ? s.filter(x => x !== id) : [...s, id]))
+  }
+
+  function updateWoop(areaId: string, patch: Partial<WoopData>) {
+    setWoopByArea(prev => ({
+      ...prev,
+      [areaId]: { ...getWoop(prev, areaId, categoryIds.length), ...patch },
+    }))
+  }
+
   const selectedCandidates = SAMPLE_CANDIDATES.filter(c => selectedIds.includes(c.id))
+  const horizon = HORIZONS[horizonIndex]
+  const selectedCategories = CATEGORIES.filter(c => categoryIds.includes(c.id))
+  // Identity headline for the review screen — first area's, falling back to sample.
+  const primaryIdentity =
+    getWoop(woopByArea, categoryIds[0] ?? '', categoryIds.length).identity || SAMPLE_WOOP.identity
 
   return (
     <div className="min-h-dvh flex flex-col" style={{ padding: '24px 20px 32px' }}>
@@ -154,9 +211,11 @@ export default function NewGoalPage() {
         <AnimatePresence mode="wait">
           {step === 'category' && (
             <StepWrap key="category">
-              <CategoryStep
-                category={category}
-                onPick={setCategory}
+              <ScopeStep
+                categoryIds={categoryIds}
+                onToggleCategory={toggleCategory}
+                horizonIndex={horizonIndex}
+                onHorizonChange={setHorizonIndex}
                 onNext={() => setStep('woop')}
               />
             </StepWrap>
@@ -165,14 +224,10 @@ export default function NewGoalPage() {
           {step === 'woop' && (
             <StepWrap key="woop">
               <WoopStep
-                wish={wish}
-                setWish={setWish}
-                bestOutcome={bestOutcome}
-                setBestOutcome={setBestOutcome}
-                obstacle={obstacle}
-                setObstacle={setObstacle}
-                identity={identity}
-                setIdentity={setIdentity}
+                areas={selectedCategories.length ? selectedCategories : [CATEGORIES[0]]}
+                horizon={horizon}
+                woopByArea={woopByArea}
+                updateWoop={updateWoop}
                 onNext={() => {
                   setStep('gen1')
                   setTimeout(() => setStep('curate'), 1800)
@@ -183,7 +238,7 @@ export default function NewGoalPage() {
 
           {step === 'gen1' && (
             <StepWrap key="gen1">
-              <LoadingStep label="Drafting your year…" />
+              <LoadingStep label={`Drafting your ${horizon.label}…`} />
             </StepWrap>
           )}
 
@@ -210,10 +265,16 @@ export default function NewGoalPage() {
           {step === 'review' && (
             <StepWrap key="review">
               <ReviewStep
-                category={CATEGORIES.find(c => c.id === category) ?? CATEGORIES[0]}
-                identity={identity}
+                categories={selectedCategories.length ? selectedCategories : [CATEGORIES[0]]}
+                horizon={horizon}
+                identity={primaryIdentity}
                 milestones={selectedCandidates.length ? selectedCandidates : SAMPLE_CANDIDATES.slice(0, 8)}
-                onSave={() => router.push('/app/mindmap/reflect')}
+                onSave={() => {
+                  // Stub for "a map exists" — unlocks Browse/Reflect on the landing.
+                  // In iteration 2 this becomes a Supabase goals query.
+                  try { localStorage.setItem('mindshift_has_map', '1') } catch {}
+                  router.push('/app/mindmap/browse')
+                }}
               />
             </StepWrap>
           )}
@@ -242,7 +303,7 @@ function StepWrap({ children }: { children: React.ReactNode }) {
 
 const STEPS_ORDER: Step[] = ['category', 'woop', 'gen1', 'curate', 'gen2', 'review']
 const STEPS_LABELS: Record<Step, string> = {
-  category: '1 of 4 · Choose',
+  category: '1 of 4 · Scope',
   woop:     '2 of 4 · Tell us',
   gen1:     '· · ·',
   curate:   '3 of 4 · Curate',
@@ -293,88 +354,293 @@ function TopBar({ step, onBack }: { step: Step; onBack: () => void }) {
   )
 }
 
-// ─── Step 1: Category ──────────────────────────────────────────────────────
+// ─── Step 1: Scope (horizon + life areas) ──────────────────────────────────
 
-function CategoryStep({
-  category,
-  onPick,
+function ScopeStep({
+  categoryIds,
+  onToggleCategory,
+  horizonIndex,
+  onHorizonChange,
   onNext,
 }: {
-  category: string
-  onPick: (id: string) => void
+  categoryIds: string[]
+  onToggleCategory: (id: string) => void
+  horizonIndex: number
+  onHorizonChange: (i: number) => void
   onNext: () => void
 }) {
+  const horizon = HORIZONS[horizonIndex]
+  const chosen = CATEGORIES.filter(c => categoryIds.includes(c.id))
+  const ready = categoryIds.length >= 1
+
   return (
-    <div className="w-full flex flex-col" style={{ gap: 20 }}>
+    <div className="w-full flex flex-col" style={{ gap: 24 }}>
       <Heading
         eyebrow="Step 1"
-        title="What part of your life are you focusing on this year?"
-        sub="One area at a time. You can plan the next one when this one feels rooted."
+        title="How far out, and what matters?"
+        sub="Set your horizon, then pick the parts of life you want to move. Pairing a few is encouraged — they pull each other forward."
       />
 
-      <div className="grid" style={{ gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-        {CATEGORIES.map(c => {
-          const active = category === c.id
-          return (
-            <button
-              key={c.id}
-              onClick={() => onPick(c.id)}
-              style={{
-                textAlign: 'left',
-                cursor: 'pointer',
-                background: active ? '#fef5f5' : 'var(--card-bg)',
-                borderTop: 'var(--card-bt)',
-                borderLeft: active ? '4px solid var(--cyan)' : 'var(--card-bl)',
-                borderRight: 'var(--card-br)',
-                borderBottom: 'var(--card-bb)',
-                borderRadius: 'var(--card-radius)',
-                padding: '14px 16px',
-                filter: 'var(--card-filter, none)',
-              }}
-            >
-              <div className="flex items-center" style={{ gap: 10, marginBottom: 4 }}>
+      {/* Horizon slider */}
+      <HorizonSlider
+        index={horizonIndex}
+        onChange={onHorizonChange}
+        label={horizon.label}
+      />
+
+      {/* Life areas — multi-select */}
+      <div className="flex flex-col" style={{ gap: 10 }}>
+        <p
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontWeight: 700,
+            fontSize: 12,
+            letterSpacing: 1,
+            textTransform: 'uppercase',
+            color: 'var(--cyan)',
+            margin: 0,
+          }}
+        >
+          Areas of life
+        </p>
+        <div className="flex flex-col" style={{ gap: 12 }}>
+          {CATEGORIES.map(c => {
+            const active = categoryIds.includes(c.id)
+            return (
+              <button
+                key={c.id}
+                onClick={() => onToggleCategory(c.id)}
+                aria-pressed={active}
+                style={{
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                  width: '100%',
+                  background: active ? '#fef5f5' : 'var(--card-bg)',
+                  borderTop: 'var(--card-bt)',
+                  borderLeft: active ? '4px solid var(--cyan)' : 'var(--card-bl)',
+                  borderRight: 'var(--card-br)',
+                  borderBottom: 'var(--card-bb)',
+                  borderRadius: 'var(--card-radius)',
+                  padding: '16px 18px',
+                  filter: 'var(--card-filter, none)',
+                  position: 'relative',
+                  display: 'flex',
+                  gap: 14,
+                  alignItems: 'flex-start',
+                }}
+              >
                 <span
                   aria-hidden
                   style={{
                     fontFamily: 'var(--font-display)',
-                    fontSize: 22,
+                    fontSize: 26,
                     lineHeight: 1,
                     color: 'var(--pink)',
+                    marginTop: 2,
                   }}
                 >
                   {c.mark}
                 </span>
-                <span
-                  style={{
-                    fontFamily: 'var(--font-display)',
-                    fontWeight: 700,
-                    fontSize: 15,
-                    letterSpacing: '-0.2px',
-                    color: 'var(--text-h1)',
-                  }}
-                >
-                  {c.label}
-                </span>
-              </div>
-              <p
-                style={{
-                  fontFamily: 'var(--font-body)',
-                  fontSize: 12,
-                  lineHeight: '16px',
-                  color: 'var(--text-sub)',
-                  margin: 0,
-                }}
-              >
-                {c.tagline}
-              </p>
-            </button>
-          )
-        })}
+                <div style={{ flex: 1, paddingRight: 22 }}>
+                  <span
+                    style={{
+                      display: 'block',
+                      fontFamily: 'var(--font-display)',
+                      fontWeight: 700,
+                      fontSize: 17,
+                      letterSpacing: '-0.3px',
+                      color: 'var(--text-h1)',
+                      marginBottom: 4,
+                    }}
+                  >
+                    {c.label}
+                  </span>
+                  <p
+                    style={{
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 13,
+                      lineHeight: '19px',
+                      color: 'var(--text-sub)',
+                      margin: 0,
+                    }}
+                  >
+                    {c.prompt}
+                  </p>
+                </div>
+                {active && (
+                  <span
+                    aria-hidden
+                    style={{
+                      position: 'absolute',
+                      top: 12,
+                      right: 12,
+                      width: 20,
+                      height: 20,
+                      borderRadius: '50%',
+                      background: 'var(--cyan)',
+                      color: '#ffffff',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontFamily: 'var(--font-display)',
+                      fontWeight: 700,
+                      fontSize: 12,
+                      lineHeight: 1,
+                    }}
+                  >
+                    ✓
+                  </span>
+                )}
+              </button>
+            )
+          })}
+        </div>
       </div>
 
-      <PrimaryButton disabled={!category} onClick={onNext}>
+      {/* Pairing preview */}
+      <PairingPreview chosen={chosen} horizonLabel={horizon.label} />
+
+      <PrimaryButton disabled={!ready} onClick={onNext}>
         Continue →
       </PrimaryButton>
+    </div>
+  )
+}
+
+function HorizonSlider({
+  index,
+  onChange,
+  label,
+}: {
+  index: number
+  onChange: (i: number) => void
+  label: string
+}) {
+  return (
+    <div className="flex flex-col" style={{ gap: 10 }}>
+      <div className="flex items-baseline justify-between">
+        <p
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontWeight: 700,
+            fontSize: 12,
+            letterSpacing: 1,
+            textTransform: 'uppercase',
+            color: 'var(--cyan)',
+            margin: 0,
+          }}
+        >
+          Plan horizon
+        </p>
+        <p
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontWeight: 700,
+            fontSize: 20,
+            letterSpacing: '-0.4px',
+            color: 'var(--text-h1)',
+            margin: 0,
+          }}
+        >
+          {label}
+        </p>
+      </div>
+      <input
+        type="range"
+        min={0}
+        max={HORIZONS.length - 1}
+        step={1}
+        value={index}
+        onChange={e => onChange(Number(e.target.value))}
+        aria-label="Plan horizon"
+        style={{
+          width: '100%',
+          accentColor: 'var(--pink)',
+          cursor: 'pointer',
+        }}
+      />
+      <div className="flex justify-between" style={{ marginTop: -2 }}>
+        {HORIZONS.map((h, i) => (
+          <span
+            key={h.months}
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 10,
+              letterSpacing: 0.3,
+              color: i === index ? 'var(--pink)' : 'var(--text-meta)',
+              fontWeight: i === index ? 700 : 400,
+            }}
+          >
+            {h.short}
+          </span>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function PairingPreview({
+  chosen,
+  horizonLabel,
+}: {
+  chosen: { id: string; label: string }[]
+  horizonLabel: string
+}) {
+  if (chosen.length === 0) {
+    return (
+      <p
+        style={{
+          fontFamily: 'var(--font-body)',
+          fontSize: 12,
+          lineHeight: '17px',
+          color: 'var(--text-meta)',
+          margin: 0,
+          textAlign: 'center',
+        }}
+      >
+        Pick one area to begin — or pair a few that belong together.
+      </p>
+    )
+  }
+  return (
+    <div
+      style={{
+        background: 'var(--card-bg)',
+        borderTop: 'var(--card-bt)',
+        borderLeft: 'var(--card-bl)',
+        borderRight: 'var(--card-br)',
+        borderBottom: 'var(--card-bb)',
+        borderRadius: 'var(--card-radius)',
+        padding: '12px 14px',
+        filter: 'var(--card-filter, none)',
+      }}
+    >
+      <p
+        style={{
+          fontFamily: 'var(--font-body)',
+          fontWeight: 700,
+          fontSize: 11,
+          letterSpacing: 0.8,
+          textTransform: 'uppercase',
+          color: 'var(--text-sub)',
+          margin: '0 0 6px',
+        }}
+      >
+        Your {horizonLabel} plan
+      </p>
+      <p
+        style={{
+          fontFamily: 'var(--font-display)',
+          fontWeight: 700,
+          fontSize: 16,
+          letterSpacing: '-0.2px',
+          lineHeight: '21px',
+          color: 'var(--text-h1)',
+          margin: 0,
+        }}
+      >
+        {chosen.map(c => c.label).join('  +  ')}
+      </p>
     </div>
   )
 }
@@ -382,61 +648,198 @@ function CategoryStep({
 // ─── Step 2: WOOP input ────────────────────────────────────────────────────
 
 function WoopStep({
-  wish, setWish,
-  bestOutcome, setBestOutcome,
-  obstacle, setObstacle,
-  identity, setIdentity,
+  areas,
+  horizon,
+  woopByArea,
+  updateWoop,
   onNext,
 }: {
-  wish: string; setWish: (s: string) => void
-  bestOutcome: string; setBestOutcome: (s: string) => void
-  obstacle: string; setObstacle: (s: string) => void
-  identity: string; setIdentity: (s: string) => void
+  areas: { id: string; label: string; mark: string }[]
+  horizon: { noun: string }
+  woopByArea: Record<string, WoopData>
+  updateWoop: (areaId: string, patch: Partial<WoopData>) => void
   onNext: () => void
 }) {
-  const ready = wish.trim().length > 20 && obstacle.trim().length > 5 && identity.trim().length > 5
+  const multi = areas.length > 1
+  const [openId, setOpenId] = useState(areas[0]?.id ?? '')
+  const allReady = areas.every(a => woopReady(getWoop(woopByArea, a.id, areas.length)))
 
   return (
     <div className="w-full flex flex-col" style={{ gap: 18 }}>
       <Heading
         eyebrow="Step 2"
         title="Tell us about it."
-        sub="We'll use this to draft milestones. Be honest — vague goals make vague plans."
+        sub={
+          multi
+            ? 'One panel per area you chose — open each and fill it in. Vague goals make vague plans.'
+            : "We'll use this to draft milestones. Be honest — vague goals make vague plans."
+        }
       />
 
+      {multi ? (
+        <div className="flex flex-col" style={{ gap: 12 }}>
+          {areas.map((a, i) => {
+            const w = getWoop(woopByArea, a.id, areas.length)
+            const ready = woopReady(w)
+            const open = openId === a.id
+            return (
+              <AccordionPanel
+                key={a.id}
+                area={a}
+                index={i + 1}
+                ready={ready}
+                open={open}
+                onToggle={() => setOpenId(open ? '' : a.id)}
+              >
+                <WoopFields w={w} horizon={horizon} onChange={patch => updateWoop(a.id, patch)} />
+              </AccordionPanel>
+            )
+          })}
+        </div>
+      ) : (
+        <WoopFields
+          w={getWoop(woopByArea, areas[0].id, areas.length)}
+          horizon={horizon}
+          onChange={patch => updateWoop(areas[0].id, patch)}
+        />
+      )}
+
+      <PrimaryButton disabled={!allReady} onClick={onNext}>
+        Generate milestones →
+      </PrimaryButton>
+    </div>
+  )
+}
+
+function WoopFields({
+  w,
+  horizon,
+  onChange,
+}: {
+  w: WoopData
+  horizon: { noun: string }
+  onChange: (patch: Partial<WoopData>) => void
+}) {
+  const inPhrase = horizon.noun === '5-year plan' ? 'five years' : `a ${horizon.noun}`
+  return (
+    <div className="flex flex-col" style={{ gap: 18 }}>
       <Field
         label="Your wish"
         helper="What's the goal? Describe it freely."
-        value={wish}
-        onChange={setWish}
-        minRows={3}
-      />
-      <Field
-        label="Best outcome"
-        helper="If this goes well, what would that look like one year from now?"
-        value={bestOutcome}
-        onChange={setBestOutcome}
+        value={w.wish}
+        onChange={v => onChange({ wish: v })}
         minRows={3}
       />
       <Field
         label="Main obstacle"
         helper="What's most likely to get in the way? (This is the most important question.)"
-        value={obstacle}
-        onChange={setObstacle}
+        value={w.obstacle}
+        onChange={v => onChange({ obstacle: v })}
         minRows={2}
+      />
+      <Field
+        label={`Desired outcome in ${inPhrase}`}
+        helper="If this goes well, what would that look like by then?"
+        value={w.outcome}
+        onChange={v => onChange({ outcome: v })}
+        minRows={3}
       />
       <Field
         label="I want to become…"
         helper="Finish the sentence: someone who…"
         prefix="someone who"
-        value={identity}
-        onChange={setIdentity}
+        value={w.identity}
+        onChange={v => onChange({ identity: v })}
         minRows={1}
       />
+    </div>
+  )
+}
 
-      <PrimaryButton disabled={!ready} onClick={onNext}>
-        Generate milestones →
-      </PrimaryButton>
+function AccordionPanel({
+  area,
+  index,
+  ready,
+  open,
+  onToggle,
+  children,
+}: {
+  area: { label: string; mark: string }
+  index: number
+  ready: boolean
+  open: boolean
+  onToggle: () => void
+  children: React.ReactNode
+}) {
+  return (
+    <div
+      style={{
+        background: 'var(--card-bg)',
+        borderTop: 'var(--card-bt)',
+        borderLeft: 'var(--card-bl)',
+        borderRight: 'var(--card-br)',
+        borderBottom: 'var(--card-bb)',
+        borderRadius: 'var(--card-radius)',
+        filter: 'var(--card-filter, none)',
+        overflow: 'hidden',
+      }}
+    >
+      <button
+        onClick={onToggle}
+        aria-expanded={open}
+        style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          padding: '14px 16px',
+          background: 'none',
+          border: 'none',
+          cursor: 'pointer',
+          textAlign: 'left',
+        }}
+      >
+        <span
+          aria-hidden
+          style={{
+            width: 22,
+            height: 22,
+            borderRadius: '50%',
+            background: ready ? 'var(--cyan)' : 'var(--bg)',
+            border: ready ? 'none' : '1.5px solid var(--input-divider)',
+            color: ready ? '#ffffff' : 'var(--text-sub)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontFamily: 'var(--font-display)',
+            fontWeight: 700,
+            fontSize: 12,
+            lineHeight: 1,
+            flexShrink: 0,
+          }}
+        >
+          {ready ? '✓' : index}
+        </span>
+        <span aria-hidden style={{ fontFamily: 'var(--font-display)', fontSize: 18, color: 'var(--pink)', lineHeight: 1 }}>
+          {area.mark}
+        </span>
+        <span
+          style={{
+            flex: 1,
+            fontFamily: 'var(--font-display)',
+            fontWeight: 700,
+            fontSize: 16,
+            letterSpacing: '-0.2px',
+            color: 'var(--text-h1)',
+          }}
+        >
+          {area.label}
+        </span>
+        <span aria-hidden style={{ fontSize: 13, color: 'var(--text-sub)' }}>
+          {open ? '▾' : '▸'}
+        </span>
+      </button>
+      {open && <div style={{ padding: '0 16px 16px' }}>{children}</div>}
     </div>
   )
 }
@@ -555,7 +958,7 @@ function CurateStep({
       </div>
 
       <PrimaryButton disabled={!ready} onClick={onNext}>
-        Build my year →
+        Build my plan →
       </PrimaryButton>
     </div>
   )
@@ -675,29 +1078,38 @@ function Checkbox({ checked }: { checked: boolean }) {
 // ─── Step 6: Review ────────────────────────────────────────────────────────
 
 function ReviewStep({
-  category,
+  categories,
+  horizon,
   identity,
   milestones,
   onSave,
 }: {
-  category: { id: string; label: string; mark: string }
+  categories: { id: string; label: string; mark: string }[]
+  horizon: { months: number; label: string; noun: string }
   identity: string
   milestones: Candidate[]
   onSave: () => void
 }) {
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-  // Distribute selected milestones across 12 months (roughly evenly)
-  const placed = milestones.map((m, i) => ({
-    ...m,
-    month: months[Math.min(11, Math.floor((i / milestones.length) * 12))],
-    index: i + 1,
-  }))
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  const startMonth = new Date().getMonth() // 0-based; spine begins from this month
+  // Distribute selected milestones across the chosen horizon (roughly evenly).
+  const placed = milestones.map((m, i) => {
+    const offset = Math.floor((i / Math.max(1, milestones.length)) * horizon.months)
+    const monthLabel =
+      horizon.months <= 1 ? `wk ${i + 1}` : monthNames[(startMonth + offset) % 12]
+    return { ...m, month: monthLabel, index: i + 1 }
+  })
+
+  const areaLabel =
+    categories.length === 1
+      ? categories[0].label.toLowerCase()
+      : categories.map(c => c.label.toLowerCase()).join(' + ')
 
   return (
     <div className="w-full flex flex-col" style={{ gap: 20 }}>
       <Heading
-        eyebrow={`Step 4 · ${category.label}`}
-        title={`Your year of ${category.label.toLowerCase()}.`}
+        eyebrow={`Step 4 · ${horizon.label}`}
+        title={`Your ${horizon.noun} of ${areaLabel}.`}
         sub={`You are becoming someone who ${identity}.`}
       />
 
