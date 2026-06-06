@@ -3,20 +3,16 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTheme } from '@/lib/theme'
+import { AREAS, type AreaId } from '@/lib/mindmap-areas'
+import { AreaIcon } from '@/components/mindmap/AreaIcon'
 
 // ─── Sample data ───────────────────────────────────────────────────────────
 
 // `prompt` is a fuller, leading subtext (shown on the stacked area cards) —
 // not just descriptive words, so each card invites the user in.
-const CATEGORIES: { id: string; label: string; mark: string; prompt: string }[] = [
-  { id: 'career',        label: 'Career',               mark: '✎', prompt: 'Map out the direction, craft, and impact you want — and set it up for real progress.' },
-  { id: 'health',        label: 'Health & Fitness',     mark: '⌇', prompt: 'Build the body, mind, and energy you want to carry through the rest of it.' },
-  { id: 'creativity',    label: 'Creativity',           mark: '✶', prompt: 'Make more of the things only you would make. Play, express, ship.' },
-  { id: 'personal',      label: 'Personal Development', mark: '◯', prompt: 'Get to know yourself a little better and grow on purpose, not by accident.' },
-  { id: 'relationships', label: 'Relationships',        mark: '✦', prompt: 'Deepen the bonds that matter — connect, repair, and show up for people.' },
-  { id: 'travel',        label: 'Travel',               mark: '✈', prompt: 'Plan the places you want to wander to, and come back changed.' },
-  { id: 'finances',      label: 'Finances',             mark: '$', prompt: 'Build security and freedom so money serves the life you want.' },
-]
+// The five life areas live in the shared module so the create flow, Browse, and
+// the mind-map canvas stay in sync. Icons come from <AreaIcon id={...} />.
+const CATEGORIES = AREAS
 
 // Plan horizon — discrete snap points for the duration slider.
 // `noun` is used inside headings ("Your year of …") so the copy reads cleanly.
@@ -479,14 +475,13 @@ function ScopeStep({
                 <span
                   aria-hidden
                   style={{
-                    fontFamily: 'var(--font-display)',
-                    fontSize: 26,
+                    display: 'inline-flex',
                     lineHeight: 1,
-                    color: active ? 'var(--green)' : 'var(--pink)',
+                    color: active ? 'var(--green)' : 'var(--cyan)',
                     marginTop: 2,
                   }}
                 >
-                  {c.mark}
+                  <AreaIcon id={c.id} size={26} />
                 </span>
                 <div style={{ flex: 1 }}>
                   <span
@@ -721,7 +716,7 @@ function WoopStep({
   updateWoop,
   onNext,
 }: {
-  areas: { id: string; label: string; mark: string }[]
+  areas: { id: AreaId; label: string }[]
   horizon: { noun: string; inPhrase?: string }
   woopByArea: Record<string, WoopData>
   updateWoop: (areaId: string, patch: Partial<WoopData>) => void
@@ -827,7 +822,7 @@ function AccordionPanel({
   onToggle,
   children,
 }: {
-  area: { label: string; mark: string }
+  area: { id: AreaId; label: string }
   index: number
   ready: boolean
   open: boolean
@@ -883,8 +878,8 @@ function AccordionPanel({
         >
           {ready ? '✓' : index}
         </span>
-        <span aria-hidden style={{ fontFamily: 'var(--font-display)', fontSize: 18, color: 'var(--pink)', lineHeight: 1 }}>
-          {area.mark}
+        <span aria-hidden style={{ display: 'inline-flex', color: 'var(--cyan)', lineHeight: 1 }}>
+          <AreaIcon id={area.id} size={18} />
         </span>
         <span
           style={{
@@ -1158,7 +1153,7 @@ function ReviewStep({
   milestones,
   onSave,
 }: {
-  categories: { id: string; label: string; mark: string }[]
+  categories: { id: AreaId; label: string }[]
   horizon: { months: number; label: string; noun: string }
   identity: string
   milestones: Candidate[]
