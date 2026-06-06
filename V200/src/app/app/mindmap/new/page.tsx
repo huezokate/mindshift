@@ -20,34 +20,75 @@ const CATEGORIES: { id: string; label: string; mark: string; prompt: string }[] 
 
 // Plan horizon — discrete snap points for the duration slider.
 // `noun` is used inside headings ("Your year of …") so the copy reads cleanly.
-const HORIZONS: { months: number; label: string; noun: string; short: string }[] = [
-  { months: 0,  label: 'A day',          noun: 'day',          short: 'day' },
-  { months: 1,  label: 'A month',        noun: 'month',        short: 'mo'  },
-  { months: 12, label: 'A year',         noun: 'year',         short: 'yr'  },
-  { months: 60, label: 'A 5-year plan',  noun: '5-year plan',  short: '5yr' },
+// The last stop is a custom date the user picks from a calendar. A month is the
+// floor: habits take ~66 days on average to form (Lally et al. 2010), so a day
+// horizon was too short to be meaningful.
+type Horizon = {
+  months: number
+  label: string
+  noun: string
+  short: string
+  custom?: boolean
+  inPhrase?: string
+}
+const HORIZONS: Horizon[] = [
+  { months: 1,  label: 'A month',          noun: 'month',   short: 'mo'  },
+  { months: 3,  label: 'A quarter',        noun: 'quarter', short: 'qtr' },
+  { months: 12, label: 'A year',           noun: 'year',    short: 'yr'  },
+  { months: 60, label: '5 years',          noun: '5 years', short: '5yr' },
+  { months: 0,  label: 'Your own timeline', noun: 'plan',   short: 'custom', custom: true },
 ]
 const DEFAULT_HORIZON_INDEX = 2 // A year
+
+// Light green tint for the selected state (pairs with --green: #7d9e7d).
+const SELECTED_BG = '#eef3ec'
+
+function monthsUntil(dateStr: string): number {
+  if (!dateStr) return 0
+  const now = new Date()
+  const d = new Date(dateStr + 'T00:00:00')
+  return Math.max(1, Math.round((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24 * 30.44)))
+}
+
+function formatDate(dateStr: string): string {
+  if (!dateStr) return ''
+  return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+}
+
+// Resolve the slider position (+ optional custom date) into a concrete horizon
+// with display label and the "in X" phrase used by the outcome field.
+function effectiveHorizon(index: number, customDate: string): Horizon {
+  const base = HORIZONS[index]
+  if (base.custom) {
+    const has = !!customDate
+    return {
+      ...base,
+      months: monthsUntil(customDate),
+      label: has ? formatDate(customDate) : 'Your own timeline',
+      noun: 'plan',
+      inPhrase: has ? `by ${formatDate(customDate)}` : 'by your target date',
+    }
+  }
+  return { ...base, inPhrase: base.months >= 60 ? 'five years' : `a ${base.noun}` }
+}
 
 // ─── WOOP answers (per area) ───────────────────────────────────────────────
 
 type WoopData = {
-  wish: string
-  obstacle: string
   outcome: string
+  obstacle: string
   identity: string
 }
 
-const BLANK_WOOP: WoopData = { wish: '', obstacle: '', outcome: '', identity: '' }
+const BLANK_WOOP: WoopData = { outcome: '', obstacle: '', identity: '' }
 
 // Prefilled demo content — used only when a single area is selected, so the
 // happy-path demo flows quickly. Multi-area accordions start blank.
 const SAMPLE_WOOP: WoopData = {
-  wish:
-    'I want to transition into a product management role — I keep telling myself I am "not quite ready" but the truth is I have been avoiding starting.',
-  obstacle:
-    'I tell myself I need to know more before I start. Reading replaces doing. I get scared of being seen as a beginner.',
   outcome:
     'I have interviewed for at least a few PM roles, even if I haven\'t taken one yet. I have stopped pretending and started doing.',
+  obstacle:
+    'I tell myself I need to know more before I start. Reading replaces doing. I get scared of being seen as a beginner.',
   identity: 'a product thinker who learns by shipping and talking to users',
 }
 
@@ -62,7 +103,7 @@ function getWoop(
 }
 
 function woopReady(w: WoopData): boolean {
-  return w.wish.trim().length > 20 && w.obstacle.trim().length > 5
+  return w.outcome.trim().length > 15 && w.obstacle.trim().length > 5
 }
 
 type Candidate = {
@@ -175,6 +216,7 @@ export default function NewGoalPage() {
   const [step, setStep] = useState<Step>('category')
   const [categoryIds, setCategoryIds] = useState<string[]>([])
   const [horizonIndex, setHorizonIndex] = useState<number>(DEFAULT_HORIZON_INDEX)
+  const [customDate, setCustomDate] = useState<string>('')
   // WOOP answers are kept per selected area so multi-area plans get their own
   // inputs (rendered as an accordion in step 2).
   const [woopByArea, setWoopByArea] = useState<Record<string, WoopData>>({})
@@ -196,7 +238,7 @@ export default function NewGoalPage() {
   }
 
   const selectedCandidates = SAMPLE_CANDIDATES.filter(c => selectedIds.includes(c.id))
-  const horizon = HORIZONS[horizonIndex]
+  const horizon = effectiveHorizon(horizonIndex, customDate)
   const selectedCategories = CATEGORIES.filter(c => categoryIds.includes(c.id))
   // Identity headline for the review screen — first area's, falling back to sample.
   const primaryIdentity =
@@ -216,6 +258,8 @@ export default function NewGoalPage() {
                 onToggleCategory={toggleCategory}
                 horizonIndex={horizonIndex}
                 onHorizonChange={setHorizonIndex}
+                customDate={customDate}
+                onCustomDate={setCustomDate}
                 onNext={() => setStep('woop')}
               />
             </StepWrap>
@@ -238,7 +282,7 @@ export default function NewGoalPage() {
 
           {step === 'gen1' && (
             <StepWrap key="gen1">
-              <LoadingStep label={`Drafting your ${horizon.label}…`} />
+              <LoadingStep label="Drafting your plan…" />
             </StepWrap>
           )}
 
@@ -361,15 +405,19 @@ function ScopeStep({
   onToggleCategory,
   horizonIndex,
   onHorizonChange,
+  customDate,
+  onCustomDate,
   onNext,
 }: {
   categoryIds: string[]
   onToggleCategory: (id: string) => void
   horizonIndex: number
   onHorizonChange: (i: number) => void
+  customDate: string
+  onCustomDate: (d: string) => void
   onNext: () => void
 }) {
-  const horizon = HORIZONS[horizonIndex]
+  const horizon = effectiveHorizon(horizonIndex, customDate)
   const chosen = CATEGORIES.filter(c => categoryIds.includes(c.id))
   const ready = categoryIds.length >= 1
 
@@ -386,6 +434,9 @@ function ScopeStep({
         index={horizonIndex}
         onChange={onHorizonChange}
         label={horizon.label}
+        isCustom={!!HORIZONS[horizonIndex].custom}
+        customDate={customDate}
+        onCustomDate={onCustomDate}
       />
 
       {/* Life areas — multi-select */}
@@ -415,15 +466,11 @@ function ScopeStep({
                   textAlign: 'left',
                   cursor: 'pointer',
                   width: '100%',
-                  background: active ? '#fef5f5' : 'var(--card-bg)',
-                  borderTop: 'var(--card-bt)',
-                  borderLeft: active ? '4px solid var(--cyan)' : 'var(--card-bl)',
-                  borderRight: 'var(--card-br)',
-                  borderBottom: 'var(--card-bb)',
+                  background: active ? SELECTED_BG : 'var(--card-bg)',
+                  border: `1.5px solid ${active ? 'var(--green)' : 'var(--pink)'}`,
                   borderRadius: 'var(--card-radius)',
                   padding: '16px 18px',
                   filter: 'var(--card-filter, none)',
-                  position: 'relative',
                   display: 'flex',
                   gap: 14,
                   alignItems: 'flex-start',
@@ -435,13 +482,13 @@ function ScopeStep({
                     fontFamily: 'var(--font-display)',
                     fontSize: 26,
                     lineHeight: 1,
-                    color: 'var(--pink)',
+                    color: active ? 'var(--green)' : 'var(--pink)',
                     marginTop: 2,
                   }}
                 >
                   {c.mark}
                 </span>
-                <div style={{ flex: 1, paddingRight: 22 }}>
+                <div style={{ flex: 1 }}>
                   <span
                     style={{
                       display: 'block',
@@ -467,30 +514,6 @@ function ScopeStep({
                     {c.prompt}
                   </p>
                 </div>
-                {active && (
-                  <span
-                    aria-hidden
-                    style={{
-                      position: 'absolute',
-                      top: 12,
-                      right: 12,
-                      width: 20,
-                      height: 20,
-                      borderRadius: '50%',
-                      background: 'var(--cyan)',
-                      color: '#ffffff',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontFamily: 'var(--font-display)',
-                      fontWeight: 700,
-                      fontSize: 12,
-                      lineHeight: 1,
-                    }}
-                  >
-                    ✓
-                  </span>
-                )}
               </button>
             )
           })}
@@ -511,11 +534,18 @@ function HorizonSlider({
   index,
   onChange,
   label,
+  isCustom,
+  customDate,
+  onCustomDate,
 }: {
   index: number
   onChange: (i: number) => void
   label: string
+  isCustom: boolean
+  customDate: string
+  onCustomDate: (d: string) => void
 }) {
+  const today = new Date().toISOString().slice(0, 10)
   return (
     <div className="flex flex-col" style={{ gap: 10 }}>
       <div className="flex items-baseline justify-between">
@@ -562,7 +592,7 @@ function HorizonSlider({
       <div className="flex justify-between" style={{ marginTop: -2 }}>
         {HORIZONS.map((h, i) => (
           <span
-            key={h.months}
+            key={i}
             style={{
               fontFamily: 'var(--font-body)',
               fontSize: 10,
@@ -575,6 +605,43 @@ function HorizonSlider({
           </span>
         ))}
       </div>
+
+      {/* Custom timeline — calendar date picker */}
+      {isCustom && (
+        <div className="flex flex-col" style={{ gap: 4, marginTop: 6 }}>
+          <p
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 11,
+              lineHeight: '15px',
+              color: 'var(--text-sub)',
+              margin: 0,
+            }}
+          >
+            Pick the date you want this to come true by.
+          </p>
+          <input
+            type="date"
+            value={customDate}
+            min={today}
+            onChange={e => onCustomDate(e.target.value)}
+            aria-label="Target date"
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 14,
+              color: 'var(--text-body)',
+              background: 'var(--input-bg)',
+              borderTop: 'var(--input-bt)',
+              borderLeft: 'var(--input-bl)',
+              borderRight: 'var(--input-br)',
+              borderBottom: 'var(--input-bb)',
+              borderRadius: 'var(--input-radius)',
+              padding: '10px 12px',
+              colorScheme: 'light',
+            }}
+          />
+        </div>
+      )}
     </div>
   )
 }
@@ -655,13 +722,16 @@ function WoopStep({
   onNext,
 }: {
   areas: { id: string; label: string; mark: string }[]
-  horizon: { noun: string }
+  horizon: { noun: string; inPhrase?: string }
   woopByArea: Record<string, WoopData>
   updateWoop: (areaId: string, patch: Partial<WoopData>) => void
   onNext: () => void
 }) {
   const multi = areas.length > 1
-  const [openId, setOpenId] = useState(areas[0]?.id ?? '')
+  // All panels start open by default.
+  const [openIds, setOpenIds] = useState<string[]>(() => areas.map(a => a.id))
+  const toggleOpen = (id: string) =>
+    setOpenIds(s => (s.includes(id) ? s.filter(x => x !== id) : [...s, id]))
   const allReady = areas.every(a => woopReady(getWoop(woopByArea, a.id, areas.length)))
 
   return (
@@ -681,7 +751,7 @@ function WoopStep({
           {areas.map((a, i) => {
             const w = getWoop(woopByArea, a.id, areas.length)
             const ready = woopReady(w)
-            const open = openId === a.id
+            const open = openIds.includes(a.id)
             return (
               <AccordionPanel
                 key={a.id}
@@ -689,7 +759,7 @@ function WoopStep({
                 index={i + 1}
                 ready={ready}
                 open={open}
-                onToggle={() => setOpenId(open ? '' : a.id)}
+                onToggle={() => toggleOpen(a.id)}
               >
                 <WoopFields w={w} horizon={horizon} onChange={patch => updateWoop(a.id, patch)} />
               </AccordionPanel>
@@ -717,17 +787,17 @@ function WoopFields({
   onChange,
 }: {
   w: WoopData
-  horizon: { noun: string }
+  horizon: { noun: string; inPhrase?: string }
   onChange: (patch: Partial<WoopData>) => void
 }) {
-  const inPhrase = horizon.noun === '5-year plan' ? 'five years' : `a ${horizon.noun}`
+  const inPhrase = horizon.inPhrase ?? `a ${horizon.noun}`
   return (
     <div className="flex flex-col" style={{ gap: 18 }}>
       <Field
-        label="Your wish"
-        helper="What's the goal? Describe it freely."
-        value={w.wish}
-        onChange={v => onChange({ wish: v })}
+        label={`Desired outcome in ${inPhrase}`}
+        helper="If this goes well, what would that look like by then?"
+        value={w.outcome}
+        onChange={v => onChange({ outcome: v })}
         minRows={3}
       />
       <Field
@@ -736,13 +806,6 @@ function WoopFields({
         value={w.obstacle}
         onChange={v => onChange({ obstacle: v })}
         minRows={2}
-      />
-      <Field
-        label={`Desired outcome in ${inPhrase}`}
-        helper="If this goes well, what would that look like by then?"
-        value={w.outcome}
-        onChange={v => onChange({ outcome: v })}
-        minRows={3}
       />
       <Field
         label="I want to become…"
@@ -964,6 +1027,16 @@ function CurateStep({
   )
 }
 
+// Pull a trailing "(3 min)" time estimate out of the first-action text so it
+// can sit in the label, matching the "FIRST ACTION (3 MIN)" treatment.
+function splitFirstAction(s: string): { time: string; action: string } {
+  const m = s.match(/\(([^)]*\bmin[^)]*)\)/i)
+  if (m) {
+    return { time: m[1].trim(), action: s.replace(m[0], '').replace(/\s{2,}/g, ' ').trim() }
+  }
+  return { time: '', action: s }
+}
+
 function CandidateCard({
   candidate,
   selected,
@@ -973,17 +1046,16 @@ function CandidateCard({
   selected: boolean
   onToggle: () => void
 }) {
+  const { time, action } = splitFirstAction(candidate.firstAction)
   return (
     <button
       onClick={onToggle}
+      aria-pressed={selected}
       style={{
         textAlign: 'left',
         cursor: 'pointer',
-        background: selected ? '#fef5f5' : 'var(--card-bg)',
-        borderTop: 'var(--card-bt)',
-        borderLeft: selected ? '4px solid var(--cyan)' : 'var(--card-bl)',
-        borderRight: 'var(--card-br)',
-        borderBottom: 'var(--card-bb)',
+        background: selected ? SELECTED_BG : 'var(--card-bg)',
+        border: `1.5px solid ${selected ? 'var(--green)' : 'var(--pink)'}`,
         borderRadius: 'var(--card-radius)',
         padding: '14px 16px',
         filter: 'var(--card-filter, none)',
@@ -1013,35 +1085,37 @@ function CandidateCard({
             fontSize: 13,
             lineHeight: '18px',
             color: 'var(--text-body)',
-            margin: '0 0 8px',
+            margin: '0 0 10px',
           }}
         >
           {candidate.outcome}
         </p>
-        <div
+        <p
           style={{
-            display: 'inline-block',
-            padding: '4px 8px',
-            background: 'var(--bg)',
-            border: '1px solid var(--input-divider)',
-            borderRadius: 4,
+            fontFamily: 'var(--font-body)',
+            fontWeight: 700,
+            fontSize: 11,
+            letterSpacing: 0.8,
+            textTransform: 'uppercase',
+            color: 'var(--cyan)',
+            margin: '0 0 3px',
           }}
         >
-          <p
-            style={{
-              fontFamily: 'var(--font-body)',
-              fontSize: 11,
-              lineHeight: '14px',
-              color: 'var(--text-sub)',
-              margin: 0,
-            }}
-          >
-            <span style={{ textTransform: 'uppercase', letterSpacing: 0.8, color: 'var(--cyan)', fontWeight: 700 }}>
-              First action ·{' '}
-            </span>
-            {candidate.firstAction}
-          </p>
-        </div>
+          First action{time ? ` (${time})` : ''}
+        </p>
+        <p
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 10.5,
+            letterSpacing: 0.5,
+            textTransform: 'uppercase',
+            lineHeight: '14px',
+            color: 'var(--text-sub)',
+            margin: 0,
+          }}
+        >
+          {action}
+        </p>
       </div>
     </button>
   )
@@ -1055,8 +1129,8 @@ function Checkbox({ checked }: { checked: boolean }) {
         width: 22,
         height: 22,
         borderRadius: 4,
-        border: '1.5px solid var(--text-body)',
-        background: checked ? 'var(--cyan)' : 'var(--card-bg)',
+        border: `1.5px solid ${checked ? 'var(--green)' : 'var(--text-body)'}`,
+        background: checked ? 'var(--green)' : 'var(--card-bg)',
         flexShrink: 0,
         display: 'inline-flex',
         alignItems: 'center',
