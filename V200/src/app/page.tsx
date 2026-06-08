@@ -216,7 +216,7 @@ function FigureDemo() {
   const [active, setActive] = useState(0)
   const f = VIGNETTES[active]
   return (
-    <Section maxWidth={860}>
+    <Section maxWidth={1120}>
       <motion.div
         variants={stagger}
         initial="hidden"
@@ -230,104 +230,109 @@ function FigureDemo() {
           <H2>One bad day. Fifteen perspectives.</H2>
         </motion.div>
 
-        {/* the vent */}
-        <motion.div variants={fade} style={{ width: '100%', maxWidth: 620 }}>
-          <div
-            style={{
-              background: 'var(--input-bg, transparent)',
-              border: '1px solid var(--violet)',
-              borderRadius: 'var(--card-radius, 8px)',
-              padding: '18px 20px',
-            }}
-          >
-            <span
-              className="uppercase"
-              style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 11, letterSpacing: 1.4, color: 'var(--violet)' }}
-            >
-              You vented
-            </span>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 18, lineHeight: 1.5, color: 'var(--text-body)', marginTop: 6 }}>
-              &ldquo;{DEMO_VENT}&rdquo;
-            </p>
+        {/* demo: vent | lens picker | response — row on desktop, stacked vertically on mobile */}
+        <motion.div variants={fade} className="w-full">
+          <div className="flex flex-col md:flex-row gap-5 md:gap-7 items-stretch md:items-start w-full">
+            {/* the vent */}
+            <div className="w-full md:flex-1">
+              <div
+                style={{
+                  background: 'var(--input-bg, transparent)',
+                  border: '1px solid var(--violet)',
+                  borderRadius: 'var(--card-radius, 8px)',
+                  padding: '18px 20px',
+                }}
+              >
+                <span
+                  className="uppercase"
+                  style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 11, letterSpacing: 1.4, color: 'var(--violet)' }}
+                >
+                  You vented
+                </span>
+                <p style={{ fontFamily: 'var(--font-body)', fontSize: 18, lineHeight: 1.5, color: 'var(--text-body)', marginTop: 6 }}>
+                  &ldquo;{DEMO_VENT}&rdquo;
+                </p>
+              </div>
+            </div>
+
+            {/* lens picker — vertical column on desktop, horizontal row on mobile */}
+            <div className="flex flex-row md:flex-col gap-3.5 justify-center md:justify-start md:shrink-0 md:pt-1">
+              {VIGNETTES.map((v, i) => (
+                <button
+                  key={v.id}
+                  onClick={() => setActive(i)}
+                  aria-label={`See ${v.name}'s perspective`}
+                  aria-pressed={i === active}
+                  className="transition-transform active:scale-95"
+                  style={{
+                    padding: 0,
+                    borderRadius: '50%',
+                    cursor: 'pointer',
+                    background: 'transparent',
+                    border: i === active ? '2.5px solid var(--cyan)' : '2.5px solid transparent',
+                    outline: 'none',
+                    lineHeight: 0,
+                    opacity: i === active ? 1 : 0.55,
+                  }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={v.img}
+                    alt={v.name}
+                    width={64}
+                    height={64}
+                    style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover', display: 'block' }}
+                  />
+                </button>
+              ))}
+            </div>
+
+            {/* the response */}
+            <div className="w-full md:flex-1">
+              <motion.div key={f.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
+                <Card>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+                    <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={f.img}
+                        alt={f.name}
+                        width={72}
+                        height={72}
+                        style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', border: '1.5px solid var(--cyan)', flexShrink: 0 }}
+                      />
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 22, letterSpacing: 1, color: 'var(--cyan)' }}>
+                          {f.name}
+                        </span>
+                        <span style={{ fontFamily: 'var(--font-body)', fontSize: 13, letterSpacing: 0.6, color: 'var(--violet)' }}>
+                          {f.era}
+                        </span>
+                      </div>
+                    </div>
+                    <Body>{f.response}</Body>
+                    <p
+                      style={{
+                        fontFamily: 'var(--font-body)',
+                        fontStyle: 'italic',
+                        fontSize: 18,
+                        lineHeight: 1.45,
+                        color: 'var(--text-body)',
+                        borderLeft: '3px solid var(--cyan)',
+                        paddingLeft: 16,
+                      }}
+                    >
+                      &ldquo;{f.quote}&rdquo;
+                    </p>
+                  </div>
+                </Card>
+              </motion.div>
+            </div>
           </div>
         </motion.div>
 
-        {/* lens picker */}
-        <motion.div variants={fade} style={{ display: 'flex', gap: 18, alignItems: 'center' }}>
-          {VIGNETTES.map((v, i) => (
-            <button
-              key={v.id}
-              onClick={() => setActive(i)}
-              aria-label={`See ${v.name}'s perspective`}
-              aria-pressed={i === active}
-              className="transition-transform active:scale-95"
-              style={{
-                padding: 0,
-                borderRadius: '50%',
-                cursor: 'pointer',
-                background: 'transparent',
-                border: i === active ? '2.5px solid var(--cyan)' : '2.5px solid transparent',
-                outline: 'none',
-                lineHeight: 0,
-                opacity: i === active ? 1 : 0.55,
-              }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={v.img}
-                alt={v.name}
-                width={68}
-                height={68}
-                style={{ width: 68, height: 68, borderRadius: '50%', objectFit: 'cover', display: 'block' }}
-              />
-            </button>
-          ))}
-        </motion.div>
-
-        {/* the response */}
-        <motion.div variants={fade} style={{ width: '100%' }}>
-          <motion.div key={f.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
-            <Card>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-                <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={f.img}
-                    alt={f.name}
-                    width={72}
-                    height={72}
-                    style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', border: '1.5px solid var(--cyan)', flexShrink: 0 }}
-                  />
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 22, letterSpacing: 1, color: 'var(--cyan)' }}>
-                      {f.name}
-                    </span>
-                    <span style={{ fontFamily: 'var(--font-body)', fontSize: 13, letterSpacing: 0.6, color: 'var(--violet)' }}>
-                      {f.era}
-                    </span>
-                  </div>
-                </div>
-                <Body>{f.response}</Body>
-                <p
-                  style={{
-                    fontFamily: 'var(--font-body)',
-                    fontStyle: 'italic',
-                    fontSize: 18,
-                    lineHeight: 1.45,
-                    color: 'var(--text-body)',
-                    borderLeft: '3px solid var(--cyan)',
-                    paddingLeft: 16,
-                  }}
-                >
-                  &ldquo;{f.quote}&rdquo;
-                </p>
-              </div>
-            </Card>
-          </motion.div>
-        </motion.div>
-
         <motion.div variants={fade}>
-          <PrimaryButton href={TRY_URL || '/app/theme-select'}>Try it on your worst Tuesday →</PrimaryButton>
+          <PrimaryButton href={TRY_URL || '/app/theme-select'}>Shift your worst Tuesday →</PrimaryButton>
         </motion.div>
       </motion.div>
     </Section>
