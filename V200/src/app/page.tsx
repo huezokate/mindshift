@@ -17,6 +17,7 @@ export default function LandingPage() {
       <Hero />
       <FigureDemo />
       <Waitlist />
+      <WhoIsItFor />
       <OriginStory />
       <Investors />
     </div>
@@ -331,6 +332,12 @@ function FigureDemo() {
           </div>
         </motion.div>
 
+        <motion.div variants={fade} style={{ maxWidth: 780, textAlign: 'center' }}>
+          <Body size={18}>
+            15 of history&apos;s greatest thinkers. Ready to weigh in on your worst Tuesday.
+          </Body>
+        </motion.div>
+
         <motion.div variants={fade}>
           <PrimaryButton href={TRY_URL || '/app/theme-select'}>Shift your worst Tuesday →</PrimaryButton>
         </motion.div>
@@ -341,53 +348,60 @@ function FigureDemo() {
 
 function Hero() {
   return (
-    <Section maxWidth={880} paddingY="clamp(80px, 12vh, 140px)">
+    <Section maxWidth={1000} paddingY="clamp(72px, 12vh, 132px)">
       <motion.div
         variants={stagger}
         initial="hidden"
         animate="show"
         className="flex flex-col items-center text-center"
-        style={{ gap: 32 }}
+        style={{ gap: 24 }}
       >
         <motion.div variants={fade} style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
           <H1>MindShift</H1>
           <Eyebrow>The app for shifting perspective</Eyebrow>
         </motion.div>
 
-        <motion.div variants={fade} style={{ maxWidth: 640 }}>
-          <Body size={20}>
-            15 of history&apos;s greatest thinkers. Ready to weigh in on your worst Tuesday.
-          </Body>
-          <div style={{ height: 16 }} />
-          <Body>
-            MindShift is journaling — but make it fun. Vent your spiral, pick a lens (Socrates? Napoleon? Tesla?), and get a perspective that actually moves you. Share it, save it, or just feel less alone in your own head.
+        <motion.div variants={fade} style={{ maxWidth: 900 }}>
+          <Body size={22}>
+            MindShift is journaling — but make it fun. Vent your spiral, pick a lens — Lincoln, Dolly Parton, Socrates — and get back a perspective that actually moves you. Share it, save it, or just feel less alone in your own head.
           </Body>
         </motion.div>
 
-        <motion.div variants={fade} style={{ maxWidth: 640 }}>
+        <motion.div variants={fade} style={{ maxWidth: 760 }}>
           <Body>
-            Whether you&apos;re venting to decompress, journaling to grow, or planning your next chapter — MindShift meets you where you are. It&apos;s the thinking tool you&apos;ll actually want to open.
+            Whether you&apos;re venting to decompress, journaling to grow, or planning your next chapter — it&apos;s the thinking tool you&apos;ll actually want to open.
           </Body>
         </motion.div>
+      </motion.div>
+    </Section>
+  )
+}
 
-        <motion.ul
-          variants={fade}
-          style={{
-            listStyle: 'none',
-            padding: 0,
-            margin: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 12,
-            maxWidth: 640,
-            textAlign: 'left',
-          }}
-        >
-          <UserLine label="For the venter">Vent it. Get a wild, brilliant take back. Screenshot it. Send it to your group chat.</UserLine>
-          <UserLine label="For the journaler">Save your perspectives, track how your thinking shifts over time.</UserLine>
-          <UserLine label="For the planner">Mind mapping is coming — a full visual map of your life, your goals, your thinking. Soon.</UserLine>
-        </motion.ul>
-
+function WhoIsItFor() {
+  return (
+    <Section maxWidth={1120}>
+      <motion.div
+        variants={stagger}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.2 }}
+        className="flex flex-col items-center"
+        style={{ gap: 36 }}
+      >
+        <motion.div variants={fade}>
+          <Eyebrow>Who is it for?</Eyebrow>
+        </motion.div>
+        <div className="flex flex-col md:flex-row gap-8 md:gap-12 w-full">
+          <motion.div variants={fade} className="md:flex-1">
+            <UserLine label="For the venter">Vent it. Get a wild, brilliant take back. Screenshot it. Send it to your group chat.</UserLine>
+          </motion.div>
+          <motion.div variants={fade} className="md:flex-1">
+            <UserLine label="For the journaler">Save your perspectives, track how your thinking shifts over time.</UserLine>
+          </motion.div>
+          <motion.div variants={fade} className="md:flex-1">
+            <UserLine label="For the planner">Mind mapping is coming — a full visual map of your life, your goals, your thinking. Soon.</UserLine>
+          </motion.div>
+        </div>
         <motion.div variants={fade}>
           <PrimaryButton href={TRY_URL || '/app/theme-select'}>Try MindShift Free →</PrimaryButton>
         </motion.div>
@@ -398,7 +412,7 @@ function Hero() {
 
 function UserLine({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <li style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, textAlign: 'left' }}>
       <span
         className="uppercase"
         style={{
@@ -421,7 +435,7 @@ function UserLine({ label, children }: { label: string; children: React.ReactNod
       >
         {children}
       </span>
-    </li>
+    </div>
   )
 }
 
@@ -563,7 +577,7 @@ function WaitlistForm() {
 
 function OriginStory() {
   return (
-    <Section maxWidth={680}>
+    <Section maxWidth={880}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
         <Eyebrow>Origin story</Eyebrow>
         <H2>Why I built this</H2>
@@ -580,7 +594,7 @@ function OriginStory() {
 
 function Investors() {
   return (
-    <Section maxWidth={720}>
+    <Section maxWidth={1040}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
         <Eyebrow>For investors and partners</Eyebrow>
         <H2>We&apos;re building the thinking layer of the internet.</H2>
