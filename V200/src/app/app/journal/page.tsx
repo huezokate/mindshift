@@ -1,52 +1,60 @@
 'use client'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { useTheme } from '@/lib/theme'
-import { BottomNav, BottomNavSpacer } from '@/components/app/BottomNav'
+import { FIGURES } from '@/lib/figures'
 
-// DRAFT — browsable journal feed for the pro experience. Sample entries cover
-// the three states: private vent w/ no lens, vent + lens (private), and a
-// shared lens entry. Standard card per Figma 470:2455. The real Supabase-backed
-// server page is preserved in page.real.tsx.bak (restore when wiring data).
+// Journal feed — compact entry cards per Figma 562:5363. Each card: titled note
+// (vent topic + clamped body) + a footer strip with a privacy icon (lock /
+// share) and the lens avatars (with social badges when shared). Tapping an entry
+// would open the expanded standard card (470:2455) — detail view is next.
+// Real Supabase page preserved at page.real.tsx.bak.
+
+const PORTRAIT: Record<string, string> = Object.fromEntries(FIGURES.map(f => [f.id, f.imgCyberpunk]))
+
+type Platform = 'instagram' | 'facebook' | 'tiktok' | 'sms'
+type Lens = { id: string; name: string; platform?: Platform }
 type Entry = {
   id: string
-  date: string
-  vent: string
-  lens?: { name: string; initials: string; quote: string; response: string }
-  shared?: string | null
+  title: string
+  body: string
+  shared: boolean
+  lenses: Lens[]
 }
 
 const ENTRIES: Entry[] = [
   {
-    id: 'e3',
-    date: 'Today',
-    vent: 'I keep saying yes to things I don’t want to do and then resenting everyone for it.',
-    lens: {
-      name: 'Socrates',
-      initials: 'So',
-      quote: 'Is it the asking that traps you — or your fear of what a “no” might cost?',
-      response:
-        'You call it resentment, but notice: no one forced the yes. What would you have to believe about yourself to say no and still feel safe? Sit with that before the next ask comes.',
-    },
-    shared: null,
+    id: 'e1', shared: true,
+    title: 'When I keep saying yes…',
+    body: 'I keep saying yes to things I don’t actually want to do and then quietly resenting everyone for it. I think the truth is I’m scared a “no” will cost me something I can’t name yet.',
+    lenses: [
+      { id: 'socrates', name: 'Socrates', platform: 'instagram' },
+      { id: 'maya-angelou', name: 'Maya Angelou', platform: 'facebook' },
+      { id: 'frida-kahlo', name: 'Frida Kahlo', platform: 'tiktok' },
+      { id: 'n-mandela', name: 'Nelson Mandela', platform: 'sms' },
+    ],
   },
   {
-    id: 'e2',
-    date: '2 days ago',
-    vent: 'I’m scared I’ve already missed my window to do the thing I actually care about.',
-    lens: {
-      name: 'Maya Angelou',
-      initials: 'MA',
-      quote: 'There is no greater agony than bearing an untold story inside you.',
-      response:
-        'Listen to me: the window is not a window. It is a door, and it opens from your side. You are not late — you are arriving exactly when you decided to stop waiting for permission.',
-    },
-    shared: 'Instagram',
+    id: 'e2', shared: true,
+    title: 'Shipping before I’m ready',
+    body: 'Everyone says just ship it but my hands freeze on the publish button every single time. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.',
+    lenses: [],
   },
   {
-    id: 'e1',
-    date: '5 days ago',
-    vent: 'Just need to get this out of my head before bed. Long day. Brain is loud. That’s all.',
-    shared: null,
+    id: 'e3', shared: false,
+    title: 'Just before bed',
+    body: 'Just need to get this out of my head before bed. Long day. Brain is loud and won’t quiet down. That’s all — no advice needed tonight.',
+    lenses: [],
+  },
+  {
+    id: 'e4', shared: false,
+    title: 'The window I think I missed',
+    body: 'I’m scared I’ve already missed my window to do the thing I actually care about. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.',
+    lenses: [
+      { id: 'maya-angelou', name: 'Maya Angelou' },
+      { id: 'a-lincoln', name: 'Abraham Lincoln' },
+      { id: 'dolly-parton', name: 'Dolly Parton' },
+    ],
   },
 ]
 
@@ -55,85 +63,134 @@ export default function JournalPage() {
   useEffect(() => { setTheme('notepad') }, [setTheme])
 
   return (
-    <div className="min-h-dvh flex flex-col items-center" style={{ padding: '48px 20px 24px' }}>
-      <div className="w-full flex flex-col" style={{ maxWidth: 440, gap: 6, marginBottom: 18 }}>
-        <p style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: 'var(--pink)', margin: 0 }}>
-          Your journal
-        </p>
-        <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 28, lineHeight: '32px', letterSpacing: '-0.5px', color: 'var(--text-h1)', margin: 0 }}>
-          Everything you’ve let out.
+    <div className="min-h-dvh flex flex-col items-center" style={{ padding: '24px 20px 120px', position: 'relative' }}>
+      {/* Header */}
+      <div className="w-full flex items-center" style={{ maxWidth: 440, justifyContent: 'space-between', marginBottom: 20 }}>
+        <div style={{ width: 28 }} aria-hidden />
+        <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 30, letterSpacing: 1, textTransform: 'uppercase', color: 'var(--cyan)', margin: 0 }}>
+          Journal
         </h1>
+        <Link href="/app/profile" aria-label="Account" style={{ color: 'var(--green)', display: 'inline-flex' }}>
+          <svg width={28} height={28} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6}>
+            <circle cx="12" cy="12" r="10" /><circle cx="12" cy="10" r="3.2" /><path d="M5.5 19a6.5 6.5 0 0 1 13 0" />
+          </svg>
+        </Link>
       </div>
 
-      <div className="w-full flex flex-col" style={{ maxWidth: 440, gap: 16 }}>
+      {/* Feed */}
+      <div className="w-full flex flex-col" style={{ maxWidth: 440, gap: 18 }}>
         {ENTRIES.map(e => <EntryCard key={e.id} entry={e} />)}
       </div>
 
-      <BottomNavSpacer />
-      <BottomNav />
+      {/* New-entry FAB */}
+      <Link
+        href="/app/vent"
+        aria-label="New vent"
+        style={{
+          position: 'fixed', bottom: 28, left: '50%', transform: 'translateX(-50%)', zIndex: 40,
+          width: 58, height: 58, borderRadius: '50%', background: 'var(--card-bg)', border: '2px solid var(--pink)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', filter: 'var(--card-filter, none)',
+          color: 'var(--pink)', fontSize: 30, fontWeight: 300, textDecoration: 'none', lineHeight: 1,
+        }}
+      >
+        +
+      </Link>
     </div>
   )
 }
 
 function EntryCard({ entry }: { entry: Entry }) {
+  const accent = entry.shared ? 'var(--green)' : 'var(--pink)'
   return (
-    <div
-      style={{
-        background: 'var(--card-bg)', border: '1.5px solid var(--pink)', borderRadius: 'var(--card-radius)',
-        padding: '16px 18px', filter: 'var(--card-filter, none)', display: 'flex', flexDirection: 'column', gap: 12,
-      }}
-    >
-      <div className="flex items-center justify-between">
-        <span style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 10, letterSpacing: 1, textTransform: 'uppercase', color: 'var(--text-meta)' }}>
-          {entry.date}
-        </span>
-        <PrivacyBadge shared={entry.shared} hasLens={!!entry.lens} />
+    <div className="flex flex-col" style={{ gap: 6 }}>
+      {/* Note (title + body) */}
+      <div style={{ background: 'var(--card-bg)', border: '1.5px solid var(--cyan)', borderLeft: '4px solid var(--cyan)', borderRadius: 'var(--card-radius)', overflow: 'hidden', filter: 'var(--card-filter, none)' }}>
+        <div style={{ background: '#e9eff5', padding: '8px 14px', borderBottom: '1px solid #d6e0ea' }}>
+          <p style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 12, letterSpacing: 0.8, textTransform: 'uppercase', color: 'var(--cyan)', margin: 0, textAlign: 'center' }}>
+            {entry.title}
+          </p>
+        </div>
+        <p
+          style={{
+            fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '21px', color: 'var(--text-body)', margin: 0,
+            padding: '12px 16px', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+          }}
+        >
+          {entry.body}
+        </p>
       </div>
 
-      <p style={{ fontFamily: 'var(--font-body)', fontStyle: 'italic', fontSize: 14, lineHeight: '21px', color: 'var(--text-body)', margin: 0 }}>
-        “{entry.vent}”
-      </p>
-
-      {entry.lens ? (
-        <div style={{ borderTop: '1px dashed var(--input-divider)', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div className="flex items-center" style={{ gap: 10 }}>
-            <div style={{ width: 34, height: 34, borderRadius: '50%', flexShrink: 0, background: 'var(--bg)', border: '1.5px solid var(--cyan)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 13, color: 'var(--cyan)' }}>{entry.lens.initials}</span>
-            </div>
-            <span style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 11, letterSpacing: 1, textTransform: 'uppercase', color: 'var(--cyan)' }}>
-              Through {entry.lens.name}
-            </span>
+      {/* Footer strip — privacy icon + lens avatars */}
+      <div
+        style={{
+          background: 'var(--card-bg)', border: `1.5px solid ${accent}`, borderLeft: `4px solid ${accent}`,
+          borderRadius: 'var(--card-radius)', padding: '10px 14px', filter: 'var(--card-filter, none)',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', minHeight: 56,
+        }}
+      >
+        <span style={{ color: accent, display: 'inline-flex' }}>
+          {entry.shared ? <ShareIcon /> : <LockIcon />}
+        </span>
+        {entry.lenses.length > 0 && (
+          <div className="flex items-center" style={{ gap: 4 }}>
+            {entry.lenses.map(l => <LensAvatar key={l.id + (l.platform ?? '')} lens={l} />)}
           </div>
-          <p style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontSize: 15, lineHeight: '21px', color: 'var(--pink)', margin: 0 }}>
-            “{entry.lens.quote}”
-          </p>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 13.5, lineHeight: '21px', color: 'var(--text-body)', margin: 0 }}>
-            {entry.lens.response}
-          </p>
-          <div className="flex items-center" style={{ gap: 10, marginTop: 2 }}>
-            {['save', 'decorate', 'share'].map(a => (
-              <span key={a} style={{ width: 30, height: 30, borderRadius: '50%', border: '1.5px solid var(--pink)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: 'var(--pink)', fontSize: 13 }}>
-                {a === 'save' ? '✶' : a === 'decorate' ? '✦' : '↗'}
-              </span>
-            ))}
-          </div>
-        </div>
-      ) : (
-        <div className="flex items-center justify-between" style={{ borderTop: '1px dashed var(--input-divider)', paddingTop: 12 }}>
-          <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--text-meta)' }}>No lens — just for you.</span>
-          <span style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 12, color: 'var(--cyan)' }}>Pick a lens →</span>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }
 
-function PrivacyBadge({ shared, hasLens }: { shared?: string | null; hasLens: boolean }) {
-  const label = shared ? `Shared · ${shared}` : hasLens ? 'Private' : 'Private · no lens'
-  const color = shared ? 'var(--green)' : 'var(--text-sub)'
+function LensAvatar({ lens }: { lens: Lens }) {
+  const [err, setErr] = useState(false)
+  const initials = lens.name.replace(/["']/g, '').split(' ').map(w => w[0]).slice(0, 2).join('')
   return (
-    <span style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 9.5, letterSpacing: 0.8, textTransform: 'uppercase', color, border: `1px solid ${color}`, borderRadius: 999, padding: '2px 8px' }}>
-      {label}
+    <div style={{ position: 'relative', width: 36, height: 36 }}>
+      <div style={{ width: 36, height: 36, borderRadius: '50%', overflow: 'hidden', border: '1.5px solid var(--pink)', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {err ? (
+          <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 12, color: 'var(--pink)' }}>{initials}</span>
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={PORTRAIT[lens.id]} alt={lens.name} onError={() => setErr(true)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        )}
+      </div>
+      {lens.platform && <PlatformBadge platform={lens.platform} />}
+    </div>
+  )
+}
+
+const BADGE: Record<Platform, { glyph: string; bg: string }> = {
+  instagram: { glyph: '⌾', bg: '#c13584' },
+  facebook: { glyph: 'f', bg: '#1877f2' },
+  tiktok: { glyph: '♪', bg: '#1e1e1e' },
+  sms: { glyph: '✉', bg: 'var(--cyan)' },
+}
+function PlatformBadge({ platform }: { platform: Platform }) {
+  const b = BADGE[platform]
+  return (
+    <span
+      style={{
+        position: 'absolute', bottom: -2, right: -2, width: 15, height: 15, borderRadius: '50%', background: b.bg,
+        border: '1.5px solid var(--card-bg)', color: '#fff', fontSize: 8, lineHeight: 1,
+        display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700,
+      }}
+    >
+      {b.glyph}
     </span>
+  )
+}
+
+function ShareIcon() {
+  return (
+    <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 16V4" /><path d="m8 8 4-4 4 4" /><path d="M5 12v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6" />
+    </svg>
+  )
+}
+function LockIcon() {
+  return (
+    <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+      <rect x="4" y="10" width="16" height="11" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" />
+    </svg>
   )
 }
