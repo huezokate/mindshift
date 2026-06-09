@@ -59,7 +59,7 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
   },
-  icons: { icon: '/lens-icon.png', apple: '/lens-icon.png' },
+  // Favicon comes from app/icon.svg (App Router auto-detects it).
 }
 
 // Structured data — helps search engines AND AI agents understand what MindShift
