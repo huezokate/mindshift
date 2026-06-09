@@ -81,7 +81,7 @@ export default function MindmapLanding() {
         {hasMap === null ? null : hasMap ? (
           <>
             <LandingCard
-              href="/app/mindmap/browse"
+              href="/app/mindmap/map"
               eyebrow="Overview"
               title="Browse the map"
               body="See every area of life, the goals stacked under each, and how far along you are."

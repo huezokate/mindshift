@@ -313,7 +313,7 @@ export default function NewGoalPage() {
                   // Stub for "a map exists" — unlocks Browse/Reflect on the landing.
                   // In iteration 2 this becomes a Supabase goals query.
                   try { localStorage.setItem('mindshift_has_map', '1') } catch {}
-                  router.push('/app/mindmap/browse')
+                  router.push('/app/mindmap/map')
                 }}
               />
             </StepWrap>

@@ -16,7 +16,7 @@ export default clerkMiddleware(async (auth, req) => {
   }
 
   if (host === APP_HOST && pathname === '/') {
-    return NextResponse.redirect(new URL('/app/theme-select', `https://${APP_HOST}`), 308)
+    return NextResponse.redirect(new URL('/app/choose-ui', `https://${APP_HOST}`), 308)
   }
 
   if (isProtectedRoute(req)) await auth.protect()

@@ -145,7 +145,7 @@ export default function ResponsePage() {
 
   function handleNew() {
     sessionStorage.removeItem('ms_session_id')
-    router.push('/app/onboarding')
+    router.push('/app/vent')
   }
 
   const iconBtn = (active = false): React.CSSProperties => ({

@@ -76,7 +76,7 @@ export default function ThemeSelectPage() {
   function handleEnter() {
     if (!acknowledged) return
     setTheme(current.id)
-    router.push('/app/onboarding')
+    router.push('/app/vent')
   }
 
   function toggleAck() {

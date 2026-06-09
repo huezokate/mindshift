@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { getSupabase } from '@/lib/supabase'
 
 const APP_BASE = process.env.NEXT_PUBLIC_APP_URL ?? ''
-const TRY_URL = `${APP_BASE}/app/theme-select`
+const TRY_URL = `${APP_BASE}/app/choose-ui`
 const WAITLIST_CONTACT = 'hello@minds-shift.com'
 const BUSINESS_CONTACT = 'kate@minds-shift.com'
 
@@ -225,7 +225,7 @@ function Hero() {
         </motion.ul>
 
         <motion.div variants={fade}>
-          <PrimaryButton href={TRY_URL || '/app/theme-select'}>Try MindShift Free →</PrimaryButton>
+          <PrimaryButton href={TRY_URL || '/app/choose-ui'}>Try MindShift Free →</PrimaryButton>
         </motion.div>
       </motion.div>
     </Section>
