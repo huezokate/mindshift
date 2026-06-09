@@ -98,7 +98,7 @@ function Avatar({ figure }: { figure: Figure }) {
         <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 30, color: 'var(--pink)' }}>{initials}</span>
       ) : (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={figure.imgCyberpunk} alt={figure.name} onError={() => setErr(true)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        <img src={figure.imgNotepad} alt={figure.name} onError={() => setErr(true)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
       )}
     </div>
   )

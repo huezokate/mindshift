@@ -10,7 +10,8 @@ import { FIGURES } from '@/lib/figures'
 // would open the expanded standard card (470:2455) — detail view is next.
 // Real Supabase page preserved at page.real.tsx.bak.
 
-const PORTRAIT: Record<string, string> = Object.fromEntries(FIGURES.map(f => [f.id, f.imgCyberpunk]))
+// Notepad UI → notepad portraits (monogram fallback until assets land).
+const PORTRAIT: Record<string, string> = Object.fromEntries(FIGURES.map(f => [f.id, f.imgNotepad]))
 
 type Platform = 'instagram' | 'facebook' | 'tiktok' | 'sms'
 type Lens = { id: string; name: string; platform?: Platform }
@@ -102,9 +103,9 @@ export default function JournalPage() {
 function EntryCard({ entry }: { entry: Entry }) {
   const accent = entry.shared ? 'var(--green)' : 'var(--pink)'
   return (
-    <div className="flex flex-col" style={{ gap: 6 }}>
+    <div className="flex flex-col">
       {/* Note (title + body) */}
-      <div style={{ background: 'var(--card-bg)', border: '1.5px solid var(--cyan)', borderLeft: '4px solid var(--cyan)', borderRadius: 'var(--card-radius)', overflow: 'hidden', filter: 'var(--card-filter, none)' }}>
+      <div style={{ position: 'relative', zIndex: 0, background: 'var(--card-bg)', border: '1.5px solid var(--cyan)', borderLeft: '4px solid var(--cyan)', borderRadius: 'var(--card-radius)', overflow: 'hidden', filter: 'var(--card-filter, none)' }}>
         <div style={{ background: '#e9eff5', padding: '8px 14px', borderBottom: '1px solid #d6e0ea' }}>
           <p style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 12, letterSpacing: 0.8, textTransform: 'uppercase', color: 'var(--cyan)', margin: 0, textAlign: 'center' }}>
             {entry.title}
@@ -123,6 +124,7 @@ function EntryCard({ entry }: { entry: Entry }) {
       {/* Footer strip — privacy icon + lens avatars */}
       <div
         style={{
+          position: 'relative', zIndex: 1, marginTop: -4,
           background: 'var(--card-bg)', border: `1.5px solid ${accent}`, borderLeft: `4px solid ${accent}`,
           borderRadius: 'var(--card-radius)', padding: '10px 14px', filter: 'var(--card-filter, none)',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', minHeight: 56,

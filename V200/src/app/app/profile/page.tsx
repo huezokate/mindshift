@@ -6,7 +6,6 @@ import { BottomNav, BottomNavSpacer } from '@/components/app/BottomNav'
 // DRAFT — pro-user profile. Nickname + the three tiers (current = Pro) + the
 // usual account rows. Sample data; Clerk/Billing wiring comes later.
 const TIERS = [
-  { key: 'anon',  name: 'Anonymous', price: '—',          blurb: '3 lenses a day, nothing saved.' },
   { key: 'free',  name: 'Free',      price: '$0',         blurb: '3 quotes/day · save to your journal.' },
   { key: 'pro',   name: 'Pro',       price: '$8.99/mo',   blurb: 'Unlimited lenses, mind-maps & weekly emails.' },
 ]
