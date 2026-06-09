@@ -1,5 +1,5 @@
 'use client'
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { motion } from 'framer-motion'
 import { getSupabase } from '@/lib/supabase'
 
@@ -12,6 +12,17 @@ const fade = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }
 const stagger = { show: { transition: { staggerChildren: 0.1 } } }
 
 export default function LandingPage() {
+  // Marketing landing is pinned to the notepad theme (its design target),
+  // regardless of the visitor's saved app theme. Restored on unmount.
+  useEffect(() => {
+    const prev = document.documentElement.getAttribute('data-theme')
+    document.documentElement.setAttribute('data-theme', 'notepad')
+    return () => {
+      if (prev) document.documentElement.setAttribute('data-theme', prev)
+      else document.documentElement.removeAttribute('data-theme')
+    }
+  }, [])
+
   return (
     <div className="min-h-dvh" style={{ background: 'var(--bg)' }}>
       <Hero />
@@ -27,7 +38,7 @@ export default function LandingPage() {
 function Section({
   children,
   maxWidth = 720,
-  paddingY = '96px',
+  paddingY = '60px',
 }: {
   children: React.ReactNode
   maxWidth?: number
@@ -188,7 +199,7 @@ const VIGNETTES: Vignette[] = [
     id: 'a-lincoln',
     name: 'Abraham Lincoln',
     era: '16th U.S. President · 1809–1865',
-    img: '/portraits/cyberpunk/a-lincoln.png',
+    img: '/portraits/kawaii/a-lincoln.png',
     response:
       "I lost my first run for office. Years later I lost two races for the Senate — the second to a man the papers swore I'd never beat. Two years after that, I was elected President, and we brought slavery to its end. I carried a melancholy most of my life, so I know the weight you're under. A day of defeat isn't a verdict — it's the part of the story right before it turns.",
     quote: 'Always bear in mind that your own resolution to succeed is more important than any other one thing.',
@@ -197,7 +208,7 @@ const VIGNETTES: Vignette[] = [
     id: 'frida-kahlo',
     name: 'Frida Kahlo',
     era: 'Painter · 1907–1954',
-    img: '/portraits/cyberpunk/frida-kahlo.png',
+    img: '/portraits/kawaii/frida-kahlo.png',
     response:
       "A streetcar nearly killed me at eighteen — it shattered my spine and my pelvis. I learned to paint flat on my back, a mirror rigged above the bed, because the alternative was to disappear. What you are calling failure, I called material. Today is not proof that you are broken. It is the raw paint. Use it.",
     quote: 'I never painted dreams. I painted my own reality.',
@@ -206,7 +217,7 @@ const VIGNETTES: Vignette[] = [
     id: 'napoleon',
     name: 'Napoleon Bonaparte',
     era: 'Emperor of the French · 1769–1821',
-    img: '/portraits/cyberpunk/napoleon.png',
+    img: '/portraits/kawaii/napoleon.png',
     response:
       "You feel ruined by a single day? I was exiled to an island — and when they sent soldiers to keep me there, I walked out to meet them and they joined me instead. Stop tallying today's losses. Find the one place the enemy is weak — your own hesitation — and strike there. Decide, and move. Momentum is everything.",
     quote: 'Impossible is a word found only in the dictionary of fools.',
@@ -348,7 +359,7 @@ function FigureDemo() {
 
 function Hero() {
   return (
-    <Section maxWidth={1000} paddingY="clamp(72px, 12vh, 132px)">
+    <Section maxWidth={1000} paddingY="clamp(40px, 5vh, 72px)">
       <motion.div
         variants={stagger}
         initial="hidden"
