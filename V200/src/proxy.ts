@@ -4,7 +4,9 @@ import { NextResponse } from 'next/server'
 const APP_HOST = 'app.minds-shift.com'
 const APEX_HOST = 'minds-shift.com'
 
-const isProtectedRoute = createRouteMatcher(['/app/journal'])
+// DRAFT: /app/journal is sample data while we stitch the pro-browse experience,
+// so it's temporarily unprotected. Re-add '/app/journal' when wiring real data.
+const isProtectedRoute = createRouteMatcher(['/app/__protected-disabled'])
 const isAppOrAuthPath = createRouteMatcher(['/app/:path*', '/sign-in/:path*', '/sign-up/:path*'])
 
 export default clerkMiddleware(async (auth, req) => {

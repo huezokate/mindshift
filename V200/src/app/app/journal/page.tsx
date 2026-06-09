@@ -1,150 +1,139 @@
-import { auth } from '@clerk/nextjs/server'
-import { redirect } from 'next/navigation'
-import { getSupabaseAdmin } from '@/lib/supabase'
-import JournalClient from '@/components/JournalClient'
-import Link from 'next/link'
+'use client'
+import { useEffect } from 'react'
+import { useTheme } from '@/lib/theme'
+import { BottomNav, BottomNavSpacer } from '@/components/app/BottomNav'
 
-const PAGE_SIZE = 10
-
-// ─── SVG icons ────────────────────────────────────────────────────────────────
-
-function CameraIcon() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style={{ display: 'block', flexShrink: 0 }}>
-      <path d="M20 5h-2.83L15 3H9L6.83 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-8 13c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.65 0-3 1.35-3 3s1.35 3 3 3 3-1.35 3-3-1.35-3-3-3z"/>
-    </svg>
-  )
+// DRAFT — browsable journal feed for the pro experience. Sample entries cover
+// the three states: private vent w/ no lens, vent + lens (private), and a
+// shared lens entry. Standard card per Figma 470:2455. The real Supabase-backed
+// server page is preserved in page.real.tsx.bak (restore when wiring data).
+type Entry = {
+  id: string
+  date: string
+  vent: string
+  lens?: { name: string; initials: string; quote: string; response: string }
+  shared?: string | null
 }
 
-function BookIcon() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style={{ display: 'block', flexShrink: 0 }}>
-      <path d="M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zm0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z"/>
-    </svg>
-  )
-}
+const ENTRIES: Entry[] = [
+  {
+    id: 'e3',
+    date: 'Today',
+    vent: 'I keep saying yes to things I don’t want to do and then resenting everyone for it.',
+    lens: {
+      name: 'Socrates',
+      initials: 'So',
+      quote: 'Is it the asking that traps you — or your fear of what a “no” might cost?',
+      response:
+        'You call it resentment, but notice: no one forced the yes. What would you have to believe about yourself to say no and still feel safe? Sit with that before the next ask comes.',
+    },
+    shared: null,
+  },
+  {
+    id: 'e2',
+    date: '2 days ago',
+    vent: 'I’m scared I’ve already missed my window to do the thing I actually care about.',
+    lens: {
+      name: 'Maya Angelou',
+      initials: 'MA',
+      quote: 'There is no greater agony than bearing an untold story inside you.',
+      response:
+        'Listen to me: the window is not a window. It is a door, and it opens from your side. You are not late — you are arriving exactly when you decided to stop waiting for permission.',
+    },
+    shared: 'Instagram',
+  },
+  {
+    id: 'e1',
+    date: '5 days ago',
+    vent: 'Just need to get this out of my head before bed. Long day. Brain is loud. That’s all.',
+    shared: null,
+  },
+]
 
-function PersonIcon() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style={{ display: 'block', flexShrink: 0 }}>
-      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-    </svg>
-  )
-}
-
-// ─── Footer nav ───────────────────────────────────────────────────────────────
-
-function FooterNav({ active }: { active: 'lens' | 'journal' | 'onboarding' }) {
-  const base = {
-    flex: 1,
-    height: '100%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 4,
-    padding: '0 8px',
-    borderTop: '4px solid var(--cyan)',
-    borderLeft: '4px solid var(--cyan)',
-    borderRight: '1px solid var(--cyan)',
-    borderBottom: '1px solid var(--cyan)',
-    borderRadius: 'var(--card-radius)',
-    color: 'var(--cyan)',
-    textDecoration: 'none',
-  } as const
-
-  const activeStyle = {
-    ...base,
-    borderTop: '4px solid var(--pink)',
-    borderLeft: '4px solid var(--pink)',
-    borderRight: '1px solid var(--pink)',
-    borderBottom: '1px solid var(--pink)',
-    color: 'var(--pink)',
-  } as const
-
-  const labelStyle = {
-    fontFamily: 'var(--font-btn)' as const,
-    fontWeight: 600,
-    fontSize: 12,
-    letterSpacing: '1.5px',
-    textTransform: 'uppercase' as const,
-    lineHeight: '14px',
-    textAlign: 'center' as const,
-  }
+export default function JournalPage() {
+  const { setTheme } = useTheme()
+  useEffect(() => { setTheme('notepad') }, [setTheme])
 
   return (
-    <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, display: 'flex', justifyContent: 'center', background: 'var(--bg)', borderTop: '1px solid rgba(255,255,255,0.06)', zIndex: 50 }}>
-      <div style={{ width: '100%', maxWidth: 440, display: 'flex', gap: 4, padding: '0 4px', height: 72 }}>
-        <Link href="/app/lens" style={active === 'lens' ? activeStyle : base}>
-          <CameraIcon />
-          <span style={labelStyle}>Try another Lens</span>
-        </Link>
-        <Link href="/app/journal" style={active === 'journal' ? activeStyle : base}>
-          <BookIcon />
-          <span style={labelStyle}>Journal</span>
-        </Link>
-        <Link href="/app/vent" style={active === 'onboarding' ? activeStyle : base}>
-          <PersonIcon />
-          <span style={labelStyle}>Continue</span>
-        </Link>
+    <div className="min-h-dvh flex flex-col items-center" style={{ padding: '48px 20px 24px' }}>
+      <div className="w-full flex flex-col" style={{ maxWidth: 440, gap: 6, marginBottom: 18 }}>
+        <p style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: 'var(--pink)', margin: 0 }}>
+          Your journal
+        </p>
+        <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 28, lineHeight: '32px', letterSpacing: '-0.5px', color: 'var(--text-h1)', margin: 0 }}>
+          Everything you’ve let out.
+        </h1>
       </div>
+
+      <div className="w-full flex flex-col" style={{ maxWidth: 440, gap: 16 }}>
+        {ENTRIES.map(e => <EntryCard key={e.id} entry={e} />)}
+      </div>
+
+      <BottomNavSpacer />
+      <BottomNav />
     </div>
   )
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
-export default async function JournalPage() {
-  const { userId } = await auth()
-  if (!userId) redirect('/sign-in?redirect_url=/app/journal')
-
-  const db = getSupabaseAdmin()
-
-  // Fetch one extra row to determine if there are more pages
-  const { data } = await db
-    .from('vent_sessions')
-    .select(`
-      id,
-      vent_text,
-      theme,
-      created_at,
-      lens_responses (
-        id,
-        figure_id,
-        response_text,
-        created_at
-      )
-    `)
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
-    .range(0, PAGE_SIZE)  // PAGE_SIZE + 1 rows
-
-  const rows = data ?? []
-  const initialHasMore = rows.length > PAGE_SIZE
-  const initialSessions = initialHasMore ? rows.slice(0, PAGE_SIZE) : rows
-
+function EntryCard({ entry }: { entry: Entry }) {
   return (
-    <div className="min-h-dvh flex flex-col items-center" style={{ background: 'var(--bg)' }}>
-      <div className="flex flex-col gap-4 w-full" style={{ maxWidth: 440, padding: '32px 20px 100px' }}>
+    <div
+      style={{
+        background: 'var(--card-bg)', border: '1.5px solid var(--pink)', borderRadius: 'var(--card-radius)',
+        padding: '16px 18px', filter: 'var(--card-filter, none)', display: 'flex', flexDirection: 'column', gap: 12,
+      }}
+    >
+      <div className="flex items-center justify-between">
+        <span style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 10, letterSpacing: 1, textTransform: 'uppercase', color: 'var(--text-meta)' }}>
+          {entry.date}
+        </span>
+        <PrivacyBadge shared={entry.shared} hasLens={!!entry.lens} />
+      </div>
 
-        {/* Header */}
-        <div style={{ background: 'var(--hcard-bg)', borderTop: 'var(--hcard-bt)', borderLeft: 'var(--hcard-bl)', borderRight: 'var(--hcard-br)', borderBottom: 'var(--hcard-bb)', borderRadius: 'var(--hcard-radius)', padding: 'var(--hcard-padding)' }}>
-          <p className="uppercase text-center" style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 28, letterSpacing: 2, color: 'var(--cyan)', lineHeight: 1 }}>
-            Journal
+      <p style={{ fontFamily: 'var(--font-body)', fontStyle: 'italic', fontSize: 14, lineHeight: '21px', color: 'var(--text-body)', margin: 0 }}>
+        “{entry.vent}”
+      </p>
+
+      {entry.lens ? (
+        <div style={{ borderTop: '1px dashed var(--input-divider)', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div className="flex items-center" style={{ gap: 10 }}>
+            <div style={{ width: 34, height: 34, borderRadius: '50%', flexShrink: 0, background: 'var(--bg)', border: '1.5px solid var(--cyan)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 13, color: 'var(--cyan)' }}>{entry.lens.initials}</span>
+            </div>
+            <span style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 11, letterSpacing: 1, textTransform: 'uppercase', color: 'var(--cyan)' }}>
+              Through {entry.lens.name}
+            </span>
+          </div>
+          <p style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontSize: 15, lineHeight: '21px', color: 'var(--pink)', margin: 0 }}>
+            “{entry.lens.quote}”
           </p>
-          <p className="text-center" style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--text-sub)', marginTop: 6, letterSpacing: '0.4px' }}>
-            Your saved perspectives
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 13.5, lineHeight: '21px', color: 'var(--text-body)', margin: 0 }}>
+            {entry.lens.response}
           </p>
+          <div className="flex items-center" style={{ gap: 10, marginTop: 2 }}>
+            {['save', 'decorate', 'share'].map(a => (
+              <span key={a} style={{ width: 30, height: 30, borderRadius: '50%', border: '1.5px solid var(--pink)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: 'var(--pink)', fontSize: 13 }}>
+                {a === 'save' ? '✶' : a === 'decorate' ? '✦' : '↗'}
+              </span>
+            ))}
+          </div>
         </div>
-
-        {/* Session list + infinite scroll */}
-        <JournalClient
-          initialSessions={initialSessions}
-          initialHasMore={initialHasMore}
-        />
-
-      </div>
-
-      <FooterNav active="journal" />
+      ) : (
+        <div className="flex items-center justify-between" style={{ borderTop: '1px dashed var(--input-divider)', paddingTop: 12 }}>
+          <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--text-meta)' }}>No lens — just for you.</span>
+          <span style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 12, color: 'var(--cyan)' }}>Pick a lens →</span>
+        </div>
+      )}
     </div>
+  )
+}
+
+function PrivacyBadge({ shared, hasLens }: { shared?: string | null; hasLens: boolean }) {
+  const label = shared ? `Shared · ${shared}` : hasLens ? 'Private' : 'Private · no lens'
+  const color = shared ? 'var(--green)' : 'var(--text-sub)'
+  return (
+    <span style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 9.5, letterSpacing: 0.8, textTransform: 'uppercase', color, border: `1px solid ${color}`, borderRadius: 999, padding: '2px 8px' }}>
+      {label}
+    </span>
   )
 }

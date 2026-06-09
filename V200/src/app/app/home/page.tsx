@@ -2,6 +2,7 @@
 import { useEffect } from 'react'
 import Link from 'next/link'
 import { useTheme } from '@/lib/theme'
+import { BottomNav, BottomNavSpacer } from '@/components/app/BottomNav'
 
 // DRAFT — returning-PREMIUM home / hub. Maps to the architecture's
 // "Existing user (premium)" page: jump to a new vent, the map, or the journal.
@@ -73,6 +74,8 @@ export default function PremiumHomePage() {
           </Link>
         ))}
       </div>
+      <BottomNavSpacer />
+      <BottomNav />
     </div>
   )
 }
