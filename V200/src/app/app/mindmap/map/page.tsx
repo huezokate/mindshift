@@ -6,7 +6,7 @@ import {
   ReactFlowProvider,
   Background,
   Controls,
-  MiniMap,
+  useReactFlow,
   Handle,
   Position,
   BaseEdge,
@@ -115,16 +115,37 @@ const nodeTypes = { hub: HubNode, area: AreaNode }
 const edgeTypes = { floating: FloatingEdge }
 
 // ── Canvas ───────────────────────────────────────────────────────────────────
+// Radial bounding box (centers at ±R, plus card half-size).
+const MAP_W = 2 * 380 + SIZE.area.w // 1091
+const MAP_H = 2 * 380 + SIZE.area.h // 960
+const MARGIN = 16
+
 function Canvas({ onOpen }: { onOpen: (id: AreaId) => void }) {
-  const [edgeColor, setEdgeColor] = useState('#c0605a')
+  const rf = useReactFlow()
   const [nodes, , onNodesChange] = useNodesState(buildNodes())
   const [edges, setEdges, onEdgesChange] = useEdgesState(buildEdges('#c0605a'))
+  // zoom-out = whole map + 16px; zoom-in = one card + 16px each side
+  const [zoom, setZoom] = useState({ min: 0.3, max: 1.4 })
 
   useEffect(() => {
     const cs = getComputedStyle(document.documentElement)
     const c = (cs.getPropertyValue('--map-edge') || cs.getPropertyValue('--pink')).trim()
-    if (c) { setEdgeColor(c); setEdges(buildEdges(c)) }
+    if (c) setEdges(buildEdges(c))
   }, [setEdges])
+
+  useEffect(() => {
+    const recompute = () => {
+      const vw = window.innerWidth, vh = window.innerHeight
+      const max = (vw - 2 * MARGIN) / SIZE.area.w
+      const fit = Math.min((vw - 2 * MARGIN) / MAP_W, (vh - 2 * MARGIN) / MAP_H)
+      const min = Math.min(fit, max)
+      setZoom({ min, max })
+      rf.fitView({ padding: MARGIN / vw, minZoom: min, maxZoom: max })
+    }
+    recompute()
+    window.addEventListener('resize', recompute)
+    return () => window.removeEventListener('resize', recompute)
+  }, [rf])
 
   return (
     <ReactFlow
@@ -141,14 +162,14 @@ function Canvas({ onOpen }: { onOpen: (id: AreaId) => void }) {
       zoomOnPinch
       panOnDrag
       fitView
-      minZoom={0.2}
-      maxZoom={2}
+      fitViewOptions={{ padding: 0.04 }}
+      minZoom={zoom.min}
+      maxZoom={zoom.max}
       proOptions={{ hideAttribution: true }}
       style={{ background: 'var(--bg)' }}
     >
       <Background gap={28} size={1.4} color="var(--input-divider)" />
       <Controls showInteractive={false} />
-      <MiniMap pannable zoomable nodeColor={() => edgeColor} maskColor="rgba(0,0,0,0.06)" />
     </ReactFlow>
   )
 }
@@ -192,7 +213,6 @@ export default function MindmapMapPage() {
         .react-flow__controls-button { background: var(--card-bg); border-bottom: 1px solid var(--input-divider); color: var(--text-body); width: 30px; height: 30px; }
         .react-flow__controls-button:hover { background: #f3ede2; }
         .react-flow__controls-button svg { fill: var(--text-body); }
-        .react-flow__minimap { border: 1.5px solid var(--pink); border-radius: 8px; box-shadow: 3px 4px 0 #d4cbbf; }
         .react-flow__node { cursor: pointer; }
         .react-flow__attribution { display: none; }
       `}</style>
