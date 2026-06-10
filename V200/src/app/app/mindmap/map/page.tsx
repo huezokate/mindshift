@@ -21,7 +21,7 @@ import {
   type NodeProps,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
-import { motion, AnimatePresence } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useTheme } from '@/lib/theme'
 import { AREAS, AREA_BY_ID, type AreaId } from '@/lib/mindmap-areas'
 import { MindmapAreaCard, type AreaDetail, type Milestone } from '@/components/mindmap/MindmapAreaCard'
@@ -29,6 +29,10 @@ import { MindmapAreaCard, type AreaDetail, type Milestone } from '@/components/m
 const SIZE: Record<string, { w: number; h: number }> = { hub: { w: 220, h: 64 }, area: { w: 331, h: 200 } }
 const sizeFor = (id: string) => (id === 'hub' ? SIZE.hub : SIZE.area)
 const HUB_LABEL = 'In 5 years…'
+const R = 380
+const MAP_W = 2 * R + SIZE.area.w
+const MAP_H = 2 * R + SIZE.area.h
+const MARGIN = 16
 
 // ── Sample detail data (Supabase later) ─────────────────────────────────────
 const SAMPLE_MILESTONES: Milestone[] = [
@@ -52,7 +56,6 @@ function detailFor(id: AreaId): AreaDetail {
 // ── Radial layout ────────────────────────────────────────────────────────────
 type Pt = { x: number; y: number }
 function radialCenters(): Map<string, Pt> {
-  const R = 380
   const m = new Map<string, Pt>([['hub', { x: 0, y: 0 }]])
   AREAS.forEach((a, i) => {
     const ang = -Math.PI / 2 + i * ((2 * Math.PI) / AREAS.length)
@@ -65,7 +68,7 @@ function buildNodes(): Node[] {
   const tl = (id: string, p: Pt) => ({ x: p.x - sizeFor(id).w / 2, y: p.y - sizeFor(id).h / 2 })
   return [
     { id: 'hub', type: 'hub', position: tl('hub', c.get('hub')!), data: {}, draggable: false },
-    ...AREAS.map(a => ({ id: a.id, type: 'area', position: tl(a.id, c.get(a.id)!), data: { areaId: a.id }, draggable: false })),
+    ...AREAS.map(a => ({ id: a.id, type: 'area', position: tl(a.id, c.get(a.id)!), data: { areaId: a.id, focused: false, maxH: 600 }, draggable: false })),
   ]
 }
 function buildEdges(color: string): Edge[] {
@@ -86,11 +89,16 @@ function HubNode(_: NodeProps) {
   )
 }
 function AreaNode({ data }: NodeProps) {
-  const id = (data as { areaId: AreaId }).areaId
+  const d = data as { areaId: AreaId; focused?: boolean; maxH?: number }
+  const card = <MindmapAreaCard area={AREA_BY_ID[d.areaId]} detail={detailFor(d.areaId)} unfolded={!!d.focused} />
   return (
     <>
       <Handle type="target" position={Position.Top} style={{ opacity: 0 }} />
-      <MindmapAreaCard area={AREA_BY_ID[id]} detail={detailFor(id)} />
+      {d.focused ? (
+        <div className="nowheel nopan" style={{ width: 331, maxHeight: d.maxH ?? 600, overflowY: 'auto', borderRadius: 8 }}>
+          {card}
+        </div>
+      ) : card}
     </>
   )
 }
@@ -115,37 +123,52 @@ const nodeTypes = { hub: HubNode, area: AreaNode }
 const edgeTypes = { floating: FloatingEdge }
 
 // ── Canvas ───────────────────────────────────────────────────────────────────
-// Radial bounding box (centers at ±R, plus card half-size).
-const MAP_W = 2 * 380 + SIZE.area.w // 1091
-const MAP_H = 2 * 380 + SIZE.area.h // 960
-const MARGIN = 16
-
-function Canvas({ onOpen }: { onOpen: (id: AreaId) => void }) {
+function Canvas({ focused, setFocused }: { focused: AreaId | null; setFocused: (id: AreaId | null) => void }) {
   const rf = useReactFlow()
-  const [nodes, , onNodesChange] = useNodesState(buildNodes())
+  const [nodes, setNodes, onNodesChange] = useNodesState(buildNodes())
   const [edges, setEdges, onEdgesChange] = useEdgesState(buildEdges('#c0605a'))
-  // zoom-out = whole map + 16px; zoom-in = one card + 16px each side
   const [zoom, setZoom] = useState({ min: 0.3, max: 1.4 })
 
   useEffect(() => {
     const cs = getComputedStyle(document.documentElement)
     const c = (cs.getPropertyValue('--map-edge') || cs.getPropertyValue('--pink')).trim()
-    if (c) setEdges(buildEdges(c))
+    if (c) setEdges(es => es.map(e => ({ ...e, style: { ...e.style, stroke: c }, markerEnd: { type: MarkerType.ArrowClosed, color: c, width: 16, height: 16 } })))
   }, [setEdges])
 
+  // Zoom bounds: whole-map +16px (out) ↔ one card +16px (in).
   useEffect(() => {
     const recompute = () => {
       const vw = window.innerWidth, vh = window.innerHeight
       const max = (vw - 2 * MARGIN) / SIZE.area.w
       const fit = Math.min((vw - 2 * MARGIN) / MAP_W, (vh - 2 * MARGIN) / MAP_H)
-      const min = Math.min(fit, max)
-      setZoom({ min, max })
-      rf.fitView({ padding: MARGIN / vw, minZoom: min, maxZoom: max })
+      setZoom({ min: Math.min(fit, max), max })
     }
     recompute()
     window.addEventListener('resize', recompute)
     return () => window.removeEventListener('resize', recompute)
-  }, [rf])
+  }, [])
+
+  // Focus mode — fade siblings, unfold the tapped card, zoom to it.
+  useEffect(() => {
+    const vh = window.innerHeight
+    const maxH = (vh * 0.82) / zoom.max
+    setNodes(ns => ns.map(n => {
+      const isF = n.type === 'area' && (n.data as { areaId: AreaId }).areaId === focused
+      const faded = focused != null && !isF
+      return {
+        ...n,
+        data: n.type === 'area' ? { ...n.data, focused: isF, maxH } : n.data,
+        style: { ...(n.style || {}), opacity: faded ? 0 : 1, transition: 'opacity 0.35s ease', pointerEvents: faded ? 'none' : 'auto' },
+      }
+    }))
+    setEdges(es => es.map(e => ({ ...e, style: { ...e.style, opacity: focused ? 0 : 1, transition: 'opacity 0.35s ease' } })))
+    if (focused) {
+      const c = radialCenters().get(focused)!
+      rf.setCenter(c.x, c.y - SIZE.area.h / 2 + maxH / 2, { zoom: zoom.max, duration: 450 })
+    } else {
+      rf.fitView({ padding: 0.04, minZoom: zoom.min, maxZoom: zoom.max, duration: 450 })
+    }
+  }, [focused, zoom, rf, setNodes, setEdges])
 
   return (
     <ReactFlow
@@ -153,14 +176,15 @@ function Canvas({ onOpen }: { onOpen: (id: AreaId) => void }) {
       edges={edges}
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
-      onNodeClick={(_, node) => { if (node.type === 'area') onOpen((node.data as { areaId: AreaId }).areaId) }}
+      onNodeClick={(_, node) => { if (!focused && node.type === 'area') setFocused((node.data as { areaId: AreaId }).areaId) }}
       nodeTypes={nodeTypes}
       edgeTypes={edgeTypes}
       nodesDraggable={false}
       nodesConnectable={false}
       elementsSelectable={false}
-      zoomOnPinch
-      panOnDrag
+      zoomOnPinch={!focused}
+      panOnDrag={!focused}
+      zoomOnDoubleClick={false}
       fitView
       fitViewOptions={{ padding: 0.04 }}
       minZoom={zoom.min}
@@ -169,41 +193,14 @@ function Canvas({ onOpen }: { onOpen: (id: AreaId) => void }) {
       style={{ background: 'var(--bg)' }}
     >
       <Background gap={28} size={1.4} color="var(--input-divider)" />
-      <Controls showInteractive={false} />
+      {!focused && <Controls showInteractive={false} />}
     </ReactFlow>
-  )
-}
-
-// ── Tap-to-open detail overlay ───────────────────────────────────────────────
-function DetailOverlay({ areaId, onClose }: { areaId: AreaId; onClose: () => void }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      onClick={onClose}
-      style={{ position: 'fixed', inset: 0, zIndex: 60, background: 'rgba(30,30,64,0.45)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '40px 16px', overflowY: 'auto' }}
-    >
-      <motion.div
-        initial={{ scale: 0.92, y: 18, opacity: 0 }} animate={{ scale: 1, y: 0, opacity: 1 }} exit={{ scale: 0.96, opacity: 0 }}
-        transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-        onClick={e => e.stopPropagation()}
-        style={{ position: 'relative' }}
-      >
-        <button
-          onClick={onClose}
-          aria-label="Close"
-          style={{ position: 'absolute', top: -14, right: -10, zIndex: 1, width: 34, height: 34, borderRadius: '50%', background: 'var(--card-bg)', border: '1.5px solid var(--pink)', color: 'var(--pink)', cursor: 'pointer', fontSize: 18, lineHeight: 1, filter: 'drop-shadow(2px 3px 0 #d4cbbf)' }}
-        >
-          ×
-        </button>
-        <MindmapAreaCard area={AREA_BY_ID[areaId]} detail={detailFor(areaId)} unfolded />
-      </motion.div>
-    </motion.div>
   )
 }
 
 export default function MindmapMapPage() {
   const { setTheme } = useTheme()
-  const [openArea, setOpenArea] = useState<AreaId | null>(null)
+  const [focused, setFocused] = useState<AreaId | null>(null)
   useEffect(() => { setTheme('notepad') }, [setTheme])
 
   return (
@@ -217,23 +214,36 @@ export default function MindmapMapPage() {
         .react-flow__attribution { display: none; }
       `}</style>
 
-      <Link
-        href="/app/mindmap"
-        style={{ position: 'absolute', top: 16, right: 16, zIndex: 10, fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--text-sub)', textDecoration: 'none', background: 'var(--card-bg)', border: '1.5px solid var(--pink)', borderRadius: 999, padding: '6px 12px', filter: 'drop-shadow(2px 3px 0 #d4cbbf)' }}
-      >
-        ← Back
-      </Link>
-      <p style={{ position: 'absolute', top: 18, left: 16, zIndex: 10, fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--text-meta)', margin: 0, maxWidth: 180 }}>
-        Tap an area to open it · pinch to zoom
-      </p>
-
-      <ReactFlowProvider>
-        <Canvas onOpen={setOpenArea} />
-      </ReactFlowProvider>
+      {/* Top-left: hint (map) / back (focus) */}
+      {focused ? (
+        <button
+          onClick={() => setFocused(null)}
+          style={{ position: 'absolute', top: 16, left: 16, zIndex: 20, fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 13, color: 'var(--pink)', background: 'var(--card-bg)', border: '1.5px solid var(--pink)', borderRadius: 999, padding: '8px 16px', cursor: 'pointer', filter: 'drop-shadow(2px 3px 0 #d4cbbf)' }}
+        >
+          ← Back to map
+        </button>
+      ) : (
+        <p style={{ position: 'absolute', top: 18, left: 16, zIndex: 10, fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--text-meta)', margin: 0, maxWidth: 180 }}>
+          Tap an area to open it · pinch to zoom
+        </p>
+      )}
 
       <AnimatePresence>
-        {openArea && <DetailOverlay areaId={openArea} onClose={() => setOpenArea(null)} />}
+        {!focused && (
+          <motion.div initial={false} animate={{ opacity: 1 }} exit={{ opacity: 0 }} key="back">
+            <Link
+              href="/app/mindmap"
+              style={{ position: 'absolute', top: 16, right: 16, zIndex: 10, fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--text-sub)', textDecoration: 'none', background: 'var(--card-bg)', border: '1.5px solid var(--pink)', borderRadius: 999, padding: '6px 12px', filter: 'drop-shadow(2px 3px 0 #d4cbbf)' }}
+            >
+              ← Back
+            </Link>
+          </motion.div>
+        )}
       </AnimatePresence>
+
+      <ReactFlowProvider>
+        <Canvas focused={focused} setFocused={setFocused} />
+      </ReactFlowProvider>
     </div>
   )
 }
