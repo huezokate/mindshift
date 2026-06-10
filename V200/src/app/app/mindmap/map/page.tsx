@@ -210,6 +210,8 @@ function LayoutToggle({ organic, onChange }: { organic: boolean; onChange: (o: b
     cursor: 'pointer',
     background: active ? 'var(--pink)' : 'var(--card-bg)',
     color: active ? '#fff' : 'var(--text-body)',
+    boxShadow: active ? 'none' : '2px 3px 0 #d4cbbf',
+    transition: 'background 0.15s, box-shadow 0.15s',
   })
   return (
     <div
@@ -241,6 +243,23 @@ export default function MindmapMapPage() {
 
   return (
     <div style={{ width: '100%', height: '100dvh', position: 'relative' }}>
+      <style>{`
+        /* Smooth the Radial <-> Organic relayout; instant while dragging. */
+        .react-flow__node { transition: transform 0.5s cubic-bezier(0.22,1,0.36,1); }
+        .react-flow__node.dragging { transition: none; }
+        .react-flow__node:active { cursor: grabbing; }
+        /* Notepad-themed controls + minimap */
+        .react-flow__controls { box-shadow: 3px 4px 0 #d4cbbf; border: 1.5px solid var(--pink); border-radius: 8px; overflow: hidden; }
+        .react-flow__controls-button {
+          background: var(--card-bg); border-bottom: 1px solid var(--input-divider);
+          color: var(--text-body); width: 30px; height: 30px;
+        }
+        .react-flow__controls-button:hover { background: #f3ede2; }
+        .react-flow__controls-button svg { fill: var(--text-body); }
+        .react-flow__minimap { border: 1.5px solid var(--pink); border-radius: 8px; box-shadow: 3px 4px 0 #d4cbbf; }
+        .react-flow__edge-path { stroke-linecap: round; }
+        .react-flow__attribution { display: none; }
+      `}</style>
       <Link
         href="/app/mindmap"
         style={{

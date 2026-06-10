@@ -25,9 +25,11 @@ export function MindmapAreaCard({
         width,
         background: selected ? 'var(--mm-card-bg-selected, #eef3ec)' : 'var(--card-bg)',
         border: `1.5px solid ${selected ? 'var(--green)' : 'var(--pink)'}`,
+        borderLeft: `4px solid ${selected ? 'var(--green)' : 'var(--pink)'}`,
         borderRadius: 'var(--card-radius)',
         padding: '14px 16px',
-        filter: 'var(--card-filter, none)',
+        // Notepad hard-offset shadow — matches the journal cards.
+        filter: 'drop-shadow(3px 4px 0 var(--mm-shadow, #d4cbbf))',
         display: 'flex',
         flexDirection: 'column',
         gap: 10,
