@@ -4,7 +4,6 @@ import Link from 'next/link'
 import {
   ReactFlow,
   ReactFlowProvider,
-  Background,
   Controls,
   useReactFlow,
   Handle,
@@ -63,12 +62,36 @@ function radialCenters(): Map<string, Pt> {
   })
   return m
 }
+// Hand-drawn arrows (Kate's), one per spoke, rotated to point outward.
+// `nat` = each arrow's natural head angle (deg, 0=right, -90=up).
+const ARROWS = [
+  { src: '/mindmap/arrows/arrow1.svg', nat: -90, len: 150 }, // career — up
+  { src: '/mindmap/arrows/arrow3.svg', nat: 0, len: 210 },   // health — swirly right
+  { src: '/mindmap/arrows/arrow4.svg', nat: -45, len: 195 }, // relationship — up-right
+  { src: '/mindmap/arrows/arrow5.svg', nat: 180, len: 195 }, // personal — left
+  { src: '/mindmap/arrows/arrow2.svg', nat: -90, len: 150 }, // finance — up
+]
+const ARROW_BOX = 290
+// Deterministic small tilt per area (sticker/hand-made vibe).
+const TILT = [-2, 1.5, -1.5, 2, -1]
+
 function buildNodes(): Node[] {
   const c = radialCenters()
   const tl = (id: string, p: Pt) => ({ x: p.x - sizeFor(id).w / 2, y: p.y - sizeFor(id).h / 2 })
+  const arrows: Node[] = AREAS.map((a, i) => {
+    const rad = ((-90 + i * 72) * Math.PI) / 180
+    const r = 0.52 * R
+    return {
+      id: `arrow-${a.id}`, type: 'arrow',
+      position: { x: Math.cos(rad) * r - ARROW_BOX / 2, y: Math.sin(rad) * r - ARROW_BOX / 2 },
+      data: { src: ARROWS[i].src, rot: -90 + i * 72 - ARROWS[i].nat, len: ARROWS[i].len },
+      draggable: false, selectable: false, zIndex: 0,
+    }
+  })
   return [
-    { id: 'hub', type: 'hub', position: tl('hub', c.get('hub')!), data: {}, draggable: false },
-    ...AREAS.map(a => ({ id: a.id, type: 'area', position: tl(a.id, c.get(a.id)!), data: { areaId: a.id, focused: false, maxH: 600 }, draggable: false })),
+    ...arrows,
+    { id: 'hub', type: 'hub', position: tl('hub', c.get('hub')!), data: {}, draggable: false, zIndex: 1 },
+    ...AREAS.map((a, i) => ({ id: a.id, type: 'area', position: tl(a.id, c.get(a.id)!), data: { areaId: a.id, focused: false, maxH: 600, tilt: TILT[i] }, draggable: false, zIndex: 2 })),
   ]
 }
 function buildEdges(color: string): Edge[] {
@@ -89,7 +112,7 @@ function HubNode(_: NodeProps) {
   )
 }
 function AreaNode({ data }: NodeProps) {
-  const d = data as { areaId: AreaId; focused?: boolean; maxH?: number }
+  const d = data as { areaId: AreaId; focused?: boolean; maxH?: number; tilt?: number }
   const card = <MindmapAreaCard area={AREA_BY_ID[d.areaId]} detail={detailFor(d.areaId)} unfolded={!!d.focused} />
   return (
     <>
@@ -98,8 +121,20 @@ function AreaNode({ data }: NodeProps) {
         <div className="nowheel nopan" style={{ width: 331, maxHeight: d.maxH ?? 600, overflowY: 'auto', borderRadius: 8 }}>
           {card}
         </div>
-      ) : card}
+      ) : (
+        <div style={{ transform: `rotate(${d.tilt ?? 0}deg)`, transition: 'transform 0.3s ease' }}>{card}</div>
+      )}
     </>
+  )
+}
+
+function ArrowNode({ data }: NodeProps) {
+  const d = data as { src: string; rot: number; len: number }
+  return (
+    <div style={{ width: ARROW_BOX, height: ARROW_BOX, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={d.src} alt="" style={{ maxWidth: d.len, maxHeight: d.len, transform: `rotate(${d.rot}deg)`, opacity: 0.85 }} />
+    </div>
   )
 }
 
@@ -119,21 +154,15 @@ function FloatingEdge({ id, source, target, markerEnd, style }: EdgeProps) {
   return <BaseEdge id={id} path={path} markerEnd={markerEnd} style={style} />
 }
 
-const nodeTypes = { hub: HubNode, area: AreaNode }
+const nodeTypes = { hub: HubNode, area: AreaNode, arrow: ArrowNode }
 const edgeTypes = { floating: FloatingEdge }
 
 // ── Canvas ───────────────────────────────────────────────────────────────────
 function Canvas({ focused, setFocused }: { focused: AreaId | null; setFocused: (id: AreaId | null) => void }) {
   const rf = useReactFlow()
   const [nodes, setNodes, onNodesChange] = useNodesState(buildNodes())
-  const [edges, setEdges, onEdgesChange] = useEdgesState(buildEdges('#c0605a'))
+  const [edges, , onEdgesChange] = useEdgesState<Edge>([]) // hand-drawn arrows replace edges
   const [zoom, setZoom] = useState({ min: 0.3, max: 1.4 })
-
-  useEffect(() => {
-    const cs = getComputedStyle(document.documentElement)
-    const c = (cs.getPropertyValue('--map-edge') || cs.getPropertyValue('--pink')).trim()
-    if (c) setEdges(es => es.map(e => ({ ...e, style: { ...e.style, stroke: c }, markerEnd: { type: MarkerType.ArrowClosed, color: c, width: 16, height: 16 } })))
-  }, [setEdges])
 
   // Zoom bounds: whole-map +16px (out) ↔ one card +16px (in).
   useEffect(() => {
@@ -161,14 +190,13 @@ function Canvas({ focused, setFocused }: { focused: AreaId | null; setFocused: (
         style: { ...(n.style || {}), opacity: faded ? 0 : 1, transition: 'opacity 0.35s ease', pointerEvents: faded ? 'none' : 'auto' },
       }
     }))
-    setEdges(es => es.map(e => ({ ...e, style: { ...e.style, opacity: focused ? 0 : 1, transition: 'opacity 0.35s ease' } })))
     if (focused) {
       const c = radialCenters().get(focused)!
       rf.setCenter(c.x, c.y - SIZE.area.h / 2 + maxH / 2, { zoom: zoom.max, duration: 450 })
     } else {
       rf.fitView({ padding: 0.04, minZoom: zoom.min, maxZoom: zoom.max, duration: 450 })
     }
-  }, [focused, zoom, rf, setNodes, setEdges])
+  }, [focused, zoom, rf, setNodes])
 
   return (
     <ReactFlow
@@ -190,9 +218,12 @@ function Canvas({ focused, setFocused }: { focused: AreaId | null; setFocused: (
       minZoom={zoom.min}
       maxZoom={zoom.max}
       proOptions={{ hideAttribution: true }}
-      style={{ background: 'var(--bg)' }}
+      style={{
+        backgroundColor: '#faf7f2',
+        // Notepad ruled-paper texture (fixed to the viewport).
+        backgroundImage: 'repeating-linear-gradient(180deg, transparent 0, transparent 27px, rgba(58,111,168,0.10) 27px, rgba(58,111,168,0.10) 28px)',
+      }}
     >
-      <Background gap={28} size={1.4} color="var(--input-divider)" />
       {!focused && <Controls showInteractive={false} />}
     </ReactFlow>
   )

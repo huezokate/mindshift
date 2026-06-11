@@ -29,7 +29,21 @@ export function MindmapAreaCard({
   const pct = detail.total ? Math.round((detail.done / detail.total) * 100) : 0
 
   return (
-    <div style={{ width, background: 'var(--card-bg)', display: 'flex', flexDirection: 'column', borderRadius: 8 }}>
+    <div style={{ width, background: 'var(--card-bg)', display: 'flex', flexDirection: 'column', borderRadius: 8, position: 'relative' }}>
+      {/* Corner sticker icon — bigger + tilted, slapped on like a sticker */}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute', top: -16, left: -14, zIndex: 3, transform: 'rotate(-11deg)',
+          width: 46, height: 46, borderRadius: '50%', background: 'var(--card-bg)',
+          border: `1.5px solid var(--pink)`, color: BLUE,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          filter: 'drop-shadow(2px 3px 0 #d4cbbf)',
+        }}
+      >
+        <AreaIcon id={area.id} size={28} />
+      </div>
+
       {/* Header */}
       <div
         style={{
@@ -40,12 +54,9 @@ export function MindmapAreaCard({
           display: 'flex', justifyContent: 'center', padding: '8px 0 2px',
         }}
       >
-        <div className="flex items-center" style={{ gap: 16 }}>
-          <span aria-hidden style={{ color: BLUE, display: 'inline-flex' }}><AreaIcon id={area.id} size={24} /></span>
-          <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 18, lineHeight: '20px', letterSpacing: 1.2, textTransform: 'uppercase', color: BLUE }}>
-            {area.label}
-          </span>
-        </div>
+        <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 18, lineHeight: '20px', letterSpacing: 1.2, textTransform: 'uppercase', color: BLUE }}>
+          {area.label}
+        </span>
       </div>
 
       {/* Body */}
