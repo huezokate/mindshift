@@ -65,13 +65,13 @@ function radialCenters(): Map<string, Pt> {
 // Hand-drawn arrows (Kate's), one per spoke, rotated to point outward.
 // `nat` = each arrow's natural head angle (deg, 0=right, -90=up).
 const ARROWS = [
-  { src: '/mindmap/arrows/arrow1.svg', nat: -90, len: 150 }, // career — up
-  { src: '/mindmap/arrows/arrow3.svg', nat: 0, len: 210 },   // health — swirly right
-  { src: '/mindmap/arrows/arrow4.svg', nat: -45, len: 195 }, // relationship — up-right
-  { src: '/mindmap/arrows/arrow5.svg', nat: 180, len: 195 }, // personal — left
-  { src: '/mindmap/arrows/arrow2.svg', nat: -90, len: 150 }, // finance — up
+  { src: '/mindmap/arrows/arrow1.svg', nat: -90, len: 118 }, // career — up
+  { src: '/mindmap/arrows/arrow3.svg', nat: 0, len: 150 },   // health — swirly right
+  { src: '/mindmap/arrows/arrow4.svg', nat: -45, len: 138 }, // relationship — up-right
+  { src: '/mindmap/arrows/arrow5.svg', nat: 180, len: 138 }, // personal — left
+  { src: '/mindmap/arrows/arrow2.svg', nat: -90, len: 118 }, // finance — up
 ]
-const ARROW_BOX = 290
+const ARROW_BOX = 200
 // Deterministic small tilt per area (sticker/hand-made vibe).
 const TILT = [-2, 1.5, -1.5, 2, -1]
 
@@ -80,7 +80,7 @@ function buildNodes(): Node[] {
   const tl = (id: string, p: Pt) => ({ x: p.x - sizeFor(id).w / 2, y: p.y - sizeFor(id).h / 2 })
   const arrows: Node[] = AREAS.map((a, i) => {
     const rad = ((-90 + i * 72) * Math.PI) / 180
-    const r = 0.52 * R
+    const r = 0.58 * R
     return {
       id: `arrow-${a.id}`, type: 'arrow',
       position: { x: Math.cos(rad) * r - ARROW_BOX / 2, y: Math.sin(rad) * r - ARROW_BOX / 2 },
@@ -168,9 +168,12 @@ function Canvas({ focused, setFocused }: { focused: AreaId | null; setFocused: (
   useEffect(() => {
     const recompute = () => {
       const vw = window.innerWidth, vh = window.innerHeight
-      const max = (vw - 2 * MARGIN) / SIZE.area.w
+      // zoom-in = one card + 16px each side (capped so desktop doesn't go huge)
+      const max = Math.min((vw - 2 * MARGIN) / SIZE.area.w, 2)
+      // zoom-out = whole map + 16px, but never upscale the map past native (≤1×)
       const fit = Math.min((vw - 2 * MARGIN) / MAP_W, (vh - 2 * MARGIN) / MAP_H)
-      setZoom({ min: Math.min(fit, max), max })
+      const min = Math.min(fit, 1)
+      setZoom({ min: Math.min(min, max), max })
     }
     recompute()
     window.addEventListener('resize', recompute)
@@ -180,7 +183,8 @@ function Canvas({ focused, setFocused }: { focused: AreaId | null; setFocused: (
   // Focus mode — fade siblings, unfold the tapped card, zoom to it.
   useEffect(() => {
     const vh = window.innerHeight
-    const maxH = (vh * 0.82) / zoom.max
+    const focusZoom = Math.min(zoom.max, 1.3)
+    const maxH = (vh * 0.82) / focusZoom
     setNodes(ns => ns.map(n => {
       const isF = n.type === 'area' && (n.data as { areaId: AreaId }).areaId === focused
       const faded = focused != null && !isF
@@ -192,7 +196,7 @@ function Canvas({ focused, setFocused }: { focused: AreaId | null; setFocused: (
     }))
     if (focused) {
       const c = radialCenters().get(focused)!
-      rf.setCenter(c.x, c.y - SIZE.area.h / 2 + maxH / 2, { zoom: zoom.max, duration: 450 })
+      rf.setCenter(c.x, c.y - SIZE.area.h / 2 + maxH / 2, { zoom: focusZoom, duration: 450 })
     } else {
       rf.fitView({ padding: 0.04, minZoom: zoom.min, maxZoom: zoom.max, duration: 450 })
     }
