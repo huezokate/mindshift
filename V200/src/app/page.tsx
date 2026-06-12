@@ -266,7 +266,7 @@ function UserLine({ label, children }: { label: string; children: React.ReactNod
 // UI moment: name in the header, quote in the body, role where the char-count sits.
 const TESTIMONIALS = [
   {
-    name: 'Mary',
+    name: 'Many',
     role: 'Beta tester',
     quote: 'I really like the historical approach — it’s not only fun, it’s educational. Such a clever touch!',
   },
