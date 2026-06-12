@@ -29,6 +29,7 @@ export default function LandingPage() {
       <FigureDemo />
       <Waitlist />
       <WhoIsItFor />
+      <Testimonials />
       <OriginStory />
       <Investors />
     </div>
@@ -45,7 +46,7 @@ function Section({
   paddingY?: string
 }) {
   return (
-    <section style={{ padding: `${paddingY} 24px` }}>
+    <section style={{ padding: `${paddingY} clamp(24px, 8vw, 120px)` }}>
       <div style={{ maxWidth, margin: '0 auto' }}>{children}</div>
     </section>
   )
@@ -61,7 +62,7 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
         fontSize: 12,
         letterSpacing: 1.4,
         lineHeight: '14px',
-        color: 'var(--violet)',
+        color: 'var(--pink)',
       }}
     >
       {children}
@@ -87,7 +88,7 @@ function H1({ children }: { children: React.ReactNode }) {
   )
 }
 
-function H2({ children }: { children: React.ReactNode }) {
+function H2({ children, tone = 'blue' }: { children: React.ReactNode; tone?: 'blue' | 'green' }) {
   return (
     <h2
       className="uppercase"
@@ -96,7 +97,7 @@ function H2({ children }: { children: React.ReactNode }) {
         fontWeight: 700,
         fontSize: 'clamp(28px, 4vw, 40px)',
         letterSpacing: 3,
-        color: 'var(--cyan)',
+        color: tone === 'green' ? 'var(--green)' : 'var(--cyan)',
         lineHeight: 1.1,
       }}
     >
@@ -586,12 +587,80 @@ function WaitlistForm() {
   )
 }
 
+// Beta-tester testimonials, styled as the user's vent card — name in the header,
+// quote in the body, role where the char count sits on a real vent card.
+const TESTIMONIALS = [
+  { name: 'Many', role: 'Beta tester', quote: 'I really like the historical approach — it’s not only fun, it’s educational. Such a clever touch!' },
+  { name: 'Natalie', role: 'Beta tester & mental-health provider', quote: 'This is fantastic — easy and lighthearted in a way that would genuinely make it effective with users. Bonus points for staying honest about its intentions: it never pretends to be a therapy tool.' },
+  { name: 'Al', role: 'Early tester', quote: 'Wow, these interfaces are so different — I can shift the whole mood of the app to match my own.' },
+]
+
+function Testimonials() {
+  return (
+    <Section maxWidth={1120}>
+      <motion.div
+        variants={stagger}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.2 }}
+        className="flex flex-col items-center text-center"
+        style={{ gap: 36 }}
+      >
+        <motion.div variants={fade} style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
+          <Eyebrow>From the people testing it</Eyebrow>
+          <H2>Vented, approved.</H2>
+        </motion.div>
+        <div className="flex flex-col md:flex-row gap-6 w-full items-stretch">
+          {TESTIMONIALS.map(t => (
+            <motion.div key={t.name} variants={fade} className="md:flex-1">
+              <TestimonialCard name={t.name} role={t.role} quote={t.quote} />
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+    </Section>
+  )
+}
+
+function TestimonialCard({ name, role, quote }: { name: string; role: string; quote: string }) {
+  return (
+    <div
+      style={{
+        background: 'var(--input-bg)',
+        borderTop: 'var(--input-bt)', borderLeft: 'var(--input-bl)',
+        borderRight: 'var(--input-br)', borderBottom: 'var(--input-bb)',
+        borderRadius: 'var(--input-radius)', filter: 'var(--card-filter, none)',
+        display: 'flex', flexDirection: 'column', overflow: 'hidden', height: '100%', textAlign: 'center',
+      }}
+    >
+      {/* Header — name */}
+      <div style={{ padding: '10px 16px', background: 'var(--input-header-bg)', borderBottom: '1px solid var(--input-divider)' }}>
+        <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 14, letterSpacing: 1, textTransform: 'uppercase', color: 'var(--cyan)' }}>
+          {name}
+        </span>
+      </div>
+      {/* Body — the quote */}
+      <div style={{ padding: '16px', flex: 1 }}>
+        <p style={{ fontFamily: 'var(--font-body)', fontSize: 15, lineHeight: 1.55, color: 'var(--text-body)', margin: 0 }}>
+          “{quote}”
+        </p>
+      </div>
+      {/* Footer — role, where the char count lives on a real vent card */}
+      <div style={{ padding: '8px 16px 12px', borderTop: '1px solid var(--input-divider)' }}>
+        <span style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 11, letterSpacing: 0.6, textTransform: 'uppercase', color: 'var(--text-meta)' }}>
+          {role}
+        </span>
+      </div>
+    </div>
+  )
+}
+
 function OriginStory() {
   return (
     <Section maxWidth={880}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 20, alignItems: 'center', textAlign: 'center' }}>
         <Eyebrow>Origin story</Eyebrow>
-        <H2>Why I built this</H2>
+        <H2 tone="green">Why I built this</H2>
         <Body>
           I made a mind map of my own struggles and goals — and someone close to me, a practitioner, said: <em>&ldquo;I wish all my clients did this.&rdquo;</em> That stuck.
         </Body>
@@ -606,9 +675,9 @@ function OriginStory() {
 function Investors() {
   return (
     <Section maxWidth={1040}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 24, alignItems: 'center', textAlign: 'center' }}>
         <Eyebrow>For investors and partners</Eyebrow>
-        <H2>We&apos;re building the thinking layer of the internet.</H2>
+        <H2 tone="green">We&apos;re building the thinking layer of the internet.</H2>
         <Body>
           MindShift starts with AI-powered perspective shifts and expands into a visual mind-mapping platform for self-reflection, life planning, and professional growth. We believe the next frontier isn&apos;t more information — it&apos;s better thinking.
         </Body>
@@ -620,6 +689,7 @@ function Investors() {
             margin: 0,
             display: 'flex',
             flexWrap: 'wrap',
+            justifyContent: 'center',
             gap: 24,
             fontFamily: 'var(--font-body)',
             fontSize: 13,
@@ -636,7 +706,7 @@ function Investors() {
           <li>Three themes</li>
         </ul>
 
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24, alignItems: 'center' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24, alignItems: 'center', justifyContent: 'center' }}>
           <SecondaryLink href={`mailto:${BUSINESS_CONTACT}`}>Let&apos;s talk →</SecondaryLink>
           <SecondaryLink
             href={`mailto:${BUSINESS_CONTACT}?subject=${encodeURIComponent('MindShift pitch deck request')}`}
