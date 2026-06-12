@@ -271,14 +271,14 @@ const TESTIMONIALS = [
     quote: 'I really like the historical approach — it’s not only fun, it’s educational. Such a clever touch!',
   },
   {
-    name: 'Al',
-    role: 'Early tester',
-    quote: 'Wow, these interfaces are so different — I can shift the whole mood of the app to match my own.',
-  },
-  {
     name: 'Natalie',
     role: 'Beta tester & mental-health provider',
     quote: 'This is fantastic — easy and lighthearted in a way that would genuinely make it effective with users. Bonus points for staying honest about its intentions: it never pretends to be a therapy tool.',
+  },
+  {
+    name: 'Al',
+    role: 'Early tester',
+    quote: 'Wow, these interfaces are so different — I can shift the whole mood of the app to match my own.',
   },
 ]
 
