@@ -159,7 +159,7 @@ function SecondaryLink({ href, children }: { href: string; children: React.React
         fontWeight: 700,
         fontSize: 13,
         letterSpacing: 2,
-        color: 'var(--violet)',
+        color: 'var(--pink)',
         textDecoration: 'underline',
         textUnderlineOffset: 4,
       }}
@@ -369,8 +369,8 @@ function Hero() {
         style={{ gap: 24 }}
       >
         <motion.div variants={fade} style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
-          <H1>MindShift</H1>
           <Eyebrow>The app for shifting perspective</Eyebrow>
+          <H1>MindShift</H1>
         </motion.div>
 
         <motion.div variants={fade} style={{ maxWidth: 900 }}>
@@ -677,7 +677,7 @@ function Investors() {
     <Section maxWidth={1040}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 24, alignItems: 'center', textAlign: 'center' }}>
         <Eyebrow>For investors and partners</Eyebrow>
-        <H2 tone="green">We&apos;re building the thinking layer of the internet.</H2>
+        <H2>We&apos;re building the thinking layer of the internet.</H2>
         <Body>
           MindShift starts with AI-powered perspective shifts and expands into a visual mind-mapping platform for self-reflection, life planning, and professional growth. We believe the next frontier isn&apos;t more information — it&apos;s better thinking.
         </Body>
