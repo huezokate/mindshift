@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import { ClerkProvider } from '@clerk/nextjs'
 import { ThemeProvider } from '@/lib/theme'
+import { GoogleAnalytics } from '@/components/GoogleAnalytics'
 
 const SITE_URL = 'https://minds-shift.com'
 const TITLE = 'MindShift — AI journaling that shifts your perspective'
@@ -116,6 +117,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ClerkProvider>
           <ThemeProvider>{children}</ThemeProvider>
         </ClerkProvider>
+        <GoogleAnalytics />
       </body>
     </html>
   )
