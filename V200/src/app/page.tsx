@@ -15,7 +15,6 @@ export default function LandingPage() {
   return (
     <div className="min-h-dvh" style={{ background: 'var(--bg)' }}>
       <Hero />
-      <Testimonials />
       <Waitlist />
       <OriginStory />
       <Investors />
@@ -259,84 +258,6 @@ function UserLine({ label, children }: { label: string; children: React.ReactNod
         {children}
       </span>
     </li>
-  )
-}
-
-// Beta-tester testimonials, styled as the user's vent card — a little on-brand
-// UI moment: name in the header, quote in the body, role where the char-count sits.
-const TESTIMONIALS = [
-  {
-    name: 'Many',
-    role: 'Beta tester',
-    quote: 'I really like the historical approach — it’s not only fun, it’s educational. Such a clever touch!',
-  },
-  {
-    name: 'Natalie',
-    role: 'Beta tester & mental-health provider',
-    quote: 'This is fantastic — easy and lighthearted in a way that would genuinely make it effective with users. Bonus points for staying honest about its intentions: it never pretends to be a therapy tool.',
-  },
-  {
-    name: 'Al',
-    role: 'Early tester',
-    quote: 'Wow, these interfaces are so different — I can shift the whole mood of the app to match my own.',
-  },
-]
-
-function Testimonials() {
-  return (
-    <Section maxWidth={1000}>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 8, marginBottom: 36 }}>
-        <Eyebrow>From the people testing it</Eyebrow>
-        <H2>Vented, approved.</H2>
-      </div>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: 22,
-          alignItems: 'start',
-        }}
-      >
-        {TESTIMONIALS.map(t => (
-          <TestimonialCard key={t.name} name={t.name} role={t.role} quote={t.quote} />
-        ))}
-      </div>
-    </Section>
-  )
-}
-
-function TestimonialCard({ name, role, quote }: { name: string; role: string; quote: string }) {
-  return (
-    <div
-      style={{
-        background: 'var(--input-bg)',
-        borderTop: 'var(--input-bt)', borderLeft: 'var(--input-bl)',
-        borderRight: 'var(--input-br)', borderBottom: 'var(--input-bb)',
-        borderRadius: 'var(--input-radius)', filter: 'var(--card-filter, none)',
-        display: 'flex', flexDirection: 'column', overflow: 'hidden', height: '100%',
-      }}
-    >
-      {/* Header — name (like the vent card's title bar) */}
-      <div style={{ padding: '10px 16px', background: 'var(--input-header-bg)', borderBottom: '1px solid var(--input-divider)' }}>
-        <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 14, letterSpacing: 1, textTransform: 'uppercase', color: 'var(--cyan)' }}>
-          {name}
-        </span>
-      </div>
-
-      {/* Body — the quote */}
-      <div style={{ padding: '16px', flex: 1 }}>
-        <p style={{ fontFamily: 'var(--font-body)', fontSize: 15, lineHeight: 1.55, color: 'var(--text-body)', margin: 0 }}>
-          “{quote}”
-        </p>
-      </div>
-
-      {/* Footer — role, where the character count lives on a real vent card */}
-      <div style={{ padding: '8px 16px 12px', display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid var(--input-divider)' }}>
-        <span style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 11, letterSpacing: 0.6, textTransform: 'uppercase', color: 'var(--text-meta)' }}>
-          {role}
-        </span>
-      </div>
-    </div>
   )
 }
 
