@@ -424,14 +424,14 @@ function WhoIsItFor() {
 
 function UserLine({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, textAlign: 'left' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, textAlign: 'center', alignItems: 'center' }}>
       <span
         className="uppercase"
         style={{
           fontFamily: 'var(--font-body)',
           fontWeight: 700,
-          fontSize: 11,
-          letterSpacing: 1.4,
+          fontSize: 15,
+          letterSpacing: 1.2,
           color: 'var(--violet)',
         }}
       >
