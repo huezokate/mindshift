@@ -430,7 +430,7 @@ function UserLine({ label, children }: { label: string; children: React.ReactNod
         style={{
           fontFamily: 'var(--font-body)',
           fontWeight: 700,
-          fontSize: 15,
+          fontSize: 24,
           letterSpacing: 1.2,
           color: 'var(--violet)',
         }}
@@ -440,7 +440,7 @@ function UserLine({ label, children }: { label: string; children: React.ReactNod
       <span
         style={{
           fontFamily: 'var(--font-body)',
-          fontSize: 16,
+          fontSize: 18,
           lineHeight: 1.55,
           color: 'var(--text-body)',
         }}
