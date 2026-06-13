@@ -24,7 +24,16 @@ export default function LandingPage() {
   }, [])
 
   return (
-    <div className="min-h-dvh" style={{ background: 'var(--bg)' }}>
+    <div
+      className="min-h-dvh"
+      style={{
+        backgroundColor: '#faf7f2',
+        // Same notepad lined-paper as the mindmap: red margin rule + blue ruled lines.
+        backgroundImage:
+          'linear-gradient(to right, transparent 52px, rgba(192,96,90,0.3) 52px, rgba(192,96,90,0.3) 54px, transparent 54px), repeating-linear-gradient(to bottom, transparent, transparent 37px, rgba(58,111,168,0.22) 37px, rgba(58,111,168,0.22) 38px)',
+        backgroundAttachment: 'local',
+      }}
+    >
       <Hero />
       <FigureDemo />
       <Waitlist />
