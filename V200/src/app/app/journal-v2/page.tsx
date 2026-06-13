@@ -89,7 +89,7 @@ function FooterNav({ active }: { active: 'lens' | 'journal' | 'onboarding' }) {
           <BookIcon />
           <span style={labelStyle}>Journal</span>
         </Link>
-        <Link href="/app/onboarding" style={active === 'onboarding' ? activeStyle : base}>
+        <Link href="/app/vent" style={active === 'onboarding' ? activeStyle : base}>
           <PersonIcon />
           <span style={labelStyle}>Continue</span>
         </Link>

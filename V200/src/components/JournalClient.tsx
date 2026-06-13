@@ -104,7 +104,7 @@ export default function JournalClient({ initialSessions, initialHasMore }: Props
           No entries yet. Vent something and save your first perspective.
         </p>
         <Link
-          href="/app/onboarding"
+          href="/app/vent"
           className="uppercase"
           style={{ fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 13, letterSpacing: 'var(--btn-letter-spacing, 3px)', color: 'var(--btn-color)', background: 'var(--btn-bg)', borderTop: 'var(--btn-bt)', borderLeft: 'var(--btn-bl)', borderRight: 'var(--btn-br)', borderBottom: 'var(--btn-bb)', borderRadius: 'var(--btn-radius)', padding: '14px 28px', boxShadow: 'var(--btn-shadow)', display: 'inline-block' }}
         >
