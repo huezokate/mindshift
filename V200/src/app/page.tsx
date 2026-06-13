@@ -374,13 +374,13 @@ function Hero() {
         </motion.div>
 
         <motion.div variants={fade} style={{ maxWidth: 900 }}>
-          <Body size={22}>
+          <Body size={18}>
             MindShift is journaling — but make it fun. Vent your spiral, pick a lens — Lincoln, Dolly Parton, Socrates — and get back a perspective that actually moves you. Share it, save it, or just feel less alone in your own head.
           </Body>
         </motion.div>
 
         <motion.div variants={fade} style={{ maxWidth: 760 }}>
-          <Body>
+          <Body size={18}>
             Whether you&apos;re venting to decompress, journaling to grow, or planning your next chapter — it&apos;s the thinking tool you&apos;ll actually want to open.
           </Body>
         </motion.div>
@@ -457,7 +457,7 @@ function Waitlist() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 24, textAlign: 'center', alignItems: 'center' }}>
         <Eyebrow>Don&apos;t miss what&apos;s next</Eyebrow>
         <H2>Be first in line</H2>
-        <Body>
+        <Body size={18}>
           We ship improvements every week. The mind mapping tool is coming — visual life planning across every category that matters to you. Drop your email and we&apos;ll keep you in the loop.
         </Body>
         <WaitlistForm />
@@ -661,10 +661,10 @@ function OriginStory() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 20, alignItems: 'center', textAlign: 'center' }}>
         <Eyebrow>Origin story</Eyebrow>
         <H2 tone="green">Why I built this</H2>
-        <Body>
+        <Body size={18}>
           I made a mind map of my own struggles and goals — and someone close to me, a practitioner, said: <em>&ldquo;I wish all my clients did this.&rdquo;</em> That stuck.
         </Body>
-        <Body>
+        <Body size={18}>
           MindShift started as a personal tool for thinking differently, and grew into something I wanted everyone to have. History&apos;s greatest minds shouldn&apos;t be locked in textbooks. They should be in your pocket on a bad day.
         </Body>
       </div>
@@ -678,7 +678,7 @@ function Investors() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 24, alignItems: 'center', textAlign: 'center' }}>
         <Eyebrow>For investors and partners</Eyebrow>
         <H2>We&apos;re building the thinking layer of the internet.</H2>
-        <Body>
+        <Body size={18}>
           MindShift starts with AI-powered perspective shifts and expands into a visual mind-mapping platform for self-reflection, life planning, and professional growth. We believe the next frontier isn&apos;t more information — it&apos;s better thinking.
         </Body>
 
