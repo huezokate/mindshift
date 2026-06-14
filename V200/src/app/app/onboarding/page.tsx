@@ -119,8 +119,10 @@ export default function OnboardingPage() {
                 style={{
                   background: 'transparent',
                   fontFamily: 'var(--font-body)',
-                  fontSize: 14,
-                  lineHeight: '20px',
+                  // 16px (not 14) so iOS Safari doesn't auto-zoom on focus and
+                  // leave the page stuck zoomed-in (flow correction #5).
+                  fontSize: 16,
+                  lineHeight: '22px',
                   letterSpacing: 0.52,
                   color: 'var(--text-body)',
                   caretColor: 'var(--cyan)',
@@ -197,93 +199,36 @@ export default function OnboardingPage() {
           </motion.button>
         </motion.div>
 
-        {/* Coming soon teaser */}
+        {/* Mind-map CTA + sign-up */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.16 }}
           className="flex flex-col items-center gap-4"
         >
-          {/* Coming soon card — pink borders (hcard) */}
-          <div
+          {/* Mind-mapping tool is live now — compact "try it" CTA replaces the
+              old "coming soon" banner + waitlist (flow correction #3). */}
+          <Link
+            href="/app/mindmap"
+            className="uppercase transition-opacity hover:opacity-80 inline-block text-center"
             style={{
-              background: 'var(--hcard-bg)',
-              borderTop: 'var(--hcard-bt)',
-              borderLeft: 'var(--hcard-bl)',
-              borderRight: 'var(--hcard-br)',
-              borderBottom: 'var(--hcard-bb)',
-              borderRadius: 'var(--hcard-radius)',
-              padding: '20px 24px',
-              width: '100%',
-            }}
-          >
-            <p
-              className="uppercase text-center"
-              style={{
-                fontFamily: 'var(--font-body)',
-                fontWeight: 700,
-                fontSize: 12,
-                letterSpacing: 1.32,
-                lineHeight: '14px',
-                color: 'var(--cyan)',
-                marginBottom: 8,
-              }}
-            >
-              Coming Soon
-            </p>
-            <p
-              className="uppercase text-center"
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontWeight: 700,
-                fontSize: 18,
-                letterSpacing: 1.44,
-                lineHeight: '20px',
-                color: 'var(--text-h1)',
-                marginBottom: 8,
-              }}
-            >
-              Mind-mapping tool
-            </p>
-            <p
-              className="text-center"
-              style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: 14,
-                letterSpacing: 0.52,
-                lineHeight: '20px',
-                color: 'var(--cyan)',
-                marginBottom: 8,
-              }}
-            >
-              Reflect, plan and achieve new horizons with step by step guidance
-            </p>
-            <p
-              className="uppercase text-center"
-              style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: 10,
-                letterSpacing: 1,
-                lineHeight: '12px',
-                color: 'var(--text-body)',
-              }}
-            >
-              career · health &amp; wellness · creativity · personal development · relationships · travel &amp; finances
-            </p>
-          </div>
-
-          <p
-            className="text-center w-full"
-            style={{
-              fontFamily: 'var(--font-body)',
+              fontFamily: 'var(--font-btn)',
+              fontWeight: 600,
               fontSize: 14,
-              letterSpacing: 0.52,
-              lineHeight: '20px',
-              color: 'var(--text-body)',
+              letterSpacing: 'var(--btn-letter-spacing, 3px)',
+              color: 'var(--btn-secondary2-color)',
+              background: 'var(--btn-secondary2-bg)',
+              borderTop: 'var(--btn-secondary2-bt)',
+              borderLeft: 'var(--btn-secondary2-bl)',
+              borderRight: 'var(--btn-secondary2-br)',
+              borderBottom: 'var(--btn-secondary2-bb)',
+              borderRadius: 'var(--btn-radius)',
+              padding: '14px 32px',
+              boxShadow: 'var(--btn-secondary2-shadow)',
             }}
           >
-            Get on the waitlist to be the first to know
-          </p>
+            Try the mind-mapping tool →
+          </Link>
 
           {/* Secondary button — Sign Up */}
           <Link

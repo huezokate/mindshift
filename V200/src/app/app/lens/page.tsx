@@ -286,7 +286,7 @@ export default function LensPage() {
             <button
               onClick={e => { e.stopPropagation(); prevPreview() }}
               className="absolute left-3 flex items-center justify-center flex-shrink-0"
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--cyan)', fontSize: 40, fontWeight: 700, lineHeight: 1, padding: '8px', zIndex: 51 }}
+              style={{ width: 48, height: 48, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--card-bg)', border: '2px solid var(--cyan)', cursor: 'pointer', color: 'var(--cyan)', fontSize: 30, fontWeight: 700, lineHeight: 1, zIndex: 51 }}
               aria-label="Previous figure"
             >
               ‹
@@ -394,7 +394,7 @@ export default function LensPage() {
             <button
               onClick={e => { e.stopPropagation(); nextPreview() }}
               className="absolute right-3 flex items-center justify-center flex-shrink-0"
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--cyan)', fontSize: 40, fontWeight: 700, lineHeight: 1, padding: '8px', zIndex: 51 }}
+              style={{ width: 48, height: 48, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--card-bg)', border: '2px solid var(--cyan)', cursor: 'pointer', color: 'var(--cyan)', fontSize: 30, fontWeight: 700, lineHeight: 1, zIndex: 51 }}
               aria-label="Next figure"
             >
               ›
