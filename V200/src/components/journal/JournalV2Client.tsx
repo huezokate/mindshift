@@ -3,6 +3,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import JournalPreviewCard from './JournalPreviewCard'
 import JournalHeader from './JournalHeader'
 import AppHeader from '@/components/nav/AppHeader'
+import Icon from '@/components/ui/Icon'
+import Link from 'next/link'
 import WelcomeCard from './WelcomeCard'
 import type { JournalEntry, JournalFilter } from '@/lib/journal-types'
 
@@ -163,6 +165,26 @@ export default function JournalV2Client({ initialEntries, initialHasMore, firstN
             />
           ))}
         </div>
+      )}
+
+      {/* "Vent it out" — primary CTA to start a new entry (Figma 606:7872). */}
+      {entries.length > 0 && (
+        <Link
+          href="/app/onboarding"
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            marginTop: 8, minHeight: 56, textDecoration: 'none',
+            fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 14,
+            letterSpacing: 'var(--btn-letter-spacing, 3px)', textTransform: 'uppercase',
+            color: 'var(--btn-color)', background: 'var(--btn-bg)',
+            borderTop: 'var(--btn-bt)', borderLeft: 'var(--btn-bl)',
+            borderRight: 'var(--btn-br)', borderBottom: 'var(--btn-bb)',
+            borderRadius: 'var(--btn-radius)', boxShadow: 'var(--btn-shadow)',
+            filter: 'var(--btn-filter, none)',
+          }}
+        >
+          <Icon name="add" size={20} /> Vent it out
+        </Link>
       )}
 
       {hasMore && (
