@@ -106,6 +106,8 @@ html[data-theme="notepad"] {
   --btn-br:             1.5px solid #1e1e40;
   --btn-bb:             1.5px solid #1e1e40;
   --btn-radius:         8px;
+  --cta-solid-bg:          #ffffff;
+  --cta-solid-bg-disabled: #ece8e0;
   --btn-shadow:         none;
   --btn-filter:         drop-shadow(2px 3px 0px #1e1e40);
   --btn-letter-spacing: -1px;

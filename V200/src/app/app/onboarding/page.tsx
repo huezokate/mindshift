@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import EntryAuthRow from '@/components/nav/EntryAuthRow'
 
 const MAX_CHARS = 800
 
@@ -230,28 +231,8 @@ export default function OnboardingPage() {
             Try the mind-mapping tool →
           </Link>
 
-          {/* Secondary button — Sign Up */}
-          <Link
-            href="/sign-up"
-            className="uppercase transition-opacity hover:opacity-80 inline-block text-center"
-            style={{
-              fontFamily: 'var(--font-btn)',
-              fontWeight: 600,
-              fontSize: 14,
-              letterSpacing: 'var(--btn-letter-spacing, 3px)',
-              color: 'var(--btn-secondary-color)',
-              background: 'var(--btn-secondary-bg)',
-              borderTop: 'var(--btn-secondary-bt)',
-              borderLeft: 'var(--btn-secondary-bl)',
-              borderRight: 'var(--btn-secondary-br)',
-              borderBottom: 'var(--btn-secondary-bb)',
-              borderRadius: 'var(--btn-radius)',
-              padding: '14px 32px',
-              boxShadow: 'var(--btn-secondary-shadow)',
-            }}
-          >
-            Sign Up
-          </Link>
+          {/* Auth — sign-up visible for anon, name shown when signed in (T-018-06) */}
+          <EntryAuthRow maxWidth={280} />
         </motion.div>
 
       </div>

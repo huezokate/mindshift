@@ -106,6 +106,8 @@ html[data-theme="kawaii"] {
   --btn-br:             4px solid #400b14;
   --btn-bb:             1px solid #400b14;
   --btn-radius:         32px;
+  --cta-solid-bg:          #ffe2ac;
+  --cta-solid-bg-disabled: #e8e4dc;
   --btn-shadow:         none;
   --btn-filter:         none;
   --btn-letter-spacing: 2px;

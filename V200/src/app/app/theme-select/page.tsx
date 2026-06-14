@@ -4,6 +4,9 @@ import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FIGURES, getFigureImg } from '@/lib/figures'
 import { useTheme, type Theme } from '@/lib/theme'
+import Icon from '@/components/ui/Icon'
+import CircleArrow from '@/components/ui/CircleArrow'
+import EntryAuthRow from '@/components/nav/EntryAuthRow'
 
 const ACK_KEY = 'ms_disclaimer_ack'
 
@@ -178,6 +181,9 @@ export default function ThemeSelectPage() {
         className="relative z-10 flex flex-col items-center min-h-dvh"
         style={{ padding: '32px 24px', gap: 20 }}
       >
+        {/* AUTH ROW — sign-up visible for anon, name shown when signed in */}
+        <EntryAuthRow maxWidth={376} />
+
         {/* HERO CARD — wordmark + tagline + disclaimer ack */}
         <div
           className="w-full flex flex-col items-center"
@@ -221,19 +227,31 @@ export default function ThemeSelectPage() {
             aria-hidden="true"
           />
 
-          {/* Disclaimer ack — progressive disclosure */}
-          <label className="flex items-start gap-3 cursor-pointer select-none w-full">
-            <input
-              type="checkbox"
-              checked={acknowledged}
-              onChange={toggleAck}
-              className="cursor-pointer"
+          {/* Disclaimer ack — progressive disclosure. Custom checkbox (Material
+              Symbol) instead of a native input: the native control with a cyan
+              accent on the dark bg read as pre-ticked. This renders an
+              unmistakably empty box until the user actually taps it. */}
+          <div
+            role="checkbox"
+            tabIndex={0}
+            aria-checked={acknowledged}
+            onClick={toggleAck}
+            onKeyDown={e => {
+              if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault()
+                toggleAck()
+              }
+            }}
+            className="flex items-start gap-3 cursor-pointer select-none w-full"
+          >
+            <Icon
+              name={acknowledged ? 'check_box' : 'check_box_outline_blank'}
+              fill={acknowledged ? 1 : 0}
+              size={20}
               style={{
-                width: 16,
-                height: 16,
-                accentColor: 'var(--cyan)',
                 flexShrink: 0,
-                marginTop: 2,
+                marginTop: 1,
+                color: acknowledged ? 'var(--cyan)' : 'var(--text-sub)',
               }}
             />
             <span
@@ -269,7 +287,7 @@ export default function ThemeSelectPage() {
                 {expanded ? 'Show less' : 'Learn more'}
               </button>
             </span>
-          </label>
+          </div>
 
           <AnimatePresence initial={false}>
             {expanded && (
@@ -391,25 +409,8 @@ export default function ThemeSelectPage() {
               {current.description}
             </p>
 
-            <div className="flex items-center gap-4" style={{ marginTop: 4 }}>
-              <button
-                onClick={prev}
-                className="flex items-center justify-center transition-opacity hover:opacity-70"
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: 'var(--cyan)',
-                  fontFamily: 'var(--font-display)',
-                  fontWeight: 700,
-                  fontSize: 20,
-                  lineHeight: 1,
-                  padding: '4px 8px',
-                }}
-                aria-label="Previous theme"
-              >
-                ‹
-              </button>
+            <div className="flex items-center gap-5" style={{ marginTop: 4 }}>
+              <CircleArrow direction="left" onClick={prev} aria-label="Previous theme" />
               <p
                 className="uppercase"
                 style={{
@@ -424,24 +425,7 @@ export default function ThemeSelectPage() {
               >
                 Pick your interface
               </p>
-              <button
-                onClick={next}
-                className="flex items-center justify-center transition-opacity hover:opacity-70"
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: 'var(--cyan)',
-                  fontFamily: 'var(--font-display)',
-                  fontWeight: 700,
-                  fontSize: 20,
-                  lineHeight: 1,
-                  padding: '4px 8px',
-                }}
-                aria-label="Next theme"
-              >
-                ›
-              </button>
+              <CircleArrow direction="right" onClick={next} aria-label="Next theme" />
             </div>
           </motion.div>
         </AnimatePresence>
@@ -458,9 +442,9 @@ export default function ThemeSelectPage() {
             fontSize: 14,
             letterSpacing: 'var(--btn-letter-spacing, 3px)',
             color: acknowledged ? 'var(--violet)' : 'var(--text-sub)',
-            // Hardcoded solid fills so the button never lets the figure grid show through,
-            // regardless of theme. Kawaii cream-yellow when active, neutral grey when disabled.
-            backgroundColor: acknowledged ? '#ffe2ac' : '#e8e4dc',
+            // Per-theme opaque CTA fill so the button never lets the figure grid show
+            // through. Cyberpunk black, kawaii cream, notepad paper (see --cta-solid-bg).
+            backgroundColor: acknowledged ? 'var(--cta-solid-bg)' : 'var(--cta-solid-bg-disabled)',
             borderTop: 'var(--card-bt)',
             borderLeft: 'var(--card-bl)',
             borderRight: 'var(--card-br)',
