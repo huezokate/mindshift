@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { FIGURES } from '@/lib/figures'
 import { useTheme } from '@/lib/theme'
+import Icon from '@/components/ui/Icon'
 import LensResponseCard from './LensResponseCard'
 
 type LensResponse = {
@@ -15,23 +16,6 @@ type Props = {
   ventText: string
   createdAt: string
   lensResponses: LensResponse[]
-}
-
-function ShareIcon() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style={{ display: 'block' }}>
-      <path d="M12 2.5L7.5 7H11v9h2V7h3.5L12 2.5z"/>
-      <path d="M3 13.5V20c0 .83.67 1.5 1.5 1.5h15c.83 0 1.5-.67 1.5-1.5V13.5h-2V20H5v-6.5H3z"/>
-    </svg>
-  )
-}
-
-function MindIcon() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style={{ display: 'block' }}>
-      <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7z"/>
-    </svg>
-  )
 }
 
 export default function SessionCard({ ventText, createdAt, lensResponses }: Props) {
@@ -60,7 +44,7 @@ export default function SessionCard({ ventText, createdAt, lensResponses }: Prop
             </div>
           </div>
           <button type="button" onClick={() => setExpanded(true)} style={{ background: 'var(--card-bg)', borderTop: '1px solid var(--violet)', borderLeft: '1px solid var(--violet)', borderRight: '4px solid var(--violet)', borderBottom: '4px solid var(--violet)', borderRadius: 'var(--card-radius)', padding: '8px 8px 4px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', cursor: 'pointer', color: 'var(--cyan)' }}>
-            <div style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ShareIcon /></div>
+            <div style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Icon name="ios_share" size={24} /></div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
               {figs.map((fig, i) => (
                 <div key={i} style={{ width: 48, height: 48, borderRadius: '50%', border: '1px solid var(--green)', background: 'var(--fig-avatar-grad)', overflow: 'hidden', flexShrink: 0, marginRight: i < figs.length - 1 ? -4 : 0, position: 'relative', zIndex: i + 1 }}>
@@ -85,7 +69,7 @@ export default function SessionCard({ ventText, createdAt, lensResponses }: Prop
             </div>
           </div>
           <button type="button" onClick={() => setExpanded(true)} style={{ position: 'relative', background: 'var(--lens-header-bg)', boxShadow: 'inset 4px 0 0 0 var(--violet)', borderTop: 'var(--input-bt)', borderLeft: 'var(--input-bl)', borderRight: 'var(--input-br)', borderBottom: 'var(--input-bb)', borderRadius: '32px', overflow: 'hidden', padding: '8px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', cursor: 'pointer', color: 'var(--pink)' }}>
-            <div style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ShareIcon /></div>
+            <div style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Icon name="ios_share" size={24} /></div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
               {figs.map((fig, i) => (
                 <div key={i} style={{ width: 48, height: 48, borderRadius: '50%', border: '1px solid var(--pink)', boxShadow: '0px 2px 8px 0px rgba(130,100,240,0.13)', background: 'var(--fig-avatar-grad)', overflow: 'hidden', flexShrink: 0, marginRight: i < figs.length - 1 ? -4 : 0, position: 'relative', zIndex: i + 1 }}>
@@ -110,7 +94,7 @@ export default function SessionCard({ ventText, createdAt, lensResponses }: Prop
           </div>
         </div>
         <button type="button" onClick={() => setExpanded(true)} style={{ filter: 'var(--card-filter)', background: 'var(--card-bg)', borderTop: '1.5px solid var(--green)', borderLeft: '4px solid var(--green)', borderRight: '1.5px solid var(--green)', borderBottom: '1.5px solid var(--green)', borderRadius: '8px', padding: '8px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', cursor: 'pointer', color: 'var(--text-body)' }}>
-          <div style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ShareIcon /></div>
+          <div style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Icon name="ios_share" size={24} /></div>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             {figs.map((fig, i) => (
               <div key={i} style={{ width: 48, height: 48, borderRadius: '50%', border: '2px solid var(--pink)', background: 'var(--fig-avatar-grad)', overflow: 'hidden', flexShrink: 0, marginRight: i < figs.length - 1 ? -4 : 0, position: 'relative', zIndex: i + 1 }}>
@@ -151,7 +135,7 @@ export default function SessionCard({ ventText, createdAt, lensResponses }: Prop
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <p style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 18, letterSpacing: '1.44px', lineHeight: '20px', color: 'var(--cyan)', textTransform: 'uppercase' }}>MindShift</p>
           <div style={{ width: 48, height: 48, borderRadius: '50%', border: '2px solid var(--green)', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: 'var(--green)' }}>
-            <MindIcon />
+            <Icon name="psychology" size={24} />
           </div>
           <p style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 18, letterSpacing: '1.44px', lineHeight: '20px', color: 'var(--violet)', textTransform: 'uppercase' }}>MindShift</p>
         </div>
@@ -177,7 +161,7 @@ export default function SessionCard({ ventText, createdAt, lensResponses }: Prop
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4px' }}>
           <p style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 18, letterSpacing: '1.44px', lineHeight: '20px', color: 'var(--cyan)', textTransform: 'uppercase' }}>MindShift</p>
           <div style={{ width: 48, height: 48, borderRadius: '50%', border: '2px solid var(--green)', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: 'var(--green)' }}>
-            <MindIcon />
+            <Icon name="psychology" size={24} />
           </div>
           <p style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 18, letterSpacing: '1.44px', lineHeight: '20px', color: 'var(--violet)', textTransform: 'uppercase' }}>MindShift</p>
         </div>
@@ -202,7 +186,7 @@ export default function SessionCard({ ventText, createdAt, lensResponses }: Prop
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4px' }}>
         <p style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 18, letterSpacing: '1.44px', lineHeight: '20px', color: 'var(--cyan)', textTransform: 'uppercase' }}>MindShift</p>
         <div style={{ width: 48, height: 48, borderRadius: '50%', border: '2px solid var(--green)', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: 'var(--green)' }}>
-          <MindIcon />
+          <Icon name="psychology" size={24} />
         </div>
         <p style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 18, letterSpacing: '1.44px', lineHeight: '20px', color: 'var(--violet)', textTransform: 'uppercase' }}>MindShift</p>
       </div>
