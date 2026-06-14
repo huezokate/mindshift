@@ -3,3 +3,8 @@
 .lisa.toml
 .lisa-layout.kdl
 *.mov
+
+# Nested git worktrees (separate branches live here — not tracked by this one)
+/website
+/journal
+/mindmap
