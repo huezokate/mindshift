@@ -2,35 +2,10 @@ import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import JournalClient from '@/components/JournalClient'
+import Icon from '@/components/ui/Icon'
 import Link from 'next/link'
 
 const PAGE_SIZE = 10
-
-// ─── SVG icons ────────────────────────────────────────────────────────────────
-
-function CameraIcon() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style={{ display: 'block', flexShrink: 0 }}>
-      <path d="M20 5h-2.83L15 3H9L6.83 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-8 13c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.65 0-3 1.35-3 3s1.35 3 3 3 3-1.35 3-3-1.35-3-3-3z"/>
-    </svg>
-  )
-}
-
-function BookIcon() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style={{ display: 'block', flexShrink: 0 }}>
-      <path d="M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zm0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z"/>
-    </svg>
-  )
-}
-
-function PersonIcon() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style={{ display: 'block', flexShrink: 0 }}>
-      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-    </svg>
-  )
-}
 
 // ─── Footer nav ───────────────────────────────────────────────────────────────
 
@@ -75,15 +50,15 @@ function FooterNav({ active }: { active: 'lens' | 'journal' | 'onboarding' }) {
     <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, display: 'flex', justifyContent: 'center', background: 'var(--bg)', borderTop: '1px solid rgba(255,255,255,0.06)', zIndex: 50 }}>
       <div style={{ width: '100%', maxWidth: 440, display: 'flex', gap: 4, padding: '0 4px', height: 72 }}>
         <Link href="/app/lens" style={active === 'lens' ? activeStyle : base}>
-          <CameraIcon />
+          <Icon name="camera" size={24} />
           <span style={labelStyle}>Try another Lens</span>
         </Link>
         <Link href="/app/journal" style={active === 'journal' ? activeStyle : base}>
-          <BookIcon />
+          <Icon name="auto_stories" size={24} />
           <span style={labelStyle}>Journal</span>
         </Link>
         <Link href="/app/onboarding" style={active === 'onboarding' ? activeStyle : base}>
-          <PersonIcon />
+          <Icon name="person" size={24} />
           <span style={labelStyle}>Continue</span>
         </Link>
       </div>
