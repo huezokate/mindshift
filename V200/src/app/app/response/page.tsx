@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
+import { motion, useAnimationControls } from 'framer-motion'
 import { useUser } from '@clerk/nextjs'
 import { FIGURES, getFigureImg } from '@/lib/figures'
 import { useTheme } from '@/lib/theme'
@@ -79,6 +79,7 @@ export default function ResponsePage() {
   const [response, setResponse] = useState('')
   const [displayed, setDisplayed] = useState('')
   const [done, setDone] = useState(false)
+  const saveControls = useAnimationControls()
 
   useEffect(() => {
     const figureId = sessionStorage.getItem('ms_figure_id')
@@ -129,6 +130,12 @@ export default function ResponsePage() {
       const data = await res.json()
       sessionStorage.setItem('ms_session_id', data.sessionId)
       setSaveState('saved')
+      // Pop the bookmark, then route to the freshly-saved entry's detail page.
+      await saveControls.start({
+        scale: [1, 1.3, 0.92, 1],
+        transition: { duration: 0.42, times: [0, 0.4, 0.7, 1], ease: 'easeOut' },
+      })
+      router.push(`/app/journal-v2/${data.sessionId}`)
     } catch {
       setSaveState('error')
     }
@@ -287,9 +294,15 @@ export default function ResponsePage() {
             className="flex gap-2 justify-end w-full"
           >
             {/* Save to journal */}
-            <button onClick={handleSave} title={saveState === 'saved' ? 'Saved!' : 'Save to journal'} style={iconBtn(saveState === 'saved')}>
+            <motion.button
+              onClick={handleSave}
+              animate={saveControls}
+              whileTap={{ scale: 0.95 }}
+              title={saveState === 'saved' ? 'Saved!' : 'Save to journal'}
+              style={iconBtn(saveState === 'saved')}
+            >
               <IconBookmark />
-            </button>
+            </motion.button>
             {/* Decorate — stickers coming soon, disabled */}
             <button
               disabled
