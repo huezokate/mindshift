@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useUser } from '@clerk/nextjs'
 import { FIGURES, getFigureImg } from '@/lib/figures'
 import { useTheme } from '@/lib/theme'
+import Icon from '@/components/ui/Icon'
+import CircularArrow from '@/components/ui/CircularArrow'
 
 // Returns 'vents' if daily vent limit hit, 'lenses' if per-vent lens limit hit, null if OK
 function checkAnonLimits(ventText: string): 'vents' | 'lenses' | null {
@@ -282,16 +284,6 @@ export default function LensPage() {
             style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(2px)', padding: '24px' }}
             onClick={() => setPreviewIndex(null)}
           >
-            {/* Left arrow */}
-            <button
-              onClick={e => { e.stopPropagation(); prevPreview() }}
-              className="absolute left-3 flex items-center justify-center flex-shrink-0"
-              style={{ width: 48, height: 48, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--card-bg)', border: '2px solid var(--cyan)', cursor: 'pointer', color: 'var(--cyan)', fontSize: 30, fontWeight: 700, lineHeight: 1, zIndex: 51 }}
-              aria-label="Previous figure"
-            >
-              ‹
-            </button>
-
             {/* Detail card */}
             <AnimatePresence mode="wait">
               <motion.div
@@ -314,17 +306,29 @@ export default function LensPage() {
                   boxShadow: 'var(--card-shadow)',
                 }}
               >
-                {/* Portrait */}
-                <div
-                  className="overflow-hidden flex-shrink-0"
-                  style={{
-                    width: 120, height: 120, borderRadius: '50%',
-                    background: 'var(--fig-avatar-grad)',
-                    border: 'var(--fig-avatar-border)',
-                    boxShadow: 'var(--fig-avatar-shadow)',
-                  }}
-                >
-                  <img src={getFigureImg(previewing, theme)} alt={previewing.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%', display: 'block' }} />
+                {/* Portrait + in-popup nav arrows (shared CircularArrow) */}
+                <div className="flex items-center justify-between w-full">
+                  <CircularArrow
+                    direction="prev"
+                    ariaLabel="Previous figure"
+                    onClick={e => { e.stopPropagation(); prevPreview() }}
+                  />
+                  <div
+                    className="overflow-hidden flex-shrink-0"
+                    style={{
+                      width: 120, height: 120, borderRadius: '50%',
+                      background: 'var(--fig-avatar-grad)',
+                      border: 'var(--fig-avatar-border)',
+                      boxShadow: 'var(--fig-avatar-shadow)',
+                    }}
+                  >
+                    <img src={getFigureImg(previewing, theme)} alt={previewing.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%', display: 'block' }} />
+                  </div>
+                  <CircularArrow
+                    direction="next"
+                    ariaLabel="Next figure"
+                    onClick={e => { e.stopPropagation(); nextPreview() }}
+                  />
                 </div>
 
                 {/* Name */}
@@ -351,10 +355,11 @@ export default function LensPage() {
                 <div className="flex gap-3 w-full" style={{ marginTop: 4 }}>
                   <button
                     onClick={() => setPreviewIndex(null)}
-                    className="flex-1 uppercase text-center"
+                    className="flex-1 uppercase flex items-center justify-center"
                     style={{
                       fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 13,
                       letterSpacing: 'var(--btn-letter-spacing, 2px)',
+                      gap: 6,
                       color: 'var(--btn-secondary-color, var(--text-body))',
                       background: 'var(--btn-secondary-bg)',
                       borderTop: 'var(--btn-bt)', borderLeft: 'var(--btn-bl)',
@@ -363,7 +368,8 @@ export default function LensPage() {
                       boxShadow: 'var(--btn-secondary-shadow)', cursor: 'pointer',
                     }}
                   >
-                    ← Back
+                    <Icon name="arrow_back" size={16} />
+                    Back
                   </button>
                   <button
                     onClick={() => {
@@ -389,16 +395,6 @@ export default function LensPage() {
                 </div>
               </motion.div>
             </AnimatePresence>
-
-            {/* Right arrow */}
-            <button
-              onClick={e => { e.stopPropagation(); nextPreview() }}
-              className="absolute right-3 flex items-center justify-center flex-shrink-0"
-              style={{ width: 48, height: 48, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--card-bg)', border: '2px solid var(--cyan)', cursor: 'pointer', color: 'var(--cyan)', fontSize: 30, fontWeight: 700, lineHeight: 1, zIndex: 51 }}
-              aria-label="Next figure"
-            >
-              ›
-            </button>
           </motion.div>
         )}
       </AnimatePresence>
