@@ -1,6 +1,8 @@
 'use client'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import EntryCard from './EntryCard'
+import JournalPreviewCard from './JournalPreviewCard'
+import JournalHeader from './JournalHeader'
+import WelcomeCard from './WelcomeCard'
 import type { JournalEntry, JournalFilter } from '@/lib/journal-types'
 
 const PAGE_SIZE = 10
@@ -8,6 +10,9 @@ const PAGE_SIZE = 10
 type Props = {
   initialEntries: JournalEntry[]
   initialHasMore: boolean
+  // First name for the personalized header. Route passes the Clerk user's name;
+  // QA harness passes a sample. Falls back to "Your Journal" when absent.
+  firstName?: string | null
 }
 
 type TabBtnProps = {
@@ -25,7 +30,8 @@ function TabBtn({ value, label, current, onSelect }: TabBtnProps) {
       onClick={() => onSelect(value)}
       style={{
         flex: 1,
-        padding: '8px 12px',
+        padding: '10px 12px',
+        minHeight: 44,
         background: 'transparent',
         border: 'none',
         borderBottom: active ? '2px solid var(--cyan)' : '2px solid transparent',
@@ -43,7 +49,7 @@ function TabBtn({ value, label, current, onSelect }: TabBtnProps) {
   )
 }
 
-export default function JournalV2Client({ initialEntries, initialHasMore }: Props) {
+export default function JournalV2Client({ initialEntries, initialHasMore, firstName }: Props) {
   const [entries, setEntries] = useState<JournalEntry[]>(initialEntries)
   const [hasMore, setHasMore] = useState(initialHasMore)
   const [filter, setFilter] = useState<JournalFilter>('all')
@@ -90,7 +96,7 @@ export default function JournalV2Client({ initialEntries, initialHasMore }: Prop
     return () => obs.disconnect()
   }, [hasMore, filter, fetchPage, entries.length])
 
-  async function runSeed() {
+  const runSeed = useCallback(async () => {
     if (seeding) return
     setSeeding(true)
     setSeedMsg(null)
@@ -108,59 +114,51 @@ export default function JournalV2Client({ initialEntries, initialHasMore }: Prop
     } finally {
       setSeeding(false)
     }
-  }
+  }, [seeding, filter, fetchPage])
+
+  // Tapping the lens footer opens the lens picker — stubbed for now. The real
+  // popup is the next task; this hook is where it drops in.
+  const handleAddLens = useCallback((entryId: string) => {
+    // eslint-disable-next-line no-console
+    console.log('[journal] add lens to entry', entryId)
+  }, [])
 
   return (
     <div className="flex flex-col gap-4">
+      <JournalHeader firstName={firstName} />
+
       <div style={{ display: 'flex', borderBottom: '1px solid rgba(127,127,127,0.15)' }}>
         <TabBtn value="all" label="All entries" current={filter} onSelect={handleSelectFilter} />
         <TabBtn value="favorites" label="Favorites" current={filter} onSelect={handleSelectFilter} />
       </div>
 
       {entries.length === 0 && !loading && (
-        <div className="flex flex-col items-center gap-4 text-center" style={{ paddingTop: 24 }}>
-          <p style={{
-            fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--text-sub)',
-            lineHeight: '20px', letterSpacing: '0.52px',
-          }}>
-            {filter === 'favorites'
-              ? 'Nothing saved yet. Tap the star on a lens response to keep it here.'
-              : 'Nothing here yet. Save your first perspective, or load a demo to look around.'}
-          </p>
-          {filter === 'all' && (
-            <button
-              type="button"
-              onClick={runSeed}
-              disabled={seeding}
-              style={{
-                fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 13,
-                letterSpacing: 'var(--btn-letter-spacing, 3px)',
-                color: 'var(--btn-color)', background: 'var(--btn-bg)',
-                borderTop: 'var(--btn-bt)', borderLeft: 'var(--btn-bl)',
-                borderRight: 'var(--btn-br)', borderBottom: 'var(--btn-bb)',
-                borderRadius: 'var(--btn-radius)', padding: '14px 28px',
-                boxShadow: 'var(--btn-shadow)', cursor: seeding ? 'wait' : 'pointer',
-                textTransform: 'uppercase',
-              }}
-            >
-              {seeding ? 'Loading demo…' : 'Load 10-entry demo'}
-            </button>
-          )}
-          {seedMsg && (
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--text-meta)' }}>
-              {seedMsg}
+        filter === 'favorites' ? (
+          <div className="flex flex-col items-center gap-4 text-center" style={{ paddingTop: 24 }}>
+            <p style={{
+              fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--text-sub)',
+              lineHeight: '20px', letterSpacing: '0.52px',
+            }}>
+              Nothing saved yet. Tap the star on a lens response to keep it here.
             </p>
-          )}
-        </div>
+          </div>
+        ) : (
+          // First-run / empty state — welcome card per Figma, demo-seed preserved.
+          <WelcomeCard onLoadDemo={runSeed} seeding={seeding} seedMsg={seedMsg} />
+        )
       )}
 
-      {entries.map(entry => (
-        <EntryCard
-          key={entry.id}
-          entry={entry}
-          onDelete={id => setEntries(prev => prev.filter(e => e.id !== id))}
-        />
-      ))}
+      {entries.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {entries.map(entry => (
+            <JournalPreviewCard
+              key={entry.id}
+              entry={entry}
+              onAddLens={handleAddLens}
+            />
+          ))}
+        </div>
+      )}
 
       {hasMore && (
         <div ref={sentinelRef} style={{ display: 'flex', justifyContent: 'center', padding: '16px 0' }}>
@@ -186,7 +184,7 @@ export default function JournalV2Client({ initialEntries, initialHasMore }: Prop
             letterSpacing: '1.5px', color: 'var(--text-meta)',
             background: 'transparent', border: '1px dashed rgba(127,127,127,0.3)',
             borderRadius: 2, padding: '8px 12px', cursor: seeding ? 'wait' : 'pointer',
-            textTransform: 'uppercase',
+            textTransform: 'uppercase', minHeight: 44,
           }}
         >
           {seeding ? 'Resetting…' : 'Reset demo entries'}

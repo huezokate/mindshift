@@ -73,14 +73,25 @@ html[data-theme="notepad"] {
   --input-header-bg:     #f0efe9;
   --input-header-shadow: none;
 
-  /* Secondary button — cream bg, no shadow, same borders as primary */
-  --btn-secondary-bg:     #f0efe9;
+  /* Secondary button — green underline (top + bottom border only) */
+  --btn-secondary-bg:     transparent;
   --btn-secondary-shadow: none;
-  --btn-secondary-color:  #1e1e40;
-  --btn-secondary-bt:     var(--btn-bt);
-  --btn-secondary-bl:     var(--btn-bl);
-  --btn-secondary-br:     var(--btn-br);
-  --btn-secondary-bb:     var(--btn-bb);
+  --btn-secondary-color:  #7d9e7d;
+  --btn-secondary-bt:     1px solid #7d9e7d;
+  --btn-secondary-bl:     none;
+  --btn-secondary-br:     none;
+  --btn-secondary-bb:     1px solid #7d9e7d;
+  --btn-secondary-radius: 0;
+
+  /* Secondary 2 button — red underline */
+  --btn-secondary2-bg:     transparent;
+  --btn-secondary2-shadow: none;
+  --btn-secondary2-color:  #c0605a;
+  --btn-secondary2-bt:     1px solid #c0605a;
+  --btn-secondary2-bl:     none;
+  --btn-secondary2-br:     none;
+  --btn-secondary2-bb:     1px solid #c0605a;
+  --btn-secondary2-radius: 0;
 
   /* Figure avatar */
   --fig-avatar-border: 1.5px solid #3a6fa8;
@@ -104,6 +115,18 @@ html[data-theme="notepad"] {
   /* Lens response card */
   --lens-header-bg: #fef5f5;
   --lens-quote-color: var(--cyan);
+
+  /* Journal preview-card body text — notepad keeps its standard body color. */
+  --preview-body: var(--text-body);
+
+  /* Share-count chip — amber (#7d9e7d) is green here, identical to the lens
+     footer. Use a muted ochre that's distinct and paper-appropriate. */
+  --share-accent: #b07d3a;
+
+  /* Portrait treatment — no notepad portrait set exists, so calm the
+     cyberpunk neon faces for cream paper: desaturate, warm with sepia,
+     lift contrast slightly so features still read. */
+  --portrait-filter: grayscale(0.55) sepia(0.35) contrast(0.95) brightness(1.02);
 
   /* Theme switcher — flat / brutalist tabs */
   --sw-bg:           transparent;

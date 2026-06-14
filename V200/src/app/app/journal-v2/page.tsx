@@ -1,4 +1,4 @@
-import { auth } from '@clerk/nextjs/server'
+import { auth, currentUser } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { getSupabaseAdmin } from '@/lib/supabase'
@@ -102,6 +102,9 @@ export default async function JournalV2Page() {
   const { userId } = await auth()
   if (!userId) redirect('/sign-in?redirect_url=/app/journal-v2')
 
+  const user = await currentUser()
+  const firstName = user?.firstName ?? null
+
   const db = getSupabaseAdmin()
   const { data } = await db
     .from('vent_sessions')
@@ -140,31 +143,11 @@ export default async function JournalV2Page() {
 
   return (
     <div className="min-h-dvh flex flex-col items-center" style={{ background: 'var(--bg)' }}>
-      <div className="flex flex-col gap-4 w-full" style={{ maxWidth: 440, padding: '32px 20px 100px' }}>
-
-        <div style={{
-          background: 'var(--hcard-bg)',
-          borderTop: 'var(--hcard-bt)', borderLeft: 'var(--hcard-bl)',
-          borderRight: 'var(--hcard-br)', borderBottom: 'var(--hcard-bb)',
-          borderRadius: 'var(--hcard-radius)', padding: 'var(--hcard-padding)',
-        }}>
-          <p className="uppercase text-center" style={{
-            fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 28,
-            letterSpacing: 2, color: 'var(--cyan)', lineHeight: 1,
-          }}>
-            Journal
-          </p>
-          <p className="text-center" style={{
-            fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--text-sub)',
-            marginTop: 6, letterSpacing: '0.4px',
-          }}>
-            Save it. Star what helps. Share what&apos;s worth saying out loud.
-          </p>
-        </div>
-
+      <div className="flex flex-col gap-4 w-full" style={{ maxWidth: 440, padding: '16px 20px 100px' }}>
         <JournalV2Client
           initialEntries={initialEntries}
           initialHasMore={initialHasMore}
+          firstName={firstName}
         />
       </div>
 

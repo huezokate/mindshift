@@ -7,7 +7,16 @@ export type Figure = {
   bio: string
   imgKawaii: string
   imgCyberpunk: string
+  imgNotepad: string
   systemPrompt: string
+}
+
+// Portrait asset for a figure in the active theme. Each theme has its own art:
+// cyberpunk = neon, kawaii = pastel, notepad = pencil-sketch on cream.
+export function portraitFor(fig: Figure, theme: string): string {
+  if (theme === 'kawaii') return fig.imgKawaii
+  if (theme === 'notepad') return fig.imgNotepad
+  return fig.imgCyberpunk
 }
 
 export const FIGURES: Figure[] = [
@@ -20,6 +29,7 @@ export const FIGURES: Figure[] = [
     bio: 'Socrates never wrote a single word, yet his method of relentless questioning gave birth to Western philosophy. He was sentenced to death for it — and drank the hemlock without flinching.',
     imgKawaii: '/portraits/kawaii/socrates.png',
     imgCyberpunk: '/portraits/cyberpunk/socrates.png',
+    imgNotepad: '/portraits/notepad/socrates.png',
     systemPrompt: 'You are Socrates, the ancient Greek philosopher. Respond by asking probing questions that help the person examine their own assumptions. Use the Socratic method — never give direct answers, only questions that illuminate truth.',
   },
   {
@@ -31,6 +41,7 @@ export const FIGURES: Figure[] = [
     bio: 'Lincoln led the United States through its bloodiest crisis and signed the Emancipation Proclamation — abolishing slavery — despite losing almost every election he entered before becoming president.',
     imgKawaii: '/portraits/kawaii/a-lincoln.png',
     imgCyberpunk: '/portraits/cyberpunk/a-lincoln.png',
+    imgNotepad: '/portraits/notepad/a-lincoln.png',
     systemPrompt: 'You are Abraham Lincoln. Respond with quiet strength, wit, and moral clarity. Draw on your experience of persisting through setbacks, political opposition, and personal grief. Speak plainly and honestly.',
   },
   {
@@ -42,6 +53,7 @@ export const FIGURES: Figure[] = [
     bio: 'Dolly Parton turned down the Presidential Medal of Freedom twice because she felt she hadn\'t earned it yet — then went on to fund the Moderna COVID vaccine research that saved millions of lives.',
     imgKawaii: '/portraits/kawaii/dolly-parton.png',
     imgCyberpunk: '/portraits/cyberpunk/dolly-parton.png',
+    imgNotepad: '/portraits/notepad/dolly-parton.png',
     systemPrompt: 'You are Dolly Parton. Respond with warmth, humor, and hard-won wisdom. Be encouraging and grounded. Reference your experience rising from poverty in rural Tennessee through pure talent and authenticity.',
   },
   {
@@ -53,6 +65,7 @@ export const FIGURES: Figure[] = [
     bio: 'Maya Angelou survived childhood trauma that left her mute for five years — then became the first Black woman to have a non-fiction bestseller and read a poem at a presidential inauguration.',
     imgKawaii: '/portraits/kawaii/maya-angelou.png',
     imgCyberpunk: '/portraits/cyberpunk/maya-angelou.png',
+    imgNotepad: '/portraits/notepad/maya-angelou.png',
     systemPrompt: 'You are Maya Angelou. Respond with poetic wisdom, warmth, and fierce self-possession. Reference transformation, the power of words, and rising above trauma. Use rich, evocative language.',
   },
   {
@@ -64,6 +77,7 @@ export const FIGURES: Figure[] = [
     bio: 'Nelson Mandela spent 27 years in prison for fighting apartheid, then walked out and led South Africa\'s first fully democratic election — winning it, and becoming president without a trace of bitterness.',
     imgKawaii: '/portraits/kawaii/n-mandela.png',
     imgCyberpunk: '/portraits/cyberpunk/n-mandela.png',
+    imgNotepad: '/portraits/notepad/n-mandela.png',
     systemPrompt: 'You are Nelson Mandela. Respond with grace, patience, and long-term perspective. Draw on 27 years of imprisonment and your commitment to reconciliation. Focus on what endures beyond short-term pain.',
   },
   {
@@ -75,6 +89,7 @@ export const FIGURES: Figure[] = [
     bio: 'On December 1st, 1955, Rosa Parks refused to give up her seat on a Montgomery bus — a single quiet act that ignited the 381-day Montgomery Bus Boycott and reshaped the civil rights movement.',
     imgKawaii: '/portraits/kawaii/rosa-parks.png',
     imgCyberpunk: '/portraits/cyberpunk/rosa-parks.png',
+    imgNotepad: '/portraits/notepad/rosa-parks.png',
     systemPrompt: 'You are Rosa Parks. Respond with quiet dignity, courage, and conviction. Reference the power of a single act of resistance and the importance of knowing your own worth. Be measured but firm.',
   },
   {
@@ -86,6 +101,7 @@ export const FIGURES: Figure[] = [
     bio: 'After a near-fatal bus accident left her bedridden, Frida Kahlo taught herself to paint lying down using a mirror rigged above her bed — producing work that now sells for over $34 million.',
     imgKawaii: '/portraits/kawaii/frida-kahlo.png',
     imgCyberpunk: '/portraits/cyberpunk/frida-kahlo.png',
+    imgNotepad: '/portraits/notepad/frida-kahlo.png',
     systemPrompt: 'You are Frida Kahlo. Respond with raw honesty, passion, and creative defiance. Reference transforming physical and emotional pain into art. Encourage the person to express what they feel without apology.',
   },
   {
@@ -97,6 +113,7 @@ export const FIGURES: Figure[] = [
     bio: 'Che Guevara was a trained physician who left a comfortable career to lead guerrilla revolutions across three continents — his face became the most reproduced image in the history of photography.',
     imgKawaii: '/portraits/kawaii/che-guevara.png',
     imgCyberpunk: '/portraits/cyberpunk/che-guevara.png',
+    imgNotepad: '/portraits/notepad/che-guevara.png',
     systemPrompt: 'You are Che Guevara. Respond with revolutionary conviction and a challenge to the status quo. Question whether the person is truly fighting for what they believe in, or accepting the system as given.',
   },
   {
@@ -108,6 +125,7 @@ export const FIGURES: Figure[] = [
     bio: 'Ching Shih commanded over 1,800 ships and 80,000 pirates — more than most world navies of her era — and negotiated her own retirement deal with the Chinese government rather than ever being defeated.',
     imgKawaii: '/portraits/kawaii/ching-shih.png',
     imgCyberpunk: '/portraits/cyberpunk/ching-shih.png',
+    imgNotepad: '/portraits/notepad/ching-shih.png',
     systemPrompt: 'You are Ching Shih, who commanded over 1800 ships and 80,000 pirates. Respond with strategic clarity and pragmatic ruthlessness. Focus on power dynamics, negotiation, and outmaneuvering obstacles.',
   },
   {
@@ -119,6 +137,7 @@ export const FIGURES: Figure[] = [
     bio: 'Gandhi led a 240-mile march to the sea to make salt in defiance of British law — a single non-violent act that cracked the foundation of one of history\'s largest empires and inspired liberation movements worldwide.',
     imgKawaii: '/portraits/kawaii/m-gandhi.png',
     imgCyberpunk: '/portraits/cyberpunk/m-gandhi.png',
+    imgNotepad: '/portraits/notepad/m-gandhi.png',
     systemPrompt: 'You are Mahatma Gandhi. Respond with gentleness, principled conviction, and the philosophy of nonviolent resistance. Focus on inner transformation as the prerequisite to outer change.',
   },
   {
@@ -130,6 +149,7 @@ export const FIGURES: Figure[] = [
     bio: 'Napoleon rose from Corsican obscurity to conquer most of Europe by age 35, personally overseeing battles using military tactics still studied in academies today — including a 47,000-troop pincer move at Austerlitz considered his masterpiece.',
     imgKawaii: '/portraits/kawaii/napoleon.png',
     imgCyberpunk: '/portraits/cyberpunk/napoleon.png',
+    imgNotepad: '/portraits/notepad/napoleon.png',
     systemPrompt: 'You are Napoleon Bonaparte. Respond with tactical brilliance, ruthless ambition, and confidence. Analyze the strategic position, identify the enemy\'s weakness, and recommend bold decisive action.',
   },
   {
@@ -141,6 +161,7 @@ export const FIGURES: Figure[] = [
     bio: 'Dalí turned his own paranoia into a painting method — the "paranoiac-critical" technique — producing The Persistence of Memory in just two hours on an afternoon when he had a headache and his wife went to the cinema.',
     imgKawaii: '/portraits/kawaii/salvador-dali.png',
     imgCyberpunk: '/portraits/cyberpunk/salvador-dali.png',
+    imgNotepad: '/portraits/notepad/salvador-dali.png',
     systemPrompt: 'You are Salvador Dalí. Respond by dissolving the rational and revealing the absurd truth underneath. Use surreal metaphors, unexpected juxtapositions, and a theatrical sense of self. Be eccentric and provocative.',
   },
   {
@@ -152,6 +173,7 @@ export const FIGURES: Figure[] = [
     bio: 'Chuck Norris held a 9-to-5 job loading aircraft at March Air Force Base while secretly training in Tang Soo Do — then went on to become the only Westerner in history to be awarded an 8th-degree Black Belt Grand Master in that discipline.',
     imgKawaii: '/portraits/kawaii/chuck-norris.png',
     imgCyberpunk: '/portraits/cyberpunk/chuck-norris.png',
+    imgNotepad: '/portraits/notepad/chuck-norris.png',
     systemPrompt: 'You are Chuck Norris. Respond with no-nonsense toughness and military-style discipline. Cut through excuses, demand accountability, and remind them that the only way out is through hard work.',
   },
   {
@@ -163,6 +185,7 @@ export const FIGURES: Figure[] = [
     bio: 'Donald Trump turned a $1 million loan into a real-estate empire, went bankrupt six times, then leveraged his celebrity brand into the White House — becoming the first person in U.S. history elected president with no prior government or military service.',
     imgKawaii: '/portraits/kawaii/d-trump.png',
     imgCyberpunk: '/portraits/cyberpunk/d-trump.png',
+    imgNotepad: '/portraits/notepad/d-trump.png',
     systemPrompt: 'You are Donald Trump. Respond with maximum confidence, superlatives, and deal-making energy. Reframe everything as a negotiation. Tell them they need to WIN, and outline your personal approach to dominating the situation.',
   },
   {
@@ -174,6 +197,7 @@ export const FIGURES: Figure[] = [
     bio: 'Lenin masterminded the October Revolution of 1917 in a single night, toppling the Russian Provisional Government and creating the world\'s first communist state — an event that reshaped the political map of the entire 20th century.',
     imgKawaii: '/portraits/kawaii/v-lenin.png',
     imgCyberpunk: '/portraits/cyberpunk/v-lenin.png',
+    imgNotepad: '/portraits/notepad/v-lenin.png',
     systemPrompt: 'You are Vladimir Lenin. Respond by analyzing power structures and recommending radical restructuring. Question who benefits from the current situation, and advocate for dismantling what is not working in favor of something fundamentally different.',
   },
 ]

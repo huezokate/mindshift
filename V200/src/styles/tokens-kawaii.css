@@ -78,14 +78,25 @@ html[data-theme="kawaii"] {
   --input-header-bg: #e5fcfa;
   --input-header-shadow: inset 4px 0 0 0 #49dbc8;
 
-  /* Secondary button — mint bg, teal shadow, same dark borders as primary */
+  /* Secondary button — mint bg, teal inset shadow */
   --btn-secondary-bg:     #e5fcfa;
   --btn-secondary-shadow: inset 4px 0 0 0 #49dbc8;
   --btn-secondary-color:  #270007;
-  --btn-secondary-bt:     var(--btn-bt);
-  --btn-secondary-bl:     var(--btn-bl);
-  --btn-secondary-br:     var(--btn-br);
-  --btn-secondary-bb:     var(--btn-bb);
+  --btn-secondary-bt:     1px solid #400b14;
+  --btn-secondary-bl:     2px solid #400b14;
+  --btn-secondary-br:     4px solid #400b14;
+  --btn-secondary-bb:     1px solid #400b14;
+  --btn-secondary-radius: 32px;
+
+  /* Secondary 2 button — pink bg, pink inset shadow */
+  --btn-secondary2-bg:     #ffe1ff;
+  --btn-secondary2-shadow: inset 4px 0 0 0 #ff50c5;
+  --btn-secondary2-color:  #270007;
+  --btn-secondary2-bt:     1px solid #400b14;
+  --btn-secondary2-bl:     2px solid #400b14;
+  --btn-secondary2-br:     4px solid #400b14;
+  --btn-secondary2-bb:     1px solid #400b14;
+  --btn-secondary2-radius: 32px;
 
   /* CTA button — warm yellow, dark text, Fredoka */
   --btn-bg:             #ffe2ac;
@@ -101,10 +112,21 @@ html[data-theme="kawaii"] {
   --btn-dis-color:      rgba(39,0,7,0.3);
   --btn-dis-border:     rgba(64,11,20,0.2);
 
+  /* Journal preview-card body text — kawaii keeps its standard body color. */
+  --preview-body: var(--text-body);
+
   /* Lens response card header background (light lavender-pink) */
   --lens-header-bg: #ffe1ff;
   /* Lens response card quote text color (deep magenta) */
   --lens-quote-color: #cf006f;
+
+  /* Share-count chip — pale amber (#ffe2ac) is invisible on white, so use a
+     warm honey-amber that reads on the card and stays distinct from the
+     magenta/teal lens accents. */
+  --share-accent: #c98a1a;
+
+  /* Portrait treatment — kawaii has its own portrait set, no filter needed. */
+  --portrait-filter: none;
 
   /* Theme switcher — pill style */
   --sw-bg:           rgba(255,255,255,0.4);

@@ -80,7 +80,7 @@
   --input-header-bg: rgba(0,245,255,0.06);
   --input-header-shadow: none;
 
-  /* Secondary button */
+  /* Secondary button — pink */
   --btn-secondary-bg:     transparent;
   --btn-secondary-shadow: none;
   --btn-secondary-color:  var(--pink);
@@ -88,6 +88,17 @@
   --btn-secondary-bl:     1px solid var(--pink);
   --btn-secondary-br:     2px solid var(--pink);
   --btn-secondary-bb:     2px solid var(--pink);
+  --btn-secondary-radius: 2px;
+
+  /* Secondary 2 button — cyan */
+  --btn-secondary2-bg:     transparent;
+  --btn-secondary2-shadow: none;
+  --btn-secondary2-color:  var(--cyan);
+  --btn-secondary2-bt:     1px solid var(--cyan);
+  --btn-secondary2-bl:     1px solid var(--cyan);
+  --btn-secondary2-br:     2px solid var(--cyan);
+  --btn-secondary2-bb:     2px solid var(--cyan);
+  --btn-secondary2-radius: 2px;
 
   /* Figure avatar */
   --fig-avatar-border: 2px solid var(--green);
@@ -111,6 +122,18 @@
   /* Lens response card */
   --lens-header-bg: rgba(0,245,255,0.04);
   --lens-quote-color: var(--cyan);
+
+  /* Journal preview-card body text. Figma 574:5939 uses "C Header green"
+     (#EEFFEA) for the vent body on cyberpunk — distinct from --text-body
+     (#E0F7FF). kawaii/notepad keep their existing body color. */
+  --preview-body: #EEFFEA;
+
+  /* Share-count chip — distinct from the green lens footer. Warm amber reads
+     legibly on the dark cyberpunk surface. */
+  --share-accent: var(--amber);
+
+  /* Portrait treatment — none in cyberpunk (neon portraits are native here). */
+  --portrait-filter: none;
 
   /* Theme switcher */
   --sw-bg: rgba(0,0,0,0.3);

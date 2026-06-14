@@ -1,8 +1,9 @@
 'use client'
 import { useState } from 'react'
-import { FIGURES } from '@/lib/figures'
+import { FIGURES, portraitFor } from '@/lib/figures'
 import { useTheme } from '@/lib/theme'
 import ShareSheet from './ShareSheet'
+import { relativeTime } from '@/lib/relative-time'
 import type { LensResponseV2, SharePlatform } from '@/lib/journal-types'
 
 type Props = {
@@ -20,15 +21,10 @@ const PLATFORM_LABEL: Record<SharePlatform, string> = {
   download: 'Downloaded',
 }
 
-function relativeTime(iso: string): string {
-  const t = new Date(iso).getTime()
-  const diff = (Date.now() - t) / 1000
-  if (diff < 60) return 'just now'
-  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`
-  if (diff < 86400 * 30) return `${Math.floor(diff / 86400)}d ago`
-  if (diff < 86400 * 365) return `${Math.floor(diff / (86400 * 30))}mo ago`
-  return `${Math.floor(diff / (86400 * 365))}y ago`
+// "just now" stays as-is; everything else gets " ago" appended for the share log.
+function relativeTimeAgo(iso: string): string {
+  const t = relativeTime(iso)
+  return t === 'just now' ? t : `${t} ago`
 }
 
 function StarIcon({ filled }: { filled: boolean }) {
@@ -55,7 +51,7 @@ export default function LensCard({ response, ventText, isEntryPublic }: Props) {
   const isKawaii = theme === 'kawaii'
   const isCyberpunk = theme === 'cyberpunk'
   const fig = FIGURES.find(f => f.id === response.figure_id)
-  const portrait = fig ? (isKawaii ? fig.imgKawaii : fig.imgCyberpunk) : null
+  const portrait = fig ? portraitFor(fig, theme) : null
 
   const [isFavorite, setIsFavorite] = useState(response.is_favorite)
   const [shares, setShares] = useState(response.shares ?? [])
@@ -138,7 +134,7 @@ export default function LensCard({ response, ventText, isEntryPublic }: Props) {
           <span style={{ color: 'var(--cyan)', fontWeight: 700 }}>
             {PLATFORM_LABEL[s.platform]}
           </span>
-          <span style={{ color: 'var(--text-meta)' }}> · {relativeTime(s.shared_at)}</span>
+          <span style={{ color: 'var(--text-meta)' }}> · {relativeTimeAgo(s.shared_at)}</span>
         </span>
       ))}
     </div>
@@ -218,20 +214,22 @@ export default function LensCard({ response, ventText, isEntryPublic }: Props) {
             </p>
             {headerActions}
           </div>
-          <div style={{ padding: 16 }}>
+          {/* Body — Figma 397:3671 p-[16px], 10px gap, Courier 14px/20 / 0.52.
+              Quote pink centered (482:2501), body cyan (397:3672). */}
+          <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
             {fig?.quote && (
               <p style={{
-                fontFamily: 'var(--font-body)', fontStyle: 'italic',
-                fontSize: 13, lineHeight: '18px', letterSpacing: '0.4px',
-                color: 'var(--cyan)', textAlign: 'center',
-                margin: '0 0 12px 0',
+                fontFamily: 'var(--font-body)',
+                fontSize: 14, lineHeight: '20px', letterSpacing: '0.52px',
+                color: 'var(--pink)', textAlign: 'center',
+                margin: 0,
               }}>
                 &ldquo;{fig.quote}&rdquo;
               </p>
             )}
             <p style={{
               fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '20px',
-              letterSpacing: '0.52px', color: 'var(--text-sub)', margin: 0,
+              letterSpacing: '0.52px', color: 'var(--cyan)', margin: 0,
             }}>
               {response.response_text}
             </p>
