@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { FIGURES, portraitFor } from '@/lib/figures'
+import Icon from '@/components/ui/Icon'
 import { useTheme } from '@/lib/theme'
 import ShareSheet from './ShareSheet'
 import { relativeTime } from '@/lib/relative-time'
@@ -25,25 +26,6 @@ const PLATFORM_LABEL: Record<SharePlatform, string> = {
 function relativeTimeAgo(iso: string): string {
   const t = relativeTime(iso)
   return t === 'just now' ? t : `${t} ago`
-}
-
-function StarIcon({ filled }: { filled: boolean }) {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24"
-      fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={2}
-      style={{ display: 'block' }}>
-      <path d="M12 2l2.9 6.9 7.1.6-5.4 4.7 1.6 7L12 17.8 5.8 21.2l1.6-7L2 9.5l7.1-.6L12 2z" />
-    </svg>
-  )
-}
-
-function ShareIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style={{ display: 'block' }}>
-      <path d="M18 8a3 3 0 1 0-2.83-4H15A3 3 0 0 0 17 6.17V8a3 3 0 0 0 1 0z" />
-      <path d="M18 6a2 2 0 1 1-2 2 2 2 0 0 1 2-2zm0 10a2 2 0 1 1-2 2 2 2 0 0 1 2-2zM8 12a2 2 0 1 1-2-2 2 2 0 0 1 2 2zm7.1 4.2L9 12.7a3 3 0 0 0 0-1.4l6.1-3.5a3 3 0 1 0-1-1.7L8 9.6a3 3 0 1 0 0 4.8l6.1 3.5a3 3 0 1 0 1-1.7z" />
-    </svg>
-  )
 }
 
 export default function LensCard({ response, ventText, isEntryPublic }: Props) {
@@ -156,7 +138,7 @@ export default function LensCard({ response, ventText, isEntryPublic }: Props) {
           display: 'flex',
         }}
       >
-        <StarIcon filled={isFavorite} />
+        <Icon name="star" fill={isFavorite ? 1 : 0} size={20} />
       </button>
       <button
         type="button"
@@ -172,7 +154,7 @@ export default function LensCard({ response, ventText, isEntryPublic }: Props) {
           display: 'flex',
         }}
       >
-        <ShareIcon />
+        <Icon name="ios_share" size={18} />
       </button>
     </div>
   )
