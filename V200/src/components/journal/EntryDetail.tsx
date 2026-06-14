@@ -86,29 +86,39 @@ export default function EntryDetail({ entry }: Props) {
   )
 
   // notepad gets the offset drop-shadow on an OUTER wrapper (overflow rule).
+  // Vent unit (Figma 606:7786): column, items-end. The vent card carries
+  // mb-[-4px] so the right-aligned "+Lens" button overlaps its bottom by 4px.
   const ventCardWrapped = (
-    <div style={{ width: '100%', position: 'relative', filter: isCyberpunk || isKawaii ? 'none' : 'var(--card-filter)' }}>
-      {ventCard}
-      {/* "+ Lens" — add a lens to this entry (Figma 602:6511). Opens the lens
-          picker (stubbed until T-018-04). */}
+    <div style={{
+      width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-end',
+    }}>
+      <div style={{
+        width: '100%', marginBottom: -4, position: 'relative', zIndex: 1,
+        filter: isCyberpunk || isKawaii ? 'none' : 'var(--card-filter)',
+      }}>
+        {ventCard}
+      </div>
+      {/* "+ Lens" — add a lens to this entry (Figma 602:6511); opens the lens
+          picker (stubbed until T-018-04). Right-aligned, -4px over the card. */}
       <button
         type="button"
         onClick={() => { /* eslint-disable-next-line no-console */ console.log('[journal] add lens to entry', entry.id) }}
         aria-label="Add a lens to this entry"
         style={{
-          position: 'absolute', right: 10, bottom: 10,
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
+          position: 'relative', zIndex: 2,
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
           background: 'var(--bg)',
           borderTop: '4px solid var(--green)', borderLeft: '4px solid var(--green)',
           borderRight: '1px solid var(--green)', borderBottom: '1px solid var(--green)',
           borderRadius: 2, color: 'var(--green)', cursor: 'pointer',
-          padding: '6px 10px', minHeight: 44,
+          padding: '8px 9px 5px 12px', minHeight: 44,
+          filter: isCyberpunk || isKawaii ? 'none' : 'var(--card-filter)',
         }}
       >
-        <Icon name="add" size={20} />
+        <Icon name="add" size={24} />
         <span style={{
-          fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 11,
-          letterSpacing: '1.5px', textTransform: 'uppercase', lineHeight: 1,
+          fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 14,
+          letterSpacing: '3px', textTransform: 'uppercase', lineHeight: '16px',
         }}>Lens</span>
       </button>
     </div>
@@ -226,13 +236,17 @@ export default function EntryDetail({ entry }: Props) {
   // ── Lens carousel item: LensCard + its button row. ──────────────────────────
   function lensItem(lens: LensResponseV2) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <LensCard
-          response={lens}
-          ventText={entry.vent_text}
-          isEntryPublic={entry.is_public}
-        />
-        {buttonRow(lens)}
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        {/* lens card mb-[-4px] so the button row overlaps its bottom by 4px
+            (Figma 602:6446). */}
+        <div style={{ marginBottom: -4, position: 'relative', zIndex: 1 }}>
+          <LensCard
+            response={lens}
+            ventText={entry.vent_text}
+            isEntryPublic={entry.is_public}
+          />
+        </div>
+        <div style={{ position: 'relative', zIndex: 2 }}>{buttonRow(lens)}</div>
       </div>
     )
   }
@@ -243,7 +257,7 @@ export default function EntryDetail({ entry }: Props) {
 
       <div style={{
         display: 'flex', flexDirection: 'column', gap: 16,
-        padding: '0 16px', width: '100%',
+        padding: '0 24px', width: '100%',
       }}>
         {ventCardWrapped}
 
@@ -276,7 +290,7 @@ export default function EntryDetail({ entry }: Props) {
                 // the Figma geometry: 24px side padding (scroll-padding snaps
                 // cards to the 24px inset), 8px gap, card = 100%-48px so the
                 // next card peeks ~16px (Figma 602:6521).
-                marginLeft: -16, marginRight: -16,
+                marginLeft: -24, marginRight: -24,
                 paddingLeft: 24, paddingRight: 24,
                 scrollPaddingLeft: 24, scrollPaddingRight: 24,
               }}
