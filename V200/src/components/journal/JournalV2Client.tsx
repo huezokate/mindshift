@@ -4,6 +4,7 @@ import JournalPreviewCard from './JournalPreviewCard'
 import JournalHeader from './JournalHeader'
 import AppHeader from '@/components/nav/AppHeader'
 import Icon from '@/components/ui/Icon'
+import { useTheme } from '@/lib/theme'
 import Link from 'next/link'
 import WelcomeCard from './WelcomeCard'
 import type { JournalEntry, JournalFilter } from '@/lib/journal-types'
@@ -53,6 +54,9 @@ function TabBtn({ value, label, current, onSelect }: TabBtnProps) {
 }
 
 export default function JournalV2Client({ initialEntries, initialHasMore, firstName }: Props) {
+  const { theme } = useTheme()
+  const isCyberpunk = theme === 'cyberpunk'
+  const isKawaii = theme === 'kawaii'
   const [entries, setEntries] = useState<JournalEntry[]>(initialEntries)
   const [hasMore, setHasMore] = useState(initialHasMore)
   const [filter, setFilter] = useState<JournalFilter>('all')
@@ -167,23 +171,59 @@ export default function JournalV2Client({ initialEntries, initialHasMore, firstN
         </div>
       )}
 
-      {/* "Vent it out" — primary CTA to start a new entry (Figma 606:7872). */}
+      {/* "Vent it out" — primary CTA to start a new entry (Figma 606:7872).
+          Composite: an "add" Button-Primary (open-bottom, w-120) raised on a green
+          rule so it reads as breaking through the line, with a "Vent it out" label
+          bar below. Whole composite is one Link → /app/onboarding. Token-driven so
+          all three themes follow; notepad gets its offset drop-shadow via filter. */}
       {entries.length > 0 && (
         <Link
           href="/app/onboarding"
+          aria-label="Vent it out — start a new entry"
           style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-            marginTop: 8, minHeight: 56, textDecoration: 'none',
-            fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 14,
-            letterSpacing: 'var(--btn-letter-spacing, 3px)', textTransform: 'uppercase',
-            color: 'var(--btn-color)', background: 'var(--btn-bg)',
-            borderTop: 'var(--btn-bt)', borderLeft: 'var(--btn-bl)',
-            borderRight: 'var(--btn-br)', borderBottom: 'var(--btn-bb)',
-            borderRadius: 'var(--btn-radius)', boxShadow: 'var(--btn-shadow)',
-            filter: 'var(--btn-filter, none)',
+            display: 'flex', flexDirection: 'column', alignItems: 'center',
+            width: '100%', marginTop: 8, textDecoration: 'none',
           }}
         >
-          <Icon name="add" size={20} /> Vent it out
+          {/* icon button raised on a rule (Figma 606:7864) */}
+          <div style={{
+            display: 'flex', alignItems: 'flex-end', width: '100%', isolation: 'isolate',
+          }}>
+            <span aria-hidden style={{
+              flex: 1, height: 4, minWidth: 1, marginRight: -4,
+              background: 'var(--green)', position: 'relative', zIndex: 3,
+            }} />
+            <div style={{
+              width: 120, marginRight: -4, position: 'relative', zIndex: 2,
+              background: 'var(--bg)',
+              borderTop: '4px solid var(--green)', borderLeft: '4px solid var(--green)',
+              borderRight: '1px solid var(--green)', // open bottom — meets the label bar
+              borderRadius: 2, color: 'var(--green)',
+              display: 'flex', flexDirection: 'column',
+              alignItems: 'center', justifyContent: 'flex-end',
+              padding: '8px 9px 0 12px',
+              filter: isCyberpunk || isKawaii ? 'none' : 'var(--card-filter)',
+            }}>
+              <Icon name="add" size={24} />
+            </div>
+            <span aria-hidden style={{
+              flex: 1, height: 1, minWidth: 1,
+              background: 'var(--green)', position: 'relative', zIndex: 1,
+            }} />
+          </div>
+          {/* label bar (Figma 606:7869) */}
+          <div style={{
+            width: '100%', background: 'var(--bg)', borderRadius: 2,
+            display: 'flex', justifyContent: 'center', padding: '0 8px 8px',
+          }}>
+            <span style={{
+              fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 14,
+              letterSpacing: '3px', lineHeight: '16px', textTransform: 'uppercase',
+              textAlign: 'center', color: 'var(--green)',
+            }}>
+              Vent it out
+            </span>
+          </div>
         </Link>
       )}
 

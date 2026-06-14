@@ -1,7 +1,7 @@
 // Renders a 1080x1350 share card to a canvas, then returns a PNG Blob.
 // Pure DOM canvas API — no html2canvas dep.
 
-import { FIGURES } from '@/lib/figures'
+import { FIGURES, portraitFor } from '@/lib/figures'
 
 type Theme = 'cyberpunk' | 'kawaii' | 'notepad'
 
@@ -150,7 +150,7 @@ export async function renderQuoteCard(opts: QuoteCardOptions): Promise<Blob> {
 
   // Portrait
   if (fig) {
-    const portraitSrc = theme === 'kawaii' ? fig.imgKawaii : fig.imgCyberpunk
+    const portraitSrc = portraitFor(fig, theme)
     const img = await loadImage(portraitSrc)
     const avatarSize = 144
     const avatarX = contentX

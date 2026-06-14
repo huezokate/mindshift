@@ -169,62 +169,58 @@ export default function EntryDetail({ entry }: Props) {
   // carries an "upcoming" chip pulled over its top-right corner via the Figma
   // mr-[-72px] trick. Socials is the only live action → opens ShareSheet.
   function buttonRow(lens: LensResponseV2) {
-    // Button Primary — border t-4 l-4 r b green, rounded 2px (Figma 602:6457).
-    const btnBase = {
+    // Three EQUAL buttons filling the row (Figma 602:6448) — no -72px overlap
+    // trick (that collided), so the row never breaks. Active = green border +
+    // label; disabled (Chat/Decorate) = genuinely muted (var(--text-muted), not
+    // just 60% opacity) with an "upcoming" chip pinned to the top-right corner.
+    const btnBase = (active: boolean) => ({
+      position: 'relative' as const,
+      flex: 1, minWidth: 0,
       background: 'var(--bg)',
-      borderTop: '4px solid var(--green)',
-      borderLeft: '4px solid var(--green)',
-      borderRight: '1px solid var(--green)',
-      borderBottom: '1px solid var(--green)',
+      borderTop: `4px solid var(${active ? '--green' : '--text-muted'})`,
+      borderLeft: `4px solid var(${active ? '--green' : '--text-muted'})`,
+      borderRight: `1px solid var(${active ? '--green' : '--text-muted'})`,
+      borderBottom: `1px solid var(${active ? '--green' : '--text-muted'})`,
       borderRadius: 2,
-      color: 'var(--green)',
+      color: `var(${active ? '--green' : '--text-muted'})`,
       display: 'flex', flexDirection: 'column' as const,
       alignItems: 'center', justifyContent: 'center', gap: 4,
-      // Figma pt-[8px] pr-[9px] pb-[5px] pl-[12px].
-      padding: '8px 9px 5px 12px',
-    }
+      padding: '10px 6px 6px', minHeight: 56,
+      cursor: active ? 'pointer' : 'not-allowed',
+    })
 
     const btnLabel = {
-      fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 14,
-      letterSpacing: '3px', lineHeight: '16px',
+      fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 12,
+      letterSpacing: '1.2px', lineHeight: '14px',
       textTransform: 'uppercase' as const, textAlign: 'center' as const,
     }
 
-    // Disabled coming-soon button + its overlapping "upcoming" chip. The button
-    // pulls -72px right (Figma mr-[-72px]) so the trailing chip lands over its
-    // top-right corner; items-start keeps the chip pinned to the top edge.
-    const comingSoon = (
-      icon: React.ReactNode,
-      label: string,
-    ) => (
-      <div style={{ display: 'flex', alignItems: 'flex-start', flexShrink: 0 }}>
-        <button
-          type="button"
-          disabled
-          aria-disabled="true"
-          title={`${label} — coming soon`}
-          style={{ ...btnBase, marginRight: -72, opacity: 0.6, cursor: 'not-allowed' }}
-        >
-          {icon}
-          <span style={btnLabel}>{label}</span>
-        </button>
-        <UpcomingChip />
-      </div>
+    const comingSoon = (icon: React.ReactNode, label: string) => (
+      <button
+        type="button"
+        disabled
+        aria-disabled="true"
+        title={`${label} — coming soon`}
+        style={btnBase(false)}
+      >
+        <span style={{ position: 'absolute', top: -8, right: -4, zIndex: 1 }}>
+          <UpcomingChip />
+        </span>
+        {icon}
+        <span style={btnLabel}>{label}</span>
+      </button>
     )
 
     return (
-      <div style={{
-        display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end',
-        gap: 4, width: '100%',
-      }}>
+      <div style={{ display: 'flex', alignItems: 'stretch', gap: 4, width: '100%' }}>
         {comingSoon(<Icon name="comic_bubble" size={24} />, 'Chat with lens')}
         {comingSoon(<Icon name="palette" size={24} />, 'Decorate')}
-        {/* Socials — active, opens ShareSheet. ~57px tall ≥ 44px tap target. */}
+        {/* Socials — the only live action → opens ShareSheet. */}
         <button
           type="button"
           onClick={() => setShareLens(lens)}
           aria-label="Share this lens to social media"
-          style={{ ...btnBase, flexShrink: 0, cursor: 'pointer' }}
+          style={btnBase(true)}
         >
           <Icon name="ios_share" size={24} />
           <span style={btnLabel}>Socials</span>
