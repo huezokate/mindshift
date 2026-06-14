@@ -5,6 +5,7 @@ import { motion, useAnimationControls } from 'framer-motion'
 import { useUser } from '@clerk/nextjs'
 import { FIGURES, getFigureImg } from '@/lib/figures'
 import { useTheme } from '@/lib/theme'
+import Icon from '@/components/ui/Icon'
 
 const MAX_CHARS = 800
 const DEMO_FIGURE = FIGURES[0]
@@ -12,62 +13,6 @@ const DEMO_VENT =
   "I keep second-guessing my career choice. Everyone around me seems so sure about what they're doing, but I'm constantly wondering if I chose the right path."
 const DEMO_RESPONSE =
   'The unexamined life is not worth living — and you, my friend, are doing the examining. Every doubt you feel is a sign of an active mind. Most who seem certain have simply stopped asking questions. Your hesitation is not weakness; it is wisdom in its earliest form.'
-
-function IconBookmark() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
-    </svg>
-  )
-}
-function IconShare() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
-      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-    </svg>
-  )
-}
-function IconPalette() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="13.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
-      <circle cx="17.5" cy="10.5" r="1" fill="currentColor" stroke="none" />
-      <circle cx="8.5" cy="7.5" r="1" fill="currentColor" stroke="none" />
-      <circle cx="6.5" cy="12.5" r="1" fill="currentColor" stroke="none" />
-      <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.477-1.125-.29-.289-.47-.684-.47-1.125a1.64 1.64 0 011.648-1.688h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" />
-    </svg>
-  )
-}
-function IconRefresh() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 102.13-9.36L1 10" />
-    </svg>
-  )
-}
-function IconNote() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" />
-    </svg>
-  )
-}
-function IconChat() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
-    </svg>
-  )
-}
-function IconCamera() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
-      <circle cx="12" cy="13" r="4" />
-    </svg>
-  )
-}
 
 export default function ResponsePage() {
   const router = useRouter()
@@ -225,7 +170,7 @@ export default function ResponsePage() {
             Mindshift
           </p>
           <span style={{ color: 'var(--text-sub)' }}>
-            <IconCamera />
+            <Icon name="camera" size={22} />
           </span>
           <p className="uppercase" style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 18, letterSpacing: 1.5, lineHeight: '22px', color: 'var(--cyan)' }}>
             Mindshift
@@ -301,7 +246,7 @@ export default function ResponsePage() {
               title={saveState === 'saved' ? 'Saved!' : 'Save to journal'}
               style={iconBtn(saveState === 'saved')}
             >
-              <IconBookmark />
+              <Icon name="bookmark" size={20} />
             </motion.button>
             {/* Decorate — stickers coming soon, disabled */}
             <button
@@ -309,11 +254,11 @@ export default function ResponsePage() {
               title="Decorate (coming soon)"
               style={{ ...iconBtn(), opacity: 0.3, cursor: 'not-allowed' }}
             >
-              <IconPalette />
+              <Icon name="palette" size={20} />
             </button>
             {/* Share via native share sheet (SMS, socials) */}
             <button onClick={handleShare} title="Share" style={iconBtn()}>
-              <IconShare />
+              <Icon name="ios_share" size={20} />
             </button>
           </motion.div>
         )}
@@ -345,7 +290,7 @@ export default function ResponsePage() {
             boxShadow: 'var(--btn-secondary-shadow)', cursor: 'pointer',
           }}
         >
-          <IconRefresh />
+          <Icon name="refresh" size={18} />
           Try another
         </button>
 
@@ -364,7 +309,7 @@ export default function ResponsePage() {
             boxShadow: 'var(--btn-shadow)', cursor: 'pointer',
           }}
         >
-          <IconNote />
+          <Icon name="note_add" size={18} />
           New
         </button>
 
@@ -382,7 +327,7 @@ export default function ResponsePage() {
             boxShadow: 'var(--btn-secondary-shadow)', cursor: 'pointer',
           }}
         >
-          <IconChat />
+          <Icon name="forum" size={18} />
           Converse
         </button>
       </div>
