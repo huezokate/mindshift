@@ -7,6 +7,7 @@
 
 import { useEffect, useState } from 'react'
 import { useTheme, type Theme } from '@/lib/theme'
+import AppHeader from '@/components/nav/AppHeader'
 import JournalHeader from '@/components/journal/JournalHeader'
 import JournalPreviewCard from '@/components/journal/JournalPreviewCard'
 import WelcomeCard from '@/components/journal/WelcomeCard'
@@ -246,7 +247,8 @@ export default function JournalPreviewPage() {
           {showWelcome ? 'Show populated feed' : 'Show first-run / welcome state'}
         </button>
 
-        {/* Personalized header — QA uses the "Kate" sample. */}
+        {/* App nav bar + personalized sub-label — QA uses the "Kate" sample. */}
+        <AppHeader entryCount={10} lensCount={18} mindmapHorizon="5 year" mindmapProgress="41% progress" />
         <JournalHeader firstName="Kate" />
 
         {showWelcome ? (

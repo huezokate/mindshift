@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import JournalPreviewCard from './JournalPreviewCard'
 import JournalHeader from './JournalHeader'
+import AppHeader from '@/components/nav/AppHeader'
 import WelcomeCard from './WelcomeCard'
 import type { JournalEntry, JournalFilter } from '@/lib/journal-types'
 
@@ -125,6 +126,10 @@ export default function JournalV2Client({ initialEntries, initialHasMore, firstN
 
   return (
     <div className="flex flex-col gap-4">
+      <AppHeader
+        entryCount={entries.length}
+        lensCount={entries.reduce((n, e) => n + e.lens_responses.length, 0)}
+      />
       <JournalHeader firstName={firstName} />
 
       <div style={{ display: 'flex', borderBottom: '1px solid rgba(127,127,127,0.15)' }}>
