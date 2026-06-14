@@ -6,6 +6,7 @@ import { useUser } from '@clerk/nextjs'
 import { FIGURES, getFigureImg } from '@/lib/figures'
 import { useTheme } from '@/lib/theme'
 import Icon from '@/components/ui/Icon'
+import AppHeader from '@/components/nav/AppHeader'
 
 const MAX_CHARS = 800
 const DEMO_FIGURE = FIGURES[0]
@@ -95,33 +96,25 @@ export default function ResponsePage() {
     }
   }
 
-  function handleNew() {
-    sessionStorage.removeItem('ms_session_id')
-    router.push('/app/onboarding')
-  }
-
-  const iconBtn = (active = false): React.CSSProperties => ({
-    width: 54, height: 54, flexShrink: 0,
+  // Flat, transparent icon buttons matching the journal lens-card button row
+  // (LensCard.tsx headerActions) — no pill chrome. Active accent applied inline.
+  const actionBtn: React.CSSProperties = {
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    borderRadius: '50%',
-    background: active ? 'var(--cyan)' : 'var(--btn-bg)',
-    borderTop: 'var(--btn-bt)',
-    borderLeft: 'var(--btn-bl)',
-    borderRight: 'var(--btn-br)',
-    borderBottom: 'var(--btn-bb)',
-    boxShadow: 'var(--btn-shadow)',
-    color: active ? 'var(--bg)' : 'var(--btn-color)',
-    cursor: 'pointer',
-    transition: 'background 0.15s, color 0.15s',
-  })
+    background: 'transparent', border: 'none', padding: 6,
+    cursor: 'pointer', color: 'var(--text-muted)',
+    transition: 'color 0.15s',
+  }
 
   return (
     <div className="min-h-dvh flex flex-col" style={{ background: 'var(--bg)' }}>
 
+      {/* Top nav — header dropdown replaces the old footer (FigJam 95:2228) */}
+      <AppHeader />
+
       {/* Scrollable content */}
       <div
         className="flex flex-col gap-4 w-full mx-auto flex-1"
-        style={{ maxWidth: 440, padding: '24px 24px 100px' }}
+        style={{ maxWidth: 440, padding: '24px 24px 32px' }}
       >
 
         {/* 1 — User quote */}
@@ -159,25 +152,7 @@ export default function ResponsePage() {
           </div>
         </motion.div>
 
-        {/* 2 — Brand bar */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.08 }}
-          className="flex items-center justify-between w-full px-1"
-        >
-          <p className="uppercase" style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 18, letterSpacing: 1.5, lineHeight: '22px', color: 'var(--violet)' }}>
-            Mindshift
-          </p>
-          <span style={{ color: 'var(--text-sub)' }}>
-            <Icon name="camera" size={22} />
-          </span>
-          <p className="uppercase" style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 18, letterSpacing: 1.5, lineHeight: '22px', color: 'var(--cyan)' }}>
-            Mindshift
-          </p>
-        </motion.div>
-
-        {/* 3 — Lens response card */}
+        {/* 2 — Lens response card */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -231,12 +206,12 @@ export default function ResponsePage() {
           </div>
         </motion.div>
 
-        {/* 4 — Quick action icons */}
+        {/* 3 — Quick action icons (lens-card button-row idiom) */}
         {done && (
           <motion.div
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex gap-2 justify-end w-full"
+            className="flex gap-1 justify-end w-full"
           >
             {/* Save to journal */}
             <motion.button
@@ -244,7 +219,7 @@ export default function ResponsePage() {
               animate={saveControls}
               whileTap={{ scale: 0.95 }}
               title={saveState === 'saved' ? 'Saved!' : 'Save to journal'}
-              style={iconBtn(saveState === 'saved')}
+              style={{ ...actionBtn, color: saveState === 'saved' ? 'var(--cyan)' : 'var(--text-muted)' }}
             >
               <Icon name="bookmark" size={20} />
             </motion.button>
@@ -252,12 +227,12 @@ export default function ResponsePage() {
             <button
               disabled
               title="Decorate (coming soon)"
-              style={{ ...iconBtn(), opacity: 0.3, cursor: 'not-allowed' }}
+              style={{ ...actionBtn, opacity: 0.3, cursor: 'not-allowed' }}
             >
               <Icon name="palette" size={20} />
             </button>
             {/* Share via native share sheet (SMS, socials) */}
-            <button onClick={handleShare} title="Share" style={iconBtn()}>
+            <button onClick={handleShare} title="Share" style={actionBtn}>
               <Icon name="ios_share" size={20} />
             </button>
           </motion.div>
@@ -269,67 +244,6 @@ export default function ResponsePage() {
           </p>
         )}
 
-      </div>
-
-      {/* 5 — Footer action bar */}
-      <div
-        className="fixed bottom-0 left-0 right-0 z-20 flex gap-1"
-        style={{ padding: '4px', background: 'var(--bg)' }}
-      >
-        <button
-          onClick={() => router.push('/app/lens')}
-          className="flex-1 flex items-center justify-center gap-2 uppercase"
-          style={{
-            fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 13,
-            letterSpacing: 'var(--btn-letter-spacing, 2px)',
-            color: 'var(--btn-secondary-color, var(--text-body))',
-            background: 'var(--btn-secondary-bg)',
-            borderTop: 'var(--btn-bt)', borderLeft: 'var(--btn-bl)',
-            borderRight: 'var(--btn-br)', borderBottom: 'var(--btn-bb)',
-            borderRadius: 'var(--btn-radius)', padding: '12px 8px',
-            boxShadow: 'var(--btn-secondary-shadow)', cursor: 'pointer',
-          }}
-        >
-          <Icon name="refresh" size={18} />
-          Try another
-        </button>
-
-        <button
-          onClick={handleNew}
-          className="flex items-center justify-center gap-2 uppercase"
-          style={{
-            flexShrink: 0,
-            fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 13,
-            letterSpacing: 'var(--btn-letter-spacing, 2px)',
-            color: 'var(--btn-color)',
-            background: 'var(--btn-bg)',
-            borderTop: 'var(--btn-bt)', borderLeft: 'var(--btn-bl)',
-            borderRight: 'var(--btn-br)', borderBottom: 'var(--btn-bb)',
-            borderRadius: 'var(--btn-radius)', padding: '12px 16px',
-            boxShadow: 'var(--btn-shadow)', cursor: 'pointer',
-          }}
-        >
-          <Icon name="note_add" size={18} />
-          New
-        </button>
-
-        <button
-          onClick={() => router.push('/app/journal')}
-          className="flex-1 flex items-center justify-center gap-2 uppercase"
-          style={{
-            fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 13,
-            letterSpacing: 'var(--btn-letter-spacing, 2px)',
-            color: 'var(--btn-secondary-color, var(--text-body))',
-            background: 'var(--btn-secondary-bg)',
-            borderTop: 'var(--btn-bt)', borderLeft: 'var(--btn-bl)',
-            borderRight: 'var(--btn-br)', borderBottom: 'var(--btn-bb)',
-            borderRadius: 'var(--btn-radius)', padding: '12px 8px',
-            boxShadow: 'var(--btn-secondary-shadow)', cursor: 'pointer',
-          }}
-        >
-          <Icon name="forum" size={18} />
-          Converse
-        </button>
       </div>
 
     </div>
