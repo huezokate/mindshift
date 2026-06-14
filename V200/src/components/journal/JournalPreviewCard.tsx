@@ -3,6 +3,8 @@ import { useRouter } from 'next/navigation'
 import { FIGURES, portraitFor } from '@/lib/figures'
 import { useTheme } from '@/lib/theme'
 import type { JournalEntry, SharePlatform } from '@/lib/journal-types'
+import Icon from '@/components/ui/Icon'
+import SocialIcon from './SocialIcon'
 
 type Props = {
   entry: JournalEntry
@@ -19,62 +21,6 @@ function formatDateLabel(iso: string): string {
   return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`
 }
 
-// ── Share glyph (left of footer) — Material ios_share, traced (Figma 574:5941).
-function ShareGlyph() {
-  return (
-    <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor" aria-hidden style={{ display: 'block' }}>
-      <path d="M16 5l-1.42 1.42-1.59-1.59V16h-1.98V4.83L9.42 6.42 8 5l4-4 4 4zm4 5v11c0 1.1-.9 2-2 2H6c-1.11 0-2-.9-2-2V10c0-1.11.89-2 2-2h3v2H6v11h12V10h-3V8h3c1.1 0 2 .89 2 2z" />
-    </svg>
-  )
-}
-
-// Inline arrow for the "Apply a lens →" CTA on no-lens footers.
-function ArrowIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden style={{ display: 'block' }}>
-      <path d="M5 12h14M13 6l6 6-6 6" />
-    </svg>
-  )
-}
-
-// ── Social-platform indicator glyphs ────────────────────────────────────────
-// Rendered under each avatar for platforms the entry's lenses were shared to
-// (Figma SocialMediaShareIcons, 579:6073 etc.). currentColor so they inherit
-// the accent slot per theme. 12px inside a 16px chip.
-function PlatformGlyph({ platform }: { platform: SharePlatform }) {
-  switch (platform) {
-    case 'instagram':
-      return (
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden style={{ display: 'block' }}>
-          <rect x="3" y="3" width="18" height="18" rx="5" />
-          <circle cx="12" cy="12" r="4" />
-          <circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none" />
-        </svg>
-      )
-    case 'tiktok':
-      return (
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden style={{ display: 'block' }}>
-          <path d="M16 3c.3 2.1 1.6 3.7 3.7 4v2.6c-1.4 0-2.7-.4-3.7-1.1v5.9c0 3.3-2.6 5.6-5.6 5.6S4.8 17.7 4.8 14.5c0-3 2.4-5.4 5.5-5.4.3 0 .5 0 .8.1v2.7c-.3-.1-.5-.1-.8-.1-1.5 0-2.8 1.2-2.8 2.7s1.3 2.7 2.8 2.7 2.8-1.2 2.8-2.7V3H16z" />
-        </svg>
-      )
-    case 'facebook':
-      return (
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden style={{ display: 'block' }}>
-          <path d="M14 6.5h2.5V3.2C16 3.1 14.9 3 13.6 3 10.9 3 9 4.6 9 7.6V10H6v3.4h3V22h3.6v-8.6H15l.5-3.4h-2.9V8c0-1 .3-1.5 1.4-1.5z" />
-        </svg>
-      )
-    case 'native':
-    case 'link':
-    case 'download':
-    default:
-      // SMS / generic share (Figma "sms" variant) — a chat bubble.
-      return (
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden style={{ display: 'block' }}>
-          <path d="M4 4h16a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H8l-4 4V5a1 1 0 0 1 1-1z" />
-        </svg>
-      )
-  }
-}
 
 export default function JournalPreviewCard({ entry, onAddLens }: Props) {
   const router = useRouter()
@@ -245,17 +191,8 @@ export default function JournalPreviewCard({ entry, onAddLens }: Props) {
                 SocialMediaShareIcons, bg --bg, rounded 4px). Shown only if this
                 lens was shared. Non-tappable status indicator (16px is fine). */}
             {platform && (
-              <span
-                title={`Shared to ${platform}`}
-                style={{
-                  width: 16, height: 16, borderRadius: 4,
-                  background: 'var(--bg)', flexShrink: 0,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: 'var(--share-accent)',
-                  position: 'relative', zIndex: 2,
-                }}
-              >
-                <PlatformGlyph platform={platform} />
+              <span style={{ position: 'relative', zIndex: 2, display: 'inline-flex', flexShrink: 0 }}>
+                <SocialIcon platform={platform} size={16} />
               </span>
             )}
           </div>
@@ -273,7 +210,7 @@ export default function JournalPreviewCard({ entry, onAddLens }: Props) {
       letterSpacing: '1.5px', color, textTransform: 'uppercase',
     }}>
       Apply a lens
-      <ArrowIcon />
+      <Icon name="arrow_forward" size={16} />
     </span>
   )
 
@@ -329,7 +266,7 @@ export default function JournalPreviewCard({ entry, onAddLens }: Props) {
           color: isCyberpunk ? 'var(--green)' : (isKawaii ? 'var(--pink)' : 'var(--green)'),
         }}
       >
-        <ShareGlyph />
+        <Icon name="ios_share" size={40} />
       </span>
 
       {hasLens
