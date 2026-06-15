@@ -56,6 +56,7 @@ export default function LensPage() {
   const [selected, setSelected] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [limitError, setLimitError] = useState<'lenses' | 'vents' | null>(null)
+  const [genError, setGenError] = useState<string | null>(null)
   const [previewIndex, setPreviewIndex] = useState<number | null>(null)
 
   useEffect(() => {
@@ -66,6 +67,7 @@ export default function LensPage() {
   async function handleGetPerspective(figureId: string) {
     if (loading) return
     setLimitError(null)
+    setGenError(null)
 
     // Anonymous limit check (client-side)
     if (!isSignedIn) {
@@ -103,15 +105,31 @@ export default function LensPage() {
         return
       }
 
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        setGenError(data.error ?? 'The lens could not respond right now. Please try again.')
+        setLoading(false)
+        setSelected(null)
+        return
+      }
+
       const data = await res.json()
-      sessionStorage.setItem('ms_response', data.response ?? 'No response received.')
+      const text = (data.response ?? '').trim()
+      if (!text) {
+        setGenError('The lens came back empty. Please try again.')
+        setLoading(false)
+        setSelected(null)
+        return
+      }
+      sessionStorage.setItem('ms_response', text)
 
       if (!isSignedIn) trackAnonLens(vent)
     } catch {
-      sessionStorage.setItem(
-        'ms_response',
-        `"${vent.slice(0, 60)}..." — ${figure.name} would say: every question worth asking already contains its answer. The fact that you doubt yourself means you're paying attention. Most people who seem certain are simply not looking closely enough.`
-      )
+      // Network failure — surface it, don't fake a response.
+      setGenError('Could not reach the lens. Check your connection and try again.')
+      setLoading(false)
+      setSelected(null)
+      return
     }
     router.push('/app/response')
   }
@@ -171,6 +189,25 @@ export default function LensPage() {
             </p>
           </div>
         </motion.div>
+
+        {/* Generation / network error — fail loud, no fake fallback */}
+        {genError && (
+          <div
+            style={{
+              background: 'var(--card-bg)',
+              border: '1px solid var(--pink)',
+              borderRadius: 'var(--card-radius)',
+              padding: '16px',
+            }}
+          >
+            <p style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 13, color: 'var(--pink)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>
+              Lens unavailable
+            </p>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--text-sub)', lineHeight: '18px' }}>
+              {genError}
+            </p>
+          </div>
+        )}
 
         {/* Limit error */}
         {limitError && (

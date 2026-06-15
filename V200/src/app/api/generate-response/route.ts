@@ -1,9 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { GoogleGenerativeAI } from '@google/generative-ai'
 import { getUserTier, TIER_LIMITS } from '@/lib/user-tier'
 import { getUsageToday, trackUsage } from '@/lib/usage'
+import { FIGURES } from '@/lib/figures'
+import { generateText } from '@/lib/ai'
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY!)
+// Shared response-shape rules appended to every figure's persona. The persona
+// (brand voice) is owned per-figure in figures.ts; these rules just constrain
+// length + format so Flash answers the person directly instead of drifting into
+// markdown lists or 400-word essays.
+const RESPONSE_RULES = [
+  'You are responding to a real person who has just vented a personal problem to you.',
+  'Speak directly to them, in second person, fully in character — never break voice.',
+  'Keep it to 2-3 short paragraphs, roughly 90-160 words total.',
+  'Plain prose only: no markdown, no bullet points, no headings, no lists, no emoji.',
+  'Do not parrot their problem back or open with "It sounds like" / "I hear you".',
+  'Give a genuine perspective — a reframe, a hard truth, or real encouragement — in your own voice.',
+].join(' ')
 
 export async function POST(req: NextRequest) {
   const { prompt, figureId, systemPrompt, isNewQuote } = await req.json()
@@ -31,14 +43,37 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-2.0-flash',
-    systemInstruction: systemPrompt ?? 'You are a wise advisor. Respond in character.',
-  })
+  // Resolve the figure's persona server-side (authoritative). Fall back to the
+  // client-sent systemPrompt only if the id is unknown, then to a generic voice.
+  const figure = FIGURES.find(f => f.id === figureId)
+  const persona = figure?.systemPrompt ?? systemPrompt ?? 'You are a wise advisor. Respond in character.'
 
-  const result = await model.generateContent(prompt)
-  const text = result.response.text()
+  let text: string
+  try {
+    text = await generateText({
+      system: `${persona}\n\n${RESPONSE_RULES}`,
+      prompt,
+      temperature: 0.9,
+      maxTokens: 400,
+    })
+  } catch (err) {
+    // Fail loud — a blocked key / API outage must NOT be swallowed into a fake
+    // response. The client shows a real error state instead of navigating on.
+    console.error('[generate-response] AI provider call failed:', err)
+    return NextResponse.json(
+      { error: 'The lens could not respond right now. Please try again.' },
+      { status: 502 }
+    )
+  }
 
+  if (!text.trim()) {
+    return NextResponse.json(
+      { error: 'The lens came back empty. Please try again.' },
+      { status: 502 }
+    )
+  }
+
+  // Only count usage once we have a real response in hand.
   if (userId && tier === 'free') {
     await trackUsage(userId, !!isNewQuote)
   }

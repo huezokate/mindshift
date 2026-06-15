@@ -6,9 +6,9 @@
 // Gemini is unavailable, slow, or a row predates the title column.
 //
 // IMPORTANT: keep this module client-safe. `deriveTitleFallback` is imported by
-// client components (JournalPreviewCard / EntryDetail), so the Gemini SDK and
-// process.env access MUST stay inside `generateVentTitle` via a dynamic import —
-// nothing server-only at module top level.
+// client components (JournalPreviewCard / EntryDetail), so all model/provider
+// access MUST stay inside `generateVentTitle` via a dynamic import of `@/lib/ai`
+// — nothing server-only at module top level.
 
 const MAX_VENT_CHARS = 800 // matches the vent input MAX_CHARS
 const MAX_TITLE_CHARS = 60
@@ -55,27 +55,19 @@ export async function generateVentTitle(ventText: string): Promise<string> {
   const fallback = deriveTitleFallback(ventText)
   const trimmed = ventText.trim()
   if (!trimmed) return fallback
-  if (!process.env.GOOGLE_GEMINI_API_KEY) return fallback
 
   try {
-    // Dynamic import keeps the Gemini SDK out of the client bundle for callers
-    // that only need deriveTitleFallback.
-    const { GoogleGenerativeAI } = await import('@google/generative-ai')
-    const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY)
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash',
-      systemInstruction: TITLE_SYSTEM_PROMPT,
+    // Dynamic import keeps the provider module out of the client bundle for
+    // callers that only need deriveTitleFallback.
+    const { generateText } = await import('@/lib/ai')
+    const raw = await generateText({
+      system: TITLE_SYSTEM_PROMPT,
+      prompt: trimmed.slice(0, MAX_VENT_CHARS),
+      temperature: 0.4,
+      maxTokens: 32,
+      timeoutMs: TITLE_TIMEOUT_MS,
     })
-
-    const prompt = trimmed.slice(0, MAX_VENT_CHARS)
-    const result = await Promise.race([
-      model.generateContent(prompt),
-      new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('title-timeout')), TITLE_TIMEOUT_MS)
-      ),
-    ])
-
-    const cleaned = cleanTitle(result.response.text())
+    const cleaned = cleanTitle(raw)
     return cleaned || fallback
   } catch {
     return fallback
