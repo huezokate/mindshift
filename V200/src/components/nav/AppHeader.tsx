@@ -117,10 +117,10 @@ export default function AppHeader({
         <div
           role="menu"
           style={{
+            // Transparent layout shell — the buttons carry all the fill/chrome,
+            // the container itself has no background or shadow (Kate, Figma).
             position: 'absolute', top: 60, right: 8, width: 229,
-            background: 'var(--bg)', borderRadius: 2,
             display: 'flex', flexDirection: 'column', gap: 2,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
           }}
         >
           {/* Profile — primary variant, 72px tall (Figma 624:7909) */}
