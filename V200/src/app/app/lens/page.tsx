@@ -7,6 +7,7 @@ import { FIGURES, getFigureImg } from '@/lib/figures'
 import { useTheme } from '@/lib/theme'
 import Icon from '@/components/ui/Icon'
 import CircularArrow from '@/components/ui/CircularArrow'
+import AppHeader from '@/components/nav/AppHeader'
 
 // Returns 'vents' if daily vent limit hit, 'lenses' if per-vent lens limit hit, null if OK
 function checkAnonLimits(ventText: string): 'vents' | 'lenses' | null {
@@ -146,7 +147,8 @@ export default function LensPage() {
 
   return (
     <div className="min-h-dvh flex flex-col items-center relative" style={{ background: 'var(--bg)' }}>
-      <div className="flex flex-col gap-6 w-full" style={{ maxWidth: 440, padding: '40px 24px 32px' }}>
+      <AppHeader />
+      <div className="flex flex-col gap-6 w-full" style={{ maxWidth: 440, padding: '24px 24px 32px' }}>
 
         {/* Vent preview — read-only */}
         <motion.div

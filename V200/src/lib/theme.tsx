@@ -11,11 +11,22 @@ const ThemeCtx = createContext<{ theme: Theme; setTheme: (t: Theme) => void }>({
 })
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(DEFAULT)
+  // The inline script in layout.tsx already set data-theme from localStorage
+  // before first paint. Read it back here so React state matches the DOM on the
+  // first client render — otherwise JS theme branches (theme === 'cyberpunk' ? …)
+  // render the default skin first and visibly flip after the effect runs.
+  const [theme, setThemeState] = useState<Theme>(() => {
+    if (typeof document !== 'undefined') {
+      const attr = document.documentElement.getAttribute('data-theme')
+      if (attr === 'cyberpunk' || attr === 'kawaii' || attr === 'notepad') return attr
+    }
+    return DEFAULT
+  })
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY) as Theme | null
-    if (saved) apply(saved)
+    if (saved && saved !== theme) apply(saved)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   function apply(t: Theme) {

@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import EntryAuthRow from '@/components/nav/EntryAuthRow'
+import AppHeader from '@/components/nav/AppHeader'
 
 const MAX_CHARS = 800
 
@@ -22,7 +23,8 @@ export default function OnboardingPage() {
 
   return (
     <div className="min-h-dvh flex flex-col items-center" style={{ background: 'var(--bg)' }}>
-      <div className="flex flex-col gap-8 w-full" style={{ maxWidth: 440, padding: '40px 24px' }}>
+      <AppHeader />
+      <div className="flex flex-col gap-8 w-full" style={{ maxWidth: 440, padding: '24px 24px 40px' }}>
 
         {/* Heading card — pink borders (hcard) */}
         <motion.div

@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FIGURES, getFigureImg } from '@/lib/figures'
@@ -7,8 +7,6 @@ import { useTheme, type Theme } from '@/lib/theme'
 import Icon from '@/components/ui/Icon'
 import CircleArrow from '@/components/ui/CircleArrow'
 import EntryAuthRow from '@/components/nav/EntryAuthRow'
-
-const ACK_KEY = 'ms_disclaimer_ack'
 
 const THEMES: { id: Theme; name: string; tagline: string; description: string }[] = [
   {
@@ -53,14 +51,10 @@ export default function ThemeSelectPage() {
 
   const currentIndex = THEMES.findIndex(t => t.id === theme)
   const [index, setIndex] = useState(currentIndex >= 0 ? currentIndex : 1)
+  // Disclaimer ack is intentionally ephemeral — it must start UNCHECKED on every
+  // visit (Kate, 14 June board). Do not restore it from localStorage.
   const [acknowledged, setAcknowledged] = useState(false)
   const [expanded, setExpanded] = useState(false)
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && localStorage.getItem(ACK_KEY) === '1') {
-      setAcknowledged(true)
-    }
-  }, [])
 
   const current = THEMES[index]
 
@@ -83,12 +77,7 @@ export default function ThemeSelectPage() {
   }
 
   function toggleAck() {
-    const next = !acknowledged
-    setAcknowledged(next)
-    if (typeof window !== 'undefined') {
-      if (next) localStorage.setItem(ACK_KEY, '1')
-      else localStorage.removeItem(ACK_KEY)
-    }
+    setAcknowledged(v => !v)
   }
 
   return (

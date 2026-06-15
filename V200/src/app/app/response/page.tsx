@@ -96,13 +96,30 @@ export default function ResponsePage() {
     }
   }
 
-  // Flat, transparent icon buttons matching the journal lens-card button row
-  // (LensCard.tsx headerActions) — no pill chrome. Active accent applied inline.
-  const actionBtn: React.CSSProperties = {
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-    background: 'transparent', border: 'none', padding: 6,
-    cursor: 'pointer', color: 'var(--text-muted)',
-    transition: 'color 0.15s',
+  // Labelled, bordered accent pills matching the Button Secondary component
+  // (Figma 414:5353) + the lens-card button-row idiom: asymmetric 1/2px border,
+  // 2px radius, a faint accent-tinted fill (color-mix off the accent slot so all
+  // three themes follow for free), ≥44px tap target. `accent` is a token name:
+  // --cyan (SAVE) / --green (NEW LENS) / --pink (SHARE).
+  function pillStyle(accent: string): React.CSSProperties {
+    const c = `var(${accent})`
+    return {
+      flex: 1,
+      minHeight: 44,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+      fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 13,
+      letterSpacing: 'var(--btn-letter-spacing, 1px)', textTransform: 'uppercase',
+      color: c,
+      background: `color-mix(in srgb, ${c} 12%, transparent)`,
+      borderTop: `1px solid ${c}`,
+      borderLeft: `1px solid ${c}`,
+      borderRight: `2px solid ${c}`,
+      borderBottom: `2px solid ${c}`,
+      borderRadius: 'var(--btn-secondary-radius, 2px)',
+      padding: '8px 12px',
+      cursor: 'pointer',
+      transition: 'opacity 0.15s',
+    }
   }
 
   return (
@@ -206,34 +223,46 @@ export default function ResponsePage() {
           </div>
         </motion.div>
 
-        {/* 3 — Quick action icons (lens-card button-row idiom) */}
+        {/* 3 — Action pills (Button Secondary idiom, Figma 414:5353):
+            SAVE (cyan) · NEW LENS (green) · SHARE (pink). Mobile = simple row;
+            on desktop sits in the left column under the vent (grid placement). */}
         {done && (
           <motion.div
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex gap-1 justify-end w-full lg:col-start-1 lg:row-start-2 lg:self-start"
+            className="flex gap-2 w-full lg:col-start-1 lg:row-start-2 lg:self-start"
           >
             {/* Save to journal */}
             <motion.button
               onClick={handleSave}
               animate={saveControls}
               whileTap={{ scale: 0.95 }}
+              className="uppercase hover:opacity-80"
               title={saveState === 'saved' ? 'Saved!' : 'Save to journal'}
-              style={{ ...actionBtn, color: saveState === 'saved' ? 'var(--cyan)' : 'var(--text-muted)' }}
+              style={pillStyle('--cyan')}
             >
-              <Icon name="bookmark" size={20} />
+              <Icon name="bookmark" size={18} />
+              {saveState === 'saved' ? 'Saved' : 'Save'}
             </motion.button>
-            {/* Decorate — stickers coming soon, disabled */}
+            {/* New lens — re-pick a lens for the same vent (vent persists in sessionStorage) */}
             <button
-              disabled
-              title="Decorate (coming soon)"
-              style={{ ...actionBtn, opacity: 0.3, cursor: 'not-allowed' }}
+              onClick={() => router.push('/app/lens')}
+              className="uppercase hover:opacity-80"
+              title="Try another lens"
+              style={pillStyle('--green')}
             >
-              <Icon name="palette" size={20} />
+              <Icon name="autorenew" size={18} />
+              New Lens
             </button>
             {/* Share via native share sheet (SMS, socials) */}
-            <button onClick={handleShare} title="Share" style={actionBtn}>
-              <Icon name="ios_share" size={20} />
+            <button
+              onClick={handleShare}
+              className="uppercase hover:opacity-80"
+              title="Share"
+              style={pillStyle('--pink')}
+            >
+              <Icon name="ios_share" size={18} />
+              Share
             </button>
           </motion.div>
         )}
