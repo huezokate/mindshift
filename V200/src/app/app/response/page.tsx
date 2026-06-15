@@ -113,15 +113,15 @@ export default function ResponsePage() {
 
       {/* Scrollable content */}
       <div
-        className="flex flex-col gap-4 w-full mx-auto flex-1"
-        style={{ maxWidth: 440, padding: '24px 24px 32px' }}
+        className="flex flex-col gap-4 w-full mx-auto flex-1 max-w-[440px] lg:grid lg:grid-cols-[2fr_3fr] lg:gap-x-6 lg:gap-y-4 lg:items-start lg:max-w-[1040px]"
+        style={{ padding: '24px 24px 32px' }}
       >
 
         {/* 1 — User quote */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col w-full overflow-hidden"
+          className="flex flex-col w-full overflow-hidden lg:col-start-1 lg:row-start-1"
           style={{
             borderTop: 'var(--input-bt)',
             borderLeft: 'var(--input-bl)',
@@ -157,7 +157,7 @@ export default function ResponsePage() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.12 }}
-          className="flex flex-col w-full overflow-hidden"
+          className="flex flex-col w-full overflow-hidden lg:col-start-2 lg:row-start-1 lg:row-span-2"
           style={{
             borderTop: 'var(--input-bt)',
             borderLeft: 'var(--input-bl)',
@@ -211,7 +211,7 @@ export default function ResponsePage() {
           <motion.div
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex gap-1 justify-end w-full"
+            className="flex gap-1 justify-end w-full lg:col-start-1 lg:row-start-2 lg:self-start"
           >
             {/* Save to journal */}
             <motion.button
@@ -239,7 +239,7 @@ export default function ResponsePage() {
         )}
 
         {saveState === 'error' && (
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--pink)', textAlign: 'center' }}>
+          <p className="lg:col-start-1 lg:row-start-3" style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--pink)', textAlign: 'center' }}>
             Could not save. Please try again.
           </p>
         )}
