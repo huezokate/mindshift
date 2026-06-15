@@ -1,14 +1,20 @@
 'use client'
 // App-wide top nav (Figma 606:7678 header + 602:6949 dropdown).
 // Bar: [brand lens icon] · MINDS SHIFT · [account button → dropdown].
-// Dropdown is color-coded per Figma: green = Profile/Log out, pink = Journal
-// section, cyan = Mind Map section. All token-driven (no hardcoded hex) so the
-// three themes follow. Counts are props (stubbed until the backend lands).
+// Dropdown rows are the design-system Button (Figma "Buttons" 397:3561), one
+// variant per section so each section stays distinct in ALL three themes:
+//   • Profile / Log out → secondary  (cyber cyan / kawaii mint / notepad green)
+//   • Journal           → secondary2 (cyber pink / kawaii pink / notepad red)
+//   • Mind Map          → primary    (cyber green / kawaii yellow / notepad white)
+// This replaces the old hand-rolled `borderTop: 4px solid var(--cyan)` rows,
+// which collapsed to one magenta in kawaii (--cyan === --pink there). The Button
+// is fully token-driven via the --btn-* families, so no hardcoded hex anywhere.
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useUser, useClerk } from '@clerk/nextjs'
 import { useTheme } from '@/lib/theme'
 import Icon from '@/components/ui/Icon'
+import Button, { type ButtonVariant } from '@/components/ui/Button'
 
 type Props = {
   entryCount?: number
@@ -17,28 +23,15 @@ type Props = {
   mindmapProgress?: string
 }
 
-// One bordered dropdown row (Figma "Button Primary": t-4 l-4 r b border, 2px
-// radius). `accent` is the token name driving border + text per section.
+// One dropdown row = the design-system Button, full-width, role="menuitem".
+// `variant` carries the per-section colour treatment (see header comment).
 function Row({
-  accent, onClick, children, tall = false,
-}: { accent: string; onClick?: () => void; children: React.ReactNode; tall?: boolean }) {
+  variant, onClick, children, tall = false,
+}: { variant: ButtonVariant; onClick?: () => void; children: React.ReactNode; tall?: boolean }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      style={{
-        width: '100%', minHeight: tall ? 56 : 45,
-        background: 'var(--bg)',
-        borderTop: `4px solid var(${accent})`, borderLeft: `4px solid var(${accent})`,
-        borderRight: `1px solid var(${accent})`, borderBottom: `1px solid var(${accent})`,
-        borderRadius: 2, padding: tall ? '12px' : '8px 12px',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        cursor: onClick ? 'pointer' : 'default',
-        color: `var(${accent})`,
-      }}
-    >
+    <Button variant={variant} onClick={onClick} tall={tall} fullWidth role="menuitem">
       {children}
-    </button>
+    </Button>
   )
 }
 
@@ -126,20 +119,20 @@ export default function AppHeader({
             boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
           }}
         >
-          {/* Profile (green) */}
-          <Row accent="--green" tall onClick={() => router.push('/app/profile')}>
+          {/* Profile — secondary variant */}
+          <Row variant="secondary" tall onClick={() => router.push('/app/profile')}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
               <span style={LABEL}>Profile</span>
               {username && <span style={META}>{username}</span>}
             </div>
           </Row>
 
-          {/* Journal (pink) */}
+          {/* Journal — secondary2 variant */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Row accent="--pink" tall onClick={() => router.push('/app/journal-v2')}>
+            <Row variant="secondary2" tall onClick={() => router.push('/app/journal-v2')}>
               <span style={LABEL}>Journal</span>
             </Row>
-            <Row accent="--pink" onClick={() => router.push('/app/journal-v2')}>
+            <Row variant="secondary2" onClick={() => router.push('/app/journal-v2')}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
                 <Icon name="article" size={20} />
                 <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1 }}>
@@ -148,19 +141,19 @@ export default function AppHeader({
                 </span>
               </span>
             </Row>
-            <Row accent="--pink" onClick={() => router.push('/app/onboarding')}>
+            <Row variant="secondary2" onClick={() => router.push('/app/onboarding')}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
                 <Icon name="add" size={20} /><span style={LABEL}>New</span>
               </span>
             </Row>
           </div>
 
-          {/* Mind Map (cyan) */}
+          {/* Mind Map — primary variant */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Row accent="--cyan" tall onClick={() => router.push('/app/mindmap')}>
+            <Row variant="primary" tall onClick={() => router.push('/app/mindmap')}>
               <span style={LABEL}>Mind Map</span>
             </Row>
-            <Row accent="--cyan" onClick={() => router.push('/app/mindmap')}>
+            <Row variant="primary" onClick={() => router.push('/app/mindmap')}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
                 <Icon name="tab_group" size={20} />
                 <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1 }}>
@@ -169,15 +162,15 @@ export default function AppHeader({
                 </span>
               </span>
             </Row>
-            <Row accent="--cyan" onClick={() => router.push('/app/mindmap/new')}>
+            <Row variant="primary" onClick={() => router.push('/app/mindmap/new')}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
                 <Icon name="add" size={20} /><span style={LABEL}>New</span>
               </span>
             </Row>
           </div>
 
-          {/* Log out (green) */}
-          <Row accent="--green" onClick={() => signOut({ redirectUrl: '/' })}>
+          {/* Log out — secondary variant (matches Profile) */}
+          <Row variant="secondary" onClick={() => signOut({ redirectUrl: '/' })}>
             <span style={LABEL}>Log out</span>
           </Row>
         </div>
