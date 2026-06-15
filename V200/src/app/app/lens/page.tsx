@@ -8,6 +8,7 @@ import { useTheme } from '@/lib/theme'
 import Icon from '@/components/ui/Icon'
 import CircularArrow from '@/components/ui/CircularArrow'
 import AppHeader from '@/components/nav/AppHeader'
+import Button from '@/components/ui/Button'
 
 // Returns 'vents' if daily vent limit hit, 'lenses' if per-vent lens limit hit, null if OK
 function checkAnonLimits(ventText: string): 'vents' | 'lenses' | null {
@@ -229,21 +230,14 @@ export default function LensPage() {
                 ? 'You\'ve applied 3 lenses to this vent. Create a free account for 5 lenses per vent.'
                 : 'You\'ve used your free vent for today. Create a free account for 3 vents per day.'}
             </p>
-            <button
+            <Button
+              variant="primary"
+              fullWidth
               onClick={() => router.push(`/sign-up?reason=${limitError}_limit`)}
-              className="w-full uppercase text-center"
-              style={{
-                fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 12,
-                letterSpacing: 'var(--btn-letter-spacing, 2px)',
-                color: 'var(--btn-color)', background: 'var(--btn-bg)',
-                borderTop: 'var(--btn-bt)', borderLeft: 'var(--btn-bl)',
-                borderRight: 'var(--btn-br)', borderBottom: 'var(--btn-bb)',
-                borderRadius: 'var(--btn-radius)', padding: '10px',
-                cursor: 'pointer',
-              }}
+              style={{ fontSize: 12, letterSpacing: 'var(--btn-letter-spacing, 2px)', padding: '10px' }}
             >
               Create free account →
-            </button>
+            </Button>
           </div>
         )}
 
@@ -410,27 +404,17 @@ export default function LensPage() {
                     <Icon name="arrow_back" size={16} />
                     Back
                   </button>
-                  <button
+                  <Button
+                    variant="primary"
+                    disabled={loading}
                     onClick={() => {
                       setPreviewIndex(null)
                       handleGetPerspective(previewing.id)
                     }}
-                    disabled={loading}
-                    className="flex-1 uppercase text-center"
-                    style={{
-                      fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 13,
-                      letterSpacing: 'var(--btn-letter-spacing, 2px)',
-                      color: 'var(--btn-color)',
-                      background: 'var(--btn-bg)',
-                      borderTop: 'var(--btn-bt)', borderLeft: 'var(--btn-bl)',
-                      borderRight: 'var(--btn-br)', borderBottom: 'var(--btn-bb)',
-                      borderRadius: 'var(--btn-radius)', padding: '12px 8px',
-                      boxShadow: 'var(--btn-shadow)', cursor: loading ? 'wait' : 'pointer',
-                      opacity: loading ? 0.6 : 1,
-                    }}
+                    style={{ flex: 1, fontSize: 13, letterSpacing: 'var(--btn-letter-spacing, 2px)', padding: '12px 8px' }}
                   >
                     {loading ? 'Loading…' : 'Select'}
-                  </button>
+                  </Button>
                 </div>
               </motion.div>
             </AnimatePresence>

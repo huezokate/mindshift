@@ -15,6 +15,7 @@
 // "The Rule"), NEVER the raw --cyan/--pink accent slots — those collapse to the
 // same magenta in kawaii, which is the bug this component replaces.
 import type { CSSProperties, ReactNode } from 'react'
+import Icon from '@/components/ui/Icon'
 
 // `primary | secondary | secondary2` map 1:1 onto the structural --btn-* token
 // families. `journal | mindmap` are SEMANTIC variants for the account dropdown:
@@ -65,6 +66,14 @@ type Props = {
   tall?: boolean
   /** Stretch to fill its container (dropdown rows are full-width). */
   fullWidth?: boolean
+  /** Disabled — renders the live treatment at opacity 0.6 (Figma's recipe) and blocks clicks. */
+  disabled?: boolean
+  /** Leading Material Symbol name (Figma `icon=yes` form). */
+  icon?: string
+  /** Icon glyph size (Figma uses 24; pass smaller for compact buttons). */
+  iconSize?: number
+  /** Native button type — 'submit' for form CTAs. */
+  type?: 'button' | 'submit'
   ariaLabel?: string
   role?: string
   style?: CSSProperties
@@ -72,7 +81,8 @@ type Props = {
 
 export default function Button({
   variant = 'primary', theme = 'cyberpunk', onClick, children,
-  tall = false, fullWidth = false, ariaLabel, role, style,
+  tall = false, fullWidth = false, disabled = false,
+  icon, iconSize = 24, type = 'button', ariaLabel, role, style,
 }: Props) {
   const family = resolveFamily(variant, theme)
   // Only the primary (CTA) family carries a drop-shadow filter (notepad's offset
@@ -80,8 +90,9 @@ export default function Button({
   const isPrimary = family === '--btn'
   return (
     <button
-      type="button"
+      type={type}
       onClick={onClick}
+      disabled={disabled}
       aria-label={ariaLabel}
       role={role}
       style={{
@@ -95,10 +106,14 @@ export default function Button({
         minHeight: tall ? 56 : 45,
         padding: tall ? '12px' : '8px 12px',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        cursor: onClick ? 'pointer' : 'default',
+        gap: icon ? 8 : undefined,
+        // Figma disabled = the live treatment dimmed to 0.6 (Kate's chosen recipe).
+        opacity: disabled ? 0.6 : 1,
+        cursor: disabled ? 'not-allowed' : (onClick || type === 'submit' ? 'pointer' : 'default'),
         ...style,
       }}
     >
+      {icon && <Icon name={icon} size={iconSize} />}
       {children}
     </button>
   )

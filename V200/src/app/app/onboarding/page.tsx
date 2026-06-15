@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import EntryAuthRow from '@/components/nav/EntryAuthRow'
 import AppHeader from '@/components/nav/AppHeader'
+import Button from '@/components/ui/Button'
 
 const MAX_CHARS = 800
 
@@ -177,32 +178,16 @@ export default function OnboardingPage() {
             </div>
           </div>
 
-          {/* Primary CTA — Select the Lens */}
-          <motion.button
-            onClick={handleProceed}
+          {/* Primary CTA — Select the Lens (shared DS Button) */}
+          <Button
+            variant="primary"
+            fullWidth
             disabled={!canProceed}
-            whileTap={{ scale: 0.97 }}
-            className="w-full uppercase text-center transition-all"
-            style={{
-              fontFamily: 'var(--font-btn)',
-              fontWeight: 600,
-              fontSize: 14,
-              letterSpacing: 'var(--btn-letter-spacing, 3px)',
-              color: canProceed ? 'var(--btn-color)' : 'var(--btn-dis-color)',
-              background: canProceed ? 'var(--btn-bg)' : 'transparent',
-              borderTop: canProceed ? 'var(--btn-bt)' : '1px solid var(--btn-dis-border)',
-              borderLeft: canProceed ? 'var(--btn-bl)' : '1px solid var(--btn-dis-border)',
-              borderRight: canProceed ? 'var(--btn-br)' : '1px solid var(--btn-dis-border)',
-              borderBottom: canProceed ? 'var(--btn-bb)' : '1px solid var(--btn-dis-border)',
-              borderRadius: 'var(--btn-radius)',
-              padding: '17px 12px',
-              boxShadow: canProceed ? 'var(--btn-shadow)' : 'none',
-              filter: canProceed ? 'var(--btn-filter, none)' : 'none',
-              cursor: canProceed ? 'pointer' : 'not-allowed',
-            }}
+            onClick={handleProceed}
+            style={{ fontSize: 14, letterSpacing: 'var(--btn-letter-spacing, 3px)', padding: '17px 12px' }}
           >
             Select the Lens
-          </motion.button>
+          </Button>
         </motion.div>
 
         {/* Mind-map CTA + sign-up */}
