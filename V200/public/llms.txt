@@ -1,0 +1,21 @@
+# MindShift
+
+> AI journaling that shifts your perspective. Vent what's on your mind, pick a "lens" from history's greatest minds (Socrates, Maya Angelou, Frida Kahlo, and more), and get an AI-generated reframe in that figure's voice. Plus visual mind mapping for self-reflection and life planning.
+
+MindShift is a mental-wellness and self-reflection web app. It turns venting into perspective: a fast, low-friction way to reframe your thinking, journal your reflections, and map your goals across the areas of life that matter.
+
+## What it does
+- **Vent → Lens → Reframe**: Write what's weighing on you, choose a historical figure, and receive an AI perspective in their voice — a form of cognitive reframing.
+- **Journal**: Save reflections privately or share them; track how your thinking shifts over time.
+- **Mind map**: Plan your year (or any horizon) across life areas — Career, Health & Fitness, Relationships, Personal Development, Finance — with milestones and weekly goals.
+
+## Who it's for
+People who overthink, want mental clarity, journal for growth, or want a thinking tool they'll actually open on a bad day.
+
+## Topics
+mental wellness, cognitive reframing, perspective shift, AI journaling, self-reflection, thinking patterns, mind mapping, life planning, emotional well-being, overthinking, mindset shift.
+
+## Links
+- Home: https://minds-shift.com
+- App: https://app.minds-shift.com
+- Contact: hello@minds-shift.com
