@@ -18,6 +18,9 @@ export default function OnboardingPage() {
   function handleProceed() {
     if (!canProceed) return
     sessionStorage.setItem('ms_vent', text.trim())
+    // A brand-new vent starts a brand-new session — drop any leftover id so the
+    // save creates a fresh journal entry instead of appending to an old one.
+    sessionStorage.removeItem('ms_session_id')
     router.push('/app/lens')
   }
 

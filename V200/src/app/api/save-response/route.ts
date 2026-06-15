@@ -15,21 +15,24 @@ export async function POST(req: NextRequest) {
   }
 
   const db = getSupabaseAdmin()
-  let resolvedSessionId: string
+  let resolvedSessionId: string | null = null
 
   if (sessionId) {
+    // Append to an existing session (e.g. a second lens on the same vent).
+    // maybeSingle() returns null (not an error) when the id is stale/foreign —
+    // in that case we fall through and create a fresh session rather than
+    // failing the save, so a leftover ms_session_id can't block journaling.
     const { data: session } = await db
       .from('vent_sessions')
       .select('id')
       .eq('id', sessionId)
       .eq('user_id', userId)
-      .single()
+      .maybeSingle()
 
-    if (!session) {
-      return NextResponse.json({ error: 'Session not found.' }, { status: 404 })
-    }
-    resolvedSessionId = session.id
-  } else {
+    if (session) resolvedSessionId = session.id
+  }
+
+  if (!resolvedSessionId) {
     // Gemini summarizes the vent into a "<synonym> on <topic>" header. Falls
     // back to a first-words title internally, so this never blocks the save.
     const title = await generateVentTitle(ventText)
