@@ -1,20 +1,20 @@
 'use client'
-// App-wide top nav (Figma 606:7678 header + 602:6949 dropdown).
-// Bar: [brand lens icon] · MINDS SHIFT · [account button → dropdown].
-// Dropdown rows are the design-system Button (Figma "Buttons" 397:3561), one
-// variant per section so each section stays distinct in ALL three themes:
-//   • Profile / Log out → secondary  (cyber cyan / kawaii mint / notepad green)
-//   • Journal           → secondary2 (cyber pink / kawaii pink / notepad red)
-//   • Mind Map          → primary    (cyber green / kawaii yellow / notepad white)
-// This replaces the old hand-rolled `borderTop: 4px solid var(--cyan)` rows,
-// which collapsed to one magenta in kawaii (--cyan === --pink there). The Button
-// is fully token-driven via the --btn-* families, so no hardcoded hex anywhere.
+// App-wide top nav (Figma header + dropdown 624:8265 "drop down menu work in
+// progress"). Bar: [brand lens icon] · MINDS SHIFT · [account button → dropdown].
+// Dropdown rows are the design-system Button (Figma "Buttons" component), one
+// variant per section, matched to the canonical per-theme frames:
+//   • Profile / Log out → primary  (cyber green / kawaii amber / notepad white+dropshadow)
+//   • Journal           → journal  (pink/red everywhere)
+//   • Mind Map          → mindmap  (cyber cyan / kawaii mint / notepad green)
+// `journal`/`mindmap` are semantic variants that resolve to the right --btn-*
+// family per theme (the accent slots are swapped cyber↔kawaii/notepad), so no
+// hardcoded hex anywhere — driven entirely by the structural token families.
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useUser, useClerk } from '@clerk/nextjs'
 import { useTheme } from '@/lib/theme'
 import Icon from '@/components/ui/Icon'
-import Button, { type ButtonVariant } from '@/components/ui/Button'
+import Button, { type ButtonVariant, type ThemeName } from '@/components/ui/Button'
 
 type Props = {
   entryCount?: number
@@ -24,12 +24,16 @@ type Props = {
 }
 
 // One dropdown row = the design-system Button, full-width, role="menuitem".
-// `variant` carries the per-section colour treatment (see header comment).
+// `variant` carries the per-section colour treatment (see header comment); the
+// semantic journal/mindmap variants need `theme` to resolve to the right family.
 function Row({
-  variant, onClick, children, tall = false,
-}: { variant: ButtonVariant; onClick?: () => void; children: React.ReactNode; tall?: boolean }) {
+  variant, theme, onClick, children, tall = false,
+}: {
+  variant: ButtonVariant; theme: ThemeName; onClick?: () => void
+  children: React.ReactNode; tall?: boolean
+}) {
   return (
-    <Button variant={variant} onClick={onClick} tall={tall} fullWidth role="menuitem">
+    <Button variant={variant} theme={theme} onClick={onClick} tall={tall} fullWidth role="menuitem">
       {children}
     </Button>
   )
@@ -119,20 +123,20 @@ export default function AppHeader({
             boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
           }}
         >
-          {/* Profile — secondary variant */}
-          <Row variant="secondary" tall onClick={() => router.push('/app/profile')}>
+          {/* Profile — primary variant, 72px tall (Figma 624:7909) */}
+          <Row variant="primary" theme={theme} tall onClick={() => router.push('/app/profile')}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
               <span style={LABEL}>Profile</span>
               {username && <span style={META}>{username}</span>}
             </div>
           </Row>
 
-          {/* Journal — secondary2 variant */}
+          {/* Journal — journal variant (pink/red in every theme) */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Row variant="secondary2" tall onClick={() => router.push('/app/journal-v2')}>
+            <Row variant="journal" theme={theme} tall onClick={() => router.push('/app/journal-v2')}>
               <span style={LABEL}>Journal</span>
             </Row>
-            <Row variant="secondary2" onClick={() => router.push('/app/journal-v2')}>
+            <Row variant="journal" theme={theme} onClick={() => router.push('/app/journal-v2')}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
                 <Icon name="article" size={20} />
                 <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1 }}>
@@ -141,19 +145,19 @@ export default function AppHeader({
                 </span>
               </span>
             </Row>
-            <Row variant="secondary2" onClick={() => router.push('/app/onboarding')}>
+            <Row variant="journal" theme={theme} onClick={() => router.push('/app/onboarding')}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
                 <Icon name="add" size={20} /><span style={LABEL}>New</span>
               </span>
             </Row>
           </div>
 
-          {/* Mind Map — primary variant */}
+          {/* Mind Map — mindmap variant (cyber cyan / kawaii mint / notepad green) */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Row variant="primary" tall onClick={() => router.push('/app/mindmap')}>
+            <Row variant="mindmap" theme={theme} tall onClick={() => router.push('/app/mindmap')}>
               <span style={LABEL}>Mind Map</span>
             </Row>
-            <Row variant="primary" onClick={() => router.push('/app/mindmap')}>
+            <Row variant="mindmap" theme={theme} onClick={() => router.push('/app/mindmap')}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
                 <Icon name="tab_group" size={20} />
                 <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1 }}>
@@ -162,15 +166,15 @@ export default function AppHeader({
                 </span>
               </span>
             </Row>
-            <Row variant="primary" onClick={() => router.push('/app/mindmap/new')}>
+            <Row variant="mindmap" theme={theme} onClick={() => router.push('/app/mindmap/new')}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
                 <Icon name="add" size={20} /><span style={LABEL}>New</span>
               </span>
             </Row>
           </div>
 
-          {/* Log out — secondary variant (matches Profile) */}
-          <Row variant="secondary" onClick={() => signOut({ redirectUrl: '/' })}>
+          {/* Log out — primary variant (matches Profile, Figma 624:7938) */}
+          <Row variant="primary" theme={theme} onClick={() => signOut({ redirectUrl: '/' })}>
             <span style={LABEL}>Log out</span>
           </Row>
         </div>
