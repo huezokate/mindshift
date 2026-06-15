@@ -91,6 +91,7 @@ export default function Button({
   return (
     <button
       type={type}
+      className="ds-btn"
       onClick={onClick}
       disabled={disabled}
       aria-label={ariaLabel}

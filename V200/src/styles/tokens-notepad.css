@@ -111,6 +111,8 @@ html[data-theme="notepad"] {
   --btn-shadow:         none;
   --btn-filter:         drop-shadow(2px 3px 0px #1e1e40);
   --btn-letter-spacing: -1px;
+  --focus-ring:         2px solid #1e1e40;
+  --mm-card-bg-selected: #eef3ec;
   --btn-dis-color:      rgba(30,30,64,0.3);
   --btn-dis-border:     rgba(30,30,64,0.2);
 

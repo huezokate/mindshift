@@ -120,6 +120,8 @@
   --btn-shadow: 0 0 12px rgba(57,255,20,0.2);
   --btn-filter: none;
   --btn-letter-spacing: 3px;
+  --focus-ring: 2px solid #00F5FF;
+  --mm-card-bg-selected: rgba(57,255,20,0.12);
   --btn-dis-color: rgba(255,255,255,0.2);
   --btn-dis-border: rgba(255,255,255,0.1);
 

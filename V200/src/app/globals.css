@@ -93,3 +93,21 @@ body {
 .ms-switcher-btn[data-id="notepad"]   { background: var(--sw-notepad-bg); }
 
 .ms-switcher-btn[data-active="false"] { opacity: 0.55; }
+
+/* ── Design-system Button interaction layer ──────────────────────────────────
+   Drives hover / active / focus-visible for the shared <Button>. Uses ONLY
+   transform + outline — the two properties Button.tsx does not set inline, so
+   they're never overridden by the variant's inline styles. Per-theme focus ring
+   comes from --focus-ring. Respects prefers-reduced-motion. */
+.ds-btn { transition: transform 0.1s ease; }
+.ds-btn:not(:disabled):hover  { transform: translateY(-1px); }
+.ds-btn:not(:disabled):active { transform: translateY(1px) scale(0.985); }
+.ds-btn:focus-visible {
+  outline: var(--focus-ring, 2px solid currentColor);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-btn { transition: none; }
+  .ds-btn:not(:disabled):hover,
+  .ds-btn:not(:disabled):active { transform: none; }
+}
