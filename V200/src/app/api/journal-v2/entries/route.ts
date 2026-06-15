@@ -15,6 +15,7 @@ type RawLens = {
 type RawSession = {
   id: string
   vent_text: string
+  title: string | null
   theme: string
   is_public: boolean
   created_at: string
@@ -56,7 +57,7 @@ export async function GET(req: Request) {
   // second query. We slice back down to `limit` before returning.
   let q = db
     .from('vent_sessions')
-    .select(`id, vent_text, theme, is_public, created_at, ${lensJoin}`)
+    .select(`id, vent_text, title, theme, is_public, created_at, ${lensJoin}`)
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
     .range(offset, offset + limit)
@@ -77,6 +78,7 @@ export async function GET(req: Request) {
   const normalized = rows.map(s => ({
     id: s.id,
     vent_text: s.vent_text,
+    title: s.title ?? null,
     theme: s.theme,
     is_public: s.is_public,
     created_at: s.created_at,

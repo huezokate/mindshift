@@ -5,7 +5,7 @@ title: material-symbols-icon-system
 type: task
 status: open
 priority: high
-phase: ready
+phase: done
 depends_on: []
 ---
 

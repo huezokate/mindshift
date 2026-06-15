@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation'
 import { FIGURES, portraitFor } from '@/lib/figures'
 import { useTheme } from '@/lib/theme'
 import type { JournalEntry, SharePlatform } from '@/lib/journal-types'
+import { deriveTitleFallback } from '@/lib/title'
 import Icon from '@/components/ui/Icon'
 import SocialIcon from './SocialIcon'
 
@@ -29,10 +30,10 @@ export default function JournalPreviewCard({ entry, onAddLens }: Props) {
   const isKawaii = theme === 'kawaii'
 
   // ── Derived content ────────────────────────────────────────────────────────
-  // Title is the user's own words, UPPERCASE (per Figma — do NOT sentence-case),
-  // first 6 words so the header line stays tidy. Matches the detail-view
-  // billboard treatment for visual continuity.
-  const title = entry.vent_text.split(/\s+/).filter(Boolean).slice(0, 6).join(' ')
+  // Prefer the Gemini "<synonym> on <topic>" title (T-018-07); fall back to the
+  // user's first words when a row predates the title column or generation fell
+  // back. Rendered UPPERCASE per Figma — do NOT sentence-case.
+  const title = entry.title?.trim() || deriveTitleFallback(entry.vent_text)
 
   // One row per lens that resolves to a known figure, paired with the first
   // platform it was shared to (its indicator glyph renders beneath the avatar;

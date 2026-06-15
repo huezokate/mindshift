@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
+import { generateVentTitle } from '@/lib/title'
 
 export async function POST(req: NextRequest) {
   const { userId } = await auth()
@@ -29,9 +30,12 @@ export async function POST(req: NextRequest) {
     }
     resolvedSessionId = session.id
   } else {
+    // Gemini summarizes the vent into a "<synonym> on <topic>" header. Falls
+    // back to a first-words title internally, so this never blocks the save.
+    const title = await generateVentTitle(ventText)
     const { data: newSession, error: sessionErr } = await db
       .from('vent_sessions')
-      .insert({ user_id: userId, vent_text: ventText, theme: theme ?? 'cyberpunk' })
+      .insert({ user_id: userId, vent_text: ventText, theme: theme ?? 'cyberpunk', title })
       .select('id')
       .single()
 

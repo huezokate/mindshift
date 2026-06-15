@@ -16,6 +16,7 @@ type RawLens = {
 type RawSession = {
   id: string
   vent_text: string
+  title: string | null
   theme: string
   is_public: boolean
   created_at: string
@@ -33,7 +34,7 @@ export default async function JournalEntryDetailPage(
   const { data } = await db
     .from('vent_sessions')
     .select(`
-      id, vent_text, theme, is_public, created_at,
+      id, vent_text, title, theme, is_public, created_at,
       lens_responses (
         id, figure_id, response_text, is_favorite, created_at,
         lens_shares ( id, platform, shared_at )
@@ -49,6 +50,7 @@ export default async function JournalEntryDetailPage(
   const entry: JournalEntry = {
     id: s.id,
     vent_text: s.vent_text,
+    title: s.title ?? null,
     theme: s.theme,
     is_public: !!s.is_public,
     created_at: s.created_at,

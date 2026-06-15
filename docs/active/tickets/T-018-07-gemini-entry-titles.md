@@ -5,7 +5,7 @@ title: gemini-entry-titles
 type: task
 status: open
 priority: low
-phase: ready
+phase: done
 depends_on: []
 ---
 
