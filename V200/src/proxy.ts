@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 const APP_HOST = 'app.minds-shift.com'
 const APEX_HOST = 'minds-shift.com'
 
-const isProtectedRoute = createRouteMatcher(['/app/journal'])
+const isProtectedRoute = createRouteMatcher(['/app/journal-v2', '/app/journal-v2/:path*'])
 const isAppOrAuthPath = createRouteMatcher(['/app/:path*', '/sign-in/:path*', '/sign-up/:path*'])
 
 export default clerkMiddleware(async (auth, req) => {
