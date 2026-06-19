@@ -2,6 +2,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { motion } from 'framer-motion'
 import { getSupabase } from '@/lib/supabase'
+import { FIGURES, type Figure } from '@/lib/figures'
 
 const APP_BASE = process.env.NEXT_PUBLIC_APP_URL ?? ''
 const TRY_URL = `${APP_BASE}/app/theme-select`
@@ -36,6 +37,7 @@ export default function LandingPage() {
     >
       <Hero />
       <FigureDemo />
+      <LensGallery />
       <Waitlist />
       <WhoIsItFor />
       <Testimonials />
@@ -291,10 +293,15 @@ function FigureDemo() {
                     borderRadius: '50%',
                     cursor: 'pointer',
                     background: 'transparent',
-                    border: i === active ? '2.5px solid var(--cyan)' : '2.5px solid transparent',
+                    // Selected / not-selected treatment per Figma (node 739:3437, notepad):
+                    // selected = thicker red ring + green offset "sticker" shadow;
+                    // not selected = thin red ring, dimmed to the 60% disabled state
+                    // (matching how a disabled lens component reads in the app).
+                    border: i === active ? '3px solid var(--pink)' : '2px solid var(--pink)',
+                    boxShadow: i === active ? '2px 4px 0 0 var(--green)' : 'none',
                     outline: 'none',
                     lineHeight: 0,
-                    opacity: i === active ? 1 : 0.55,
+                    opacity: i === active ? 1 : 0.6,
                   }}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -364,6 +371,96 @@ function FigureDemo() {
         </motion.div>
       </motion.div>
     </Section>
+  )
+}
+
+// All 15 lenses, styled to match the notepad landing: white "sticker" cards (red border +
+// offset paper shadow via the --card-* tokens), red avatar rings, serif blue names. Uses the
+// kawaii portraits — same set the demo above uses, which read warm on light paper (the
+// cyberpunk portraits are tuned for the dark app theme). Layout per Figma node 482:2611 /
+// 469:3977: mobile is a 3-up grid showing the vibe; desktop is a 5-up grid showing the quote.
+// Notepad portraits live alongside the kawaii set with identical filenames, so we derive
+// the path off imgKawaii rather than threading a new field through the shared figures list.
+function notepadPortrait(f: Figure) {
+  return f.imgKawaii.replace('/portraits/kawaii/', '/portraits/notepad/')
+}
+
+function LensCard({ f }: { f: Figure }) {
+  return (
+    // Matches Figma node 469:3975 (notepad lens card): up to 376px wide, hand-drawn green
+    // border (heavier 3px left, 1px right, 2px top/bottom), 8px padding, 16px gap, no shadow.
+    // Spacing/sizing is INLINE, not Tailwind classes: this project doesn't emit p-*/gap-*/m-*
+    // utilities (every component styles spacing inline), so p-2/gap-* silently rendered as 0 —
+    // which is what made the content sit flush against the border.
+    <div
+      className="flex flex-col items-center"
+      style={{
+        width: '100%',
+        maxWidth: 376,
+        margin: '0 auto',
+        padding: 8,
+        gap: 16,
+        borderRadius: 8,
+        background: 'var(--card-bg)',
+        borderTop: '2px solid var(--green)',
+        borderRight: '1px solid var(--green)',
+        borderBottom: '2px solid var(--green)',
+        borderLeft: '3px solid var(--green)',
+      }}
+    >
+      <div className="size-16 md:size-20 shrink-0 overflow-hidden rounded-full" style={{ border: '2px solid var(--pink)' }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={notepadPortrait(f)} alt={f.name} width={80} height={80} className="size-full object-cover" />
+      </div>
+      <p
+        className="text-center uppercase text-[12px] md:text-[18px] leading-tight md:leading-[20px]"
+        style={{ fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: 1.2, color: 'var(--cyan)' }}
+      >
+        {f.name}
+      </p>
+      {/* the vibe — shown on mobile (compact 3-up stack) */}
+      <p
+        className="md:hidden text-center uppercase text-[10px]"
+        style={{ fontFamily: 'var(--font-body)', fontWeight: 600, letterSpacing: 0.8, lineHeight: 1.3, color: 'var(--text-sub)' }}
+      >
+        {f.descriptor}
+      </p>
+      {/* the famous quote — shown on desktop (Figma: Inter 14px, regular, notepad black) */}
+      <p
+        className="hidden md:block text-center text-[14px]"
+        style={{ fontFamily: 'var(--font-body)', letterSpacing: 0.18, lineHeight: '20px', color: 'var(--text-body)' }}
+      >
+        &ldquo;{f.quote}&rdquo;
+      </p>
+    </div>
+  )
+}
+
+function LensGallery() {
+  return (
+    // Full-bleed section: the grid spans the whole viewport with 120px side padding on
+    // desktop (clamping down on smaller screens), rather than the centered maxWidth used elsewhere.
+    <section style={{ padding: '60px clamp(24px, 8vw, 120px)' }}>
+      <motion.div
+        variants={stagger}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.1 }}
+        className="flex flex-col"
+        style={{ gap: 36 }}
+      >
+        <motion.div variants={fade} className="flex flex-col items-center text-center" style={{ gap: 12 }}>
+          <Eyebrow>The full lineup</Eyebrow>
+          <H2>Fifteen lenses, each with a vibe</H2>
+        </motion.div>
+
+        <motion.div variants={fade} className="grid grid-cols-3 md:grid-cols-5" style={{ gap: 16 }}>
+          {FIGURES.map((f) => (
+            <LensCard key={f.id} f={f} />
+          ))}
+        </motion.div>
+      </motion.div>
+    </section>
   )
 }
 
