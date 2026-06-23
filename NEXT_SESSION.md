@@ -1,38 +1,97 @@
-# MindShift — Next session to-do (written 2026-06-14)
+# MindShift — Next session to-do (written 2026-06-23)
 
-## Where things stand (shipped this session)
-- **Journal frontend SHIPPED to prod** — merged `feat/landing-figure-vent` → `main` (Vercel auto-deploys). Feed + entry detail, 3 themes, AppHeader nav + dropdown, Material Symbols icons, real per-theme portraits, social badges, "Vent it out" / "+Lens" CTAs.
-- **Migration 004 applied to prod DB** — `vent_sessions.title` column exists (for AI titles).
-- **Comp allowlist live** — `test@minds-shift.com` = pro (unlimited), in `src/lib/user-tier.ts` `COMP_EMAILS`.
-- **Repos untangled** — `MindShift/` has worktrees `website/` (feat/website) + `mindmap/` (feat/mindmap-flow); journal = root on `main`. TimeLens + strawberry-farm split into their own projects. Home `~` de-gitted. lisa scoped to MindShift (`docs/active/` = story **S-018** only; older tickets archived in `docs/archive/`).
-- ⚠️ **Lisa-worker screens shipped without direct review** — response-screen footer cleanup, sign-in/theme-select arrows, Gemini-title scaffolding. Eyeball on prod; revert any single commit if off.
+## TL;DR
+Journal (S-018) is **done and live on prod**. Next focus: **Mindmap — wire the
+backend (Groq) + polish the frontend** so the key flow ships before the
+**Saturday investor pitch**. Start with a **mindmap frontend review**.
 
-## Key facts for next session
-- Supabase project ref: `wwszertnwbsdwbkzrupk` (one project). Migrations in `V200/supabase/migrations/`.
-- Save logic (Kate): **anon = explicit Save button** (→ pop → journal); **signed-in = auto-save** vent + all lenses (no button). Tracked on ticket T-018-05.
-- Tiers: anon 3 lenses/day · free 3 quotes/day, 5 lenses/quote · pro unlimited. Logic in `src/lib/user-tier.ts`.
-- Figma source of truth — always `get_design_context`, match exactly, tokens only. For Figma *builds*, load `figma-generate-design` + bind real design-system variables/styles/components (don't hardcode). Note: the use_figma plugin has Google-Fonts only (no OS "Georgia").
-- lisa is clean for MindShift — `cd ~/Documents/projects/MindShift && lisa loop` will only schedule S-018.
+---
 
-## ▶ DO FIRST — Journal backend (close the shipped feature)
-1. **Verify end-to-end on prod** signed-in: vent → lens → save → appears in `/app/journal-v2` → detail page loads. Fix any API/RLS gaps.
-2. **Save-by-tier (T-018-05):** anon Save button persists; signed-in auto-saves vent + all applied lenses. Wire to `save-response` API.
-3. **Gemini entry titles (T-018-07):** call `/api/generate-title` on save → persist to `vent_sessions.title` (column exists). Falls back to first-words if it fails.
-4. **Lens-picker popup (T-018-04):** the `onAddLens` stub on feed + the "+Lens" button on detail → open picker → add lens to an existing entry, tier-gated (free 3/entry, pro unlimited).
-5. **Review/polish the worker-shipped screens** (response footer, sign-in/theme-select #1/#4).
+## Shipped to prod this session (2026-06-23)
+All on `main` (Vercel auto-deploys). Prod tip: `728925e`.
+- **Theme persistence** — marketing landing restores the saved theme on exit (no
+  longer strips `data-theme`). ⚠️ Do NOT add a global "sync data-theme to state"
+  effect in `lib/theme.tsx` — it overrides the landing's notepad pin and broke
+  minds-shift.com once already. The landing is intentionally pinned to notepad.
+- **Account dropdown** (`AppHeader.tsx`) — matches Figma `626:9114`: opaque rows
+  (cyberpunk black `var(--bg)`, notepad paper), no container frame, "MENU"
+  primary trigger. Self-fetches journal counts via `/api/journal-v2/counts`.
+- **Anon funnel** — every account-bound dropdown row (Profile, Journal, Mind Map,
+  Log-out→Sign-in) routes anon users to sign-in via `goOrSignIn()`. Journal "New"
+  still → `/app/onboarding` (the anon vent funnel). We want users onboarded.
+- **Pre-save share card** — response screen opens the rich `ShareSheet` (same as
+  journal); `ShareSheet.responseId` is now optional.
+- **T-018-05 auto-save** — signed-in users auto-save vent + every lens (no button);
+  anon Save → sign-in. (`app/app/response/page.tsx`)
+- **T-018-04 +lens picker** — `LensPickerSheet` (extracted from `/app/lens`,
+  endless carousel, opens on Socrates). "+Lens" on feed card + entry detail →
+  generate (tier-enforced) + append + carousel scrolls to the new lens.
+  Helper: `lib/add-lens.ts`.
 
-## ▶ THEN — Mindmap + its backend (the bigger build)
-6. Mindmap **schema migration** (goals / milestones / weekly_goals / check-ins — draft in `V200/SESSION_CONTEXT.md`).
-7. **Gemini generation** — WOOP/scope input → weekly goals + milestones at the chosen cadence.
-8. **Persistence + auth/email** — gate map creation or capture email; wire save/load.
-9. **Mindmap frontend** — reconcile feat/mindmap-flow with the latest Figma; match design-system styles.
+Tabled: T-018-07 Gemini titles (Groq titles are fine). **Model/Gemini tuning is
+tabled** — lenses run on Groq and quality is good.
 
-## ▶ LATER (roadmap order)
-10. **Clerk billing** — free-premium passcode/comp (recruited users free; stumble-on users must pay). Comp allowlist already exists as a stopgap.
-11. **Ship + campaign.**
-12. **Gemini response-quality tuning** (audit the lens responses).
-13. **Weekly goals + Monday email** (Resend; `hello@minds-shift.com` verified).
+---
 
-## Queued (parallel, non-blocking)
-- **Code → Figma component inventory** at node `603:6971` (cyberpunk first) — once journal components are final. Needs `figma-use` + `figma-generate-library`.
-- Redo the **share card in Figma** (node `534:4003`) on real design-system styles/components (current one is hardcoded + Inter placeholder avatar).
+## ⚠️ How to ship to prod (the safe process — IMPORTANT)
+Prod runs off `main`. The active dev branch `feat/mindmap` has **unshipped
+mindmap work**, so DO NOT merge the whole branch. Ship only finished commits:
+```
+git checkout -b ship/<name> origin/main
+git cherry-pick <commit>...          # the finished commits only
+npm --prefix V200 run build          # safety gate — must pass
+git push origin ship/<name>:main     # clean fast-forward → Vercel deploys
+git checkout feat/mindmap && git branch -D ship/<name>
+```
+Most app files are identical on `main` and `feat/mindmap`, so cherry-picks apply
+clean. Never `rm -rf .next` while `npm run dev` is running (corrupts Turbopack
+cache → 500s; stop dev first).
+
+## Branch / worktree map
+- ONE repo: `github.com/huezokate/mindshift`. `MindShift/` (root) = `feat/mindmap`
+  (active app dev). Worktrees: `website/`=`main`, `mindmap/`=`feat/mindmap-flow`.
+- `feat/mindmap` is canonical for app work (has migration 005 + the ported
+  mindmap frontend + everything above). All `backup/2026-06-22/*` tags preserve
+  every old branch tip — nothing is lost.
+- Deferred: the monorepo restructure (`apps/web/`) + unifying `main` — AFTER the
+  pitch.
+
+---
+
+## ▶ NEXT: Mindmap — review, backend, polish
+**Current state:** frontend pages exist but run on **sample/stub data**; schema
+migration `005_mindmap.sql` exists; **no mindmap API routes, no real
+persistence/generation yet.**
+- Pages: `app/app/mindmap/page.tsx` (gate — localStorage stub), `new/page.tsx`
+  (WOOP create flow, `SAMPLE_WOOP`), `map/page.tsx` (`SAMPLE_MILESTONES`),
+  `reflect/page.tsx` (**tabled — skip**).
+- Components: `components/mindmap/{MindmapAreaCard,AreaIcon}.tsx`.
+- Lib: `lib/mindmap-areas.ts` (5 life areas). Migration: `supabase/migrations/005_mindmap.sql`.
+
+**Plan (start with a frontend review):**
+1. **Frontend review** — open `/app/mindmap`, `/new`, `/map` in all 3 themes;
+   note what's solid vs rough vs not-Figma-matched. Decide the minimal shippable
+   flow (likely: create via WOOP → generate goals/milestones → view map).
+2. **Schema** — read `005_mindmap.sql`; confirm it covers goals / milestones /
+   weekly_goals / check-ins with RLS keyed on `user_id` (`requesting_user_id()`).
+   Apply via Supabase MCP `apply_migration` if not already on prod DB.
+3. **Backend** — add `/api/mindmap/*`: generate (Groq, WOOP input →
+   weekly goals + milestones), save, fetch. Mirror the journal API patterns
+   (`getSupabaseAdmin()`, `auth()` from `@clerk/nextjs/server`, tier checks).
+4. **Wire frontend** — replace `SAMPLE_*` with real fetches; persist on create.
+   Account-bound, so behind sign-in (anon dropdown already funnels there).
+5. **Polish to Figma** — `get_design_context` per node, tokens only (Figma is the
+   bible). Mindmap nodes referenced in `docs/active/SESSION-RECAP-2026-06-05-07.md`
+   (e.g. `541:5035` hub, `541:4022/4231` cards, `534:4003` capture page).
+
+**Weekly goals + Monday email** = LAST mindmap phase (Resend, verified
+`hello@minds-shift.com`). M5 Sunday-reminder is scaffolded on `feat/mindmap`.
+Not needed for the pitch.
+
+## Key facts
+- Supabase ref: `wwszertnwbsdwbkzrupk`. Migrations in `V200/supabase/migrations/`.
+- AI: lenses on **Groq** (`AI_PROVIDER`); `/api/generate-response` enforces tiers.
+- Tiers: anon 3 lenses/day · free 3 quotes/day, 5 lenses/quote · pro unlimited
+  (`lib/user-tier.ts`, comp via `comp_users` table, migration 006).
+- Figma source of truth — always `get_design_context`, match exactly, tokens only.
+- Theme bug (theme-select→onboarding flip): **not chasing** — not reproducing now.
