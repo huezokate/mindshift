@@ -80,13 +80,16 @@ export default function AppHeader({
   const shownEntries = entryCount ?? fetchedCounts?.entries ?? 0
   const shownLenses = lensCount ?? fetchedCounts?.lenses ?? 0
 
-  // Anon has no journal — journaling persists per user_id, so the journal is
-  // gated. Tapping anything journal-related sends them to sign-in (returning to
-  // the journal afterwards) and we show no entry/lens count.
-  const goJournal = () =>
+  // Anon has no account-bound surfaces (journal, profile, mind map all persist
+  // per user_id), so every account-menu destination funnels anon users to
+  // sign-in/create-account — we need them onboarded (Kate, 23 June). Signed-in
+  // users go straight to the destination.
+  const goOrSignIn = (dest: string, reason: string) =>
     isSignedIn
-      ? router.push('/app/journal-v2')
-      : router.push('/sign-in?reason=journal&redirect_url=' + encodeURIComponent('/app/journal-v2'))
+      ? router.push(dest)
+      : router.push(`/sign-in?reason=${reason}&redirect_url=` + encodeURIComponent(dest))
+
+  const goJournal = () => goOrSignIn('/app/journal-v2', 'journal')
 
   // Close on outside click / Esc.
   useEffect(() => {
@@ -178,7 +181,7 @@ export default function AppHeader({
           }}
         >
           {/* Profile — primary variant, 72px tall (Figma 624:7909) */}
-          <Row variant="primary" theme={theme} tall onClick={() => router.push('/app/profile')}>
+          <Row variant="primary" theme={theme} tall onClick={() => goOrSignIn('/app/profile', 'profile')}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
               <span style={LABEL}>Profile</span>
               {username && <span style={META}>{username}</span>}
@@ -214,12 +217,13 @@ export default function AppHeader({
             </Row>
           </div>
 
-          {/* Mind Map — mindmap variant (cyber cyan / kawaii mint / notepad green) */}
+          {/* Mind Map — mindmap variant (cyber cyan / kawaii mint / notepad green).
+              Anon → sign-in (account-bound, like Journal). */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Row variant="mindmap" theme={theme} tall onClick={() => router.push('/app/mindmap')}>
+            <Row variant="mindmap" theme={theme} tall onClick={() => goOrSignIn('/app/mindmap', 'mindmap')}>
               <span style={LABEL}>Mind Map</span>
             </Row>
-            <Row variant="mindmap" theme={theme} onClick={() => router.push('/app/mindmap')}>
+            <Row variant="mindmap" theme={theme} onClick={() => goOrSignIn('/app/mindmap', 'mindmap')}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
                 <Icon name="tab_group" size={20} />
                 <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1 }}>
@@ -228,7 +232,7 @@ export default function AppHeader({
                 </span>
               </span>
             </Row>
-            <Row variant="mindmap" theme={theme} onClick={() => router.push('/app/mindmap/new')}>
+            <Row variant="mindmap" theme={theme} onClick={() => goOrSignIn('/app/mindmap/new', 'mindmap')}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
                 <Icon name="add" size={20} /><span style={LABEL}>New</span>
               </span>
