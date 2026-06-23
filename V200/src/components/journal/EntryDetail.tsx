@@ -1,5 +1,5 @@
 'use client'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTheme } from '@/lib/theme'
 import Icon from '@/components/ui/Icon'
 import AppHeader from '@/components/nav/AppHeader'
@@ -31,6 +31,8 @@ export default function EntryDetail({ entry }: Props) {
   const [pickerOpen, setPickerOpen] = useState(false)
   const [addingLens, setAddingLens] = useState(false)
   const [addLensError, setAddLensError] = useState<string | null>(null)
+  // Set after adding a lens so the post-render effect centers the carousel on it.
+  const scrollToNewLens = useRef(false)
 
   async function handlePickLens(figureId: string) {
     if (addingLens) return
@@ -40,11 +42,9 @@ export default function EntryDetail({ entry }: Props) {
       const { lens } = await applyLensToEntry({
         sessionId: entry.id, ventText: entry.vent_text, figureId, theme,
       })
-      setLenses(prev => {
-        const next = [...prev.filter(l => l.figure_id !== lens.figure_id), lens]
-        setActiveLens(next.length - 1) // focus the freshly added lens
-        return next
-      })
+      // Upsert: drop any prior lens for this figure, append the new one at the end.
+      setLenses(prev => [...prev.filter(l => l.figure_id !== lens.figure_id), lens])
+      scrollToNewLens.current = true
       setPickerOpen(false)
     } catch (err) {
       setAddLensError(err instanceof Error ? err.message : 'Could not add the lens.')
@@ -52,6 +52,19 @@ export default function EntryDetail({ entry }: Props) {
       setAddingLens(false)
     }
   }
+
+  // After a lens is added, center the carousel on it (the new lens is last).
+  // Runs once the new card has rendered, so the scroll target exists.
+  useEffect(() => {
+    if (!scrollToNewLens.current) return
+    scrollToNewLens.current = false
+    const last = lenses.length - 1
+    setActiveLens(last)
+    const el = lensScrollRef.current
+    if (el && lenses.length > 1) {
+      el.scrollTo({ left: last * (el.clientWidth - 48 + 8), behavior: 'smooth' })
+    }
+  }, [lenses])
 
   // Prefer the Gemini "<synonym> on <topic>" title (T-018-07); fall back to the
   // vent's first words. Rendered UPPERCASE to match Figma (469:4275) — the
