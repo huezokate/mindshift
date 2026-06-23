@@ -27,6 +27,9 @@ export default function ResponsePage() {
   const [displayed, setDisplayed] = useState('')
   const [done, setDone] = useState(false)
   const [shareOpen, setShareOpen] = useState(false)
+  // True only when this is a real vent (loaded from sessionStorage), not the
+  // demo fallback — gates auto-save so we never persist the placeholder.
+  const [loadedReal, setLoadedReal] = useState(false)
   const saveControls = useAnimationControls()
 
   useEffect(() => {
@@ -36,6 +39,7 @@ export default function ResponsePage() {
     const found = figureId ? FIGURES.find(f => f.id === figureId) : null
     if (found) setFigure(found)
     if (ventText) setVent(ventText)
+    if (resp) setLoadedReal(true)
     setResponse(resp || DEMO_RESPONSE)
   }, [])
 
@@ -54,13 +58,10 @@ export default function ResponsePage() {
 
   const avatarSrc = getFigureImg(figure, theme)
 
-  async function handleSave() {
-    if (!isSignedIn) {
-      router.push('/sign-in?reason=save&redirect_url=' + encodeURIComponent('/app/response'))
-      return
-    }
-    if (saveState === 'saving' || saveState === 'saved') return
-    setSaveState('saving')
+  // Core persist — upserts the vent session + this lens. Appends to the existing
+  // session (ms_session_id) so every lens applied to the same vent lands in one
+  // entry. Returns the saved sessionId, or null on failure.
+  async function persist(): Promise<string | null> {
     try {
       const existingSessionId = sessionStorage.getItem('ms_session_id')
       const res = await fetch('/api/save-response', {
@@ -77,16 +78,44 @@ export default function ResponsePage() {
       if (!res.ok) throw new Error()
       const data = await res.json()
       sessionStorage.setItem('ms_session_id', data.sessionId)
-      setSaveState('saved')
-      // Pop the bookmark, then route to the freshly-saved entry's detail page.
-      await saveControls.start({
-        scale: [1, 1.3, 0.92, 1],
-        transition: { duration: 0.42, times: [0, 0.4, 0.7, 1], ease: 'easeOut' },
-      })
-      router.push(`/app/journal-v2/${data.sessionId}`)
+      return data.sessionId
     } catch {
-      setSaveState('error')
+      return null
     }
+  }
+
+  // Signed-in users journal automatically (T-018-05): once the response finishes
+  // typing, silently save the vent + this lens. No button, no navigation — the
+  // entry just appears in their journal. Re-runs per lens via saveState gating.
+  useEffect(() => {
+    if (isSignedIn !== true || !done || !loadedReal || saveState !== 'idle') return
+    let alive = true
+    setSaveState('saving')
+    persist().then(id => {
+      if (!alive) return
+      setSaveState(id ? 'saved' : 'error')
+    })
+    return () => { alive = false }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSignedIn, done, loadedReal])
+
+  // Explicit Save — anon only (signed-in auto-saves above). Anon can't journal
+  // without an account, so route to sign-in and return to the response after.
+  async function handleSave() {
+    if (!isSignedIn) {
+      router.push('/sign-in?reason=save&redirect_url=' + encodeURIComponent('/app/response'))
+      return
+    }
+    if (saveState === 'saving' || saveState === 'saved') return
+    setSaveState('saving')
+    const id = await persist()
+    if (!id) { setSaveState('error'); return }
+    setSaveState('saved')
+    await saveControls.start({
+      scale: [1, 1.3, 0.92, 1],
+      transition: { duration: 0.42, times: [0, 0.4, 0.7, 1], ease: 'easeOut' },
+    })
+    router.push(`/app/journal-v2/${id}`)
   }
 
   // Open the same rich quote-card sheet used in the journal — generated from the
@@ -231,18 +260,39 @@ export default function ResponsePage() {
             animate={{ opacity: 1, y: 0 }}
             className="flex gap-2 w-full lg:col-start-1 lg:row-start-2 lg:self-start"
           >
-            {/* Save to journal */}
-            <motion.button
-              onClick={handleSave}
-              animate={saveControls}
-              whileTap={{ scale: 0.95 }}
-              className="uppercase hover:opacity-80"
-              title={saveState === 'saved' ? 'Saved!' : 'Save to journal'}
-              style={pillStyle('--cyan')}
-            >
-              <Icon name="bookmark" size={18} />
-              {saveState === 'saved' ? 'Saved' : 'Save'}
-            </motion.button>
+            {/* Save: anon taps to save (routes to sign-in). Signed-in auto-saves
+                (T-018-05) — show a non-interactive status pill instead. */}
+            {isSignedIn === true ? (
+              <div
+                role={saveState === 'error' ? 'button' : undefined}
+                onClick={saveState === 'error' ? () => {
+                  setSaveState('saving')
+                  persist().then(id => setSaveState(id ? 'saved' : 'error'))
+                } : undefined}
+                className="uppercase"
+                title={saveState === 'error' ? 'Save failed — tap to retry' : 'Saved to your journal'}
+                style={{
+                  ...pillStyle('--cyan'),
+                  cursor: saveState === 'error' ? 'pointer' : 'default',
+                  opacity: saveState === 'saving' ? 0.6 : 1,
+                }}
+              >
+                <Icon name={saveState === 'saved' ? 'bookmark_added' : 'bookmark'} size={18} />
+                {saveState === 'saved' ? 'Saved' : saveState === 'error' ? 'Retry' : 'Saving…'}
+              </div>
+            ) : (
+              <motion.button
+                onClick={handleSave}
+                animate={saveControls}
+                whileTap={{ scale: 0.95 }}
+                className="uppercase hover:opacity-80"
+                title="Save to journal"
+                style={pillStyle('--cyan')}
+              >
+                <Icon name="bookmark" size={18} />
+                Save
+              </motion.button>
+            )}
             {/* New lens — re-pick a lens for the same vent (vent persists in sessionStorage) */}
             <button
               onClick={() => router.push('/app/lens')}
