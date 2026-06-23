@@ -5,9 +5,11 @@ import Icon from '@/components/ui/Icon'
 import AppHeader from '@/components/nav/AppHeader'
 import LensCard from './LensCard'
 import ShareSheet from './ShareSheet'
+import LensPickerSheet from './LensPickerSheet'
 import UpcomingChip from './UpcomingChip'
 import type { JournalEntry, LensResponseV2, SharePlatform } from '@/lib/journal-types'
 import { deriveTitleFallback } from '@/lib/title'
+import { applyLensToEntry } from '@/lib/add-lens'
 
 type Props = {
   entry: JournalEntry
@@ -24,7 +26,32 @@ export default function EntryDetail({ entry }: Props) {
   const [shareLens, setShareLens] = useState<LensResponseV2 | null>(null)
   const lensScrollRef = useRef<HTMLDivElement>(null)
 
-  const lenses = entry.lens_responses
+  // Lenses live in state so an added lens (T-018-04) shows immediately.
+  const [lenses, setLenses] = useState<LensResponseV2[]>(entry.lens_responses)
+  const [pickerOpen, setPickerOpen] = useState(false)
+  const [addingLens, setAddingLens] = useState(false)
+  const [addLensError, setAddLensError] = useState<string | null>(null)
+
+  async function handlePickLens(figureId: string) {
+    if (addingLens) return
+    setAddingLens(true)
+    setAddLensError(null)
+    try {
+      const { lens } = await applyLensToEntry({
+        sessionId: entry.id, ventText: entry.vent_text, figureId, theme,
+      })
+      setLenses(prev => {
+        const next = [...prev.filter(l => l.figure_id !== lens.figure_id), lens]
+        setActiveLens(next.length - 1) // focus the freshly added lens
+        return next
+      })
+      setPickerOpen(false)
+    } catch (err) {
+      setAddLensError(err instanceof Error ? err.message : 'Could not add the lens.')
+    } finally {
+      setAddingLens(false)
+    }
+  }
 
   // Prefer the Gemini "<synonym> on <topic>" title (T-018-07); fall back to the
   // vent's first words. Rendered UPPERCASE to match Figma (469:4275) — the
@@ -102,7 +129,7 @@ export default function EntryDetail({ entry }: Props) {
           picker (stubbed until T-018-04). Right-aligned, -4px over the card. */}
       <button
         type="button"
-        onClick={() => { /* eslint-disable-next-line no-console */ console.log('[journal] add lens to entry', entry.id) }}
+        onClick={() => { setAddLensError(null); setPickerOpen(true) }}
         aria-label="Add a lens to this entry"
         style={{
           position: 'relative', zIndex: 2,
@@ -348,6 +375,17 @@ export default function EntryDetail({ entry }: Props) {
           onShared={onShared}
         />
       )}
+
+      {/* Add-a-lens picker — shared carousel; Back returns to this entry. */}
+      <LensPickerSheet
+        open={pickerOpen}
+        startIndex={0}
+        loading={addingLens}
+        error={addLensError}
+        selectLabel="Add lens"
+        onBack={() => { setPickerOpen(false); setAddLensError(null) }}
+        onSelect={handlePickLens}
+      />
     </div>
   )
 }
