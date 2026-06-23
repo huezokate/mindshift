@@ -1,14 +1,13 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { useUser } from '@clerk/nextjs'
 import { FIGURES, getFigureImg } from '@/lib/figures'
 import { useTheme } from '@/lib/theme'
-import Icon from '@/components/ui/Icon'
-import CircularArrow from '@/components/ui/CircularArrow'
 import AppHeader from '@/components/nav/AppHeader'
 import Button from '@/components/ui/Button'
+import LensPickerSheet from '@/components/journal/LensPickerSheet'
 
 // Returns 'vents' if daily vent limit hit, 'lenses' if per-vent lens limit hit, null if OK
 function checkAnonLimits(ventText: string): 'vents' | 'lenses' | null {
@@ -134,16 +133,6 @@ export default function LensPage() {
       return
     }
     router.push('/app/response')
-  }
-
-  const previewing = previewIndex !== null ? FIGURES[previewIndex] : null
-
-  function prevPreview() {
-    setPreviewIndex(i => i === null ? null : (i - 1 + FIGURES.length) % FIGURES.length)
-  }
-
-  function nextPreview() {
-    setPreviewIndex(i => i === null ? null : (i + 1) % FIGURES.length)
   }
 
   return (
@@ -304,123 +293,15 @@ export default function LensPage() {
 
       </div>
 
-      {/* Lens detail overlay */}
-      <AnimatePresence>
-        {previewing && (
-          <motion.div
-            key="overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.18 }}
-            className="fixed inset-0 z-50 flex items-center justify-center"
-            style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(2px)', padding: '24px' }}
-            onClick={() => setPreviewIndex(null)}
-          >
-            {/* Detail card */}
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={previewing.id}
-                initial={{ opacity: 0, scale: 0.94, y: 8 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.94, y: 8 }}
-                transition={{ duration: 0.16 }}
-                onClick={e => e.stopPropagation()}
-                className="flex flex-col items-center gap-4 w-full"
-                style={{
-                  maxWidth: 320,
-                  background: 'var(--card-bg)',
-                  borderTop: 'var(--card-bt)',
-                  borderLeft: 'var(--card-bl)',
-                  borderRight: 'var(--card-br)',
-                  borderBottom: 'var(--card-bb)',
-                  borderRadius: 'var(--card-radius)',
-                  padding: '28px 20px 20px',
-                  boxShadow: 'var(--card-shadow)',
-                }}
-              >
-                {/* Portrait + in-popup nav arrows (shared CircularArrow) */}
-                <div className="flex items-center justify-between w-full">
-                  <CircularArrow
-                    direction="prev"
-                    ariaLabel="Previous figure"
-                    onClick={e => { e.stopPropagation(); prevPreview() }}
-                  />
-                  <div
-                    className="overflow-hidden flex-shrink-0"
-                    style={{
-                      width: 120, height: 120, borderRadius: '50%',
-                      background: 'var(--fig-avatar-grad)',
-                      border: 'var(--fig-avatar-border)',
-                      boxShadow: 'var(--fig-avatar-shadow)',
-                    }}
-                  >
-                    <img src={getFigureImg(previewing, theme)} alt={previewing.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%', display: 'block' }} />
-                  </div>
-                  <CircularArrow
-                    direction="next"
-                    ariaLabel="Next figure"
-                    onClick={e => { e.stopPropagation(); nextPreview() }}
-                  />
-                </div>
-
-                {/* Name */}
-                <p className="uppercase text-center" style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 18, letterSpacing: 1.5, lineHeight: '22px', color: 'var(--violet)' }}>
-                  {previewing.name}
-                </p>
-
-                {/* Era */}
-                <p className="text-center uppercase" style={{ fontFamily: 'var(--font-body)', fontSize: 10, letterSpacing: 1, color: 'var(--text-sub)', marginTop: -8 }}>
-                  {previewing.era}
-                </p>
-
-                {/* Quote */}
-                <p className="text-center" style={{ fontFamily: 'var(--font-body)', fontSize: 13, lineHeight: '20px', color: 'var(--text-body)', fontStyle: 'italic' }}>
-                  &ldquo;{previewing.quote}&rdquo;
-                </p>
-
-                {/* Bio */}
-                <p className="text-center" style={{ fontFamily: 'var(--font-body)', fontSize: 13, lineHeight: '20px', color: 'var(--text-body)' }}>
-                  {previewing.bio}
-                </p>
-
-                {/* Action buttons */}
-                <div className="flex gap-3 w-full" style={{ marginTop: 4 }}>
-                  <button
-                    onClick={() => setPreviewIndex(null)}
-                    className="flex-1 uppercase flex items-center justify-center"
-                    style={{
-                      fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 13,
-                      letterSpacing: 'var(--btn-letter-spacing, 2px)',
-                      gap: 6,
-                      color: 'var(--btn-secondary-color, var(--text-body))',
-                      background: 'var(--btn-secondary-bg)',
-                      borderTop: 'var(--btn-bt)', borderLeft: 'var(--btn-bl)',
-                      borderRight: 'var(--btn-br)', borderBottom: 'var(--btn-bb)',
-                      borderRadius: 'var(--btn-radius)', padding: '12px 8px',
-                      boxShadow: 'var(--btn-secondary-shadow)', cursor: 'pointer',
-                    }}
-                  >
-                    <Icon name="arrow_back" size={16} />
-                    Back
-                  </button>
-                  <Button
-                    variant="primary"
-                    disabled={loading}
-                    onClick={() => {
-                      setPreviewIndex(null)
-                      handleGetPerspective(previewing.id)
-                    }}
-                    style={{ flex: 1, fontSize: 13, letterSpacing: 'var(--btn-letter-spacing, 2px)', padding: '12px 8px' }}
-                  >
-                    {loading ? 'Loading…' : 'Select'}
-                  </Button>
-                </div>
-              </motion.div>
-            </AnimatePresence>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Lens detail overlay — shared picker (vent flow). Select generates the
+          response and routes to /app/response; Back returns to the grid. */}
+      <LensPickerSheet
+        open={previewIndex !== null}
+        startIndex={previewIndex ?? 0}
+        loading={loading}
+        onBack={() => setPreviewIndex(null)}
+        onSelect={figureId => { setPreviewIndex(null); handleGetPerspective(figureId) }}
+      />
     </div>
   )
 }

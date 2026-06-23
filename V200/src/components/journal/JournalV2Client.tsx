@@ -2,9 +2,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import JournalPreviewCard from './JournalPreviewCard'
 import JournalHeader from './JournalHeader'
+import LensPickerSheet from './LensPickerSheet'
 import AppHeader from '@/components/nav/AppHeader'
 import Icon from '@/components/ui/Icon'
 import { useTheme } from '@/lib/theme'
+import { applyLensToEntry } from '@/lib/add-lens'
 import Link from 'next/link'
 import WelcomeCard from './WelcomeCard'
 import type { JournalEntry, JournalFilter } from '@/lib/journal-types'
@@ -123,12 +125,41 @@ export default function JournalV2Client({ initialEntries, initialHasMore, firstN
     }
   }, [seeding, filter, fetchPage])
 
-  // Tapping the lens footer opens the lens picker — stubbed for now. The real
-  // popup is the next task; this hook is where it drops in.
+  // Add-a-lens picker (T-018-04): the lens footer opens the shared picker; on
+  // Select we generate + append the lens, then optimistically show it. Back
+  // returns to the journal.
+  const [pickerEntryId, setPickerEntryId] = useState<string | null>(null)
+  const [addingLens, setAddingLens] = useState(false)
+  const [addLensError, setAddLensError] = useState<string | null>(null)
+
   const handleAddLens = useCallback((entryId: string) => {
-    // eslint-disable-next-line no-console
-    console.log('[journal] add lens to entry', entryId)
+    setAddLensError(null)
+    setPickerEntryId(entryId)
   }, [])
+
+  const handlePickLens = useCallback(async (figureId: string) => {
+    if (!pickerEntryId || addingLens) return
+    const entry = entries.find(e => e.id === pickerEntryId)
+    if (!entry) return
+    setAddingLens(true)
+    setAddLensError(null)
+    try {
+      const { lens } = await applyLensToEntry({
+        sessionId: entry.id, ventText: entry.vent_text, figureId, theme,
+      })
+      setEntries(prev => prev.map(e =>
+        e.id === entry.id
+          // upsert: replace if this figure already had a lens, else append
+          ? { ...e, lens_responses: [...e.lens_responses.filter(l => l.figure_id !== lens.figure_id), lens] }
+          : e
+      ))
+      setPickerEntryId(null)
+    } catch (err) {
+      setAddLensError(err instanceof Error ? err.message : 'Could not add the lens.')
+    } finally {
+      setAddingLens(false)
+    }
+  }, [pickerEntryId, addingLens, entries, theme])
 
   return (
     <div className="flex flex-col gap-4">
@@ -262,6 +293,17 @@ export default function JournalV2Client({ initialEntries, initialHasMore, firstN
           {seedMsg}
         </p>
       )}
+
+      {/* Add-a-lens picker — shared carousel; Back returns to the journal. */}
+      <LensPickerSheet
+        open={pickerEntryId !== null}
+        startIndex={0}
+        loading={addingLens}
+        error={addLensError}
+        selectLabel="Add lens"
+        onBack={() => { setPickerEntryId(null); setAddLensError(null) }}
+        onSelect={handlePickLens}
+      />
     </div>
   )
 }
