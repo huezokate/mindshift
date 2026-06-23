@@ -5,7 +5,9 @@ import { renderQuoteCard } from './QuoteCardCanvas'
 import type { SharePlatform } from '@/lib/journal-types'
 
 type Props = {
-  responseId: string
+  /** Persisted response id — only needed to LOG the share. Omitted before save
+      (response screen), where the card is generated from the content alone. */
+  responseId?: string
   figureId: string
   responseText: string
   ventText: string
@@ -114,6 +116,9 @@ export default function ShareSheet({
   }, [figureId, responseText, themeKey, ventText, includeVent])
 
   async function logShare(platform: SharePlatform) {
+    // No persisted id (sharing before the entry is saved) → nothing to log to,
+    // but the share still happened, so notify the parent for UI/analytics.
+    if (!responseId) { onShared(platform); return }
     try {
       await fetch(`/api/journal-v2/responses/${responseId}/share`, {
         method: 'POST',

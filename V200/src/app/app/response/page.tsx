@@ -7,6 +7,7 @@ import { FIGURES, getFigureImg } from '@/lib/figures'
 import { useTheme } from '@/lib/theme'
 import Icon from '@/components/ui/Icon'
 import AppHeader from '@/components/nav/AppHeader'
+import ShareSheet from '@/components/journal/ShareSheet'
 
 const MAX_CHARS = 800
 const DEMO_FIGURE = FIGURES[0]
@@ -25,6 +26,7 @@ export default function ResponsePage() {
   const [response, setResponse] = useState('')
   const [displayed, setDisplayed] = useState('')
   const [done, setDone] = useState(false)
+  const [shareOpen, setShareOpen] = useState(false)
   const saveControls = useAnimationControls()
 
   useEffect(() => {
@@ -87,13 +89,10 @@ export default function ResponsePage() {
     }
   }
 
-  async function handleShare() {
-    const text = `${figure.name}: "${response}"`
-    if (navigator.share) {
-      await navigator.share({ text })
-    } else {
-      await navigator.clipboard.writeText(text)
-    }
+  // Open the same rich quote-card sheet used in the journal — generated from the
+  // content, so the card looks identical whether or not the entry is saved yet.
+  function handleShare() {
+    setShareOpen(true)
   }
 
   // Labelled, bordered accent pills matching the Button Secondary component
@@ -274,6 +273,17 @@ export default function ResponsePage() {
         )}
 
       </div>
+
+      {shareOpen && (
+        <ShareSheet
+          figureId={figure.id}
+          responseText={response}
+          ventText={vent}
+          isEntryPublic={false}
+          onClose={() => setShareOpen(false)}
+          onShared={() => {}}
+        />
+      )}
 
     </div>
   )

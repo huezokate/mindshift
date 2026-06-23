@@ -29,6 +29,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Keep the <html data-theme> attribute locked to React state. Other code can
+  // mutate the attribute directly (e.g. the marketing landing pins notepad while
+  // mounted and strips it on exit) — without this, an app screen navigated to
+  // afterwards renders the bare :root skin instead of the selected theme. This
+  // re-asserts the real theme on every state change so the DOM never drifts.
+  useEffect(() => {
+    if (document.documentElement.getAttribute('data-theme') !== theme) {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+  }, [theme])
+
   function apply(t: Theme) {
     document.documentElement.setAttribute('data-theme', t)
     localStorage.setItem(STORAGE_KEY, t)
