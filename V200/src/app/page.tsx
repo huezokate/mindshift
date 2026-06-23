@@ -16,11 +16,13 @@ export default function LandingPage() {
   // Marketing landing is pinned to the notepad theme (its design target),
   // regardless of the visitor's saved app theme. Restored on unmount.
   useEffect(() => {
-    const prev = document.documentElement.getAttribute('data-theme')
     document.documentElement.setAttribute('data-theme', 'notepad')
     return () => {
-      if (prev) document.documentElement.setAttribute('data-theme', prev)
-      else document.documentElement.removeAttribute('data-theme')
+      // Restore to the visitor's actual saved theme (defaulting to cyberpunk) —
+      // never leave the attribute stripped, or the next app screen falls back to
+      // the bare :root skin and the theme picked on /app/theme-select is lost.
+      const saved = localStorage.getItem('ms_theme')
+      document.documentElement.setAttribute('data-theme', saved || 'cyberpunk')
     }
   }, [])
 

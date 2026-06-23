@@ -52,15 +52,41 @@ export default function AppHeader({
   entryCount, lensCount, mindmapHorizon, mindmapProgress,
 }: Props) {
   const router = useRouter()
-  const { user } = useUser()
+  const { user, isSignedIn } = useUser()
   const { signOut } = useClerk()
   const { theme } = useTheme()
   const [open, setOpen] = useState(false)
+  const [fetchedCounts, setFetchedCounts] = useState<{ entries: number; lenses: number } | null>(null)
   const wrapRef = useRef<HTMLDivElement>(null)
 
   const username = user?.username
     ? `@${user.username}`
     : user?.primaryEmailAddress?.emailAddress ?? null
+
+  // Counts: a page may pass live values (the journal page does); otherwise a
+  // signed-in header self-fetches its totals so the dropdown isn't stuck at 0
+  // on onboarding / response / lens etc. Props always win when provided.
+  useEffect(() => {
+    if (entryCount != null && lensCount != null) return
+    if (!isSignedIn) { setFetchedCounts(null); return }
+    let alive = true
+    fetch('/api/journal-v2/counts')
+      .then(r => (r.ok ? r.json() : null))
+      .then(d => { if (alive && d) setFetchedCounts(d) })
+      .catch(() => {})
+    return () => { alive = false }
+  }, [isSignedIn, entryCount, lensCount])
+
+  const shownEntries = entryCount ?? fetchedCounts?.entries ?? 0
+  const shownLenses = lensCount ?? fetchedCounts?.lenses ?? 0
+
+  // Anon has no journal — journaling persists per user_id, so the journal is
+  // gated. Tapping anything journal-related sends them to sign-in (returning to
+  // the journal afterwards) and we show no entry/lens count.
+  const goJournal = () =>
+    isSignedIn
+      ? router.push('/app/journal-v2')
+      : router.push('/sign-in?reason=journal&redirect_url=' + encodeURIComponent('/app/journal-v2'))
 
   // Close on outside click / Esc.
   useEffect(() => {
@@ -109,7 +135,35 @@ export default function AppHeader({
         }}>
           MindShift
         </p>
-        {badge('psychology', () => setOpen(o => !o), 'Account menu')}
+        {/* Menu trigger — text + icon, primary button treatment so it matches
+            the design-system CTA per theme (kawaii amber fill / cyberpunk black
+            + green border / notepad white fill + black border). Driven by the
+            --btn-* (primary) token family, never hardcoded. */}
+        <button
+          type="button"
+          onClick={() => setOpen(o => !o)}
+          aria-label="Account menu"
+          aria-expanded={open}
+          style={{
+            height: 48, flexShrink: 0,
+            background: 'var(--btn-bg)',
+            color: 'var(--btn-color)',
+            borderTop: 'var(--btn-bt)',
+            borderLeft: 'var(--btn-bl)',
+            borderRight: 'var(--btn-br)',
+            borderBottom: 'var(--btn-bb)',
+            borderRadius: 'var(--btn-radius, 24px)',
+            boxShadow: 'var(--btn-shadow, none)',
+            filter: 'var(--btn-filter, none)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            cursor: 'pointer', padding: '0 18px',
+            fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 14,
+            letterSpacing: '3px', textTransform: 'uppercase', lineHeight: 1,
+          }}
+        >
+          <Icon name={open ? 'close' : 'menu'} size={22} />
+          Menu
+        </button>
       </div>
 
       {/* Dropdown */}
@@ -117,8 +171,8 @@ export default function AppHeader({
         <div
           role="menu"
           style={{
-            // Transparent layout shell — the buttons carry all the fill/chrome,
-            // the container itself has no background or shadow (Kate, Figma).
+            // No frame — the rows carry their own per-theme fill (Kate, 23 June).
+            // Transparent layout shell only.
             position: 'absolute', top: 60, right: 8, width: 229,
             display: 'flex', flexDirection: 'column', gap: 2,
           }}
@@ -133,18 +187,26 @@ export default function AppHeader({
 
           {/* Journal — journal variant (pink/red in every theme) */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Row variant="journal" theme={theme} tall onClick={() => router.push('/app/journal-v2')}>
+            <Row variant="journal" theme={theme} tall onClick={goJournal}>
               <span style={LABEL}>Journal</span>
             </Row>
-            <Row variant="journal" theme={theme} onClick={() => router.push('/app/journal-v2')}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
-                <Icon name="article" size={20} />
-                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1 }}>
-                  <span style={LABEL}>{entryCount ?? 0} entries</span>
-                  <span style={META}>{lensCount ?? 0} lenses</span>
+            {isSignedIn ? (
+              <Row variant="journal" theme={theme} onClick={goJournal}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
+                  <Icon name="article" size={20} />
+                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1 }}>
+                    <span style={LABEL}>{shownEntries} entries</span>
+                    <span style={META}>{shownLenses} lenses</span>
+                  </span>
                 </span>
-              </span>
-            </Row>
+              </Row>
+            ) : (
+              <Row variant="journal" theme={theme} onClick={goJournal}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
+                  <Icon name="login" size={20} /><span style={LABEL}>Sign in to save</span>
+                </span>
+              </Row>
+            )}
             <Row variant="journal" theme={theme} onClick={() => router.push('/app/onboarding')}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
                 <Icon name="add" size={20} /><span style={LABEL}>New</span>
@@ -173,10 +235,16 @@ export default function AppHeader({
             </Row>
           </div>
 
-          {/* Log out — primary variant (matches Profile, Figma 624:7938) */}
-          <Row variant="primary" theme={theme} onClick={() => signOut({ redirectUrl: '/' })}>
-            <span style={LABEL}>Log out</span>
-          </Row>
+          {/* Log out (signed-in) / Sign in (anon) — primary variant (Figma 624:7938) */}
+          {isSignedIn ? (
+            <Row variant="primary" theme={theme} onClick={() => signOut({ redirectUrl: '/' })}>
+              <span style={LABEL}>Log out</span>
+            </Row>
+          ) : (
+            <Row variant="primary" theme={theme} onClick={() => router.push('/sign-in')}>
+              <span style={LABEL}>Sign in</span>
+            </Row>
+          )}
         </div>
       )}
     </div>

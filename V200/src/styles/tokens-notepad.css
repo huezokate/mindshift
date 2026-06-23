@@ -73,8 +73,9 @@ html[data-theme="notepad"] {
   --input-header-bg:     #f0efe9;
   --input-header-shadow: none;
 
-  /* Secondary button — green underline (top + bottom border only) */
-  --btn-secondary-bg:     transparent;
+  /* Secondary button — green underline (top + bottom border only). Paper bg
+     (== page bg) so dropdown rows are solid over content yet blend on-page. */
+  --btn-secondary-bg:     var(--bg);
   --btn-secondary-shadow: none;
   --btn-secondary-color:  #7d9e7d;
   --btn-secondary-bt:     1px solid #7d9e7d;
@@ -83,8 +84,8 @@ html[data-theme="notepad"] {
   --btn-secondary-bb:     1px solid #7d9e7d;
   --btn-secondary-radius: 0;
 
-  /* Secondary 2 button — red underline */
-  --btn-secondary2-bg:     transparent;
+  /* Secondary 2 button — red underline. Paper bg (see secondary note). */
+  --btn-secondary2-bg:     var(--bg);
   --btn-secondary2-shadow: none;
   --btn-secondary2-color:  #c0605a;
   --btn-secondary2-bt:     1px solid #c0605a;
