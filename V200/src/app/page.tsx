@@ -4,10 +4,22 @@ import { motion } from 'framer-motion'
 import { getSupabase } from '@/lib/supabase'
 import { FIGURES, type Figure } from '@/lib/figures'
 
-const APP_BASE = process.env.NEXT_PUBLIC_APP_URL ?? ''
-const TRY_URL = `${APP_BASE}/app/theme-select`
 const WAITLIST_CONTACT = 'hello@minds-shift.com'
 const BUSINESS_CONTACT = 'kate@minds-shift.com'
+
+// While the app is offline we don't send people into it. "Try MindShift Free"
+// opens a pre-filled email to claim alpha access + free Pro-for-life instead.
+const ALPHA_MAILTO = `mailto:${WAITLIST_CONTACT}?subject=${encodeURIComponent(
+  'Claiming my free alpha access',
+)}&body=${encodeURIComponent(
+  "Hi MindShift team,\n\nI'd love to join as an alpha tester and claim my free Pro access for life. Count me in — happy to share feedback as I go!\n\nThanks!",
+)}`
+
+// General contact / lens-request email — pre-fills a friendly opener so the
+// visitor just keeps typing their question.
+const CONTACT_MAILTO = `mailto:${WAITLIST_CONTACT}?subject=${encodeURIComponent(
+  'Question / lens request',
+)}&body=${encodeURIComponent('Hi MindShift team!\n\n')}`
 
 const fade = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }
 const stagger = { show: { transition: { staggerChildren: 0.1 } } }
@@ -30,8 +42,8 @@ export default function LandingPage() {
     <div className="notepad-paper min-h-dvh">
       <Hero />
       <FigureDemo />
-      <LensGallery />
       <Waitlist />
+      <LensGallery />
       <WhoIsItFor />
       <Testimonials />
       <OriginStory />
@@ -43,14 +55,16 @@ export default function LandingPage() {
 function Section({
   children,
   maxWidth = 720,
-  paddingY = '60px',
+  paddingY = '24px',
+  id,
 }: {
   children: React.ReactNode
   maxWidth?: number | string
   paddingY?: string
+  id?: string
 }) {
   return (
-    <section style={{ padding: `${paddingY} var(--page-pad)` }}>
+    <section id={id} style={{ padding: `${paddingY} var(--page-pad)`, scrollMarginTop: 24 }}>
       <div style={{ maxWidth, margin: '0 auto' }}>{children}</div>
     </section>
   )
@@ -358,10 +372,6 @@ function FigureDemo() {
             15 of history&apos;s greatest thinkers. Ready to weigh in on your worst Tuesday.
           </Body>
         </motion.div>
-
-        <motion.div variants={fade}>
-          <PrimaryButton href={TRY_URL || '/app/theme-select'}>Shift your worst Tuesday →</PrimaryButton>
-        </motion.div>
       </motion.div>
     </Section>
   )
@@ -433,7 +443,7 @@ function LensGallery() {
   return (
     // Full-bleed section: the grid spans the whole viewport with 120px side padding on
     // desktop (clamping down on smaller screens), rather than the centered maxWidth used elsewhere.
-    <section style={{ padding: '60px var(--page-pad)' }}>
+    <section style={{ padding: '24px var(--page-pad)' }}>
       <motion.div
         variants={stagger}
         initial="hidden"
@@ -459,7 +469,7 @@ function LensGallery() {
 
 function Hero() {
   return (
-    <Section maxWidth="none" paddingY="clamp(40px, 5vh, 72px)">
+    <Section maxWidth="none">
       <motion.div
         variants={stagger}
         initial="hidden"
@@ -514,7 +524,7 @@ function WhoIsItFor() {
           </motion.div>
         </div>
         <motion.div variants={fade}>
-          <PrimaryButton href={TRY_URL || '/app/theme-select'}>Try MindShift Free →</PrimaryButton>
+          <PrimaryButton href={ALPHA_MAILTO}>Try MindShift Free →</PrimaryButton>
         </motion.div>
       </motion.div>
     </Section>
@@ -552,7 +562,7 @@ function UserLine({ label, children }: { label: string; children: React.ReactNod
 
 function Waitlist() {
   return (
-    <Section maxWidth="none">
+    <Section id="waitlist" maxWidth="none">
       <div style={{ display: 'flex', flexDirection: 'column', gap: 24, textAlign: 'center', alignItems: 'center' }}>
         <Eyebrow>Don&apos;t miss what&apos;s next</Eyebrow>
         <H2>Be first in line</H2>
@@ -562,8 +572,9 @@ function Waitlist() {
         <div style={{ width: '100%', maxWidth: 560 }}>
           <WaitlistForm />
         </div>
-        <div style={{ marginTop: 8 }}>
-          <SecondaryLink href={`mailto:${WAITLIST_CONTACT}`}>Let&apos;s talk →</SecondaryLink>
+        <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'center' }}>
+          <Body>Questions, or a specific lens you&apos;d love to see?</Body>
+          <SecondaryLink href={CONTACT_MAILTO}>Drop us a line →</SecondaryLink>
         </div>
       </div>
     </Section>
