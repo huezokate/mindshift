@@ -111,3 +111,31 @@ body {
   .ds-btn:not(:disabled):hover,
   .ds-btn:not(:disabled):active { transform: none; }
 }
+
+/* ── Marketing landing: notepad lined paper ──────────────────────────────────
+   Red margin rule + blue ruled lines. The rule's x-offset (--rule-x) and the
+   page's horizontal padding (--page-pad) are responsive and kept in lockstep so
+   the rule always sits in the left margin, never crossing body text:
+     mobile  → rule at 24px, content padded 32px from the edge
+     desktop → rule at 80px, content padded 120px from the edge */
+.notepad-paper {
+  --rule-x: 24px;
+  --page-pad: 32px;
+  background-color: #faf7f2;
+  background-image:
+    linear-gradient(to right,
+      transparent var(--rule-x),
+      rgba(192, 96, 90, 0.3) var(--rule-x),
+      rgba(192, 96, 90, 0.3) calc(var(--rule-x) + 2px),
+      transparent calc(var(--rule-x) + 2px)),
+    repeating-linear-gradient(to bottom,
+      transparent, transparent 37px,
+      rgba(58, 111, 168, 0.22) 37px, rgba(58, 111, 168, 0.22) 38px);
+  background-attachment: local;
+}
+@media (min-width: 768px) {
+  .notepad-paper {
+    --rule-x: 80px;
+    --page-pad: 120px;
+  }
+}

@@ -27,16 +27,7 @@ export default function LandingPage() {
   }, [])
 
   return (
-    <div
-      className="min-h-dvh"
-      style={{
-        backgroundColor: '#faf7f2',
-        // Same notepad lined-paper as the mindmap: red margin rule + blue ruled lines.
-        backgroundImage:
-          'linear-gradient(to right, transparent 52px, rgba(192,96,90,0.3) 52px, rgba(192,96,90,0.3) 54px, transparent 54px), repeating-linear-gradient(to bottom, transparent, transparent 37px, rgba(58,111,168,0.22) 37px, rgba(58,111,168,0.22) 38px)',
-        backgroundAttachment: 'local',
-      }}
-    >
+    <div className="notepad-paper min-h-dvh">
       <Hero />
       <FigureDemo />
       <LensGallery />
@@ -55,11 +46,11 @@ function Section({
   paddingY = '60px',
 }: {
   children: React.ReactNode
-  maxWidth?: number
+  maxWidth?: number | string
   paddingY?: string
 }) {
   return (
-    <section style={{ padding: `${paddingY} clamp(24px, 8vw, 120px)` }}>
+    <section style={{ padding: `${paddingY} var(--page-pad)` }}>
       <div style={{ maxWidth, margin: '0 auto' }}>{children}</div>
     </section>
   )
@@ -215,7 +206,7 @@ const VIGNETTES: Vignette[] = [
     era: '16th U.S. President · 1809–1865',
     img: '/portraits/kawaii/a-lincoln.png',
     response:
-      "I lost my first run for office. Years later I lost two races for the Senate — the second to a man the papers swore I'd never beat. Two years after that, I was elected President, and we brought slavery to its end. I carried a melancholy most of my life, so I know the weight you're under. A day of defeat isn't a verdict — it's the part of the story right before it turns.",
+      "I lost my first run for office. Years later I lost two races for the Senate, the second to a man the papers swore I'd never beat. Two years after that, I was elected President, and we brought slavery to its end. I carried a melancholy most of my life, so I know the weight you're under. A day of defeat isn't a verdict — it's the part of the story right before it turns.",
     quote: 'Always bear in mind that your own resolution to succeed is more important than any other one thing.',
   },
   {
@@ -233,7 +224,7 @@ const VIGNETTES: Vignette[] = [
     era: 'Emperor of the French · 1769–1821',
     img: '/portraits/kawaii/napoleon.png',
     response:
-      "You feel ruined by a single day? I was exiled to an island — and when they sent soldiers to keep me there, I walked out to meet them and they joined me instead. Stop tallying today's losses. Find the one place the enemy is weak — your own hesitation — and strike there. Decide, and move. Momentum is everything.",
+      "You feel ruined by a single day? I was exiled to an island — and when they sent soldiers to keep me there, I walked out to meet them and they joined me instead. Stop tallying today's losses. Find the one place the enemy is weak, your own hesitation, and strike there. Decide, and move. Momentum is everything.",
     quote: 'Impossible is a word found only in the dictionary of fools.',
   },
 ]
@@ -242,7 +233,7 @@ function FigureDemo() {
   const [active, setActive] = useState(0)
   const f = VIGNETTES[active]
   return (
-    <Section maxWidth={1120}>
+    <Section maxWidth="none">
       <motion.div
         variants={stagger}
         initial="hidden"
@@ -442,7 +433,7 @@ function LensGallery() {
   return (
     // Full-bleed section: the grid spans the whole viewport with 120px side padding on
     // desktop (clamping down on smaller screens), rather than the centered maxWidth used elsewhere.
-    <section style={{ padding: '60px clamp(24px, 8vw, 120px)' }}>
+    <section style={{ padding: '60px var(--page-pad)' }}>
       <motion.div
         variants={stagger}
         initial="hidden"
@@ -468,7 +459,7 @@ function LensGallery() {
 
 function Hero() {
   return (
-    <Section maxWidth={1000} paddingY="clamp(40px, 5vh, 72px)">
+    <Section maxWidth="none" paddingY="clamp(40px, 5vh, 72px)">
       <motion.div
         variants={stagger}
         initial="hidden"
@@ -481,15 +472,15 @@ function Hero() {
           <H1>MindShift</H1>
         </motion.div>
 
-        <motion.div variants={fade} style={{ maxWidth: 900 }}>
+        <motion.div variants={fade} style={{ width: '100%' }}>
           <Body size={18}>
-            MindShift is journaling — but make it fun. Vent your spiral, pick a lens — Lincoln, Dolly Parton, Socrates — and get back a perspective that actually moves you. Share it, save it, or just feel less alone in your own head.
+            MindShift is journaling, but make it fun. Vent your spiral, pick a lens (Lincoln, Dolly Parton, Socrates), and get back a perspective that actually moves you. Share it, save it, or just feel less alone in your own head.
           </Body>
         </motion.div>
 
-        <motion.div variants={fade} style={{ maxWidth: 760 }}>
+        <motion.div variants={fade} style={{ width: '100%' }}>
           <Body size={18}>
-            Whether you&apos;re venting to decompress, journaling to grow, or planning your next chapter — it&apos;s the thinking tool you&apos;ll actually want to open.
+            Whether you&apos;re venting to decompress, journaling to grow, or planning your next chapter, it&apos;s the thinking tool you&apos;ll actually want to open.
           </Body>
         </motion.div>
       </motion.div>
@@ -499,7 +490,7 @@ function Hero() {
 
 function WhoIsItFor() {
   return (
-    <Section maxWidth={1120}>
+    <Section maxWidth="none">
       <motion.div
         variants={stagger}
         initial="hidden"
@@ -519,7 +510,7 @@ function WhoIsItFor() {
             <UserLine label="For the journaler">Save your perspectives, track how your thinking shifts over time.</UserLine>
           </motion.div>
           <motion.div variants={fade} className="md:flex-1">
-            <UserLine label="For the planner">Mind mapping is coming — a full visual map of your life, your goals, your thinking. Soon.</UserLine>
+            <UserLine label="For the planner">Mind mapping is coming: a full visual map of your life, your goals, your thinking. Soon.</UserLine>
           </motion.div>
         </div>
         <motion.div variants={fade}>
@@ -561,14 +552,16 @@ function UserLine({ label, children }: { label: string; children: React.ReactNod
 
 function Waitlist() {
   return (
-    <Section maxWidth={640}>
+    <Section maxWidth="none">
       <div style={{ display: 'flex', flexDirection: 'column', gap: 24, textAlign: 'center', alignItems: 'center' }}>
         <Eyebrow>Don&apos;t miss what&apos;s next</Eyebrow>
         <H2>Be first in line</H2>
         <Body size={18}>
-          We ship improvements every week. The mind mapping tool is coming — visual life planning across every category that matters to you. Drop your email and we&apos;ll keep you in the loop.
+          We ship improvements every week. The mind mapping tool is coming: visual life planning across every category that matters to you. Drop your email and we&apos;ll keep you in the loop.
         </Body>
-        <WaitlistForm />
+        <div style={{ width: '100%', maxWidth: 560 }}>
+          <WaitlistForm />
+        </div>
         <div style={{ marginTop: 8 }}>
           <SecondaryLink href={`mailto:${WAITLIST_CONTACT}`}>Let&apos;s talk →</SecondaryLink>
         </div>
@@ -622,16 +615,18 @@ function WaitlistForm() {
           <Body>
             {status === 'success'
               ? "We'll be in touch when there's something worth your inbox."
-              : 'Good taste. Sit tight — updates are coming.'}
+              : 'Good taste. Sit tight. Updates are coming.'}
           </Body>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <label htmlFor="waitlist-email" style={{ display: 'none' }}>
             Email
           </label>
+          <div className="flex flex-col sm:flex-row sm:items-stretch gap-3">
           <input
             id="waitlist-email"
+            className="flex-1 min-w-0"
             type="email"
             required
             inputMode="email"
@@ -655,7 +650,7 @@ function WaitlistForm() {
           <button
             type="submit"
             disabled={status === 'loading'}
-            className="uppercase transition-opacity hover:opacity-80 active:scale-95 disabled:opacity-50"
+            className="uppercase shrink-0 whitespace-nowrap transition-opacity hover:opacity-80 active:scale-95 disabled:opacity-50"
             style={{
               fontFamily: 'var(--font-btn)',
               fontWeight: 600,
@@ -676,6 +671,7 @@ function WaitlistForm() {
           >
             {status === 'loading' ? 'Sending…' : 'Notify me'}
           </button>
+          </div>
           {status === 'error' && (
             <p
               role="alert"
@@ -698,9 +694,9 @@ function WaitlistForm() {
 // Beta-tester testimonials, styled as the user's vent card — name in the header,
 // quote in the body, role where the char count sits on a real vent card.
 const TESTIMONIALS = [
-  { name: 'Many', role: 'Beta tester', quote: 'I really like the historical approach — it’s not only fun, it’s educational. Such a clever touch!' },
-  { name: 'Natalie', role: 'Beta tester & mental-health provider', quote: 'This is fantastic — easy and lighthearted in a way that would genuinely make it effective with users. Bonus points for staying honest about its intentions: it never pretends to be a therapy tool.' },
-  { name: 'Al', role: 'Early tester', quote: 'Wow, these interfaces are so different — I can shift the whole mood of the app to match my own.' },
+  { name: 'Many', role: 'Beta tester', quote: 'I really like the historical approach. It’s not only fun, it’s educational. Such a clever touch!'},
+  { name: 'Natalie', role: 'Beta tester & mental-health provider', quote: 'This is fantastic, easy and lighthearted in a way that would genuinely make it effective with users. Bonus points for staying honest about its intentions: it never pretends to be a therapy tool.' },
+  { name: 'Al', role: 'Early tester', quote: 'Wow, these interfaces are so different. I can shift the whole mood of the app to match my own.'},
 ]
 
 function Testimonials() {
@@ -765,12 +761,12 @@ function TestimonialCard({ name, role, quote }: { name: string; role: string; qu
 
 function OriginStory() {
   return (
-    <Section maxWidth={880}>
+    <Section maxWidth="none">
       <div style={{ display: 'flex', flexDirection: 'column', gap: 20, alignItems: 'center', textAlign: 'center' }}>
         <Eyebrow>Origin story</Eyebrow>
         <H2 tone="green">Why I built this</H2>
         <Body size={18}>
-          I made a mind map of my own struggles and goals — and someone close to me, a practitioner, said: <em>&ldquo;I wish all my clients did this.&rdquo;</em> That stuck.
+          I made a mind map of my own struggles and goals, and someone close to me, a practitioner, said: <em>&ldquo;I wish all my clients did this.&rdquo;</em> That stuck.
         </Body>
         <Body size={18}>
           MindShift started as a personal tool for thinking differently, and grew into something I wanted everyone to have. History&apos;s greatest minds shouldn&apos;t be locked in textbooks. They should be in your pocket on a bad day.
@@ -782,12 +778,12 @@ function OriginStory() {
 
 function Investors() {
   return (
-    <Section maxWidth={1040}>
+    <Section maxWidth="none">
       <div style={{ display: 'flex', flexDirection: 'column', gap: 24, alignItems: 'center', textAlign: 'center' }}>
         <Eyebrow>For investors and partners</Eyebrow>
         <H2>We&apos;re building the thinking layer of the internet.</H2>
         <Body size={18}>
-          MindShift starts with AI-powered perspective shifts and expands into a visual mind-mapping platform for self-reflection, life planning, and professional growth. We believe the next frontier isn&apos;t more information — it&apos;s better thinking.
+          MindShift starts with AI-powered perspective shifts and expands into a visual mind-mapping platform for self-reflection, life planning, and professional growth. We believe the next frontier isn&apos;t more information. It&apos;s better thinking.
         </Body>
 
         <ul
