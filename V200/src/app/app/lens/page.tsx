@@ -100,7 +100,9 @@ export default function LensPage() {
 
       if (res.status === 429) {
         const data = await res.json()
-        setLimitError(data.error)
+        // Server reports the limit kind in `limitType` ('lenses' | 'quotes').
+        // Map the daily-quote cap onto our 'vents' copy bucket.
+        setLimitError(data.limitType === 'lenses' ? 'lenses' : 'vents')
         setLoading(false)
         setSelected(null)
         return

@@ -130,7 +130,7 @@ export default function AppHeader({
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: 8, width: '100%',
       }}>
-        {badge('camera', () => router.push('/app/journal-v2'), 'MindShift home')}
+        {badge('camera', () => router.push(isSignedIn ? '/app/journal-v2' : '/app/onboarding'), 'MindShift home')}
         <p style={{
           fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 28,
           letterSpacing: '4.2px', lineHeight: '26px', color: 'var(--green)',

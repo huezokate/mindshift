@@ -31,7 +31,7 @@ export async function applyLensToEntry(opts: {
   })
   if (gen.status === 429) {
     const d = await gen.json().catch(() => ({}))
-    throw new Error(d.error === 'lenses' ? 'Lens limit reached for this entry.' : 'Daily limit reached.')
+    throw new Error(d.limitType === 'lenses' ? 'Lens limit reached for this entry.' : 'Daily limit reached.')
   }
   if (!gen.ok) {
     const d = await gen.json().catch(() => ({}))

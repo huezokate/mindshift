@@ -1,7 +1,11 @@
 /* MindShift V200 — Notepad Theme Tokens */
 /* Source: Figma node 416:7783 — exact colors, no modifications */
 
-html[data-theme="notepad"] {
+/* Matches both the app at <html data-theme="notepad"> and any element scoped to
+   notepad locally (e.g. the marketing landing wrapper), so the landing can pin
+   notepad without mutating the shared <html data-theme>. */
+html[data-theme="notepad"],
+[data-theme="notepad"] {
   /* Core palette */
   --bg:     #faf7f2;
   --cyan:   #3a6fa8;

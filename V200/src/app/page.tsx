@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import { motion } from 'framer-motion'
 import { getSupabase } from '@/lib/supabase'
 import { FIGURES, type Figure } from '@/lib/figures'
@@ -25,21 +25,14 @@ const fade = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }
 const stagger = { show: { transition: { staggerChildren: 0.1 } } }
 
 export default function LandingPage() {
-  // Marketing landing is pinned to the notepad theme (its design target),
-  // regardless of the visitor's saved app theme. Restored on unmount.
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', 'notepad')
-    return () => {
-      // Restore to the visitor's actual saved theme (defaulting to cyberpunk) —
-      // never leave the attribute stripped, or the next app screen falls back to
-      // the bare :root skin and the theme picked on /app/theme-select is lost.
-      const saved = localStorage.getItem('ms_theme')
-      document.documentElement.setAttribute('data-theme', saved || 'cyberpunk')
-    }
-  }, [])
-
+  // The marketing landing is pinned to the notepad theme (its design target),
+  // regardless of the visitor's saved app theme. We scope that to this wrapper's
+  // own `data-theme` instead of mutating the shared <html data-theme> — so the
+  // app keeps the user's real theme and never renders desynced after a visit
+  // here. The notepad token block matches both html[data-theme] and any scoped
+  // [data-theme] element (see tokens-notepad.css).
   return (
-    <div className="notepad-paper min-h-dvh">
+    <div data-theme="notepad" className="notepad-paper min-h-dvh">
       <Hero />
       <FigureDemo />
       <Waitlist />

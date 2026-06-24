@@ -29,6 +29,16 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Keep <html data-theme> locked to React state so the DOM never drifts from
+  // the selected theme. (The marketing landing now scopes its notepad pin to its
+  // own wrapper's data-theme rather than mutating <html>, so this no longer
+  // fights the landing the way it did before — see 2df220f.)
+  useEffect(() => {
+    if (document.documentElement.getAttribute('data-theme') !== theme) {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+  }, [theme])
+
   function apply(t: Theme) {
     document.documentElement.setAttribute('data-theme', t)
     localStorage.setItem(STORAGE_KEY, t)
