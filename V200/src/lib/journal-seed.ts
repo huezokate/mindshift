@@ -46,9 +46,9 @@ export const DEMO_ENTRIES: SeedEntry[] = [
           "Resentment grows quietly in the soil of unspoken needs. Speak. Not in anger, but plainly. The team you imagine — fair, sharing the load — cannot exist until someone names what is missing.",
       },
       {
-        figure_id: 'dolly-parton',
+        figure_id: 'marilyn-monroe',
         response_text:
-          "Honey, you can love your work and still go home at six. That isn't quitting on it — that's keeping enough of yourself to come back tomorrow and love it again.",
+          "They'll take every hour you hand them and call it devotion — the studio would have worked me to nothing and replaced me by morning. Loving the work doesn't mean disappearing into it. Go home at six. Keep enough of yourself to still be someone tomorrow.",
       },
     ],
   },
@@ -144,9 +144,9 @@ export const DEMO_ENTRIES: SeedEntry[] = [
           "He was patient with you for years when you had nothing to give back but need. The ledger does not need to be balanced this weekend. Sit with him again next weekend. Patience is a practice, not a virtue.",
       },
       {
-        figure_id: 'dolly-parton',
+        figure_id: 'marilyn-monroe',
         response_text:
-          "Honey, my daddy repeated himself too. By the end I knew his stories better than my own. I'd give anything to hear him tell one of 'em wrong one more time. You're doing better than you think.",
+          "I never knew my father. I used to invent him — give him a warm voice, imagine him telling me the same story twice. You have yours, right here, repeating himself, and that impatience is only love grown tired. Don't be sick about it. Sit closer. You have the very thing I spent my whole life wishing for.",
       },
     ],
   },
@@ -195,9 +195,9 @@ export const DEMO_ENTRIES: SeedEntry[] = [
     theme: 'cyberpunk',
     lenses: [
       {
-        figure_id: 'd-trump',
+        figure_id: 'm-ali',
         response_text:
-          "He went back to his phone? That's a HUGE compliment, believe me. The ones who really hate it argue with you. The ones already calculating their check size go quiet. You don't know how to read it because you're reading him — read the room. Who else leaned in?",
+          "He picked up his phone? Let me tell you — the man who's scared of you keeps his eyes on you. The man already counting your worth looks away to do the math. You floated, you stung, and that room felt it. Stop watching the one who looked down. Find the eyes that lifted up. And next time, walk in KNOWING you're the best thing they'll see all night — because you are.",
         shared_to: ['instagram'],
       },
       {

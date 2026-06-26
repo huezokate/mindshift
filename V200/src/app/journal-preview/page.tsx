@@ -78,8 +78,8 @@ const ENTRIES: JournalEntry[] = [
     lens_responses: [
       lens('v4-l1', 'm-gandhi',
         "Resentment grows quietly in the soil of unspoken needs. Speak. Not in anger, but plainly."),
-      lens('v4-l2', 'dolly-parton',
-        "Honey, money between family is just family with an awkward room added on. Open the door before the room takes over the house."),
+      lens('v4-l2', 'marilyn-monroe',
+        "Money between people you love builds a quiet little wall, one brick a day, every day no one says a word. I know about walls. Say it gently and say it soon — before the wall is taller than the love."),
     ],
   },
   // 5. Post + 3 lenses, private
@@ -92,8 +92,8 @@ const ENTRIES: JournalEntry[] = [
     lens_responses: [
       lens('v5-l1', 'a-lincoln',
         "A man who works himself to the bone for those who will not share the load is not a partner — he is a draft horse. Begin with one Tuesday. Just one."),
-      lens('v5-l2', 'dolly-parton',
-        "Honey, you can love your work and still go home at six. That isn't quitting on it — that's keeping enough of yourself to come back tomorrow."),
+      lens('v5-l2', 'marilyn-monroe',
+        "They'll take every hour you give and call it devotion — then replace you by morning. Loving the work doesn't mean vanishing into it. Go home at six. Keep enough of yourself to come back tomorrow."),
       lens('v5-l3', 'm-gandhi',
         "Resentment grows quietly in the soil of unspoken needs. Speak. Not in anger, but plainly."),
     ],
@@ -180,8 +180,8 @@ const ENTRIES: JournalEntry[] = [
     is_public: true,
     created_at: WEEK_AGO,
     lens_responses: [
-      lens('v10-l1', 'dolly-parton',
-        "Sweetheart, 'no' is a complete sentence. You don't owe anybody the rest of the paragraph.",
+      lens('v10-l1', 'marilyn-monroe',
+        "'No' is a complete sentence — I learned it too late, after I'd already said yes to becoming everyone's idea of me. You don't owe anybody the rest of the paragraph. Say it, let them be disappointed, and stay standing.",
         { is_favorite: true,
           shares: [{ id: 'v10-s1', platform: 'tiktok', shared_at: WEEK_AGO }] }),
     ],

@@ -477,7 +477,7 @@ function Hero() {
 
         <motion.div variants={fade} style={{ width: '100%' }}>
           <Body size={18}>
-            MindShift is journaling, but make it fun. Vent your spiral, pick a lens (Lincoln, Dolly Parton, Socrates), and get back a perspective that actually moves you. Share it, save it, or just feel less alone in your own head.
+            MindShift is journaling, but make it fun. Vent your spiral, pick a lens (Lincoln, Marilyn Monroe, Socrates), and get back a perspective that actually moves you. Share it, save it, or just feel less alone in your own head.
           </Body>
         </motion.div>
 

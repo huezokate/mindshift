@@ -36,9 +36,9 @@ const SAMPLE: JournalEntry = {
     },
     {
       id: 'd-l2',
-      figure_id: 'dolly-parton',
+      figure_id: 'marilyn-monroe',
       response_text:
-        "Sugar, 'responsible' is a word folks use when they're too scared to say what they really want out loud. You said it yourself — you'd do this work for free. That's not a job, that's a calling, and callings don't tend to call twice. A little less money and a lot more you sounds like a raise to me.",
+        "'Responsible' is the word people reach for when they're too frightened to say what they really want out loud. You already told the truth — you'd do this work for free. I walked away from the safe, sure thing to chase the work that was actually mine, and I never once regretted the leap. A little less money and a lot more you? That's the raise that matters.",
       is_favorite: false,
       created_at: DAY_AGO,
       shares: [{ id: 'd-s3', platform: 'instagram', shared_at: DAY_AGO }],
