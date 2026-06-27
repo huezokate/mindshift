@@ -11,16 +11,17 @@ export default function MindmapLanding() {
     setTheme('notepad')
   }, [setTheme])
 
-  // Has the user already built a map? Stubbed via localStorage until the
-  // Supabase goals query lands in iteration 2. `null` = not yet known (avoids
-  // an SSR/first-paint flash of the wrong state).
+  // Has the user already built a map? Reads their saved maps from the API.
+  // `null` = not yet known (avoids a first-paint flash of the wrong state).
+  // On any error we fall back to "no map" so the create CTA still shows.
   const [hasMap, setHasMap] = useState<boolean | null>(null)
   useEffect(() => {
-    try {
-      setHasMap(localStorage.getItem('mindshift_has_map') === '1')
-    } catch {
-      setHasMap(false)
-    }
+    let active = true
+    fetch('/api/mindmap/maps')
+      .then(r => (r.ok ? r.json() : { maps: [] }))
+      .then(data => { if (active) setHasMap((data?.maps?.length ?? 0) > 0) })
+      .catch(() => { if (active) setHasMap(false) })
+    return () => { active = false }
   }, [])
 
   return (

@@ -16,6 +16,11 @@ export type GenerateArgs = {
   temperature?: number
   maxTokens?: number
   timeoutMs?: number
+  // When true, ask the provider for a strict JSON object back (Groq
+  // `response_format: json_object`, Gemini `responseMimeType`). The prompt must
+  // still describe the desired shape and contain the word "json" (Groq requires
+  // it). Callers parse the returned string themselves.
+  json?: boolean
 }
 
 const DEFAULT_TIMEOUT_MS = 20_000
@@ -34,6 +39,7 @@ async function generateWithGroq({
   temperature = 0.9,
   maxTokens = 400,
   timeoutMs = DEFAULT_TIMEOUT_MS,
+  json = false,
 }: GenerateArgs): Promise<string> {
   const key = process.env.GROQ_API_KEY
   if (!key) throw new Error('GROQ_API_KEY is not set')
@@ -53,6 +59,7 @@ async function generateWithGroq({
         temperature,
         max_tokens: maxTokens,
         top_p: 0.95,
+        ...(json ? { response_format: { type: 'json_object' } } : {}),
         messages: [
           { role: 'system', content: system },
           { role: 'user', content: prompt },
@@ -77,6 +84,7 @@ async function generateWithGemini({
   prompt,
   temperature = 0.9,
   maxTokens = 400,
+  json = false,
 }: GenerateArgs): Promise<string> {
   const key = process.env.GOOGLE_GEMINI_API_KEY
   if (!key) throw new Error('GOOGLE_GEMINI_API_KEY is not set')
@@ -85,7 +93,12 @@ async function generateWithGemini({
   const model = genAI.getGenerativeModel({
     model: process.env.GEMINI_MODEL ?? 'gemini-2.0-flash',
     systemInstruction: system,
-    generationConfig: { temperature, topP: 0.95, maxOutputTokens: maxTokens },
+    generationConfig: {
+      temperature,
+      topP: 0.95,
+      maxOutputTokens: maxTokens,
+      ...(json ? { responseMimeType: 'application/json' } : {}),
+    },
   })
   const result = await model.generateContent(prompt)
   return result.response.text()

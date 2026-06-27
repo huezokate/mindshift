@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, LayoutGroup } from 'framer-motion'
 import { useTheme } from '@/lib/theme'
 import { AREAS, type AreaId } from '@/lib/mindmap-areas'
 import { AreaIcon } from '@/components/mindmap/AreaIcon'
@@ -78,28 +78,25 @@ type WoopData = {
 
 const BLANK_WOOP: WoopData = { outcome: '', obstacle: '', identity: '' }
 
-// Prefilled demo content — used only when a single area is selected, so the
-// happy-path demo flows quickly. Multi-area accordions start blank.
-const SAMPLE_WOOP: WoopData = {
-  outcome:
-    'I have interviewed for at least a few PM roles, even if I haven\'t taken one yet. I have stopped pretending and started doing.',
-  obstacle:
-    'I tell myself I need to know more before I start. Reading replaces doing. I get scared of being seen as a beginner.',
-  identity: 'a product thinker who learns by shipping and talking to users',
-}
+// Minimum lengths to draft a usable plan — kept low so short, genuine goals
+// ("to kiss a girl") pass, while empty / one-word answers don't. Surfaced in
+// the UI so the requirement is never a mystery.
+const MIN_OUTCOME = 4
+const MIN_OBSTACLE = 3
 
+// Fields always start blank now (no demo prefill — it confused real users by
+// pre-filling unrelated career text). The 3rd arg is kept for the existing
+// call sites but no longer changes behavior.
 function getWoop(
   byArea: Record<string, WoopData>,
   areaId: string,
-  selectedCount: number
+  _selectedCount: number
 ): WoopData {
-  const stored = byArea[areaId]
-  if (stored) return stored
-  return selectedCount === 1 ? SAMPLE_WOOP : BLANK_WOOP
+  return byArea[areaId] ?? BLANK_WOOP
 }
 
 function woopReady(w: WoopData): boolean {
-  return w.outcome.trim().length > 15 && w.obstacle.trim().length > 5
+  return w.outcome.trim().length >= MIN_OUTCOME && w.obstacle.trim().length >= MIN_OBSTACLE
 }
 
 type Candidate = {
@@ -110,96 +107,18 @@ type Candidate = {
   ifThen: string
 }
 
-// Stubbed Gemini pass-1 output for category="career" (12 candidates).
-// In iteration 2 this comes from POST /api/mindmap/generate-candidates.
-const SAMPLE_CANDIDATES: Candidate[] = [
-  {
-    id: 'c1',
-    headline: 'Become someone who maps systems they touch',
-    outcome: 'Sketch one product workflow each week to build PM-style thinking.',
-    firstAction: 'Open a blank doc and sketch one workflow you touched today (3 min).',
-    ifThen: 'If a project meeting ends, then I sketch the workflow we discussed.',
-  },
-  {
-    id: 'c2',
-    headline: 'Become someone who studies one PM thinker per month',
-    outcome: 'Finish 12 PM books, essays, or interviews this year and write one takeaway each.',
-    firstAction: 'Pick one PM newsletter and subscribe today (2 min).',
-    ifThen: 'If it is Sunday morning, then I read for 20 minutes before email.',
-  },
-  {
-    id: 'c3',
-    headline: 'Become someone who talks to users every week',
-    outcome: 'Run 30+ user interviews this year — even informal ones with friends.',
-    firstAction: 'DM one user or customer this week with one open question.',
-    ifThen: 'If I notice friction in a product I use, then I message a real user about it.',
-  },
-  {
-    id: 'c4',
-    headline: 'Become someone who writes product memos',
-    outcome: 'Publish one memo a month on a product or decision you find interesting.',
-    firstAction: 'Write 200 words on a product you love and why it works.',
-    ifThen: 'If it is the first Saturday of the month, then I draft a memo.',
-  },
-  {
-    id: 'c5',
-    headline: 'Become someone who learns from real PMs',
-    outcome: 'Have a real conversation with 6 working PMs by month 6.',
-    firstAction: 'Ask one PM to a 20-minute coffee chat.',
-    ifThen: 'If I see a thoughtful PM post online, then I send a kind note + ask one question.',
-  },
-  {
-    id: 'c6',
-    headline: 'Become someone who builds in public',
-    outcome: 'Ship one small experiment or write-up monthly so the work is visible.',
-    firstAction: 'Open a doc and write your week-1 PM thesis.',
-    ifThen: 'If I finish a memo, then I post a 3-sentence summary somewhere public.',
-  },
-  {
-    id: 'c7',
-    headline: 'Become someone who runs prioritization frameworks fluently',
-    outcome: 'Apply RICE or ICE to three real decisions and write what changed.',
-    firstAction: 'Read one short article on RICE today.',
-    ifThen: 'If I have a list of >5 things to do, then I score them with RICE.',
-  },
-  {
-    id: 'c8',
-    headline: 'Become someone who runs tiny experiments',
-    outcome: 'Design and report on 4 tiny experiments at work or on a side project.',
-    firstAction: 'Pick one assumption you hold and write the test that would prove it wrong.',
-    ifThen: 'If I make a claim about users, then I write the experiment that would disprove it.',
-  },
-  {
-    id: 'c9',
-    headline: 'Become someone who tells crisp product stories',
-    outcome: 'Practice the 2-sentence pitch on every project you touch.',
-    firstAction: 'Pitch your current project in 2 sentences — to yourself, out loud.',
-    ifThen: 'If someone asks what I am working on, then I answer in 2 sentences.',
-  },
-  {
-    id: 'c10',
-    headline: 'Become someone who interviews for PM roles',
-    outcome: 'Take 6 real PM interviews this year — practice is the point.',
-    firstAction: 'Update LinkedIn headline to reflect where you are heading.',
-    ifThen: 'If a recruiter messages me, then I reply within 24 hours.',
-  },
-  {
-    id: 'c11',
-    headline: 'Become someone who keeps a portfolio',
-    outcome: 'Document 4 case studies showing how you think about product.',
-    firstAction: 'Start a Notion doc titled "PM Case Studies."',
-    ifThen: 'If I ship something at work, then I add a note to the portfolio that week.',
-  },
-  {
-    id: 'c12',
-    headline: 'Become someone who networks with intention',
-    outcome: 'Send 5 thoughtful notes a month to people whose work you admire.',
-    firstAction: 'Send one LinkedIn note today to a PM you respect.',
-    ifThen: 'If someone helps me, then I send a thank-you note within a week.',
-  },
-]
 
 type Step = 'category' | 'woop' | 'gen1' | 'curate' | 'gen2' | 'review'
+
+// A milestone the timeline has placed (gen2) — a candidate plus its bucket.
+type SequencedMilestone = Candidate & { month: number }
+
+// One goal as POST /api/mindmap/maps wants it: area + WOOP + its milestones.
+type SaveGoalPayload = {
+  category: AreaId
+  woop: WoopData
+  milestones: (Candidate & { month?: number })[]
+}
 
 // ─── Page ──────────────────────────────────────────────────────────────────
 
@@ -217,6 +136,12 @@ export default function NewGoalPage() {
   // inputs (rendered as an accordion in step 2).
   const [woopByArea, setWoopByArea] = useState<Record<string, WoopData>>({})
   const [selectedIds, setSelectedIds] = useState<string[]>([])
+  // Real generated data — replaces the SAMPLE_* stubs and the fake gen timers.
+  const [candidates, setCandidates] = useState<Candidate[]>([]) // primary, from gen1
+  const [sequenced, setSequenced] = useState<SequencedMilestone[]>([]) // primary, after gen2
+  const [supportingGoals, setSupportingGoals] = useState<SaveGoalPayload[]>([]) // light secondary goals
+  const [genError, setGenError] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
 
   function toggleSelected(id: string) {
     setSelectedIds(s => (s.includes(id) ? s.filter(x => x !== id) : [...s, id]))
@@ -233,12 +158,127 @@ export default function NewGoalPage() {
     }))
   }
 
-  const selectedCandidates = SAMPLE_CANDIDATES.filter(c => selectedIds.includes(c.id))
+  const selectedCandidates = candidates.filter(c => selectedIds.includes(c.id))
   const horizon = effectiveHorizon(horizonIndex, customDate)
   const selectedCategories = CATEGORIES.filter(c => categoryIds.includes(c.id))
-  // Identity headline for the review screen — first area's, falling back to sample.
+  // Identity headline for the review screen — primary area's, falling back to sample.
   const primaryIdentity =
-    getWoop(woopByArea, categoryIds[0] ?? '', categoryIds.length).identity || SAMPLE_WOOP.identity
+    getWoop(woopByArea, categoryIds[0] ?? '', categoryIds.length).identity || 'is moving with intention'
+
+  // First selected area is the primary focus; the rest are light supporting goals.
+  const primaryCategory = (categoryIds[0] ?? CATEGORIES[0].id) as AreaId
+  const secondaryCategories = categoryIds.slice(1) as AreaId[]
+
+  // gen1 — generate the 12 primary candidates from the primary area's WOOP.
+  async function runGen1() {
+    setGenError(null)
+    setSelectedIds([])
+    setStep('gen1')
+    try {
+      const res = await fetch('/api/mindmap/generate-candidates', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          category: primaryCategory,
+          horizonLabel: horizon.label,
+          horizonMonths: horizon.months,
+          woop: getWoop(woopByArea, primaryCategory, categoryIds.length),
+        }),
+      })
+      if (!res.ok) throw new Error((await res.json().catch(() => ({})))?.error || 'Generation failed.')
+      const data = await res.json()
+      setCandidates(data.candidates ?? [])
+      setStep('curate')
+    } catch (e) {
+      // Stay on the gen1 screen and show the error + a retry.
+      setGenError(e instanceof Error ? e.message : 'Something went wrong.')
+    }
+  }
+
+  // gen2 — sequence the primary picks, and in parallel auto-generate ~3 light
+  // milestones for each supporting area (no curate screen).
+  async function runGen2() {
+    setGenError(null)
+    setStep('gen2')
+    try {
+      const [seq, supporting] = await Promise.all([
+        fetch('/api/mindmap/sequence-timeline', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            category: primaryCategory,
+            horizonLabel: horizon.label,
+            horizonMonths: horizon.months,
+            picked: selectedCandidates,
+          }),
+        }).then(async r => {
+          if (!r.ok) throw new Error('Sequencing failed.')
+          return (await r.json()).milestones as SequencedMilestone[]
+        }),
+        Promise.all(
+          secondaryCategories.map(async cat => {
+            const woop = getWoop(woopByArea, cat, categoryIds.length)
+            try {
+              const r = await fetch('/api/mindmap/generate-candidates', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  category: cat,
+                  horizonLabel: horizon.label,
+                  horizonMonths: horizon.months,
+                  woop,
+                  count: 3,
+                }),
+              })
+              const d = r.ok ? await r.json() : { candidates: [] }
+              return { category: cat, woop, milestones: d.candidates ?? [] }
+            } catch {
+              return { category: cat, woop, milestones: [] }
+            }
+          })
+        ),
+      ])
+      setSequenced(seq ?? selectedCandidates.map((c, i) => ({ ...c, month: i + 1 })))
+      setSupportingGoals(supporting)
+      setStep('review')
+    } catch (e) {
+      setGenError(e instanceof Error ? e.message : 'Something went wrong.')
+    }
+  }
+
+  // Save the whole map (primary + supporting goals) and head to Browse.
+  async function runSave() {
+    setGenError(null)
+    setSaving(true)
+    try {
+      const goals: SaveGoalPayload[] = [
+        {
+          category: primaryCategory,
+          woop: getWoop(woopByArea, primaryCategory, categoryIds.length),
+          milestones: sequenced,
+        },
+        ...supportingGoals,
+      ]
+      const res = await fetch('/api/mindmap/maps', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          horizonLabel: horizon.label,
+          horizonDate: horizon.custom ? customDate : null,
+          theme: 'notepad',
+          goals,
+        }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err?.error || 'Could not save your map.')
+      }
+      router.push('/app/mindmap/browse')
+    } catch (e) {
+      setGenError(e instanceof Error ? e.message : 'Could not save your map.')
+      setSaving(false)
+    }
+  }
 
   return (
     <div className="min-h-dvh flex flex-col" style={{ padding: '24px 20px 32px' }}>
@@ -268,37 +308,39 @@ export default function NewGoalPage() {
                 horizon={horizon}
                 woopByArea={woopByArea}
                 updateWoop={updateWoop}
-                onNext={() => {
-                  setStep('gen1')
-                  setTimeout(() => setStep('curate'), 1800)
-                }}
+                onNext={runGen1}
               />
             </StepWrap>
           )}
 
           {step === 'gen1' && (
             <StepWrap key="gen1">
-              <LoadingStep label="Drafting your plan…" />
+              {genError ? (
+                <GenErrorStep message={genError} onRetry={runGen1} />
+              ) : (
+                <LoadingStep label="Drafting your plan…" />
+              )}
             </StepWrap>
           )}
 
           {step === 'curate' && (
             <StepWrap key="curate">
               <CurateStep
-                candidates={SAMPLE_CANDIDATES}
+                candidates={candidates}
                 selectedIds={selectedIds}
                 onToggle={toggleSelected}
-                onNext={() => {
-                  setStep('gen2')
-                  setTimeout(() => setStep('review'), 1600)
-                }}
+                onNext={runGen2}
               />
             </StepWrap>
           )}
 
           {step === 'gen2' && (
             <StepWrap key="gen2">
-              <LoadingStep label="Weaving your timeline…" />
+              {genError ? (
+                <GenErrorStep message={genError} onRetry={runGen2} />
+              ) : (
+                <LoadingStep label="Weaving your timeline…" />
+              )}
             </StepWrap>
           )}
 
@@ -308,13 +350,10 @@ export default function NewGoalPage() {
                 categories={selectedCategories.length ? selectedCategories : [CATEGORIES[0]]}
                 horizon={horizon}
                 identity={primaryIdentity}
-                milestones={selectedCandidates.length ? selectedCandidates : SAMPLE_CANDIDATES.slice(0, 8)}
-                onSave={() => {
-                  // Stub for "a map exists" — unlocks Browse/Reflect on the landing.
-                  // In iteration 2 this becomes a Supabase goals query.
-                  try { localStorage.setItem('mindshift_has_map', '1') } catch {}
-                  router.push('/app/mindmap/browse')
-                }}
+                milestones={sequenced.length ? sequenced : selectedCandidates}
+                onSave={runSave}
+                saving={saving}
+                error={genError}
               />
             </StepWrap>
           )}
@@ -396,6 +435,115 @@ function TopBar({ step, onBack }: { step: Step; onBack: () => void }) {
 
 // ─── Step 1: Scope (horizon + life areas) ──────────────────────────────────
 
+function AreaSectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p
+      style={{
+        fontFamily: 'var(--font-body)',
+        fontWeight: 700,
+        fontSize: 12,
+        letterSpacing: 1,
+        textTransform: 'uppercase',
+        color: 'var(--cyan)',
+        margin: 0,
+      }}
+    >
+      {children}
+    </p>
+  )
+}
+
+// One area card. `role` drives the styling: the primary focus is emphasized
+// (green, with a badge), supporting picks are selected-green, the rest are the
+// default pink-outline invitation.
+function AreaOption({
+  c,
+  role,
+  onClick,
+}: {
+  c: { id: AreaId; label: string; prompt: string }
+  role: 'primary' | 'secondary' | 'unselected'
+  onClick: () => void
+}) {
+  const selected = role !== 'unselected'
+  return (
+    <button
+      onClick={onClick}
+      aria-pressed={selected}
+      style={{
+        textAlign: 'left',
+        cursor: 'pointer',
+        width: '100%',
+        background: selected ? SELECTED_BG : 'var(--card-bg)',
+        border: `${role === 'primary' ? 2 : 1.5}px solid ${selected ? 'var(--green)' : 'var(--pink)'}`,
+        borderRadius: 'var(--card-radius)',
+        padding: '16px 18px',
+        filter: 'var(--card-filter, none)',
+        display: 'flex',
+        gap: 14,
+        alignItems: 'flex-start',
+      }}
+    >
+      <span
+        aria-hidden
+        style={{
+          display: 'inline-flex',
+          lineHeight: 1,
+          color: selected ? 'var(--green)' : 'var(--cyan)',
+          marginTop: 2,
+        }}
+      >
+        <AreaIcon id={c.id} size={26} />
+      </span>
+      <div style={{ flex: 1 }}>
+        <span
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            fontFamily: 'var(--font-display)',
+            fontWeight: 700,
+            fontSize: 17,
+            letterSpacing: '-0.3px',
+            color: 'var(--text-h1)',
+            marginBottom: 4,
+          }}
+        >
+          {c.label}
+          {role === 'primary' && (
+            <span
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontWeight: 700,
+                fontSize: 10,
+                letterSpacing: 0.6,
+                textTransform: 'uppercase',
+                color: 'var(--green)',
+                border: '1px solid var(--green)',
+                borderRadius: 999,
+                padding: '1px 7px',
+              }}
+            >
+              Primary
+            </span>
+          )}
+        </span>
+        <p
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 13,
+            lineHeight: '19px',
+            color: 'var(--text-sub)',
+            margin: 0,
+          }}
+        >
+          {c.prompt}
+        </p>
+      </div>
+    </button>
+  )
+}
+
 function ScopeStep({
   categoryIds,
   onToggleCategory,
@@ -416,6 +564,11 @@ function ScopeStep({
   const horizon = effectiveHorizon(horizonIndex, customDate)
   const chosen = CATEGORIES.filter(c => categoryIds.includes(c.id))
   const ready = categoryIds.length >= 1
+  // First selected area is the primary focus; everything else sits below it as
+  // a supporting option (selected or not).
+  const primaryId = categoryIds[0]
+  const primary = primaryId ? CATEGORIES.find(c => c.id === primaryId) : undefined
+  const rest = CATEGORIES.filter(c => c.id !== primaryId)
 
   return (
     <div className="w-full flex flex-col" style={{ gap: 24 }}>
@@ -435,85 +588,52 @@ function ScopeStep({
         onCustomDate={onCustomDate}
       />
 
-      {/* Life areas — multi-select */}
-      <div className="flex flex-col" style={{ gap: 10 }}>
-        <p
-          style={{
-            fontFamily: 'var(--font-body)',
-            fontWeight: 700,
-            fontSize: 12,
-            letterSpacing: 1,
-            textTransform: 'uppercase',
-            color: 'var(--cyan)',
-            margin: 0,
-          }}
-        >
-          Areas of life
-        </p>
-        <div className="flex flex-col" style={{ gap: 12 }}>
-          {CATEGORIES.map(c => {
-            const active = categoryIds.includes(c.id)
-            return (
-              <button
-                key={c.id}
-                onClick={() => onToggleCategory(c.id)}
-                aria-pressed={active}
+      {/* Life areas — first pick becomes the primary focus, the rest sit below
+          as supporting options. Cards animate as they reorder. */}
+      <LayoutGroup>
+        <div className="flex flex-col" style={{ gap: 10 }}>
+          <AreaSectionLabel>{primary ? 'Primary area of focus' : 'Areas of life · pick your main focus'}</AreaSectionLabel>
+
+          {primary && (
+            <motion.div layout="position" key={`primary-${primary.id}`} transition={{ duration: 0.28 }}>
+              <AreaOption c={primary} role="primary" onClick={() => onToggleCategory(primary.id)} />
+            </motion.div>
+          )}
+
+          {primary && (
+            <div style={{ marginTop: 6 }}>
+              <AreaSectionLabel>Supporting areas · optional</AreaSectionLabel>
+              <p
                 style={{
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  width: '100%',
-                  background: active ? SELECTED_BG : 'var(--card-bg)',
-                  border: `1.5px solid ${active ? 'var(--green)' : 'var(--pink)'}`,
-                  borderRadius: 'var(--card-radius)',
-                  padding: '16px 18px',
-                  filter: 'var(--card-filter, none)',
-                  display: 'flex',
-                  gap: 14,
-                  alignItems: 'flex-start',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 12,
+                  lineHeight: '17px',
+                  color: 'var(--text-sub)',
+                  margin: '2px 0 0',
                 }}
               >
-                <span
-                  aria-hidden
-                  style={{
-                    display: 'inline-flex',
-                    lineHeight: 1,
-                    color: active ? 'var(--green)' : 'var(--cyan)',
-                    marginTop: 2,
-                  }}
-                >
-                  <AreaIcon id={c.id} size={26} />
-                </span>
-                <div style={{ flex: 1 }}>
-                  <span
-                    style={{
-                      display: 'block',
-                      fontFamily: 'var(--font-display)',
-                      fontWeight: 700,
-                      fontSize: 17,
-                      letterSpacing: '-0.3px',
-                      color: 'var(--text-h1)',
-                      marginBottom: 4,
-                    }}
-                  >
-                    {c.label}
-                  </span>
-                  <p
-                    style={{
-                      fontFamily: 'var(--font-body)',
-                      fontSize: 13,
-                      lineHeight: '19px',
-                      color: 'var(--text-sub)',
-                      margin: 0,
-                    }}
-                  >
-                    {c.prompt}
-                  </p>
-                </div>
-              </button>
-            )
-          })}
+                It&rsquo;s all a circle — supporting goals keep you accountable. You can&rsquo;t really move one
+                part of life in isolation.
+              </p>
+            </div>
+          )}
+
+          <div className="flex flex-col" style={{ gap: 12 }}>
+            {rest.map(c => {
+              const active = categoryIds.includes(c.id)
+              return (
+                <motion.div layout="position" key={c.id} transition={{ duration: 0.28 }}>
+                  <AreaOption
+                    c={c}
+                    role={active ? 'secondary' : 'unselected'}
+                    onClick={() => onToggleCategory(c.id)}
+                  />
+                </motion.div>
+              )
+            })}
+          </div>
         </div>
-      </div>
+      </LayoutGroup>
 
       {/* Pairing preview */}
       <PairingPreview chosen={chosen} horizonLabel={horizon.label} />
@@ -769,6 +889,20 @@ function WoopStep({
         />
       )}
 
+      {!allReady && (
+        <p
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 11,
+            lineHeight: '15px',
+            color: 'var(--text-sub)',
+            textAlign: 'center',
+            margin: 0,
+          }}
+        >
+          Add at least a few words to your outcome and obstacle to continue.
+        </p>
+      )}
       <PrimaryButton disabled={!allReady} onClick={onNext}>
         Generate milestones →
       </PrimaryButton>
@@ -791,6 +925,7 @@ function WoopFields({
       <Field
         label={`Desired outcome in ${inPhrase}`}
         helper="If this goes well, what would that look like by then?"
+        placeholder="e.g. I've gone on a few real dates and feel more like myself around people I'm into."
         value={w.outcome}
         onChange={v => onChange({ outcome: v })}
         minRows={3}
@@ -798,6 +933,7 @@ function WoopFields({
       <Field
         label="Main obstacle"
         helper="What's most likely to get in the way? (This is the most important question.)"
+        placeholder="e.g. I talk myself out of it before I even try."
         value={w.obstacle}
         onChange={v => onChange({ obstacle: v })}
         minRows={2}
@@ -805,7 +941,7 @@ function WoopFields({
       <Field
         label="I want to become…"
         helper="Finish the sentence: someone who…"
-        prefix="someone who"
+        placeholder="someone who…"
         value={w.identity}
         onChange={v => onChange({ identity: v })}
         minRows={1}
@@ -938,6 +1074,28 @@ function LoadingStep({ label }: { label: string }) {
       >
         {label}
       </p>
+    </div>
+  )
+}
+
+// Shown in place of a LoadingStep when a generation call fails — keeps the user
+// on the step with a clear retry instead of dropping them into an empty screen.
+function GenErrorStep({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <div className="flex flex-col items-center justify-center" style={{ minHeight: 360, gap: 16, textAlign: 'center' }}>
+      <p
+        style={{
+          fontFamily: 'var(--font-body)',
+          fontSize: 14,
+          lineHeight: '20px',
+          color: 'var(--text-body)',
+          margin: 0,
+          maxWidth: 320,
+        }}
+      >
+        {message}
+      </p>
+      <PrimaryButton onClick={onRetry}>Try again</PrimaryButton>
     </div>
   )
 }
@@ -1152,20 +1310,28 @@ function ReviewStep({
   identity,
   milestones,
   onSave,
+  saving,
+  error,
 }: {
   categories: { id: AreaId; label: string }[]
   horizon: { months: number; label: string; noun: string }
   identity: string
-  milestones: Candidate[]
+  milestones: (Candidate & { month?: number })[]
   onSave: () => void
+  saving?: boolean
+  error?: string | null
 }) {
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
   const startMonth = new Date().getMonth() // 0-based; spine begins from this month
-  // Distribute selected milestones across the chosen horizon (roughly evenly).
+  // Place each milestone on its gen2-assigned bucket; fall back to an even
+  // spread for any without one (e.g. if sequencing failed).
   const placed = milestones.map((m, i) => {
-    const offset = Math.floor((i / Math.max(1, milestones.length)) * horizon.months)
+    const bucket =
+      typeof m.month === 'number'
+        ? m.month
+        : 1 + Math.floor((i / Math.max(1, milestones.length)) * horizon.months)
     const monthLabel =
-      horizon.months <= 1 ? `wk ${i + 1}` : monthNames[(startMonth + offset) % 12]
+      horizon.months <= 1 ? `wk ${bucket}` : monthNames[(startMonth + bucket - 1) % 12]
     return { ...m, month: monthLabel, index: i + 1 }
   })
 
@@ -1295,7 +1461,22 @@ function ReviewStep({
         ))}
       </div>
 
-      <PrimaryButton onClick={onSave}>Save my year →</PrimaryButton>
+      {error && (
+        <p
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 12,
+            color: '#c0605a',
+            textAlign: 'center',
+            margin: 0,
+          }}
+        >
+          {error}
+        </p>
+      )}
+      <PrimaryButton onClick={onSave} disabled={saving}>
+        {saving ? 'Saving…' : 'Save my plan →'}
+      </PrimaryButton>
       <p
         style={{
           fontFamily: 'var(--font-body)',
@@ -1365,14 +1546,14 @@ function Field({
   helper,
   value,
   onChange,
-  prefix,
+  placeholder,
   minRows = 2,
 }: {
   label: string
   helper?: string
   value: string
   onChange: (s: string) => void
-  prefix?: string
+  placeholder?: string
   minRows?: number
 }) {
   return (
@@ -1417,24 +1598,11 @@ function Field({
           alignItems: 'flex-start',
         }}
       >
-        {prefix && (
-          <span
-            style={{
-              fontFamily: 'var(--font-body)',
-              fontStyle: 'italic',
-              fontSize: 13,
-              lineHeight: '20px',
-              color: 'var(--text-sub)',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {prefix}
-          </span>
-        )}
         <textarea
           value={value}
           onChange={e => onChange(e.target.value)}
           rows={minRows}
+          placeholder={placeholder}
           style={{
             flex: 1,
             background: 'transparent',
@@ -1446,7 +1614,8 @@ function Field({
             lineHeight: '20px',
             color: 'var(--text-body)',
             caretColor: 'var(--cyan)',
-            minHeight: minRows * 20,
+            // Every field is at least as tall as the outcome box (≈120px), per design.
+            minHeight: Math.max(120, minRows * 20),
           }}
         />
       </div>
