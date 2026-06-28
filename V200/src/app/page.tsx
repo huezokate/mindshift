@@ -7,6 +7,10 @@ import { FIGURES, type Figure } from '@/lib/figures'
 const WAITLIST_CONTACT = 'hello@minds-shift.com'
 const BUSINESS_CONTACT = 'kate@minds-shift.com'
 
+// The live product. Prod is healthy again, so the hero CTA sends people straight
+// in (the subdomain root 308-redirects to /app/onboarding).
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.minds-shift.com'
+
 // While the app is offline we don't send people into it. "Try MindShift Free"
 // opens a pre-filled email to claim alpha access + free Pro-for-life instead.
 const ALPHA_MAILTO = `mailto:${WAITLIST_CONTACT}?subject=${encodeURIComponent(
@@ -485,6 +489,10 @@ function Hero() {
           <Body size={18}>
             Whether you&apos;re venting to decompress, journaling to grow, or planning your next chapter, it&apos;s the thinking tool you&apos;ll actually want to open.
           </Body>
+        </motion.div>
+
+        <motion.div variants={fade}>
+          <PrimaryButton href={APP_URL}>Try the web app →</PrimaryButton>
         </motion.div>
       </motion.div>
     </Section>
