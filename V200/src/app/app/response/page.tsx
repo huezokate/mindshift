@@ -130,6 +130,35 @@ export default function ResponsePage() {
   // three themes follow for free), ≥44px tap target. `accent` is a token name:
   // --cyan (SAVE) / --green (NEW LENS) / --pink (SHARE).
   function pillStyle(accent: string): React.CSSProperties {
+    // Kawaii renders the canonical design-system Secondary button (Figma 626:8286):
+    // a SOLID fill + brown asymmetric border + inset accent shadow + 32px radius —
+    // not the faint accent-tint pill below, which reads washed-out on kawaii's pink
+    // page bg. Kawaii only ships two secondary fills, so map each accent slot to the
+    // matching family: the teal/mint accent (--green) → "secondary" (mint #e5fcfa /
+    // teal inset), the pink accents (--cyan/--pink) → "secondary2" (pink #ffe1ff /
+    // magenta inset). All values come from the --btn-secondary* / --btn-secondary2*
+    // token families — no hardcoded hex.
+    if (theme === 'kawaii') {
+      const fam = accent === '--green' ? 'secondary' : 'secondary2'
+      return {
+        flex: 1,
+        minHeight: 44,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+        fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 13,
+        letterSpacing: 0.2, textTransform: 'uppercase',
+        color: `var(--btn-${fam}-color)`,
+        background: `var(--btn-${fam}-bg)`,
+        borderTop: `var(--btn-${fam}-bt)`,
+        borderLeft: `var(--btn-${fam}-bl)`,
+        borderRight: `var(--btn-${fam}-br)`,
+        borderBottom: `var(--btn-${fam}-bb)`,
+        borderRadius: `var(--btn-${fam}-radius)`,
+        boxShadow: `var(--btn-${fam}-shadow)`,
+        padding: '8px 12px',
+        cursor: 'pointer',
+        transition: 'opacity 0.15s',
+      }
+    }
     const c = `var(${accent})`
     return {
       flex: 1,

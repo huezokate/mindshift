@@ -106,6 +106,12 @@ export default function AppHeader({
     }
   }, [open])
 
+  // Brand accent for the wordmark + lens badge. Cyberpunk/notepad keep the green
+  // accent slot; kawaii's --green is teal (reads as a washed teal/cyan brand mark),
+  // so kawaii uses the design-system purple instead — note --violet is a pink accent
+  // slot in kawaii (#ff50c5), so the real purple is --fig-name-unsel (#7e2091).
+  const brandAccent = theme === 'kawaii' ? 'var(--fig-name-unsel)' : 'var(--green)'
+
   const badge = (iconName: string, onClick?: () => void, label?: string) => (
     <button
       type="button"
@@ -113,9 +119,9 @@ export default function AppHeader({
       aria-label={label}
       style={{
         width: 48, height: 48, borderRadius: '50%', flexShrink: 0,
-        background: 'var(--bg)', border: '2px solid var(--green)',
+        background: 'var(--bg)', border: `2px solid ${brandAccent}`,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        color: theme === 'cyberpunk' ? 'var(--pink)' : 'var(--green)',
+        color: theme === 'cyberpunk' ? 'var(--pink)' : brandAccent,
         cursor: onClick ? 'pointer' : 'default', padding: 0,
       }}
     >
@@ -133,7 +139,7 @@ export default function AppHeader({
         {badge('camera', () => router.push(isSignedIn ? '/app/journal-v2' : '/app/onboarding'), 'MindShift home')}
         <p style={{
           fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 28,
-          letterSpacing: '4.2px', lineHeight: '26px', color: 'var(--green)',
+          letterSpacing: '4.2px', lineHeight: '26px', color: brandAccent,
           textTransform: 'uppercase', margin: 0, whiteSpace: 'nowrap',
         }}>
           MindShift
