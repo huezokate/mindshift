@@ -19,18 +19,19 @@ describe('validateMigrations', () => {
     expect(result.errors).toEqual([]);
   });
 
-  it('accepts the real 001..007 migration set (order-independent)', () => {
+  it('accepts the real 001..008 migration set (order-independent)', () => {
     const result = validateMigrations([
-      '007_lens_chat.sql',
+      '008_lens_chat.sql',
       '001_journal.sql',
       '004_entry_titles.sql',
       '002_journal_v2.sql',
       '006_comp_users.sql',
       '003_waitlist.sql',
       '005_mindmap.sql',
+      '007_mindmap_milestone_fields.sql',
     ]);
     expect(result.ok).toBe(true);
-    expect(result.count).toBe(7);
+    expect(result.count).toBe(8);
   });
 
   it('rejects a filename that breaks the NNN_name.sql convention', () => {
