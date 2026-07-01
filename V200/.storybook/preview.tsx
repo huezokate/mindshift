@@ -26,12 +26,22 @@ const THEMES = [
 // useLayoutEffect sets it before paint (no default-theme flash); keying on `theme`
 // re-asserts on every theme change AND every story mount, so there's no leakage
 // between stories.
-const withTheme = (Story: () => React.JSX.Element, context: { globals: { theme?: string } }) => {
-  const theme = context.globals.theme ?? 'cyberpunk'
+// The hook lives in a real (capitalized) component so react-hooks/rules-of-hooks
+// is satisfied — a bare decorator function is neither a component nor a hook.
+function ThemeHtmlSync({ theme, children }: { theme: string; children: React.ReactNode }) {
   useLayoutEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
   }, [theme])
-  return <Story />
+  return <>{children}</>
+}
+
+const withTheme = (Story: () => React.JSX.Element, context: { globals: { theme?: string } }) => {
+  const theme = context.globals.theme ?? 'cyberpunk'
+  return (
+    <ThemeHtmlSync theme={theme}>
+      <Story />
+    </ThemeHtmlSync>
+  )
 }
 
 // Clerk isolation decorator (T-022-04). The @clerk/nextjs mock (.storybook/mocks/
