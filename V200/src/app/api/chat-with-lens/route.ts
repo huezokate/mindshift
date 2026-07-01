@@ -99,10 +99,12 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // Parse the graceful-close sentinel, then strip it so the user never sees it.
-  // The hard cap forces a close even if the model omitted the token.
-  const hitCap = userTurnCount >= CHAT_HARD_CAP
-  const done = hitCap || raw.includes(CHAT_DONE_TOKEN)
+  // Parse the resting-point sentinel, then strip it so the user never sees it.
+  // `done` is a SOFT close (a resting point that keeps the composer alive);
+  // `capped` is the hard rail that actually locks the thread. The cap forces both
+  // even if the model omitted the token.
+  const capped = userTurnCount >= CHAT_HARD_CAP
+  const done = capped || raw.includes(CHAT_DONE_TOKEN)
   const reply = raw.split(CHAT_DONE_TOKEN).join('').trim()
 
   if (!reply) {
@@ -144,5 +146,5 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  return NextResponse.json({ reply, done, userTurnCount })
+  return NextResponse.json({ reply, done, capped, userTurnCount })
 }

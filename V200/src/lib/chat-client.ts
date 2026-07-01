@@ -8,8 +8,9 @@
 import type { ChatMessage } from './chat-types'
 
 /**
- * Send one user turn. Returns the lens reply, whether the thread closed, and the
- * new user-turn count. Throws on limit/generation/network failure (caller surfaces).
+ * Send one user turn. Returns the lens reply, `done` (a soft close / resting point
+ * — the composer stays open), `capped` (the hard rail that actually locks the
+ * thread), and the new user-turn count. Throws on limit/generation/network failure.
  */
 export async function sendChatTurn(opts: {
   sessionId: string | null
@@ -18,7 +19,7 @@ export async function sendChatTurn(opts: {
   seedReply: string
   userMessage: string
   history: ChatMessage[]
-}): Promise<{ reply: string; done: boolean; userTurnCount: number }> {
+}): Promise<{ reply: string; done: boolean; capped: boolean; userTurnCount: number }> {
   let res: Response
   try {
     res = await fetch('/api/chat-with-lens', {
@@ -45,7 +46,7 @@ export async function sendChatTurn(opts: {
   const data = await res.json()
   const reply = (data.reply ?? '').trim()
   if (!reply) throw new Error('The lens came back empty. Please try again.')
-  return { reply, done: !!data.done, userTurnCount: data.userTurnCount ?? 0 }
+  return { reply, done: !!data.done, capped: !!data.capped, userTurnCount: data.userTurnCount ?? 0 }
 }
 
 // ── Anon ephemeral thread (sessionStorage) ──────────────────────────────────
