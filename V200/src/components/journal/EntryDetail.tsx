@@ -218,19 +218,22 @@ export default function EntryDetail({ entry }: Props) {
   // mr-[-72px] trick. Socials is the only live action → opens ShareSheet.
   function buttonRow(lens: LensResponseV2) {
     // Three EQUAL buttons filling the row (Figma 602:6448) — no -72px overlap
-    // trick (that collided), so the row never breaks. Active = green border +
-    // label; disabled (Chat/Decorate) = genuinely muted (var(--text-muted), not
-    // just 60% opacity) with an "upcoming" chip pinned to the top-right corner.
+    // trick (that collided), so the row never breaks. Active buttons use the
+    // canonical themed button tokens (--btn-*), so both COLOR and SHAPE adapt per
+    // theme — a neon bevel in cyberpunk, a soft pill in kawaii, a clean outline in
+    // notepad. (Previously hardcoded var(--green), which is teal in kawaii — the
+    // exact cyberpunk-shape-in-kawaii bleed this row was corrected for.) Disabled
+    // (Decorate) = a muted secondary surface with the "upcoming" chip pinned.
     const btnBase = (active: boolean) => ({
       position: 'relative' as const,
       flex: 1, minWidth: 0,
-      background: 'var(--bg)',
-      borderTop: `4px solid var(${active ? '--green' : '--text-muted'})`,
-      borderLeft: `4px solid var(${active ? '--green' : '--text-muted'})`,
-      borderRight: `1px solid var(${active ? '--green' : '--text-muted'})`,
-      borderBottom: `1px solid var(${active ? '--green' : '--text-muted'})`,
-      borderRadius: 2,
-      color: `var(${active ? '--green' : '--text-muted'})`,
+      background: active ? 'var(--btn-bg)' : 'var(--btn-secondary-bg)',
+      borderTop: active ? 'var(--btn-bt)' : '1px solid var(--input-divider)',
+      borderLeft: active ? 'var(--btn-bl)' : '1px solid var(--input-divider)',
+      borderRight: active ? 'var(--btn-br)' : '1px solid var(--input-divider)',
+      borderBottom: active ? 'var(--btn-bb)' : '1px solid var(--input-divider)',
+      borderRadius: 'var(--btn-radius)',
+      color: active ? 'var(--btn-color)' : 'var(--text-muted)',
       display: 'flex', flexDirection: 'column' as const,
       alignItems: 'center', justifyContent: 'center', gap: 4,
       padding: '10px 6px 6px', minHeight: 56,
