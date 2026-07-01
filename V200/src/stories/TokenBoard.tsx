@@ -289,6 +289,9 @@ function ThemeColumn({ theme, title, tokens }: { theme: ThemeKey; title: string;
 export default function TokenBoard() {
   const [caps, setCaps] = useState<Captured | null>(null)
   useLayoutEffect(() => {
+    // DOM measurement: captureAll() transiently sets data-theme on <html> and
+    // reads resolved token values via getComputedStyle — must run after mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCaps(captureAll(ALL_TOKENS))
   }, [])
 
