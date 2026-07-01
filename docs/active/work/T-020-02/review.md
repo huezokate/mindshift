@@ -15,13 +15,14 @@ with a figure, in voice.
 | `V200/src/app/api/chat-with-lens/route.ts` | POST one turn: tier/figure resolve, authoritative turn count, cap→graceful close, `generateText` with history, sentinel parse, signed-in persistence, no usage increment. |
 | `V200/src/app/api/chat-with-lens/history/route.ts` | GET a persisted thread + `closed` (signed-in). |
 | `V200/src/lib/chat-client.ts` | `sendChatTurn` + anon ephemeral thread helpers (sessionStorage). |
-| `V200/src/components/journal/ChatSheet.tsx` | Bottom-sheet thread UI (bubbles, composer, typing indicator, closed footer), token-themed. |
+| `V200/src/components/journal/ChatScreen.tsx` | Full-screen thread UI (vent + reframe as opening bubbles, composer pinned bottom, typing dots, closed footer). Structural-token-themed — correct in all 3 themes. |
+| `V200/src/app/app/journal-v2/[id]/chat/[figureId]/page.tsx` | Server route for the chat screen: loads the session + the figure's seed reframe. |
 
 ### Modified files
 | File | Change |
 |---|---|
 | `V200/src/lib/ai.ts` | `GenerateArgs.messages?: ChatTurn[]`; Groq maps history into its messages array, Gemini via `startChat`. Single-shot behavior preserved when omitted. |
-| `V200/src/components/journal/EntryDetail.tsx` | "Chat with lens" button is now live (was a `comingSoon` stub); opens `ChatSheet` seeded by vent + that lens's reply. |
+| `V200/src/components/journal/EntryDetail.tsx` | "Chat with lens" button is now live (was a `comingSoon` stub); navigates to the dedicated chat screen for that lens's figure. |
 
 Four incremental commits (`02dc501`, `3c5bdf4`, `3d14a36`, `074cfda`).
 

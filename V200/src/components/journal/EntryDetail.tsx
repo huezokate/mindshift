@@ -1,12 +1,12 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useTheme } from '@/lib/theme'
 import Icon from '@/components/ui/Icon'
 import AppHeader from '@/components/nav/AppHeader'
 import LensCard from './LensCard'
 import ShareSheet from './ShareSheet'
 import LensPickerSheet from './LensPickerSheet'
-import ChatSheet from './ChatSheet'
 import UpcomingChip from './UpcomingChip'
 import type { JournalEntry, LensResponseV2, SharePlatform } from '@/lib/journal-types'
 import { deriveTitleFallback } from '@/lib/title'
@@ -17,6 +17,7 @@ type Props = {
 }
 
 export default function EntryDetail({ entry }: Props) {
+  const router = useRouter()
   const { theme } = useTheme()
   const isKawaii = theme === 'kawaii'
   const isCyberpunk = theme === 'cyberpunk'
@@ -35,9 +36,11 @@ export default function EntryDetail({ entry }: Props) {
   // Set after adding a lens so the post-render effect centers the carousel on it.
   const scrollToNewLens = useRef(false)
 
-  // "Chat with the Lens" (T-020-02) — opens a bounded thread with this lens's
-  // figure, seeded by the vent + this lens's reply.
-  const [chatLens, setChatLens] = useState<LensResponseV2 | null>(null)
+  // "Chat with the Lens" (T-020-02) — navigate to the dedicated chat screen for
+  // this lens's figure; the vent + this reply open the thread as chat bubbles.
+  function openChat(lens: LensResponseV2) {
+    router.push(`/app/journal-v2/${entry.id}/chat/${lens.figure_id}`)
+  }
 
   async function handlePickLens(figureId: string) {
     if (addingLens) return
@@ -261,7 +264,7 @@ export default function EntryDetail({ entry }: Props) {
         {/* Chat with lens — live (T-020-02): opens a bounded thread with this figure. */}
         <button
           type="button"
-          onClick={() => setChatLens(lens)}
+          onClick={() => openChat(lens)}
           aria-label={`Chat with ${lens.figure_id}`}
           style={btnBase(true)}
         >
@@ -400,18 +403,6 @@ export default function EntryDetail({ entry }: Props) {
           isEntryPublic={entry.is_public}
           onClose={() => setShareLens(null)}
           onShared={onShared}
-        />
-      )}
-
-      {/* Chat with the Lens — bounded thread with the selected lens's figure. */}
-      {chatLens && (
-        <ChatSheet
-          open={!!chatLens}
-          figureId={chatLens.figure_id}
-          sessionId={entry.id}
-          ventText={entry.vent_text}
-          seedReply={chatLens.response_text}
-          onClose={() => setChatLens(null)}
         />
       )}
 
