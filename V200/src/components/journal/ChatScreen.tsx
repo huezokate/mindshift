@@ -284,82 +284,92 @@ export default function ChatScreen({ figureId, sessionId, ventText, seedReply }:
   // Rotate the invitation deterministically per resting point (stable across
   // re-renders; varies as the thread grows) — no flicker, no Math.random.
   const restingPrompt = RESTING_PROMPTS[messages.length % RESTING_PROMPTS.length]
+  // The bars (header divider, composer divider) span the full screen width; their
+  // content — and the thread — stay centered in a 900px column.
+  const centered = { width: '100%', maxWidth: 900, marginLeft: 'auto', marginRight: 'auto' } as const
 
   return (
     <div className="flex flex-col" style={{ height: '100dvh', background: 'var(--bg)' }}>
-      {/* Header: back + figure */}
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0,
-        padding: '12px 16px', borderBottom: '1px solid var(--input-divider)',
-      }}>
-        <button
-          onClick={() => router.back()}
-          aria-label="Back"
-          style={{ background: 'none', border: 'none', color: 'var(--text-body)', cursor: 'pointer', padding: 4, display: 'flex' }}
-        >
-          <Icon name="arrow_back" size={24} />
-        </button>
-        {avatar(34)}
-        <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-          <span style={{
-            fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 16,
-            letterSpacing: 1, textTransform: 'uppercase', color: 'var(--violet)',
-            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-          }}>{fig.name}</span>
-          <span style={{
-            fontFamily: 'var(--font-body)', fontSize: 10, letterSpacing: '0.6px',
-            textTransform: 'uppercase', color: 'var(--text-sub)',
-          }}>{fig.era}</span>
+      {/* Header bar: full-bleed bottom border; content centered in the column. */}
+      <div style={{ flexShrink: 0, borderBottom: '1px solid var(--input-divider)' }}>
+        <div style={{
+          ...centered, display: 'flex', alignItems: 'center', gap: 10,
+          padding: '12px 16px',
+        }}>
+          <button
+            onClick={() => router.back()}
+            aria-label="Back"
+            style={{ background: 'none', border: 'none', color: 'var(--text-body)', cursor: 'pointer', padding: 4, display: 'flex' }}
+          >
+            <Icon name="arrow_back" size={24} />
+          </button>
+          {avatar(34)}
+          <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+            <span style={{
+              fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 16,
+              letterSpacing: 1, textTransform: 'uppercase', color: 'var(--violet)',
+              whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+            }}>{fig.name}</span>
+            <span style={{
+              fontFamily: 'var(--font-body)', fontSize: 10, letterSpacing: '0.6px',
+              textTransform: 'uppercase', color: 'var(--text-sub)',
+            }}>{fig.era}</span>
+          </div>
         </div>
       </div>
 
-      {/* Thread — vent + seed reframe open it, then the follow-up turns */}
-      <div ref={scrollRef} style={{
-        flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 12,
-        padding: 16,
-      }}>
-        {bubble({ role: 'user', content: ventText, turn_index: -2 }, 'vent')}
-        {bubble({ role: 'lens', content: seedReply, turn_index: -1 }, 'seed')}
-        {messages.map((m, i) => chatBubble(m, m.id ?? i))}
-        {pending && typingDots}
-        {error && (
-          <p style={{
-            fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--btn-secondary-color)',
-            textAlign: 'center', margin: 0,
-          }}>{error}</p>
-        )}
+      {/* Thread — full-width scroll, centered column. vent + seed reframe open it,
+          then the follow-up turns. */}
+      <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto' }}>
+        <div style={{
+          ...centered, display: 'flex', flexDirection: 'column', gap: 12, padding: 16,
+        }}>
+          {bubble({ role: 'user', content: ventText, turn_index: -2 }, 'vent')}
+          {bubble({ role: 'lens', content: seedReply, turn_index: -1 }, 'seed')}
+          {messages.map((m, i) => chatBubble(m, m.id ?? i))}
+          {pending && typingDots}
+          {error && (
+            <p style={{
+              fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--btn-secondary-color)',
+              textAlign: 'center', margin: 0,
+            }}>{error}</p>
+          )}
+        </div>
       </div>
 
       {/* Locked footer (hard cap only) OR the always-available composer. A soft
           close never lands here — it keeps the composer and adds the resting rail. */}
       {locked ? (
-        <div style={{
-          flexShrink: 0, padding: 16, borderTop: '1px solid var(--input-divider)',
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10,
-        }}>
-          <span style={{
-            fontFamily: 'var(--font-body)', fontSize: 12, letterSpacing: '0.4px',
-            color: 'var(--text-sub)', textAlign: 'center',
+        <div style={{ flexShrink: 0, borderTop: '1px solid var(--input-divider)' }}>
+          <div style={{
+            ...centered, padding: 16,
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10,
           }}>
-            This conversation has found its close. The shift is yours to carry.
-          </span>
-          <button
-            onClick={() => router.back()}
-            style={{
-              background: 'var(--btn-secondary-bg)', color: 'var(--btn-secondary-color)',
-              border: '1px solid var(--input-divider)', borderRadius: 'var(--btn-radius)',
-              padding: '8px 18px', fontFamily: 'var(--font-body)', fontSize: 13,
-              letterSpacing: '0.3px', cursor: 'pointer',
-            }}
-          >
-            Return to journal
-          </button>
+            <span style={{
+              fontFamily: 'var(--font-body)', fontSize: 12, letterSpacing: '0.4px',
+              color: 'var(--text-sub)', textAlign: 'center',
+            }}>
+              This conversation has found its close. The shift is yours to carry.
+            </span>
+            <button
+              onClick={() => router.back()}
+              style={{
+                background: 'var(--btn-secondary-bg)', color: 'var(--btn-secondary-color)',
+                border: '1px solid var(--input-divider)', borderRadius: 'var(--btn-radius)',
+                padding: '8px 18px', fontFamily: 'var(--font-body)', fontSize: 13,
+                letterSpacing: '0.3px', cursor: 'pointer',
+              }}
+            >
+              Return to journal
+            </button>
+          </div>
         </div>
       ) : (
-        <div style={{
-          display: 'flex', flexDirection: 'column', gap: 8, flexShrink: 0,
-          padding: '12px 16px', borderTop: '1px solid var(--input-divider)',
-        }}>
+        <div style={{ flexShrink: 0, borderTop: '1px solid var(--input-divider)' }}>
+          <div style={{
+            ...centered, display: 'flex', flexDirection: 'column', gap: 8,
+            padding: '12px 16px',
+          }}>
           {/* Sticky resting strip: one wind-down marker pinned above the input
               once the lens has offered its closing thought. Never repeats. */}
           {resting && softCloseDivider('resting-sticky', restingPrompt)}
@@ -402,6 +412,7 @@ export default function ChatScreen({ figureId, sessionId, ventText, seedReply }:
             >
               <Icon name="arrow_upward" size={22} />
             </button>
+          </div>
           </div>
         </div>
       )}
