@@ -13,7 +13,13 @@
 
 ## Preview QA
 
-- [ ] Checked the change on the Vercel preview deploy <!-- full checklist: T-026-03 -->
+Open the Vercel preview (bot comment ↑) and verify — full runbook: [docs/PREVIEW-QA.md](../docs/PREVIEW-QA.md)
+
+- [ ] Feature actually runs on the preview (not just builds)
+- [ ] Theme sweep — Cyberpunk / Kawaii / Notepad look correct
+- [ ] Smoked the primary flow this PR touches
+- [ ] Chat/AI change? Ran the [T-025-01 chat matrix](../docs/PREVIEW-QA.md#3-chat--ai-changes--run-the-chat-matrix)
+- [ ] N/A — docs/tooling only, no runtime surface
 
 ---
 
