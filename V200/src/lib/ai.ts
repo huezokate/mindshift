@@ -10,9 +10,18 @@
 // stays behind a dynamic import so client components that (indirectly) import this
 // don't pull it into the bundle. All provider keys are read at call time.
 
+// A prior conversation turn, for multi-turn calls (Chat with the Lens, T-020-02).
+// `lens` is mapped to the provider's assistant role. Single-shot callers omit this.
+export type ChatTurn = { role: 'user' | 'lens'; content: string }
+
 export type GenerateArgs = {
   system: string
   prompt: string
+  // Optional conversation history preceding `prompt`. When present, the call is
+  // multi-turn: history + the final user `prompt` are sent as a message sequence
+  // so voice/context persist across turns. When absent, behavior is the original
+  // single-shot system+prompt (all existing callers).
+  messages?: ChatTurn[]
   temperature?: number
   maxTokens?: number
   timeoutMs?: number
@@ -31,6 +40,7 @@ export async function generateText(args: GenerateArgs): Promise<string> {
 async function generateWithGroq({
   system,
   prompt,
+  messages,
   temperature = 0.9,
   maxTokens = 400,
   timeoutMs = DEFAULT_TIMEOUT_MS,
@@ -38,6 +48,13 @@ async function generateWithGroq({
   const key = process.env.GROQ_API_KEY
   if (!key) throw new Error('GROQ_API_KEY is not set')
   const model = process.env.GROQ_MODEL ?? 'llama-3.3-70b-versatile'
+
+  // Groq is OpenAI-compatible: history maps 1:1 into the messages array
+  // (lens → assistant). The final user `prompt` is always the last message.
+  const history = (messages ?? []).map(m => ({
+    role: m.role === 'lens' ? ('assistant' as const) : ('user' as const),
+    content: m.content,
+  }))
 
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), timeoutMs)
@@ -55,6 +72,7 @@ async function generateWithGroq({
         top_p: 0.95,
         messages: [
           { role: 'system', content: system },
+          ...history,
           { role: 'user', content: prompt },
         ],
       }),
@@ -75,6 +93,7 @@ async function generateWithGroq({
 async function generateWithGemini({
   system,
   prompt,
+  messages,
   temperature = 0.9,
   maxTokens = 400,
 }: GenerateArgs): Promise<string> {
@@ -87,6 +106,20 @@ async function generateWithGemini({
     systemInstruction: system,
     generationConfig: { temperature, topP: 0.95, maxOutputTokens: maxTokens },
   })
+
+  // Multi-turn: replay history through a chat session (lens → model role), then
+  // send the final user prompt. Single-shot when no history is supplied.
+  if (messages && messages.length > 0) {
+    const chat = model.startChat({
+      history: messages.map(m => ({
+        role: m.role === 'lens' ? 'model' : 'user',
+        parts: [{ text: m.content }],
+      })),
+    })
+    const result = await chat.sendMessage(prompt)
+    return result.response.text()
+  }
+
   const result = await model.generateContent(prompt)
   return result.response.text()
 }
