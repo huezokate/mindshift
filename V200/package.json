@@ -9,6 +9,7 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
+    "migrations:check": "node scripts/check-migrations.mjs",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
