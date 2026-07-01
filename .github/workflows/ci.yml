@@ -47,6 +47,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Static guard over V200/supabase/migrations/: fails on a malformed set
+      # (bad NNN_name.sql filename, duplicate version, or a gap in the sequence).
+      # Pure filesystem check — no DB, no secrets. Runs early so an obviously
+      # broken migration set fails fast, before the slower build/test steps.
+      # See docs/knowledge/migration-process.md for the full gated process.
+      - name: Validate migrations
+        run: npm run migrations:check
+
       # Lint is currently NON-BLOCKING: main has a pre-existing lint backlog
       # (react-hooks/set-state-in-effect, react/no-unescaped-entities, unused
       # eslint-disable directives) that predates this pipeline. Keeping it visible
