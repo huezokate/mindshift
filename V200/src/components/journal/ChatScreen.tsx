@@ -10,6 +10,17 @@
 // --text-*) — never the raw --cyan/--pink/--green accent slots, which collapse to
 // one magenta in kawaii (the exact bug this screen was corrected for). So it reads
 // correctly in cyberpunk, kawaii, and notepad.
+//
+// ⚠ ANON PATH IS NOT REACHABLE IN THE PRODUCT (T-025-02). This component supports an
+// anon/ephemeral mode (`sessionId=null`, signed-out → sessionStorage thread, no DB
+// write), but there is NO product entry point to it: the only route that mounts
+// ChatScreen — /app/journal-v2/[id]/chat/[figureId] — is sign-in-gated and always
+// passes a real `sessionId`. The anon branch runs only under Storybook isolation
+// (ChatScreen.stories.tsx → `Anon`). It is intentionally left unshipped per S-025
+// ("no new user-facing behavior"); anon chat is deferred, NOT a tested product path.
+// To reactivate later (ticket option a): add an entry point that opens ChatScreen
+// with `sessionId=null` (e.g. a button on /app/response) and first resolve the
+// parked anon chat-depth/limits question (only the shared 20-message cap exists).
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
@@ -17,6 +28,8 @@ import { useUser } from '@clerk/nextjs'
 import { FIGURES, portraitFor } from '@/lib/figures'
 import { useTheme } from '@/lib/theme'
 import Icon from '@/components/ui/Icon'
+// loadAnonThread/saveAnonThread back the anon-only branch below — unreachable in
+// product today (see the header note + T-025-02).
 import { sendChatTurn, loadAnonThread, saveAnonThread } from '@/lib/chat-client'
 import { CHAT_HARD_CAP, type ChatMessage } from '@/lib/chat-types'
 
@@ -75,7 +88,9 @@ export default function ChatScreen({ figureId, sessionId, ventText, seedReply }:
         .then(d => apply(d.messages ?? [], !!d.locked))
         .catch(() => apply([], false))
     } else {
-      // Anon locks only at the hard cap too — a soft close keeps the input alive.
+      // Anon / unsaved branch — NOT reachable in the product today (Storybook-only;
+      // see the header note + T-025-02). Anon locks only at the hard cap too — a
+      // soft close keeps the input alive.
       const anon = loadAnonThread(figureId)
       const anonUserTurns = anon.filter(m => m.role === 'user').length
       Promise.resolve().then(() => apply(anon, anonUserTurns >= CHAT_HARD_CAP))
@@ -121,6 +136,7 @@ export default function ChatScreen({ figureId, sessionId, ventText, seedReply }:
       const lensMsg: ChatMessage = { role: 'lens', content: reply, turn_index: messages.length + 1, done }
       setMessages(prev => {
         const next = [...prev, lensMsg]
+        // Anon persistence — product-unreachable today (Storybook-only; T-025-02).
         if (!isSignedIn) saveAnonThread(figureId, next)
         return next
       })

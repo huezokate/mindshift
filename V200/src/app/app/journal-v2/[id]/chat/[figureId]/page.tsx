@@ -16,6 +16,11 @@ export default async function ChatWithLensPage(
 ) {
   const { id, figureId } = await params
   const { userId } = await auth()
+  // This sign-in gate is the SOLE entry point to ChatScreen. Because of it, the
+  // anon/ephemeral branch of ChatScreen (`sessionId=null`, signed-out) is
+  // unreachable in the product today, and `sessionId` below is always a real,
+  // DB-loaded id — never null. Anon chat is intentionally deferred (T-025-02,
+  // per S-025 "no new user-facing behavior"); see ChatScreen.tsx for details.
   if (!userId) redirect(`/sign-in?redirect_url=/app/journal-v2/${id}/chat/${figureId}`)
 
   // Unknown figure → 404 (can't seed a persona).

@@ -96,6 +96,17 @@ Four incremental commits (`02dc501`, `3c5bdf4`, `3d14a36`, `074cfda`).
    add a `stream:true` branch in `ai.ts` + SSE client — no schema change needed.
 7. **`/app/response` entry point not added** (nice-to-have deferred). Only the
    journal detail opens chat today.
+   - **RESOLVED — T-025-02 (decision: defer).** The sign-in-gated journal detail
+     is still the only chat entry, which makes ChatScreen's anon/ephemeral branch
+     (`sessionId=null`, signed-out) **unreachable in the product**. Per S-025
+     ("no new user-facing behavior"; the `/app/response` entry point is an
+     explicit non-goal), anon chat is **intentionally deferred**. The anon branch
+     is **retained but documented as product-unreachable / not-shipped** (see the
+     guard notes in `ChatScreen.tsx`, `chat-client.ts`, the chat route `page.tsx`,
+     and the `Anon` Storybook story). Reactivation (ticket option a) is a small
+     follow-up: add an entry point opening ChatScreen with `sessionId=null`, and
+     first resolve the parked anon chat-depth/limits question. See
+     `docs/active/work/T-025-02/`.
 
 ## Reviewer quick-start
 Read `design.md` (the three resolved open questions) then `chat-prompt.ts` and the
