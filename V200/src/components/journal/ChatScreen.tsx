@@ -10,7 +10,7 @@
 // --text-*) — never the raw --cyan/--pink/--green accent slots, which collapse to
 // one magenta in kawaii (the exact bug this screen was corrected for). So it reads
 // correctly in cyberpunk, kawaii, and notepad.
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { useUser } from '@clerk/nextjs'
@@ -89,7 +89,7 @@ export default function ChatScreen({ figureId, sessionId, ventText, seedReply }:
     const ta = taRef.current
     if (!ta) return
     ta.style.height = 'auto'
-    ta.style.height = `${Math.min(ta.scrollHeight, 120)}px`
+    ta.style.height = `${Math.min(ta.scrollHeight, 160)}px`
   }
 
   async function send() {
@@ -240,9 +240,9 @@ export default function ChatScreen({ figureId, sessionId, ventText, seedReply }:
     </div>
   )
 
-  // Soft-close marker: a subtle in-thread wind-down after the lens offers its
-  // closing thought. Purely tonal — it does NOT remove the composer. Structural
-  // tokens only, so it reads correctly across all three themes.
+  // Soft-close marker: a subtle wind-down shown ONCE, pinned above the composer,
+  // after the lens offers its closing thought. Purely tonal — it does NOT remove
+  // the composer. Structural tokens only, so it reads across all three themes.
   const softCloseDivider = (key: string | number) => (
     <div key={key} style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
@@ -267,7 +267,7 @@ export default function ChatScreen({ figureId, sessionId, ventText, seedReply }:
 
   const lastMsg = messages[messages.length - 1]
   // "Resting" = the lens has offered a closing thought and we're not capped. The
-  // input stays; we just soften the invitation and show an explicit way to leave.
+  // input stays; we just soften the placeholder and pin the wind-down strip above it.
   const resting = !locked && !!lastMsg && lastMsg.role === 'lens' && !!lastMsg.done
   const placeholder = resting ? 'Still here if you need more…' : `Say something to ${fig.name}…`
 
@@ -306,15 +306,7 @@ export default function ChatScreen({ figureId, sessionId, ventText, seedReply }:
       }}>
         {bubble({ role: 'user', content: ventText, turn_index: -2 }, 'vent')}
         {bubble({ role: 'lens', content: seedReply, turn_index: -1 }, 'seed')}
-        {messages.map((m, i) => (
-          <Fragment key={m.id ?? i}>
-            {chatBubble(m, m.id ?? i)}
-            {/* A resting-point divider follows any lens message that soft-closed,
-                unless the cap already turned this into the final locked footer. */}
-            {m.role === 'lens' && m.done && !(locked && i === messages.length - 1) &&
-              softCloseDivider(`sc-${m.id ?? i}`)}
-          </Fragment>
-        ))}
+        {messages.map((m, i) => chatBubble(m, m.id ?? i))}
         {pending && typingDots}
         {error && (
           <p style={{
@@ -354,21 +346,9 @@ export default function ChatScreen({ figureId, sessionId, ventText, seedReply }:
           display: 'flex', flexDirection: 'column', gap: 8, flexShrink: 0,
           padding: '12px 16px', borderTop: '1px solid var(--input-divider)',
         }}>
-          {/* Resting rail: an explicit, user-initiated way to leave once the lens
-              has offered its closing thought. Optional — the input stays live. */}
-          {resting && (
-            <button
-              onClick={() => router.back()}
-              style={{
-                alignSelf: 'center', background: 'none', border: 'none',
-                color: 'var(--text-sub)', cursor: 'pointer',
-                fontFamily: 'var(--font-body)', fontSize: 12, letterSpacing: '0.4px',
-                textDecoration: 'underline', textUnderlineOffset: 3, padding: 2,
-              }}
-            >
-              I’m good — carry the shift
-            </button>
-          )}
+          {/* Sticky resting strip: one wind-down marker pinned above the input
+              once the lens has offered its closing thought. Never repeats. */}
+          {resting && softCloseDivider('resting-sticky')}
           <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
             <textarea
               ref={taRef}
@@ -380,11 +360,11 @@ export default function ChatScreen({ figureId, sessionId, ventText, seedReply }:
                 }
               }}
               placeholder={placeholder}
-              rows={1}
+              rows={2}
               maxLength={MAX_MSG_CHARS}
               disabled={pending}
               style={{
-                flex: 1, resize: 'none', maxHeight: 120, overflowY: 'auto',
+                flex: 1, resize: 'none', minHeight: 76, maxHeight: 160, overflowY: 'auto',
                 background: 'var(--input-bg)', color: 'var(--text-body)',
                 border: '1px solid var(--input-divider)', borderRadius: 'var(--input-radius)',
                 padding: '10px 14px', fontFamily: 'var(--font-body)', fontSize: 14,
