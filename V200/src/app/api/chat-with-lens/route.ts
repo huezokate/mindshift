@@ -104,7 +104,10 @@ export async function POST(req: NextRequest) {
   // `capped` is the hard rail that actually locks the thread. The cap forces both
   // even if the model omitted the token.
   const capped = userTurnCount >= CHAT_HARD_CAP
-  const done = capped || raw.includes(CHAT_DONE_TOKEN)
+  // Honor the resting-point token only from the 2nd follow-up on — an eager close
+  // on the very first reply would surface a wind-down before the talk has gone
+  // anywhere. The token is always stripped regardless, so the user never sees it.
+  const done = capped || (userTurnCount >= 2 && raw.includes(CHAT_DONE_TOKEN))
   const reply = raw.split(CHAT_DONE_TOKEN).join('').trim()
 
   if (!reply) {
