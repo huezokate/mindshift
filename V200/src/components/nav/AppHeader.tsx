@@ -68,7 +68,7 @@ export default function AppHeader({
   // on onboarding / response / lens etc. Props always win when provided.
   useEffect(() => {
     if (entryCount != null && lensCount != null) return
-    if (!isSignedIn) { setFetchedCounts(null); return }
+    if (!isSignedIn) return
     let alive = true
     fetch('/api/journal-v2/counts')
       .then(r => (r.ok ? r.json() : null))
@@ -77,8 +77,11 @@ export default function AppHeader({
     return () => { alive = false }
   }, [isSignedIn, entryCount, lensCount])
 
-  const shownEntries = entryCount ?? fetchedCounts?.entries ?? 0
-  const shownLenses = lensCount ?? fetchedCounts?.lenses ?? 0
+  // Derive display counts. Gate the self-fetched fallback on isSignedIn so a
+  // previous session's counts are never shown after sign-out (replaces the old
+  // synchronous setFetchedCounts(null) reset that lived in the effect above).
+  const shownEntries = entryCount ?? (isSignedIn ? fetchedCounts?.entries ?? 0 : 0)
+  const shownLenses = lensCount ?? (isSignedIn ? fetchedCounts?.lenses ?? 0 : 0)
 
   // Anon has no account-bound surfaces (journal, profile, mind map all persist
   // per user_id), so every account-menu destination funnels anon users to

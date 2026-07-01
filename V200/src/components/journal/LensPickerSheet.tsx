@@ -4,7 +4,7 @@
 // Socrates → … → Lenin → Socrates). Presentational: the parent owns what Select
 // and Back do (vent flow routes to /app/response; the journal adds a lens to the
 // open entry and Back returns to it). Kate, 23 June — "it's solid for now."
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FIGURES, getFigureImg } from '@/lib/figures'
 import { useTheme } from '@/lib/theme'
@@ -29,9 +29,15 @@ export default function LensPickerSheet({
 }: Props) {
   const { theme } = useTheme()
   const [index, setIndex] = useState(startIndex)
+  const [prevOpen, setPrevOpen] = useState(open)
 
-  // Reset to the requested start figure each time the sheet opens.
-  useEffect(() => { if (open) setIndex(startIndex) }, [open, startIndex])
+  // Reset to the requested start figure each time the sheet opens. Done during
+  // render (not in an effect) so React reconciles before paint — no cascade, no
+  // flash of the previous figure.
+  if (open !== prevOpen) {
+    setPrevOpen(open)
+    if (open) setIndex(startIndex)
+  }
 
   const fig = FIGURES[index]
   const prev = () => setIndex(i => (i - 1 + FIGURES.length) % FIGURES.length)
