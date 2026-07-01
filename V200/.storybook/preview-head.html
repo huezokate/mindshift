@@ -1,0 +1,10 @@
+<!-- Injected into the Storybook preview iframe <head>. Mirrors V200/src/app/layout.tsx:
+     the Material Symbols Sharp webfont is loaded via <link>, NOT globals.css (globals.css
+     only defines the .material-symbols-sharp class). Without this, <Icon> renders ligature
+     text ("favorite") instead of glyphs. Keep the URL/axes in sync with layout.tsx. -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+/>
