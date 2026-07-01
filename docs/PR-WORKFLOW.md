@@ -16,6 +16,7 @@ Branch protection on `main` (applied via
 |---|---|---|
 | Pull request required | direct pushes to `main` blocked | every change is reviewable + CI-checked |
 | Required status check | **`ci`** (from [T-026-01](./active/tickets)) must pass | no merge while lint/typecheck/build/test are red |
+| Required status check | **`Vercel`** (when `REQUIRE_VERCEL_PREVIEW=true`) | no merge unless the preview deploy is `Ready` — a broken preview build ≈ a broken prod build (T-026-03). *Not* `Vercel Preview Comments` (cosmetic) or `Cloudflare Pages` (stale/failing). |
 | Branch up to date | `strict: true` | prevents the silent-drift-then-merge that shipped unverified code before |
 | Conversation resolution | required | no unresolved review threads at merge |
 | Approving reviews | **not required** (solo dev) | GitHub blocks self-approval; requiring one would deadlock a solo `main`. Revisit when a second collaborator joins. |
@@ -39,8 +40,9 @@ branch off main  →  push  →  open PR  →  ci green  →  preview QA  →  s
 3. **Wait for `ci`** (lint / typecheck / build / test). It must be green to merge.
 4. **Keep the branch current** — if `main` moved, update your branch (protection
    requires it to be up to date).
-5. **Preview QA** — check the change on the Vercel preview deploy (full checklist:
-   T-026-03).
+5. **Preview QA** — open the Vercel preview and run the checklist in
+   [PREVIEW-QA.md](./PREVIEW-QA.md) (theme sweep + smoke; chat matrix for AI
+   changes).
 6. **Squash-merge.** The head branch auto-deletes on merge
    (`delete_branch_on_merge`), so no cleanup.
 
