@@ -707,7 +707,7 @@ function AllComponents({ themeKey }: { themeKey: string }) {
         </div>
         <div style={{ background: 'var(--input-bg)', padding: '12px 16px' }}>
           <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '20px', color: 'var(--text-body)', letterSpacing: 0.52 }}>
-            I keep second-guessing my career choice. Everyone around me seems so sure about what they're doing, but I'm constantly wondering if I chose the right path.
+            I keep second-guessing my career choice. Everyone around me seems so sure about what they&apos;re doing, but I&apos;m constantly wondering if I chose the right path.
           </p>
         </div>
         <div style={{ background: 'var(--input-bg)', borderTop: '1px solid var(--input-divider)', padding: '4px 12px', display: 'flex', justifyContent: 'flex-end' }}>

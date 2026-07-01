@@ -26,6 +26,7 @@ export default function ResponsePage() {
   const [response, setResponse] = useState('')
   const [displayed, setDisplayed] = useState('')
   const [done, setDone] = useState(false)
+  const [prevResponse, setPrevResponse] = useState('')
   const [shareOpen, setShareOpen] = useState(false)
   // True only when this is a real vent (loaded from sessionStorage), not the
   // demo fallback — gates auto-save so we never persist the placeholder.
@@ -37,16 +38,26 @@ export default function ResponsePage() {
     const resp = sessionStorage.getItem('ms_response') ?? ''
     const ventText = sessionStorage.getItem('ms_vent') ?? ''
     const found = figureId ? FIGURES.find(f => f.id === figureId) : null
+    // hydration-safe: defer client-only sessionStorage reads past first paint so
+    // SSR + first client render match the demo fallbacks (no hydration mismatch).
+    /* eslint-disable react-hooks/set-state-in-effect */
     if (found) setFigure(found)
     if (ventText) setVent(ventText)
     if (resp) setLoadedReal(true)
     setResponse(resp || DEMO_RESPONSE)
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [])
+
+  // Reset the typewriter when the response changes — done during render (not in
+  // the effect) so the old text never flashes and there's no cascading render.
+  if (response && response !== prevResponse) {
+    setPrevResponse(response)
+    setDisplayed('')
+    setDone(false)
+  }
 
   useEffect(() => {
     if (!response) return
-    setDisplayed('')
-    setDone(false)
     let i = 0
     const interval = setInterval(() => {
       i++
@@ -90,6 +101,9 @@ export default function ResponsePage() {
   useEffect(() => {
     if (isSignedIn !== true || !done || !loadedReal || saveState !== 'idle') return
     let alive = true
+    // Optimistic in-flight status before the async persist below (also acts as
+    // the re-entry guard via the saveState !== 'idle' check above).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSaveState('saving')
     persist().then(id => {
       if (!alive) return

@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "migrations:check": "node scripts/check-migrations.mjs",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.94.0",
@@ -28,13 +33,19 @@
     "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
+    "@storybook/addon-docs": "^10.4.6",
+    "@storybook/nextjs-vite": "^10.4.6",
     "@tailwindcss/postcss": "^4",
+    "@tailwindcss/vite": "^4.3.2",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
+    "storybook": "^10.4.6",
     "tailwindcss": "^4",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vite": "^8.1.2",
+    "vitest": "^4.1.9"
   }
 }

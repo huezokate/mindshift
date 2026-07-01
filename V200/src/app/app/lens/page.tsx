@@ -62,6 +62,9 @@ export default function LensPage() {
 
   useEffect(() => {
     const stored = sessionStorage.getItem('ms_vent')
+    // hydration-safe: defer client-only sessionStorage read past first paint so
+    // SSR + first client render match DEMO_VENT (no hydration mismatch).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (stored) setVent(stored)
   }, [])
 
