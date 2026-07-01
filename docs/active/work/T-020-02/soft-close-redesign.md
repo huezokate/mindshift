@@ -104,3 +104,38 @@ Key inversions vs. today:
   in or out for v1? Research says it's the single highest-value element (user
   agency = safest closure). Recommended in. Alternative: purely tonal soft close
   (divider only, no button), rely on the user just… stopping.
+
+---
+
+## Implemented (2026-07-01)
+
+Shipped the soft-close model end-to-end. Key decisions taken:
+
+- **`done` = soft close (resting point), never a lock.** Server returns `done`
+  *and* a separate `capped`. Only `capped` (hard cap 20) removes the composer.
+- **Nudge earlier:** `CHAT_SOFT_TARGET` 5 → 3; closing clause starts at 3 and
+  tapers harder past turn 5. `CHAT_SOFT_NUDGE` (was 8) removed.
+- **Anti-manipulation prompt guard:** control rules explicitly forbid "before you
+  go" / "you're leaving already" and any refusal to continue.
+- **Eager-close gate:** the resting token is honored only from the 2nd follow-up
+  on (always stripped from the reply regardless), so a wind-down can't appear on
+  turn 1.
+- **UI (design-system consistent, structural tokens only):**
+  - In-thread **resting divider** after any soft-closed lens message ("The shift
+    is yours to carry" + "Sit with this — or keep going.").
+  - Composer **stays**; placeholder softens to "Still here if you need more…".
+  - Optional **"I'm good — carry the shift"** leave rail (user-initiated close →
+    `router.back()`, thread persists / revisitable).
+  - Locked (cap-20) footer keeps the brand line **plus** a "Return to journal"
+    continuity button — a doorway, not a dead end.
+
+Files: `chat-types.ts`, `chat-prompt.ts`, `chat-client.ts`,
+`api/chat-with-lens/route.ts`, `api/chat-with-lens/history/route.ts`,
+`components/journal/ChatScreen.tsx`.
+
+**Verification:** `tsc --noEmit` + eslint clean (only a pre-existing `<img>`
+warning + an unrelated stale mindmap type error, both untouched). All CSS tokens
+used are defined in tokens.css / -kawaii / -notepad. Not runtime-smoke-tested
+(chat is auth-gated + model output non-deterministic) — recommend a manual pass:
+short thread → confirm resting divider + live input; keep replying past it →
+confirm lens tapers and never walls; 20 turns → confirm graceful locked footer.
