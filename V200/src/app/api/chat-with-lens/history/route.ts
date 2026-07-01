@@ -5,9 +5,10 @@ import { CHAT_HARD_CAP, type ChatMessage } from '@/lib/chat-types'
 
 // Chat with the Lens — load a persisted thread (T-020-02).
 // Signed-in only: returns the ordered follow-up messages for (session, figure)
-// plus `closed` (a done row exists, or the user hit the hard cap) so a revisited
-// entry re-opens the conversation in the right state. Anon threads are ephemeral
-// (client state) and never reach here.
+// plus `locked` — true ONLY when the user hit the hard cap. A soft close (a `done`
+// row) is a resting point, not a lock: those are rendered inline (a wind-down
+// divider) while the composer stays open, so per-message `done` flags travel with
+// `messages` and the client decides. Anon threads are ephemeral (client state).
 
 export async function GET(req: NextRequest) {
   const { userId } = await auth()
@@ -35,7 +36,7 @@ export async function GET(req: NextRequest) {
 
   const messages = (data ?? []) as ChatMessage[]
   const userTurns = messages.filter(m => m.role === 'user').length
-  const closed = messages.some(m => m.done) || userTurns >= CHAT_HARD_CAP
+  const locked = userTurns >= CHAT_HARD_CAP // only the hard cap locks the composer
 
-  return NextResponse.json({ messages, closed })
+  return NextResponse.json({ messages, locked })
 }

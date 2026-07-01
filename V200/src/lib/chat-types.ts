@@ -21,21 +21,25 @@ export type ChatThread = {
   sessionId: string | null // null for anon (never persisted)
   figureId: string
   messages: ChatMessage[]
-  closed: boolean // true once a done message arrives or the hard cap is hit
+  // `locked` is the ONLY state that removes the composer, and it is set solely by
+  // the hard cap (a safety/cost rail). A model-signaled `done` is a *soft close* —
+  // a resting point that keeps the input alive (see CHAT_DONE_TOKEN).
+  locked: boolean
 }
 
 // Soft target: the lens aims to land the reframe around here and offer a closing
-// thought. Not enforced — it's what the prompt steers toward.
-export const CHAT_SOFT_TARGET = 5
+// thought (a "resting point"). Not enforced and NOT a lock — it's where the prompt
+// starts steering toward a graceful wind-down. Kept low so the nudge lands in a
+// few moves, per the product bet (a shift should land, not chat forever).
+export const CHAT_SOFT_TARGET = 3
 
-// Hard cap on USER messages. At the cap the reply is a forced graceful close,
-// never an error wall. Applies to all tiers in v1.
+// Hard cap on USER messages. This is the one place the composer is removed — a
+// safety/cost rail, not the normal way a chat ends. At the cap the reply is a
+// forced graceful in-character close, never an error wall. Applies to all tiers.
 export const CHAT_HARD_CAP = 20
 
-// After this many user messages, the system prompt starts nudging toward a close
-// so long threads always converge even if the model never volunteers the sentinel.
-export const CHAT_SOFT_NUDGE = 8
-
-// Trailing sentinel the model appends to its final reply when the reframe has
-// landed. Parsed + stripped server-side; never shown to the user.
+// Trailing sentinel the model appends when it offers its closing thought. This is
+// a SOFT close: parsed + stripped server-side, it marks a resting point in the
+// thread and softens the UI — it does NOT end the conversation. If the user keeps
+// talking, the lens keeps replying (tapering gently). Never shown to the user.
 export const CHAT_DONE_TOKEN = '⟪END⟫' // ⟪END⟫
