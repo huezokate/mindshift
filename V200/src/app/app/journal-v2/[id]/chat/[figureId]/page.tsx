@@ -38,7 +38,7 @@ export default async function ChatWithLensPage(
   if (!seed) notFound()
 
   return (
-    <div className="mx-auto w-full" style={{ maxWidth: 440 }}>
+    <div className="mx-auto w-full" style={{ maxWidth: 900 }}>
       <ChatScreen
         figureId={figureId}
         sessionId={s.id}
