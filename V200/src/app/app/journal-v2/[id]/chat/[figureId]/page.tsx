@@ -38,13 +38,13 @@ export default async function ChatWithLensPage(
   if (!seed) notFound()
 
   return (
-    <div className="mx-auto w-full" style={{ maxWidth: 900 }}>
-      <ChatScreen
-        figureId={figureId}
-        sessionId={s.id}
-        ventText={s.vent_text}
-        seedReply={seed.response_text}
-      />
-    </div>
+    // Full width — ChatScreen makes its header/composer bars full-bleed and keeps
+    // the content centered in a 900px column.
+    <ChatScreen
+      figureId={figureId}
+      sessionId={s.id}
+      ventText={s.vent_text}
+      seedReply={seed.response_text}
+    />
   )
 }
