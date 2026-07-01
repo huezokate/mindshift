@@ -126,7 +126,14 @@ create policy "waitlist_anon_insert" on waitlist for insert with check (true);
 
 **Supabase project ref:** `wwszertnwbsdwbkzrupk` (one project on the account).
 
-Migration files (apply manually in Supabase SQL editor OR via the Supabase MCP `apply_migration`):
+Migrations follow the **gated process** in `docs/knowledge/migration-process.md` —
+authored as the next contiguous `NNN_name.sql`, validated by `npm run
+migrations:check` (also a CI gate), applied via the Supabase MCP `apply_migration`
+as part of releasing the PR that needs them, and verified against
+`list_migrations`. Do NOT apply migrations by hand in the SQL editor "whenever" —
+that is what caused the historical drift documented in the process doc.
+
+Migration files:
 - `V200/supabase/migrations/001_journal.sql` — vent_sessions + lens_responses + RLS
 - `V200/supabase/migrations/002_journal_v2.sql` — privacy, favorites, share log
 - `V200/supabase/migrations/003_waitlist.sql` — citext email + source upgrade on existing waitlist table
@@ -191,7 +198,7 @@ docs/active/tickets/    Ticket files (markdown with YAML frontmatter)
 docs/active/stories/    Story files (same frontmatter pattern)
 docs/active/work/       Work artifacts, one subdirectory per ticket ID
 discovery/              Archived V1/experimental files — read-only reference
-V200/supabase/          SQL migration files (run manually in Supabase SQL editor)
+V200/supabase/          SQL migration files (applied via the gated process — see docs/knowledge/migration-process.md)
 ```
 
 ---
