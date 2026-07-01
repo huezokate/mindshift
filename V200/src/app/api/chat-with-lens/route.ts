@@ -43,20 +43,27 @@ export async function POST(req: NextRequest) {
   const db = getSupabaseAdmin()
   const persist = Boolean(userId && sessionId)
 
-  // Prior user-turn count is authoritative from the DB for a persisted thread;
-  // anon / unsaved threads count the user messages in the client-supplied history.
+  // For a persisted thread the DB is authoritative for BOTH the prior turns
+  // (context replayed to the model) and the next turn_index — never trust the
+  // client's optimistic history, which can drift from what actually saved. Anon /
+  // unsaved threads rely on the client-supplied history (their only state).
   let priorUserTurns: number
+  let priorRows = 0 // total persisted rows so far → next turn_index base
+  let priorTurns: ChatMessage[]
   if (persist) {
-    const { count } = await db
+    const { data } = await db
       .from('lens_chat_messages')
-      .select('id', { count: 'exact', head: true })
+      .select('role, content, turn_index')
       .eq('session_id', sessionId)
       .eq('user_id', userId!)
       .eq('figure_id', figureId)
-      .eq('role', 'user')
-    priorUserTurns = count ?? 0
+      .order('turn_index', { ascending: true })
+    priorTurns = (data ?? []) as ChatMessage[]
+    priorRows = priorTurns.length
+    priorUserTurns = priorTurns.filter(m => m.role === 'user').length
   } else {
-    priorUserTurns = (history ?? []).filter(m => m.role === 'user').length
+    priorTurns = history ?? []
+    priorUserTurns = priorTurns.filter(m => m.role === 'user').length
   }
 
   const userTurnCount = priorUserTurns + 1 // ordinal of the turn being generated
@@ -71,7 +78,7 @@ export async function POST(req: NextRequest) {
   const contextTurns: ChatTurn[] = [
     { role: 'user', content: ventText! },
     ...(seedReply?.trim() ? [{ role: 'lens' as const, content: seedReply }] : []),
-    ...(history ?? []).map(m => ({ role: m.role, content: m.content })),
+    ...priorTurns.map(m => ({ role: m.role, content: m.content })),
   ]
 
   let raw: string
@@ -106,17 +113,17 @@ export async function POST(req: NextRequest) {
   }
 
   // Persist the follow-up turn (signed-in with a saved session only). The seed
-  // reframe is NOT stored here — it already lives in lens_responses.
+  // reframe is NOT stored here — it already lives in lens_responses. turn_index
+  // continues from the actual row count so concurrent/retried turns can't collide.
   if (persist) {
-    const base = priorUserTurns * 2 // 2 rows (user+lens) per prior follow-up turn
-    await db.from('lens_chat_messages').insert([
+    const { error: insertErr } = await db.from('lens_chat_messages').insert([
       {
         session_id: sessionId,
         user_id: userId,
         figure_id: figureId,
         role: 'user',
         content: userMessage,
-        turn_index: base,
+        turn_index: priorRows,
         done: false,
       },
       {
@@ -125,10 +132,16 @@ export async function POST(req: NextRequest) {
         figure_id: figureId,
         role: 'lens',
         content: reply,
-        turn_index: base + 1,
+        turn_index: priorRows + 1,
         done,
       },
     ])
+    // Don't fail the turn on a save miss (the reply is already in the user's
+    // hands), but surface it — a silent failure here reads as "persisted" when it
+    // wasn't (e.g. migration 007 not yet applied).
+    if (insertErr) {
+      console.error('[chat-with-lens] failed to persist turn:', insertErr.message)
+    }
   }
 
   return NextResponse.json({ reply, done, userTurnCount })
