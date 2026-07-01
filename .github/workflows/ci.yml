@@ -1,0 +1,68 @@
+name: CI
+
+# Runs the core quality gates (lint / typecheck / build / test) on every PR and
+# on every push to main (the branch that auto-deploys to prod via Vercel).
+# Steps run inside V200/ — the workflow file itself must live at the repo root
+# .github/workflows/ so GitHub can discover it.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read # least privilege — CI only needs to read the checkout
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true # kill superseded runs on the same ref, save minutes
+
+jobs:
+  ci:
+    name: ci # -> status-check context "CI / ci" — stable contract for branch protection (T-026-02)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: V200 # every `run:` executes inside the Next.js app root
+    env:
+      # Dummy PUBLIC placeholders so `next build`'s SSG prerender + <ClerkProvider>
+      # don't throw on a missing publishable key. These are NOT secrets — no
+      # CLERK_SECRET_KEY, Supabase service role, Gemini/Groq, Stripe, or Resend
+      # keys are read at build time (all runtime clients read env lazily). If a
+      # future build step ever needs a real secret, make the code lazier instead
+      # of adding secrets here.
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_ci-placeholder
+      NEXT_PUBLIC_SUPABASE_URL: https://ci-placeholder.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder-anon-key
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22 # matches local v22.15.1
+          cache: npm
+          cache-dependency-path: V200/package-lock.json # lockfile is in a subdir, not repo root
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Lint is currently NON-BLOCKING: main has a pre-existing lint backlog
+      # (react-hooks/set-state-in-effect, react/no-unescaped-entities, unused
+      # eslint-disable directives) that predates this pipeline. Keeping it visible
+      # but non-fatal lets CI go green on a clean branch today while still
+      # surfacing lint output on every run.
+      # TODO(T-026): once the lint backlog is cleared, remove `continue-on-error`
+      # so lint becomes a hard gate (and can be required in branch protection).
+      - name: Lint
+        continue-on-error: true
+        run: npm run lint
+
+      - name: Typecheck
+        run: npx tsc --noEmit # fresh checkout has no .next, so tsconfig's `.next/types/**` include is empty — no stale phantom errors
+
+      - name: Build
+        run: npm run build # next build, validated under dummy public env only
+
+      - name: Test
+        run: npm test # vitest run
