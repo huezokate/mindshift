@@ -3,19 +3,24 @@ import { getUserTier, TIER_LIMITS } from '@/lib/user-tier'
 import { getUsageToday, trackUsage } from '@/lib/usage'
 import { FIGURES } from '@/lib/figures'
 import { generateText } from '@/lib/ai'
+import { responseLengthRule } from '@/lib/response-length'
 
 // Shared response-shape rules appended to every figure's persona. The persona
 // (brand voice) is owned per-figure in figures.ts; these rules just constrain
 // length + format so Flash answers the person directly instead of drifting into
-// markdown lists or 400-word essays.
-const RESPONSE_RULES = [
-  'You are responding to a real person who has just vented a personal problem to you.',
-  'Speak directly to them, in second person, fully in character — never break voice.',
-  'Keep it to 2-3 short paragraphs, roughly 90-160 words total.',
-  'Plain prose only: no markdown, no bullet points, no headings, no lists, no emoji.',
-  'Do not parrot their problem back or open with "It sounds like" / "I hear you".',
-  'Give a genuine perspective — a reframe, a hard truth, or real encouragement — in your own voice.',
-].join(' ')
+// markdown lists or 400-word essays. The length rule is dynamic (T-020-01): it
+// tracks how much the user wrote. Everything else — voice, second person,
+// no-markdown — is fixed.
+function buildResponseRules(ventText: string): string {
+  return [
+    'You are responding to a real person who has just vented a personal problem to you.',
+    'Speak directly to them, in second person, fully in character — never break voice.',
+    responseLengthRule(ventText),
+    'Plain prose only: no markdown, no bullet points, no headings, no lists, no emoji.',
+    'Do not parrot their problem back or open with "It sounds like" / "I hear you".',
+    'Give a genuine perspective — a reframe, a hard truth, or real encouragement — in your own voice.',
+  ].join(' ')
+}
 
 export async function POST(req: NextRequest) {
   const { prompt, figureId, systemPrompt, isNewQuote } = await req.json()
@@ -51,7 +56,7 @@ export async function POST(req: NextRequest) {
   let text: string
   try {
     text = await generateText({
-      system: `${persona}\n\n${RESPONSE_RULES}`,
+      system: `${persona}\n\n${buildResponseRules(prompt)}`,
       prompt,
       temperature: 0.9,
       maxTokens: 400,
