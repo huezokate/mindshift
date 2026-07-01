@@ -25,13 +25,26 @@ REQUIRED_APPROVALS=0
 LINEAR_HISTORY=true
 # Apply the gate to admins too (owner also stops pushing straight to prod)?
 ENFORCE_ADMINS=true
+# Require the Vercel preview deploy to succeed before merge? (T-026-03 D2)
+# Gates on the `Vercel` deploy check — NOT `Vercel Preview Comments` (cosmetic)
+# and NEVER `Cloudflare Pages` (a stale, always-failing legacy check pending
+# removal). Flip to false to drop it back to `ci`-only.
+REQUIRE_VERCEL_PREVIEW=true
 # ---------------------------------------------------------------------------
+
+# Build the required-checks array from the knobs above. `ci` is always required;
+# `Vercel` is appended when REQUIRE_VERCEL_PREVIEW is on. Keeps the heredoc JSON
+# valid in either state.
+CHECKS='{ "context": "ci" }'
+if [ "$REQUIRE_VERCEL_PREVIEW" = true ]; then
+  CHECKS="${CHECKS}, { \"context\": \"Vercel\" }"
+fi
 
 read -r -d '' BODY <<JSON || true
 {
   "required_status_checks": {
     "strict": true,
-    "checks": [{ "context": "ci" }]
+    "checks": [ ${CHECKS} ]
   },
   "enforce_admins": ${ENFORCE_ADMINS},
   "required_pull_request_reviews": {
