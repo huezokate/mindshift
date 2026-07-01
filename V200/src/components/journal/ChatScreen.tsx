@@ -134,8 +134,16 @@ export default function ChatScreen({ figureId, sessionId, ventText, seedReply }:
     </div>
   )
 
-  // Bubbles use structural tokens only (theme-safe). Outgoing = the secondary
-  // surface; incoming = the card surface; both carry the divider border + body text.
+  // Shared bubble text styling (theme-safe body).
+  const bubbleText = {
+    fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '20px',
+    letterSpacing: '0.2px', color: 'var(--text-body)',
+    whiteSpace: 'pre-wrap' as const, wordBreak: 'break-word' as const,
+  }
+
+  // The OPENING pair — the original vent + the seed reframe — keep the plain,
+  // tailless bubble they've always had. Outgoing = secondary surface; incoming =
+  // card surface. Structural tokens only (theme-safe).
   const bubble = (m: ChatMessage, key: string | number) => {
     const mine = m.role === 'user'
     return (
@@ -150,11 +158,64 @@ export default function ChatScreen({ figureId, sessionId, ventText, seedReply }:
           border: '1px solid var(--input-divider)',
           borderRadius: 'var(--input-radius)',
           padding: '10px 14px',
-          fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '20px',
-          letterSpacing: '0.2px', color: 'var(--text-body)',
-          whiteSpace: 'pre-wrap', wordBreak: 'break-word',
+          ...bubbleText,
         }}>
           {m.content}
+        </div>
+      </div>
+    )
+  }
+
+  // FOLLOW-UP turns get a voice: the user "speaks" (a speech bubble with a tail),
+  // the lens is "just a thought" (a thought bubble with trailing clouds) — cuter,
+  // and it reads as the person talking while the lens's reply is ephemeral,
+  // fleeting. The tail vs. trailing-dots is the differentiator so it stays on the
+  // same --input-radius across all three themes (kawaii's 32px stays round).
+  const chatBubble = (m: ChatMessage, key: string | number) => {
+    const mine = m.role === 'user'
+    const surface = mine ? 'var(--btn-secondary-bg)' : 'var(--card-bg)'
+    return (
+      <div key={key} style={{
+        display: 'flex', gap: 8, alignItems: 'flex-end',
+        flexDirection: mine ? 'row-reverse' : 'row',
+        // Extra room below lens bubbles so the thought trail doesn't crowd the next.
+        marginBottom: mine ? 0 : 8,
+      }}>
+        {!mine && avatar(30)}
+        <div style={{
+          position: 'relative',
+          maxWidth: '76%',
+          background: surface,
+          border: '1px solid var(--input-divider)',
+          borderRadius: 'var(--input-radius)',
+          padding: '10px 14px',
+          ...bubbleText,
+        }}>
+          {m.content}
+          {mine ? (
+            // Speech tail — a small pointer off the bottom-right (the speaker's side).
+            <span style={{
+              position: 'absolute', right: 12, bottom: -5, width: 11, height: 11,
+              background: surface,
+              borderRight: '1px solid var(--input-divider)',
+              borderBottom: '1px solid var(--input-divider)',
+              transform: 'rotate(45deg)', borderBottomRightRadius: 2,
+            }} />
+          ) : (
+            // Thought trail — two shrinking clouds drifting toward the avatar.
+            <>
+              <span style={{
+                position: 'absolute', left: 12, bottom: -7, width: 9, height: 9,
+                borderRadius: '50%', background: surface,
+                border: '1px solid var(--input-divider)',
+              }} />
+              <span style={{
+                position: 'absolute', left: 4, bottom: -15, width: 5, height: 5,
+                borderRadius: '50%', background: surface,
+                border: '1px solid var(--input-divider)',
+              }} />
+            </>
+          )}
         </div>
       </div>
     )
@@ -247,7 +308,7 @@ export default function ChatScreen({ figureId, sessionId, ventText, seedReply }:
         {bubble({ role: 'lens', content: seedReply, turn_index: -1 }, 'seed')}
         {messages.map((m, i) => (
           <Fragment key={m.id ?? i}>
-            {bubble(m, m.id ?? i)}
+            {chatBubble(m, m.id ?? i)}
             {/* A resting-point divider follows any lens message that soft-closed,
                 unless the cap already turned this into the final locked footer. */}
             {m.role === 'lens' && m.done && !(locked && i === messages.length - 1) &&
