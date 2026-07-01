@@ -46,6 +46,7 @@ automatically — no manual cleanup, no accumulation of dead `feat/*` remotes.
 
 ## PR flow
 
-The pull-request gate (branch protection, required checks, PR template) is
-defined in **T-026-02**. When that lands, its PR-flow doc should link back here so
-naming + protection live side by side. Until then: branch → PR → green → merge.
+The pull-request gate — branch protection, the required `ci` check, and the PR
+template — is documented in **[PR-WORKFLOW.md](./PR-WORKFLOW.md)** (T-026-02).
+Naming (here) and the gate (there) live side by side: branch → PR → `ci` green →
+preview QA → squash-merge.
