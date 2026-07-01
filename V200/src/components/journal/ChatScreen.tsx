@@ -22,6 +22,17 @@ import { CHAT_HARD_CAP, type ChatMessage } from '@/lib/chat-types'
 
 const MAX_MSG_CHARS = 800 // matches the vent input cap
 
+// Gentle, interchangeable invitations shown under the wind-down strip — encourage
+// the person to sit with the shift and process, rather than nudging them to keep
+// chatting. Picked deterministically per resting point (see restingPrompt).
+const RESTING_PROMPTS = [
+  'Sit with it.',
+  'Meditate on that.',
+  'Take some time to process.',
+  'Let it settle.',
+  'Carry it with you.',
+]
+
 type Props = {
   figureId: string
   sessionId: string | null // null for anon / unsaved
@@ -243,7 +254,7 @@ export default function ChatScreen({ figureId, sessionId, ventText, seedReply }:
   // Soft-close marker: a subtle wind-down shown ONCE, pinned above the composer,
   // after the lens offers its closing thought. Purely tonal — it does NOT remove
   // the composer. Structural tokens only, so it reads across all three themes.
-  const softCloseDivider = (key: string | number) => (
+  const softCloseDivider = (key: string | number, subline: string) => (
     <div key={key} style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
       padding: '4px 8px',
@@ -259,7 +270,7 @@ export default function ChatScreen({ figureId, sessionId, ventText, seedReply }:
       <span style={{
         fontFamily: 'var(--font-body)', fontSize: 11, letterSpacing: '0.2px',
         color: 'var(--text-sub)', opacity: 0.75,
-      }}>Sit with this — or keep going.</span>
+      }}>{subline}</span>
     </div>
   )
 
@@ -270,6 +281,9 @@ export default function ChatScreen({ figureId, sessionId, ventText, seedReply }:
   // input stays; we just soften the placeholder and pin the wind-down strip above it.
   const resting = !locked && !!lastMsg && lastMsg.role === 'lens' && !!lastMsg.done
   const placeholder = resting ? 'Still here if you need more…' : `Say something to ${fig.name}…`
+  // Rotate the invitation deterministically per resting point (stable across
+  // re-renders; varies as the thread grows) — no flicker, no Math.random.
+  const restingPrompt = RESTING_PROMPTS[messages.length % RESTING_PROMPTS.length]
 
   return (
     <div className="flex flex-col" style={{ height: '100dvh', background: 'var(--bg)' }}>
@@ -348,7 +362,7 @@ export default function ChatScreen({ figureId, sessionId, ventText, seedReply }:
         }}>
           {/* Sticky resting strip: one wind-down marker pinned above the input
               once the lens has offered its closing thought. Never repeats. */}
-          {resting && softCloseDivider('resting-sticky')}
+          {resting && softCloseDivider('resting-sticky', restingPrompt)}
           <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
             <textarea
               ref={taRef}
