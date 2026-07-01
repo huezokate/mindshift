@@ -1,5 +1,6 @@
 import { useLayoutEffect } from 'react'
 import type { Preview } from '@storybook/nextjs-vite'
+import { __setClerkState, type ClerkState } from './mocks/clerk'
 // The real app cascade — Tailwind v4 entry, all three token sets, the four text
 // fonts, global resets, `.material-symbols-sharp`, and the `.ds-btn` layer. Reusing
 // globals.css (not re-listing imports) keeps Storybook and production from drifting.
@@ -33,8 +34,21 @@ const withTheme = (Story: () => React.JSX.Element, context: { globals: { theme?:
   return <Story />
 }
 
+// Clerk isolation decorator (T-022-04). The @clerk/nextjs mock (.storybook/mocks/
+// clerk.tsx, aliased in main.ts) holds signed-in/out state in a module singleton;
+// this pushes each story's `parameters.clerk` into it BEFORE render so auth-aware
+// components (AppHeader, EntryAuthRow, ChatScreen) show the intended state. Passing
+// undefined resets to the signed-in default, so state never bleeds between stories.
+const withClerkState = (
+  Story: () => React.JSX.Element,
+  context: { parameters: { clerk?: Partial<ClerkState> } },
+) => {
+  __setClerkState(context.parameters.clerk)
+  return <Story />
+}
+
 const preview: Preview = {
-  decorators: [withTheme],
+  decorators: [withClerkState, withTheme],
   globalTypes: {
     theme: {
       description: 'Global MindShift theme',
@@ -50,6 +64,12 @@ const preview: Preview = {
   // globalTypes.defaultValue.
   initialGlobals: { theme: 'cyberpunk' },
   parameters: {
+    // App Router mocks (T-022-04): opt every story into @storybook/nextjs-vite's
+    // built-in next/navigation mock so useRouter()/usePathname()/useSearchParams()
+    // return sane spies instead of throwing the "expected app router" invariant.
+    nextjs: { appDirectory: true },
+    // Default Clerk identity for stories that don't set `parameters.clerk`.
+    clerk: { signedIn: true },
     controls: {
       matchers: {
         color: /(background|color)$/i,

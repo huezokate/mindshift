@@ -64,8 +64,9 @@ describe('quoteEscalationClause', () => {
 })
 
 describe('closingClause', () => {
-  it('is empty before the soft target (turn 2)', () => {
-    expect(closingClause(2)).toBe('')
+  it('is empty below the soft target (turns < CHAT_SOFT_TARGET)', () => {
+    expect(closingClause(1)).toBe('')
+    expect(closingClause(CHAT_SOFT_TARGET - 1)).toBe('') // turn 2
   })
 
   it('offers a resting point at the soft target and references the done token', () => {
@@ -98,6 +99,9 @@ describe('closingClause', () => {
     expect(clause).toContain(CHAT_DONE_TOKEN)
     // The hard-cap branch is checked first, so it must NOT be the soft resting-point text.
     expect(clause).not.toContain('resting point')
+    // The done-token guidance is the FINAL instruction: it comes after the close is
+    // announced (matches the AC's "warm final close that ends with CHAT_DONE_TOKEN").
+    expect(clause.indexOf(CHAT_DONE_TOKEN)).toBeGreaterThan(clause.indexOf('final message'))
   })
 })
 
