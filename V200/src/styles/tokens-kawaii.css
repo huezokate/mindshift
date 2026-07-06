@@ -1,7 +1,12 @@
 /* MindShift V200 — Kawaii Theme Tokens */
 /* Source: Figma node 416:7498 — exact colors, no modifications */
 
-html[data-theme="kawaii"] {
+/* Matches both the app at <html data-theme="kawaii"> and any element scoped to
+   kawaii locally (mirrors the notepad pattern), so a wrapper can pin the kawaii
+   skin without mutating the shared <html data-theme> — used by the Storybook
+   "compare all modes" grid, and available to the app the same way notepad is. */
+html[data-theme="kawaii"],
+[data-theme="kawaii"] {
   /* Core palette */
   --bg:     #ffafd6;
   --cyan:   #ff50c5;

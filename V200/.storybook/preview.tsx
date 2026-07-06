@@ -37,7 +37,40 @@ function ThemeHtmlSync({ theme, children }: { theme: string; children: React.Rea
   return <>{children}</>
 }
 
-const withTheme = (Story: () => React.JSX.Element, context: { globals: { theme?: string } }) => {
+// Compare-all-modes grid: render the story three times, once per skin, each in a
+// wrapper scoped to that mode. Forces <html> to the cyberpunk :root base so the
+// notepad/kawaii cells override cleanly via their element-scoped selectors and the
+// cyberpunk cell inherits the base. This is why kawaii's tokens are element-scoped
+// (tokens-kawaii.css) alongside notepad's.
+// NOTE: best for inline components. A story that renders a fixed/portal overlay
+// (the sheets) will stack three viewport-filling copies — use single mode there.
+function CompareGrid({ Story }: { Story: () => React.JSX.Element }) {
+  useLayoutEffect(() => {
+    document.documentElement.setAttribute('data-theme', 'cyberpunk')
+  }, [])
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1, background: '#d9d9e3', minHeight: '100vh' }}>
+      {MODES.map((m) => (
+        <div
+          key={m.value}
+          {...(m.value !== 'cyberpunk' ? { 'data-theme': m.value } : {})}
+          style={{ background: 'var(--bg)', padding: 16, overflow: 'auto' }}
+        >
+          <div style={{ font: '600 11px system-ui', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-sub)', marginBottom: 12 }}>
+            {m.title}
+          </div>
+          <Story />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+const withModes = (
+  Story: () => React.JSX.Element,
+  context: { globals: { theme?: string; compare?: boolean } },
+) => {
+  if (context.globals.compare) return <CompareGrid Story={Story} />
   const theme = context.globals.theme ?? 'cyberpunk'
   return (
     <ThemeHtmlSync theme={theme}>
@@ -60,7 +93,7 @@ const withClerkState = (
 }
 
 const preview: Preview = {
-  decorators: [withClerkState, withTheme],
+  decorators: [withClerkState, withModes],
   globalTypes: {
     theme: {
       description: 'MindShift skin, as a mode (light / cheerful / dark)',
@@ -71,10 +104,22 @@ const preview: Preview = {
         dynamicTitle: true,
       },
     },
+    compare: {
+      description: 'Show one mode, or all three side by side',
+      toolbar: {
+        title: 'View',
+        icon: 'sidebyside',
+        items: [
+          { value: false, title: 'Single mode' },
+          { value: true, title: 'Compare all 3' },
+        ],
+        dynamicTitle: true,
+      },
+    },
   },
   // App default (src/lib/theme.tsx DEFAULT). Replaces the deprecated
   // globalTypes.defaultValue.
-  initialGlobals: { theme: 'cyberpunk' },
+  initialGlobals: { theme: 'cyberpunk', compare: false },
   parameters: {
     // App Router mocks (T-022-04): opt every story into @storybook/nextjs-vite's
     // built-in next/navigation mock so useRouter()/usePathname()/useSearchParams()
