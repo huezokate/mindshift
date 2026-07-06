@@ -8,14 +8,16 @@ import { __setClerkState, type ClerkState } from './mocks/clerk'
 // (mirroring layout.tsx) — it is not part of globals.css.
 import '../src/app/globals.css'
 
-// Theme toolbar (T-022-03). Mirrors the app's runtime switch in src/lib/theme.tsx:
-// theme is a document-level concern — the token files scope every non-cyberpunk
-// skin to `html[data-theme="…"]` (tokens-kawaii.css / tokens-notepad.css), and
-// cyberpunk is the bare `:root` default. Order matches THEMES in theme.tsx.
-const THEMES = [
-  { value: 'cyberpunk', title: 'Cyberpunk' },
-  { value: 'kawaii', title: 'Kawaii' },
-  { value: 'notepad', title: 'Notepad' },
+// Mode toolbar (T-022-03). The three skins are presented as MODES, not separate
+// components: structure (lens cards, chat bubbles, sheets, screen layouts) is
+// identical everywhere — only radii, shadows and colours change per mode. Mirrors
+// the app's runtime switch in src/lib/theme.tsx: `data-theme` on <html>, with the
+// token files scoping each skin (tokens-kawaii.css / tokens-notepad.css) and
+// cyberpunk as the bare `:root` default. Ordered light → cheerful → dark.
+const MODES = [
+  { value: 'notepad', title: 'Light · Notepad' },
+  { value: 'kawaii', title: 'Cheerful · Kawaii' },
+  { value: 'cyberpunk', title: 'Dark · Cyberpunk' },
 ] as const
 
 // Global decorator: apply the selected theme by setting `data-theme` on the iframe
@@ -61,11 +63,11 @@ const preview: Preview = {
   decorators: [withClerkState, withTheme],
   globalTypes: {
     theme: {
-      description: 'Global MindShift theme',
+      description: 'MindShift skin, as a mode (light / cheerful / dark)',
       toolbar: {
-        title: 'Theme',
-        icon: 'paintbrush',
-        items: THEMES.map((t) => ({ value: t.value, title: t.title })),
+        title: 'Mode',
+        icon: 'contrast',
+        items: MODES.map((m) => ({ value: m.value, title: m.title })),
         dynamicTitle: true,
       },
     },
