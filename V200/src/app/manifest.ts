@@ -2,8 +2,8 @@ import type { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'MindShift — AI journaling that shifts your perspective',
-    short_name: 'MindShift',
+    name: 'Minds Shift — AI journaling that shifts your perspective',
+    short_name: 'Minds Shift',
     description:
       'Vent, pick a lens from history’s greatest minds, and get an AI reframe. Journaling + mind mapping for mental clarity.',
     start_url: '/',

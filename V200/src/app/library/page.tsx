@@ -888,7 +888,7 @@ export default function LibraryPage() {
       {/* Page header */}
       <div style={{ marginBottom: 36 }}>
         <h1 style={{ fontFamily: 'monospace', fontSize: 20, fontWeight: 700, color: '#fff', marginBottom: 4 }}>
-          MindShift Component Library
+          Minds Shift Component Library
         </h1>
         <p style={{ fontFamily: 'monospace', fontSize: 11, color: '#555', letterSpacing: '0.08em' }}>
           All components across 3 design systems — scroll right to compare

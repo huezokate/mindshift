@@ -1,5 +1,5 @@
 // Single icon primitive for the whole app. Renders a Google Material Symbols
-// (Sharp) glyph by name — the ONLY icon source in MindShift (no custom SVGs).
+// (Sharp) glyph by name — the ONLY icon source in Minds Shift (no custom SVGs).
 // The Sharp stylesheet is loaded in src/app/layout.tsx. Inherits currentColor.
 import type { CSSProperties } from 'react'
 

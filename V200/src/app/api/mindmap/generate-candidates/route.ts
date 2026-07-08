@@ -17,7 +17,7 @@ const MAX_COUNT = 12
 
 function buildSystem(count: number): string {
   return [
-    'You are a goal-design coach for MindShift.',
+    'You are a goal-design coach for Minds Shift.',
     'A user picked a life area and answered a WOOP exercise (their desired outcome, their main obstacle, and the identity they want to grow into).',
     `Propose exactly ${count} DISTINCT milestone candidates they could commit to, all scaled to their time horizon.`,
     '',

@@ -71,7 +71,7 @@ export default function EntryAuthRow({ maxWidth, className }: Props) {
           color: 'var(--btn-secondary-color, var(--text-body))',
           // --btn-secondary-bg is transparent in cyberpunk/notepad, so the page bg
           // leaked through and the link was invisible. Use the same opaque surface
-          // token the theme-select "Enter MindShift" CTA uses (--cta-solid-bg) so
+          // token the theme-select "Enter Minds Shift" CTA uses (--cta-solid-bg) so
           // both links stay legible across all three themes. (14 June UI corrections)
           background: 'var(--cta-solid-bg)',
           borderTop: 'var(--btn-bt)',
@@ -90,7 +90,7 @@ export default function EntryAuthRow({ maxWidth, className }: Props) {
           ...PILL,
           color: 'var(--btn-color)',
           // --btn-bg is transparent by design in cyberpunk; give Sign up the same
-          // opaque CTA surface as "Enter MindShift" so it reads as a solid button.
+          // opaque CTA surface as "Enter Minds Shift" so it reads as a solid button.
           background: 'var(--cta-solid-bg)',
           borderTop: 'var(--btn-bt)',
           borderLeft: 'var(--btn-bl)',

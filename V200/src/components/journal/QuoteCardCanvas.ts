@@ -126,7 +126,7 @@ export async function renderQuoteCard(opts: QuoteCardOptions): Promise<Blob> {
   ctx.fillStyle = palette.card
   ctx.fillRect(cardX, cardY, cardW, cardH)
 
-  // Asymmetric border (echoes the MindShift card style)
+  // Asymmetric border (echoes the Minds Shift card style)
   ctx.strokeStyle = palette.border
   ctx.lineWidth = 8
   ctx.beginPath()

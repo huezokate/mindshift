@@ -133,12 +133,12 @@ export default function ShareSheet({
 
   async function shareNative() {
     if (!pngBlob) return
-    const file = new File([pngBlob], 'mindshift.png', { type: 'image/png' })
+    const file = new File([pngBlob], 'minds-shift.png', { type: 'image/png' })
     if (navigator.canShare?.({ files: [file] })) {
       try {
         await navigator.share({
           files: [file],
-          text: 'A perspective from MindShift',
+          text: 'A perspective from Minds Shift',
         })
         await logShare('native')
         setStatus('Shared.')
@@ -190,7 +190,7 @@ export default function ShareSheet({
     const safeFig = figureId.replace(/[^a-z0-9-]/gi, '')
     const a = document.createElement('a')
     a.href = pngUrl
-    a.download = `mindshift-${safeFig || 'quote'}-${Date.now()}.png`
+    a.download = `minds-shift-${safeFig || 'quote'}-${Date.now()}.png`
     document.body.appendChild(a)
     a.click()
     a.remove()

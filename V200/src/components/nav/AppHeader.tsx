@@ -136,13 +136,13 @@ export default function AppHeader({
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: 8, width: '100%',
       }}>
-        {badge('camera', () => router.push(isSignedIn ? '/app/journal-v2' : '/app/onboarding'), 'MindShift home')}
+        {badge('camera', () => router.push(isSignedIn ? '/app/journal-v2' : '/app/onboarding'), 'Minds Shift home')}
         <p style={{
           fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 28,
           letterSpacing: '4.2px', lineHeight: '26px', color: brandAccent,
           textTransform: 'uppercase', margin: 0, whiteSpace: 'nowrap',
         }}>
-          MindShift
+          Minds Shift
         </p>
         {/* Menu trigger — text + icon, primary button treatment so it matches
             the design-system CTA per theme (kawaii amber fill / cyberpunk black
