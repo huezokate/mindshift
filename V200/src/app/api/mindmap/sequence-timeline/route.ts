@@ -22,7 +22,7 @@ function timeline(horizonMonths: number): { unit: 'week' | 'month'; buckets: num
 
 function buildSystem(unit: 'week' | 'month', buckets: number): string {
   return [
-    'You are a goal-sequencing coach for MindShift.',
+    'You are a goal-sequencing coach for Minds Shift.',
     'The user picked a set of milestones for one life area over a fixed time horizon. Order them into a sensible plan and place each one on the timeline.',
     '',
     'Principles:',

@@ -181,7 +181,7 @@ export default function EntryDetail({ entry }: Props) {
       color: 'var(--cyan)', textTransform: 'uppercase',
       whiteSpace: 'nowrap',
     }}>
-      MindShift
+      Minds Shift
     </span>
   )
 

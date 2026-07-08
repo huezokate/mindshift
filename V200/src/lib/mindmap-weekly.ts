@@ -36,7 +36,7 @@ export type WeeklyGoalInput = {
 }
 
 const SYSTEM = [
-  'You are a weekly planning coach for MindShift.',
+  'You are a weekly planning coach for Minds Shift.',
   'Given a person\'s goal for one life area and where they are in their plan, write ONE concrete goal for THIS WEEK.',
   'It must be small enough to finish in a week, a clear step toward the bigger outcome, and specific (numbers/cadence where natural).',
   'If a reflection from last week is provided, RESPOND to it — build on what went well, and adjust for what got in the way.',

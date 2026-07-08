@@ -5,7 +5,7 @@ type Props = {
 }
 
 // Small "{firstName}'s Journal" subheading sitting under the app header bar
-// (Figma 606:7745). The brand medallion + "MindShift" wordmark now live in
+// (Figma 606:7745). The brand medallion + "Minds Shift" wordmark now live in
 // <AppHeader/>; this is just the personalized sub-label. Falls back to "Your
 // Journal" when no name.
 export default function JournalHeader({ firstName }: Props) {

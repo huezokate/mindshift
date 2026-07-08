@@ -5,7 +5,7 @@ import { ThemeProvider } from '@/lib/theme'
 import { GoogleAnalytics } from '@/components/GoogleAnalytics'
 
 const SITE_URL = 'https://minds-shift.com'
-const TITLE = 'MindShift — AI journaling that shifts your perspective'
+const TITLE = 'Minds Shift — AI journaling that shifts your perspective'
 const DESCRIPTION =
   'Vent what’s on your mind, pick a lens from history’s greatest minds, and get an AI reframe that shifts how you think. Journaling + mind mapping for mental clarity, self-reflection, and better thinking.'
 
@@ -13,13 +13,13 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: TITLE,
-    template: '%s · MindShift',
+    template: '%s · Minds Shift',
   },
   description: DESCRIPTION,
-  applicationName: 'MindShift',
+  applicationName: 'Minds Shift',
   authors: [{ name: 'Kate Huezo' }],
   creator: 'Kate Huezo',
-  publisher: 'MindShift',
+  publisher: 'Minds Shift',
   category: 'health',
   keywords: [
     'AI journaling app',
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
   alternates: { canonical: SITE_URL },
   openGraph: {
     type: 'website',
-    siteName: 'MindShift',
+    siteName: 'Minds Shift',
     url: SITE_URL,
     title: TITLE,
     description: DESCRIPTION,
@@ -63,14 +63,14 @@ export const metadata: Metadata = {
   // Favicon comes from app/icon.svg (App Router auto-detects it).
 }
 
-// Structured data — helps search engines AND AI agents understand what MindShift
+// Structured data — helps search engines AND AI agents understand what Minds Shift
 // is. WebApplication (the product) + Organization (the brand).
 const JSON_LD = {
   '@context': 'https://schema.org',
   '@graph': [
     {
       '@type': 'WebApplication',
-      name: 'MindShift',
+      name: 'Minds Shift',
       url: SITE_URL,
       applicationCategory: 'HealthApplication',
       operatingSystem: 'Web, iOS, Android',
@@ -90,11 +90,11 @@ const JSON_LD = {
     },
     {
       '@type': 'Organization',
-      name: 'MindShift',
+      name: 'Minds Shift',
       url: SITE_URL,
       email: 'hello@minds-shift.com',
       description:
-        'MindShift turns venting into perspective — AI-powered reframes through history’s greatest minds, plus visual mind mapping for self-reflection and life planning.',
+        'Minds Shift turns venting into perspective — AI-powered reframes through history’s greatest minds, plus visual mind mapping for self-reflection and life planning.',
     },
   ],
 }
