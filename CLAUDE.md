@@ -2,7 +2,7 @@
 
 ## Project
 
-MindShift — a perspective-shifting app that lets users vent a problem, pick a historical figure "lens", and receive an AI-generated response in that figure's voice. Three visual themes: Cyberpunk, Kawaii, Notepad.
+Minds Shift — a perspective-shifting app that lets users vent a problem, pick a historical figure "lens", and receive an AI-generated response in that figure's voice. Three visual themes: Cyberpunk, Kawaii, Notepad.
 
 **Domains:** `minds-shift.com` (marketing landing) · `app.minds-shift.com` (the product) · `localhost:3000` (dev — no host split locally)
 
