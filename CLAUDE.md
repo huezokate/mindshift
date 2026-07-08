@@ -21,8 +21,8 @@ Everything in `discovery/` is archived experiments — do not reference or modif
 | Database | Supabase (Postgres) |
 | AI / Lenses | Google Gemini 2.0 Flash (`@google/generative-ai`) |
 | Email | Resend |
-| Hosting | Vercel |
-| DNS | Cloudflare (DNS-only / gray cloud — do NOT enable CF proxy; conflicts with Vercel SSL) |
+| Hosting / deploys | Vercel, auto-deploys from GitHub `main` (the full deploy stack is GitHub → Vercel; backend is Supabase + Clerk) |
+| Domain | Purchased at Cloudflare (registrar ONLY — not part of the stack; no Pages/Workers/proxy). DNS records point to Vercel and must stay DNS-only/gray-cloud: enabling the CF proxy breaks Vercel SSL |
 | Email (receive) | iCloud+ Custom Email Domain — `kate@`, `hello@`, `test@minds-shift.com` |
 | Email (send) | Resend, verified domain, `hello@minds-shift.com` from-address |
 
