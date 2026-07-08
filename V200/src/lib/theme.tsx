@@ -11,21 +11,21 @@ const ThemeCtx = createContext<{ theme: Theme; setTheme: (t: Theme) => void }>({
 })
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  // The inline script in layout.tsx already set data-theme from localStorage
-  // before first paint. Read it back here so React state matches the DOM on the
-  // first client render — otherwise JS theme branches (theme === 'cyberpunk' ? …)
-  // render the default skin first and visibly flip after the effect runs.
-  const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof document !== 'undefined') {
-      const attr = document.documentElement.getAttribute('data-theme')
-      if (attr === 'cyberpunk' || attr === 'kawaii' || attr === 'notepad') return attr
-    }
-    return DEFAULT
-  })
+  // State MUST start at DEFAULT to match what the server rendered. Reading
+  // data-theme in the initializer (the old approach) made the first client
+  // render already equal the saved theme, so nothing ever re-rendered — and
+  // React does not patch attribute mismatches on hydration, which left the
+  // server's default-theme <img src> (cyberpunk portraits) permanently in the
+  // DOM on notepad/kawaii devices. CSS never flashes either way (the inline
+  // script in layout.tsx sets data-theme before first paint); only JS theme
+  // branches swap once after mount, which is the correct trade.
+  const [theme, setThemeState] = useState<Theme>(DEFAULT)
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY) as Theme | null
-    if (saved && saved !== theme) apply(saved)
+    const attr = document.documentElement.getAttribute('data-theme') as Theme | null
+    const active = saved ?? (attr && THEMES.includes(attr) ? attr : null)
+    if (active && active !== theme) apply(active)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
