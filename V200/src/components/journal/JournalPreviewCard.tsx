@@ -58,7 +58,7 @@ export default function JournalPreviewCard({ entry, onAddLens }: Props) {
       onAddLens(entry.id)
     } else {
       // Stub: the real lens-picker popup is the next task.
-      // eslint-disable-next-line no-console
+       
       console.log('[journal] add lens to entry', entry.id)
     }
   }
