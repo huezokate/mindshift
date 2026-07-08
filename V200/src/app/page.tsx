@@ -11,19 +11,19 @@ const BUSINESS_CONTACT = 'kate@minds-shift.com'
 // in (the subdomain root 308-redirects to /app/onboarding).
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.minds-shift.com'
 
-// While the app is offline we don't send people into it. "Try MindShift Free"
+// While the app is offline we don't send people into it. "Try Minds Shift Free"
 // opens a pre-filled email to claim alpha access + free Pro-for-life instead.
 const ALPHA_MAILTO = `mailto:${WAITLIST_CONTACT}?subject=${encodeURIComponent(
   'Claiming my free alpha access',
 )}&body=${encodeURIComponent(
-  "Hi MindShift team,\n\nI'd love to join as an alpha tester and claim my free Pro access for life. Count me in — happy to share feedback as I go!\n\nThanks!",
+  "Hi Minds Shift team,\n\nI'd love to join as an alpha tester and claim my free Pro access for life. Count me in — happy to share feedback as I go!\n\nThanks!",
 )}`
 
 // General contact / lens-request email — pre-fills a friendly opener so the
 // visitor just keeps typing their question.
 const CONTACT_MAILTO = `mailto:${WAITLIST_CONTACT}?subject=${encodeURIComponent(
   'Question / lens request',
-)}&body=${encodeURIComponent('Hi MindShift team!\n\n')}`
+)}&body=${encodeURIComponent('Hi Minds Shift team!\n\n')}`
 
 const fade = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }
 const stagger = { show: { transition: { staggerChildren: 0.1 } } }
@@ -215,7 +215,7 @@ const VIGNETTES: Vignette[] = [
     id: 'a-lincoln',
     name: 'Abraham Lincoln',
     era: '16th U.S. President · 1809–1865',
-    img: '/portraits/kawaii/a-lincoln.png',
+    img: '/portraits/notepad/a-lincoln.png',
     response:
       "I lost my first run for office. Years later I lost two races for the Senate, the second to a man the papers swore I'd never beat. Two years after that, I was elected President, and we brought slavery to its end. I carried a melancholy most of my life, so I know the weight you're under. A day of defeat isn't a verdict — it's the part of the story right before it turns.",
     quote: 'Always bear in mind that your own resolution to succeed is more important than any other one thing.',
@@ -224,7 +224,7 @@ const VIGNETTES: Vignette[] = [
     id: 'frida-kahlo',
     name: 'Frida Kahlo',
     era: 'Painter · 1907–1954',
-    img: '/portraits/kawaii/frida-kahlo.png',
+    img: '/portraits/notepad/frida-kahlo.png',
     response:
       "A streetcar nearly killed me at eighteen — it shattered my spine and my pelvis. I learned to paint flat on my back, a mirror rigged above the bed, because the alternative was to disappear. What you are calling failure, I called material. Today is not proof that you are broken. It is the raw paint. Use it.",
     quote: 'I never painted dreams. I painted my own reality.',
@@ -233,7 +233,7 @@ const VIGNETTES: Vignette[] = [
     id: 'napoleon',
     name: 'Napoleon Bonaparte',
     era: 'Emperor of the French · 1769–1821',
-    img: '/portraits/kawaii/napoleon.png',
+    img: '/portraits/notepad/napoleon.png',
     response:
       "You feel ruined by a single day? I was exiled to an island — and when they sent soldiers to keep me there, I walked out to meet them and they joined me instead. Stop tallying today's losses. Find the one place the enemy is weak, your own hesitation, and strike there. Decide, and move. Momentum is everything.",
     quote: 'Impossible is a word found only in the dictionary of fools.',
@@ -476,12 +476,12 @@ function Hero() {
       >
         <motion.div variants={fade} style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
           <Eyebrow>The app for shifting perspective</Eyebrow>
-          <H1>MindShift</H1>
+          <H1>Minds Shift</H1>
         </motion.div>
 
         <motion.div variants={fade} style={{ width: '100%' }}>
           <Body size={18}>
-            MindShift is journaling, but make it fun. Vent your spiral, pick a lens (Lincoln, Marilyn Monroe, Socrates), and get back a perspective that actually moves you. Share it, save it, or just feel less alone in your own head.
+            Minds Shift is journaling, but make it fun. Vent your spiral, pick a lens (Lincoln, Marilyn Monroe, Socrates), and get back a perspective that actually moves you. Share it, save it, or just feel less alone in your own head.
           </Body>
         </motion.div>
 
@@ -525,7 +525,7 @@ function WhoIsItFor() {
           </motion.div>
         </div>
         <motion.div variants={fade}>
-          <PrimaryButton href={ALPHA_MAILTO}>Try MindShift Free →</PrimaryButton>
+          <PrimaryButton href={ALPHA_MAILTO}>Try Minds Shift Free →</PrimaryButton>
         </motion.div>
       </motion.div>
     </Section>
@@ -781,7 +781,7 @@ function OriginStory() {
           I made a mind map of my own struggles and goals, and someone close to me, a practitioner, said: <em>&ldquo;I wish all my clients did this.&rdquo;</em> That stuck.
         </Body>
         <Body size={18}>
-          MindShift started as a personal tool for thinking differently, and grew into something I wanted everyone to have. History&apos;s greatest minds shouldn&apos;t be locked in textbooks. They should be in your pocket on a bad day.
+          Minds Shift started as a personal tool for thinking differently, and grew into something I wanted everyone to have. History&apos;s greatest minds shouldn&apos;t be locked in textbooks. They should be in your pocket on a bad day.
         </Body>
       </div>
     </Section>
@@ -795,7 +795,7 @@ function Investors() {
         <Eyebrow>For investors and partners</Eyebrow>
         <H2>We&apos;re building the thinking layer of the internet.</H2>
         <Body size={18}>
-          MindShift starts with AI-powered perspective shifts and expands into a visual mind-mapping platform for self-reflection, life planning, and professional growth. We believe the next frontier isn&apos;t more information. It&apos;s better thinking.
+          Minds Shift starts with AI-powered perspective shifts and expands into a visual mind-mapping platform for self-reflection, life planning, and professional growth. We believe the next frontier isn&apos;t more information. It&apos;s better thinking.
         </Body>
 
         <ul
@@ -825,7 +825,7 @@ function Investors() {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24, alignItems: 'center', justifyContent: 'center' }}>
           <SecondaryLink href={`mailto:${BUSINESS_CONTACT}`}>Let&apos;s talk →</SecondaryLink>
           <SecondaryLink
-            href={`mailto:${BUSINESS_CONTACT}?subject=${encodeURIComponent('MindShift pitch deck request')}`}
+            href={`mailto:${BUSINESS_CONTACT}?subject=${encodeURIComponent('Minds Shift pitch deck request')}`}
           >
             Request the pitch deck →
           </SecondaryLink>
