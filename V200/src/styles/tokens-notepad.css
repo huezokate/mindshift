@@ -77,15 +77,18 @@ html[data-theme="notepad"],
   --input-header-bg:     #f0efe9;
   --input-header-shadow: none;
 
-  /* Secondary button — green underline (top + bottom border only). Paper bg
-     (== page bg) so dropdown rows are solid over content yet blend on-page. */
+  /* Secondary button — blue underline (top + bottom border only). Paper bg
+     (== page bg) so dropdown rows are solid over content yet blend on-page.
+     Cross-theme rule (Kate 2026-07-10, trial): secondary = positive = blue,
+     secondary2 = negative = red — red may flex to neutral when a surface
+     needs more than one non-primary button. Was green (#7d9e7d) before. */
   --btn-secondary-bg:     var(--bg);
   --btn-secondary-shadow: none;
-  --btn-secondary-color:  #7d9e7d;
-  --btn-secondary-bt:     1px solid #7d9e7d;
+  --btn-secondary-color:  #3a6fa8;
+  --btn-secondary-bt:     1px solid #3a6fa8;
   --btn-secondary-bl:     none;
   --btn-secondary-br:     none;
-  --btn-secondary-bb:     1px solid #7d9e7d;
+  --btn-secondary-bb:     1px solid #3a6fa8;
   --btn-secondary-radius: var(--btn-radius);
 
   /* Secondary 2 button — red underline. Paper bg (see secondary note). */
