@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite'
-import LensCard from '@/components/journal/LensCard'
+import LensResponseCard from '@/components/journal/LensResponseCard'
 import type { LensResponseV2 } from '@/lib/journal-types'
 import { DEMO_ENTRY } from '@/components/__fixtures__/journal'
 
@@ -8,17 +8,17 @@ import { DEMO_ENTRY } from '@/components/__fixtures__/journal'
 // log when the response has shares. Re-themes via the toolbar.
 //
 // DEVIATION FROM TICKET: the ticket's suggested "collapsed/expanded" and
-// "favorited vs not" states no longer exist — the current LensCard is a flat card
+// "favorited vs not" states no longer exist — the current LensResponseCard is a flat card
 // and the save/star affordance was removed (sharing moved to the detail page,
-// see LensCard.tsx L29-32). So `is_favorite` does not affect the render. We cover
+// see LensResponseCard.tsx L29-32). So `is_favorite` does not affect the render. We cover
 // the states that DO vary the output instead: shares, figure identity, and the
 // unknown-figure fallback.
 const BASE: LensResponseV2 = DEMO_ENTRY.lens_responses[0] // a-lincoln, 1 share
 const MARILYN: LensResponseV2 = DEMO_ENTRY.lens_responses[1] // marilyn-monroe, no shares
 
-const meta: Meta<typeof LensCard> = {
-  title: 'Journal/LensCard',
-  component: LensCard,
+const meta: Meta<typeof LensResponseCard> = {
+  title: 'Journal/LensResponseCard',
+  component: LensResponseCard,
   args: {
     response: BASE,
     ventText: DEMO_ENTRY.vent_text,
@@ -27,7 +27,7 @@ const meta: Meta<typeof LensCard> = {
 }
 export default meta
 
-type Story = StoryObj<typeof LensCard>
+type Story = StoryObj<typeof LensResponseCard>
 
 // Lincoln, quote + response + a single Instagram share in the log.
 export const Default: Story = {}

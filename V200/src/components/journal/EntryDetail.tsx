@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useTheme } from '@/lib/theme'
 import Icon from '@/components/ui/Icon'
 import AppHeader from '@/components/nav/AppHeader'
-import LensCard from './LensCard'
+import LensResponseCard from './LensResponseCard'
 import ShareSheet from './ShareSheet'
 import LensPickerSheet from './LensPickerSheet'
 import UpcomingChip from './UpcomingChip'
@@ -281,14 +281,14 @@ export default function EntryDetail({ entry }: Props) {
     )
   }
 
-  // ── Lens carousel item: LensCard + its button row. ──────────────────────────
+  // ── Lens carousel item: LensResponseCard + its button row. ──────────────────────────
   function lensItem(lens: LensResponseV2) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         {/* lens card mb-[-4px] so the button row overlaps its bottom by 4px
             (Figma 602:6446). */}
         <div style={{ marginBottom: -4, position: 'relative', zIndex: 1 }}>
-          <LensCard
+          <LensResponseCard
             response={lens}
             ventText={entry.vent_text}
             isEntryPublic={entry.is_public}
