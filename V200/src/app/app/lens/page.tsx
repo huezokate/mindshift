@@ -141,7 +141,7 @@ export default function LensPage() {
   }
 
   return (
-    <div className="min-h-dvh flex flex-col items-center relative" style={{ background: 'var(--bg)' }}>
+    <div className="min-h-dvh flex flex-col items-center relative">
       <AppHeader />
       <div className="flex flex-col gap-6 w-full" style={{ maxWidth: 440, padding: '24px 24px 32px' }}>
 

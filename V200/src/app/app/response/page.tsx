@@ -194,7 +194,7 @@ export default function ResponsePage() {
   }
 
   return (
-    <div className="min-h-dvh flex flex-col" style={{ background: 'var(--bg)' }}>
+    <div className="min-h-dvh flex flex-col">
 
       {/* Top nav — header dropdown replaces the old footer (FigJam 95:2228) */}
       <AppHeader />
