@@ -4,10 +4,11 @@ import type { JournalEntry } from '@/lib/journal-types'
 import { DEMO_ENTRY } from '@/components/__fixtures__/journal'
 
 // Journal feed card (T-022-04 smoke → expanded in T-023-02). Presentational; only
-// Next dependency is useRouter() (nav mock). The AC-critical multi-state component:
-// covers has-lens (avatar stack + share badge) vs no-lens (the "Apply a lens →"
-// invite), and long/short vent bodies (the body clamps to 3 lines). onAddLens is a
-// no-op so tapping the footer stays silent. Re-themes via the toolbar.
+// Next dependency is useRouter() (nav mock). The AC-critical multi-state component
+// (Figma set 572:5715, UI type × shared/not shared/privat × lens/no lens): footer
+// glyph = share icon (public) vs lock (private); right side = avatar stack w/
+// per-lens share badges (lens) vs the "+ Lens" secondary button (no lens).
+// onAddLens is a no-op so tapping the footer stays silent. Re-themes via toolbar.
 const meta: Meta<typeof JournalPreviewCard> = {
   title: 'Journal/JournalPreviewCard',
   component: JournalPreviewCard,
@@ -17,12 +18,23 @@ export default meta
 
 type Story = StoryObj<typeof JournalPreviewCard>
 
-// DEMO_ENTRY: two lenses, one with an Instagram share (badge tucks into the avatar).
+// DEMO_ENTRY: private entry (lock glyph), two lenses, one with an Instagram
+// share (badge tucks into the avatar). Figma "privat, lens".
 export const Default: Story = {}
 
-// No lenses yet → footer becomes the "Apply a lens →" invitation.
+// Public entry → the footer glyph flips to the share icon. Figma "shared, lens".
+export const Shared: Story = {
+  args: { entry: { ...DEMO_ENTRY, is_public: true } },
+}
+
+// No lenses yet → footer shows the "+ Lens" button. Figma "privat, no lens".
 export const NoLens: Story = {
   args: { entry: { ...DEMO_ENTRY, lens_responses: [] } },
+}
+
+// Public, no lenses → share glyph + "+ Lens". Figma "not shared, no lens".
+export const SharedNoLens: Story = {
+  args: { entry: { ...DEMO_ENTRY, is_public: true, lens_responses: [] } },
 }
 
 // Long vent → the body clamps to 3 lines (-webkit-line-clamp).

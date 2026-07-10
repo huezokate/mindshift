@@ -5,6 +5,7 @@ import { useTheme } from '@/lib/theme'
 import type { JournalEntry, SharePlatform } from '@/lib/journal-types'
 import { deriveTitleFallback } from '@/lib/title'
 import Icon from '@/components/ui/Icon'
+import Button from '@/components/ui/Button'
 import SocialIcon from './SocialIcon'
 
 type Props = {
@@ -15,7 +16,7 @@ type Props = {
 }
 
 // ── Date label ──────────────────────────────────────────────────────────────
-// "2 JUN 2026"-style, derived from created_at (Figma 602:6680).
+// "2 JUN 2026"-style, derived from created_at (Figma 604:7285).
 const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
 function formatDateLabel(iso: string): string {
   const d = new Date(iso)
@@ -28,6 +29,7 @@ export default function JournalPreviewCard({ entry, onAddLens }: Props) {
   const { theme } = useTheme()
   const isCyberpunk = theme === 'cyberpunk'
   const isKawaii = theme === 'kawaii'
+  const isNotepad = theme === 'notepad'
 
   // ── Derived content ────────────────────────────────────────────────────────
   // Prefer the Gemini "<synonym> on <topic>" title (T-018-07); fall back to the
@@ -64,10 +66,10 @@ export default function JournalPreviewCard({ entry, onAddLens }: Props) {
   }
 
   // ── Vent body (tap → detail) ───────────────────────────────────────────────
-  // Reuses the input-card surface (cyan accent in cyberpunk) so a saved entry
-  // reads as the surface the user originally typed into. -4px bottom margin lets
-  // the footer overlap by 4px (Figma 602:6682). Kawaii's 32px-radius post +
-  // 32px-radius footer kiss awkwardly when overlapped, so tuck flush there.
+  // The "User quote input field" instance (Figma 604:7288 / 604:7472 / 572:5434):
+  // card surface (--card-bg) with the theme's input borders, single-line title
+  // header, clamped vent preview. -4px bottom margin lets the footer overlap by
+  // 4px in ALL themes (Figma keeps mb-[-4px] even on kawaii's 32px radii).
   const ventBody = (
     <button
       type="button"
@@ -77,7 +79,7 @@ export default function JournalPreviewCard({ entry, onAddLens }: Props) {
         appearance: 'none',
         textAlign: 'inherit',
         width: '100%',
-        background: 'var(--input-bg)',
+        background: 'var(--card-bg)',
         borderTop: 'var(--input-bt)',
         borderLeft: 'var(--input-bl)',
         borderRight: 'var(--input-br)',
@@ -92,28 +94,37 @@ export default function JournalPreviewCard({ entry, onAddLens }: Props) {
         display: 'block',
       }}
     >
+      {/* Header — Figma only fills it on kawaii (#e5fcfa); cyberpunk/notepad
+          show the card surface. The header/body divider is the input
+          component's own bottom border (solid, per theme). */}
       <div
         style={{
-          background: 'var(--input-header-bg)',
-          boxShadow: 'var(--input-header-shadow)',
-          padding: '8px 16px 4px',
-          borderBottom: '1px solid var(--input-divider)',
+          background: isKawaii ? 'var(--input-header-bg)' : 'transparent',
+          boxShadow: isKawaii ? 'var(--input-header-shadow)' : 'none',
+          padding: isKawaii ? '8px 16px 4px' : '8px 16px 2px',
+          borderBottom: 'var(--input-bb)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}
       >
         <p
           style={{
-            fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 12,
-            letterSpacing: '1.32px', lineHeight: '14px', color: 'var(--cyan)',
+            fontFamily: 'var(--font-body)',
+            fontWeight: isNotepad ? 600 : 700,
+            fontSize: 12,
+            letterSpacing: isCyberpunk ? '1.32px' : (isKawaii ? '0.52px' : '0.55px'),
+            lineHeight: '14px',
+            // Figma title color: C Blue / Kawaii text main / Notepad Blue.
+            color: isKawaii ? 'var(--text-body)' : 'var(--cyan)',
             textTransform: 'uppercase', textAlign: 'center', margin: 0,
-            display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
+            // Single line with "..." (Figma renders the title nowrap).
+            maxWidth: '100%', whiteSpace: 'nowrap',
+            overflow: 'hidden', textOverflow: 'ellipsis',
           }}
         >
           {title}
         </p>
       </div>
-      <div style={{ padding: '8px 16px 12px' }}>
+      <div style={{ padding: isKawaii ? '4px 8px 4px 16px' : '4px 16px' }}>
         <p
           style={{
             fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '20px',
@@ -121,7 +132,12 @@ export default function JournalPreviewCard({ entry, onAddLens }: Props) {
             // Figma 574:5939 → "C Header green" #EEFFEA on cyberpunk; kawaii/
             // notepad keep their body color (token resolves per theme).
             color: 'var(--preview-body)', margin: 0,
-            display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical',
+            // Figma fixes the vent at ~120px; line-clamp approximates it
+            // (4 lines cp/kawaii, 3 on notepad's taller header) while letting
+            // short vents shrink.
+            display: '-webkit-box',
+            WebkitLineClamp: isNotepad ? 3 : 4,
+            WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
           }}
         >
@@ -132,24 +148,26 @@ export default function JournalPreviewCard({ entry, onAddLens }: Props) {
   )
 
   // notepad gets the offset drop-shadow on an OUTER wrapper (overflow rule).
-  // The wrapper also owns the -4px footer overlap (cyberpunk + notepad).
+  // The wrapper also owns the -4px footer overlap (all themes — Figma 604:7472).
   const ventBodyWrapped = (
     <div style={{
       width: '100%',
       filter: isCyberpunk || isKawaii ? 'none' : 'var(--card-filter)',
-      marginBottom: isKawaii ? 0 : -4,
+      marginBottom: -4,
       position: 'relative', zIndex: 1,
     }}>
       {ventBody}
     </div>
   )
 
-  // ── Avatar stack with per-avatar share badges (Figma 579:6099). ─────────────
+  // ── Avatar stack with per-avatar share badges (Figma 604:7292). ─────────────
   // Each avatar is its own `items-end justify-end` group. The avatar overlaps
   // its 16px badge via mr-[-16px] so the badge tucks into the avatar's
-  // bottom-right corner; groups nest by -4px between them (Figma 579:6098 etc).
+  // bottom-right corner; groups nest by -4px between them (Figma 604:7293 etc).
   // Badge = the single platform this lens was shared to; no share → no badge,
   // and the avatar drops its -16px so nothing is pulled into empty space.
+  // Avatar ring per Figma: cyberpunk 1px violet / kawaii 2px pink / notepad
+  // 2px green.
   const avatarStack = (
     <div style={{ display: 'flex', alignItems: 'center' }}>
       {lensAvatars.map(({ fig, platform }, i) => {
@@ -172,9 +190,9 @@ export default function JournalPreviewCard({ entry, onAddLens }: Props) {
                 // (Figma LensAvatar mr-[-16px]). Only when a badge follows.
                 marginRight: platform ? -16 : 0,
                 border: isCyberpunk
-                  ? '1px solid var(--green)'
-                  : (isKawaii ? '1px solid var(--pink)' : '2px solid var(--pink)'),
-                boxShadow: isKawaii ? '0px 2px 8px 0px rgba(130,100,240,0.13)' : undefined,
+                  ? '1px solid var(--violet)'
+                  : '2px solid var(--' + (isKawaii ? 'pink' : 'green') + ')',
+                boxShadow: isKawaii ? 'var(--fig-avatar-shadow)' : undefined,
                 background: 'var(--fig-avatar-grad)',
                 overflow: 'hidden', flexShrink: 0,
                 position: 'relative', zIndex: 1,
@@ -202,22 +220,10 @@ export default function JournalPreviewCard({ entry, onAddLens }: Props) {
     </div>
   )
 
-  // No-lens invite — tapping the footer opens the lens picker, so frame it as
-  // an invitation, not a passive label.
-  const applyLensLabel = (color: string) => (
-    <span style={{
-      display: 'inline-flex', alignItems: 'center', gap: 6,
-      fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 12,
-      letterSpacing: '1.5px', color, textTransform: 'uppercase',
-    }}>
-      Apply a lens
-      <Icon name="arrow_forward" size={16} />
-    </span>
-  )
-
-  // ── Lens footer (tap → onAddLens) — green accent (Figma 574:5940). ──────────
-  // Share glyph left, avatar stack + platform indicators right. No-lens → the
-  // "Apply a lens →" invite. Per-theme borders so all 3 follow from tokens.
+  // ── Lens footer (tap → onAddLens) — green accent (Figma 604:7289). ──────────
+  // Status glyph left (share icon when public, lock when private — Figma
+  // shared/privat variants), avatar stack OR the "+ Lens" secondary button
+  // right. Per-theme borders so all 3 follow from tokens.
   const footerBorder = isCyberpunk
     ? {
         borderTop: '1px solid var(--green)', borderLeft: '1px solid var(--green)',
@@ -229,7 +235,8 @@ export default function JournalPreviewCard({ entry, onAddLens }: Props) {
           borderTop: 'var(--input-bt)', borderLeft: 'var(--input-bl)',
           borderRight: 'var(--input-br)', borderBottom: 'var(--input-bb)',
           borderRadius: '32px', background: 'var(--lens-header-bg)',
-          boxShadow: 'inset 4px 0 0 0 var(--green)',
+          // Figma 604:7473 — pink inner stroke, not the teal input one.
+          boxShadow: 'inset 4px 0 0 0 var(--pink)',
         }
       : {
           borderTop: '1.5px solid var(--green)', borderLeft: '4px solid var(--green)',
@@ -237,52 +244,76 @@ export default function JournalPreviewCard({ entry, onAddLens }: Props) {
           borderRadius: '8px', background: 'var(--card-bg)',
         }
 
-  const footer = (
+  const footerStyle = {
+    ...footerBorder,
+    // notepad drop-shadow on the footer itself is fine — it isn't clipped.
+    filter: isCyberpunk || isKawaii ? 'none' : 'var(--card-filter)',
+    appearance: 'none' as const,
+    width: '100%',
+    minHeight: 56,
+    // Figma: cyberpunk p-[8px] (604:7289); kawaii/notepad px-16 py-8.
+    padding: isCyberpunk ? 8 : '8px 16px',
+    display: 'flex', alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+    position: 'relative' as const, zIndex: 2,
+  }
+
+  // Status glyph — 40px (Figma 604:7290 size-[40px]): share icon on public
+  // entries, lock on private ones (Figma shared vs privat variants).
+  const statusGlyph = (
+    <span
+      aria-hidden
+      style={{
+        width: 40, height: 40, flexShrink: 0,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        color: 'var(--preview-glyph)',
+      }}
+    >
+      <Icon name={entry.is_public ? 'ios_share' : 'lock'} size={40} />
+    </span>
+  )
+
+  // With lenses the whole footer is the tap target; without, the "+ Lens"
+  // design-system button (Figma 606:7852 / 606:7843 / 606:7826) is the button,
+  // so we don't nest <button> in <button>.
+  const footer = hasLens ? (
     <button
       type="button"
       onClick={addLens}
-      aria-label={hasLens ? 'Add another lens to this entry' : 'Apply a lens to this entry'}
-      style={{
-        ...footerBorder,
-        // notepad drop-shadow on the footer itself is fine — it isn't clipped.
-        filter: isCyberpunk || isKawaii ? 'none' : 'var(--card-filter)',
-        appearance: 'none',
-        width: '100%',
-        minHeight: 56,
-        // Figma 574:5940 → p-[8px] all sides (was 8px 12px).
-        padding: 8,
-        display: 'flex', alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 8, cursor: 'pointer',
-        position: 'relative', zIndex: 2,
-      }}
+      aria-label="Add another lens to this entry"
+      style={{ ...footerStyle, cursor: 'pointer' }}
     >
-      {/* Share glyph — 40px (Figma 574:5941 size-[40px]). The whole footer is
-          the tap target, so the glyph itself need not be 44px. */}
-      <span
-        aria-hidden
-        style={{
-          width: 40, height: 40, flexShrink: 0,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: isCyberpunk ? 'var(--green)' : (isKawaii ? 'var(--pink)' : 'var(--green)'),
-        }}
-      >
-        <Icon name="ios_share" size={40} />
-      </span>
-
-      {hasLens
-        ? avatarStack
-        : applyLensLabel(isCyberpunk ? 'var(--green)' : (isKawaii ? 'var(--pink)' : 'var(--green)'))}
+      {statusGlyph}
+      {avatarStack}
     </button>
+  ) : (
+    <div style={footerStyle}>
+      {statusGlyph}
+      <Button
+        variant="secondary"
+        icon="add"
+        onClick={addLens}
+        ariaLabel="Apply a lens to this entry"
+      >
+        Lens
+      </Button>
+    </div>
   )
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-      {/* Date label above the card (Figma 602:6680). */}
+      {/* Date label above the card (Figma 604:7285) — flush against the vent
+          card (pb-[4px] mb-[-4px] cancel out). Cyberpunk sets it in the
+          12px subhead style; kawaii/notepad in the 10px tooltip style. */}
       <p style={{
-        fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 12,
-        letterSpacing: '1.32px', lineHeight: '14px', color: 'var(--pink)',
-        textTransform: 'uppercase', margin: '0 0 6px 2px',
+        fontFamily: 'var(--font-body)',
+        fontWeight: isCyberpunk ? 700 : 400,
+        fontSize: isCyberpunk ? 12 : 10,
+        lineHeight: isCyberpunk ? '14px' : '12px',
+        letterSpacing: isCyberpunk ? '1.32px' : 'var(--btn-subtext-tracking)',
+        color: 'var(--pink)',
+        textTransform: 'uppercase', margin: 0,
       }}>
         {dateLabel}
       </p>

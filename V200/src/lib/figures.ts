@@ -202,7 +202,9 @@ export const FIGURES: Figure[] = [
   },
 ]
 
+// Legacy alias for portraitFor — kept for existing call sites (same fix as
+// main PR #10: it used to lack a notepad branch and fell through to kawaii,
+// putting wrong-theme art on the lens, response, and theme-select screens).
 export function getFigureImg(figure: Figure, theme: string): string {
-  if (theme === 'cyberpunk') return figure.imgCyberpunk
-  return figure.imgKawaii
+  return portraitFor(figure, theme)
 }
