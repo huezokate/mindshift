@@ -16,7 +16,7 @@
 //
 // Storybook-only. Imports nothing from the app except the real Button.
 import { useLayoutEffect, useState, type CSSProperties } from 'react'
-import Button, { type ThemeName } from '@/components/ui/Button'
+import Button from '@/components/ui/Button'
 
 // ── Themes ────────────────────────────────────────────────────────────────────
 const THEMES = [
@@ -24,7 +24,7 @@ const THEMES = [
   { key: 'kawaii', title: 'Kawaii' },
   { key: 'notepad', title: 'Notepad' },
 ] as const
-type ThemeKey = (typeof THEMES)[number]['key'] // === Button's ThemeName
+type ThemeKey = (typeof THEMES)[number]['key']
 
 // ── Token catalog ───────────────────────────────────────────────────────────────
 // `kind` selects how a token is RESOLVED to a literal (a raw custom-property read
@@ -214,25 +214,21 @@ function TypographySection({ tokens }: { tokens: ThemeTokens }) {
 }
 
 // Reuses the REAL Button (T-023-01 matrix). Buttons read the column's injected
-// --btn-* vars, so each shows its own theme treatment; `theme` drives the semantic
-// journal/mindmap family swap (resolveFamily in Button.tsx).
-function ButtonSection({ theme }: { theme: ThemeName }) {
+// --btn-* vars, so each shows its own theme treatment. Three structural variants
+// only (per Kate 2026-07-09) — icon/disabled are modifiers on any of them.
+function ButtonSection() {
   const row: CSSProperties = { display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }
   return (
     <>
       <div style={sectionTitle}>Buttons</div>
       <div style={row}>
-        <Button variant="primary" theme={theme}>Primary</Button>
-        <Button variant="primary" theme={theme} icon="bolt">Icon</Button>
-        <Button variant="primary" theme={theme} disabled>Disabled</Button>
+        <Button variant="primary">Primary</Button>
+        <Button variant="primary" icon="bolt">Icon</Button>
+        <Button variant="primary" disabled>Disabled</Button>
       </div>
       <div style={row}>
-        <Button variant="secondary" theme={theme}>Secondary</Button>
-        <Button variant="secondary2" theme={theme}>Secondary 2</Button>
-      </div>
-      <div style={row}>
-        <Button variant="journal" theme={theme}>Journal</Button>
-        <Button variant="mindmap" theme={theme}>Mind Map</Button>
+        <Button variant="secondary">Secondary</Button>
+        <Button variant="secondary2">Secondary 2</Button>
       </div>
     </>
   )
@@ -280,7 +276,7 @@ function ThemeColumn({ theme, title, tokens }: { theme: ThemeKey; title: string;
       <h3 style={{ ...mono, fontSize: 13, margin: '0 0 4px', opacity: 0.9 }}>{title}</h3>
       <ColorSection tokens={tokens} />
       <TypographySection tokens={tokens} />
-      <ButtonSection theme={theme} />
+      <ButtonSection />
       <RadiiSection tokens={tokens} />
     </section>
   )

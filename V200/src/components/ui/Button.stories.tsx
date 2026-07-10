@@ -1,32 +1,27 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite'
-import Button, { type ButtonVariant, type ThemeName } from '@/components/ui/Button'
+import Button, { type ButtonVariant } from '@/components/ui/Button'
 
 // Full coverage story for the design-system Button (T-023-01) — the flagship
 // consistency check for S-023. Button is entirely token-driven (--btn-* families)
 // and renders a Material Symbol via <Icon> when given `icon`, so it exercises the
 // whole styling pipeline (tokens + fonts + borders + webfont) in one component.
 //
-// The subtle bit these stories exist to catch: the SEMANTIC variants `journal` and
-// `mindmap` resolve to a DIFFERENT --btn-* family per theme (the accent slots are
-// swapped between cyberpunk and kawaii/notepad). Journal must read pink/red and
-// Mind Map cyan/mint/green in EVERY theme — so those stories must forward the
-// active toolbar theme as the `theme` prop, or the swap mis-resolves and the bug
-// hides. See resolveFamily() in Button.tsx.
+// The model (per Kate, 2026-07-09): THREE structural variants only — primary /
+// secondary / secondary2 — colored natively by the active theme. `icon` and
+// `disabled` are orthogonal modifiers available on every variant. Sizing is
+// role-based: primary 56min/16×12 (the former "tall" specs are its default),
+// secondaries 45min/12×8. Surfaces like the journal/mindmap dropdown rows pick
+// from these three types; there are no semantic variants.
 const meta: Meta<typeof Button> = {
   title: 'UI/Button',
   component: Button,
-  args: { children: 'Enter MindShift' },
+  args: { children: 'Enter Minds Shift' },
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['primary', 'secondary', 'secondary2', 'journal', 'mindmap'],
-    },
-    theme: {
-      control: { type: 'select' },
-      options: ['cyberpunk', 'kawaii', 'notepad'],
+      options: ['primary', 'secondary', 'secondary2'],
     },
     disabled: { control: { type: 'boolean' } },
-    tall: { control: { type: 'boolean' } },
     fullWidth: { control: { type: 'boolean' } },
     icon: { control: { type: 'text' } },
     children: { control: { type: 'text' } },
@@ -36,33 +31,17 @@ export default meta
 
 type Story = StoryObj<typeof Button>
 
-// Reads the toolbar theme so a story renders in whatever the toolbar is set to.
-const themeOf = (ctx: { globals: { theme?: string } }): ThemeName =>
-  (ctx.globals.theme as ThemeName) ?? 'cyberpunk'
-
-// ── Structural variants (family is theme-independent) ─────────────────────────
+// ── The three variants (family is theme-independent; theme paints them) ───────
 // CTA treatment (cyber green / kawaii amber / notepad white+dropshadow).
 export const Primary: Story = { args: { variant: 'primary' } }
 export const Secondary: Story = { args: { variant: 'secondary', children: 'Secondary' } }
 export const Secondary2: Story = { args: { variant: 'secondary2', children: 'Secondary 2' } }
 
-// ── Semantic variants (must resolve against the active theme) ─────────────────
-// Journal → pink/red family in every theme; Mind Map → cyan/mint/green family.
-export const Journal: Story = {
-  args: { variant: 'journal', children: 'Journal' },
-  render: (args, ctx) => <Button {...args} theme={themeOf(ctx)} />,
-}
-export const Mindmap: Story = {
-  args: { variant: 'mindmap', children: 'Mind Map' },
-  render: (args, ctx) => <Button {...args} theme={themeOf(ctx)} />,
-}
-
-// ── States ────────────────────────────────────────────────────────────────────
+// ── Modifiers (orthogonal — valid on every variant) ───────────────────────────
 // Leading Material Symbol — the load-bearing glyph check (renders a symbol, not
 // the word "favorite", when the webfont is wired).
 export const WithIcon: Story = { args: { variant: 'primary', icon: 'favorite' } }
 export const Disabled: Story = { args: { variant: 'primary', disabled: true } }
-export const Tall: Story = { args: { variant: 'primary', tall: true, children: 'Section header' } }
 export const FullWidth: Story = {
   args: { variant: 'primary', fullWidth: true, children: 'Full width' },
   render: (args) => (
@@ -72,14 +51,12 @@ export const FullWidth: Story = {
   ),
 }
 
-// ── The money shot: variants × states, re-themed by the toolbar ───────────────
-// All five variants (rows) with their default + key states, all resolved against
-// the toolbar's current theme. Flip the Theme toolbar (Cyberpunk / Kawaii /
-// Notepad) to compare — that's the theme axis. Semantic rows forward `theme` so
-// the family swap is visible: Journal stays pink/red, Mind Map stays cyan-family,
-// in all three themes.
-const STRUCTURAL: ButtonVariant[] = ['primary', 'secondary', 'secondary2']
-const SEMANTIC: ButtonVariant[] = ['journal', 'mindmap']
+// ── The money shot: variants × modifiers, re-themed by the toolbar ────────────
+// All three variants (rows), each with the full modifier grid: default, icon,
+// disabled, and icon+disabled. Flip the Theme toolbar (Cyberpunk / Kawaii /
+// Notepad) to compare — the primary row should always read bigger (56/16×12)
+// than the secondaries (45/12×8), with identical corner radii per theme.
+const VARIANTS: ButtonVariant[] = ['primary', 'secondary', 'secondary2']
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -93,28 +70,19 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
 }
 
 export const AllVariants: StoryObj = {
-  render: (_args, ctx) => {
-    const theme = themeOf(ctx)
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 24 }}>
-        <p style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: 13, opacity: 0.7, color: 'var(--fg, currentColor)', margin: 0 }}>
-          Flip the Theme toolbar to compare Cyberpunk / Kawaii / Notepad.
-        </p>
-        {STRUCTURAL.map((variant) => (
-          <Row key={variant} label={variant}>
-            <Button variant={variant} theme={theme}>Default</Button>
-            <Button variant={variant} theme={theme} disabled>Disabled</Button>
-            <Button variant={variant} theme={theme} tall>Tall</Button>
-            <Button variant={variant} theme={theme} icon="bolt">Icon</Button>
-          </Row>
-        ))}
-        {SEMANTIC.map((variant) => (
-          <Row key={variant} label={variant}>
-            <Button variant={variant} theme={theme}>{variant === 'journal' ? 'Journal' : 'Mind Map'}</Button>
-            <Button variant={variant} theme={theme} disabled>Disabled</Button>
-          </Row>
-        ))}
-      </div>
-    )
-  },
+  render: () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 24 }}>
+      <p style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: 13, opacity: 0.7, color: 'var(--fg, currentColor)', margin: 0 }}>
+        Flip the Theme toolbar to compare Cyberpunk / Kawaii / Notepad.
+      </p>
+      {VARIANTS.map((variant) => (
+        <Row key={variant} label={variant}>
+          <Button variant={variant}>Default</Button>
+          <Button variant={variant} icon="bolt">Icon</Button>
+          <Button variant={variant} disabled>Disabled</Button>
+          <Button variant={variant} icon="bolt" disabled>Icon</Button>
+        </Row>
+      ))}
+    </div>
+  ),
 }
