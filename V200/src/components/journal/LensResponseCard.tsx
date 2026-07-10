@@ -30,7 +30,7 @@ function relativeTimeAgo(iso: string): string {
 // (star) and share icons were removed; sharing lives in the detail page's
 // "Socials" button, and signed-in vents auto-save. The "SHARED …" log at the
 // foot still shows where this lens was shared.
-export default function LensCard({ response }: Props) {
+export default function LensResponseCard({ response }: Props) {
   const { theme } = useTheme()
   const isKawaii = theme === 'kawaii'
   const isCyberpunk = theme === 'cyberpunk'

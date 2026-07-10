@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useTheme } from '@/lib/theme'
 import Icon from '@/components/ui/Icon'
 import AppHeader from '@/components/nav/AppHeader'
-import LensCard from './LensCard'
+import LensResponseCard from './LensResponseCard'
 import ShareSheet from './ShareSheet'
 import LensPickerSheet from './LensPickerSheet'
 import UpcomingChip from './UpcomingChip'
@@ -88,11 +88,14 @@ export default function EntryDetail({ entry }: Props) {
   // ── Header: shared app nav bar (Figma 602:6952 → AppHeader). ────────────────
   const header = <AppHeader />
 
-  // ── Full vent card — reuses the input-card surface (Figma 469:4275). ────────
+  // ── Full vent card — the "User quote input field" instance (Figma 469:4275):
+  // card surface (--card-bg) with the theme's input borders. The header/body
+  // divider is the input component's own solid bottom border; Figma only fills
+  // the header on kawaii (#e5fcfa) — cyberpunk/notepad show the card surface.
   const ventCard = (
     <div
       style={{
-        background: 'var(--input-bg)',
+        background: 'var(--card-bg)',
         borderTop: 'var(--input-bt)',
         borderLeft: 'var(--input-bl)',
         borderRight: 'var(--input-br)',
@@ -106,21 +109,27 @@ export default function EntryDetail({ entry }: Props) {
       }}
     >
       <div style={{
-        background: 'var(--input-header-bg)',
-        boxShadow: 'var(--input-header-shadow)',
-        padding: '8px 16px 2px',
-        borderBottom: '1px solid var(--input-divider)',
+        background: isKawaii ? 'var(--input-header-bg)' : 'transparent',
+        boxShadow: isKawaii ? 'var(--input-header-shadow)' : 'none',
+        padding: isKawaii ? '8px 16px 4px' : '8px 16px 2px',
+        borderBottom: 'var(--input-bb)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
         <p style={{
-          fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 12,
-          letterSpacing: '1.32px', lineHeight: '14px', color: 'var(--cyan)',
+          fontFamily: 'var(--font-body)',
+          fontWeight: isCyberpunk || isKawaii ? 700 : 600,
+          fontSize: 12,
+          letterSpacing: isCyberpunk ? '1.32px' : (isKawaii ? '0.52px' : '0.55px'),
+          lineHeight: '14px',
+          // Figma title color: C Blue / Kawaii text main / Notepad Blue.
+          color: isKawaii ? 'var(--text-body)' : 'var(--cyan)',
           textTransform: 'uppercase', textAlign: 'center', margin: 0,
         }}>
           {title}
         </p>
       </div>
-      <div style={{ padding: '8px 16px 14px' }}>
+      {/* Body — Figma px-[16px] py-[4px] (kawaii pr-[8px]). */}
+      <div style={{ padding: isKawaii ? '4px 8px 4px 16px' : '4px 16px' }}>
         <p style={{
           fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '20px',
           letterSpacing: isKawaii ? '0.52px' : (isCyberpunk ? '0.52px' : '0.18px'),
@@ -146,157 +155,140 @@ export default function EntryDetail({ entry }: Props) {
       }}>
         {ventCard}
       </div>
-      {/* "+ Lens" — add a lens to this entry (Figma 602:6511); opens the lens
-          picker (stubbed until T-018-04). Right-aligned, -4px over the card. */}
+      {/* "+ Lens" — add a lens to this entry (Figma 602:6511 "Button Primary");
+          opens the lens picker. Right-aligned, -4px over the card. Column
+          [icon over label] layout, colored/shaped by the primary --btn-*
+          family so all 3 themes follow from tokens. */}
       <button
         type="button"
+        className="ds-btn"
         onClick={() => { setAddLensError(null); setPickerOpen(true) }}
         aria-label="Add a lens to this entry"
         style={{
           position: 'relative', zIndex: 2,
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-          background: 'var(--bg)',
-          borderTop: '4px solid var(--green)', borderLeft: '4px solid var(--green)',
-          borderRight: '1px solid var(--green)', borderBottom: '1px solid var(--green)',
-          borderRadius: 2, color: 'var(--green)', cursor: 'pointer',
+          display: 'flex', flexDirection: 'column', alignItems: 'center',
+          justifyContent: 'center', gap: 4,
+          background: 'var(--btn-bg)',
+          borderTop: 'var(--btn-bt)', borderLeft: 'var(--btn-bl)',
+          borderRight: 'var(--btn-br)', borderBottom: 'var(--btn-bb)',
+          borderRadius: 'var(--btn-radius)',
+          boxShadow: 'var(--btn-shadow, none)',
+          color: 'var(--btn-color)', cursor: 'pointer',
           padding: '8px 9px 5px 12px', minHeight: 44,
-          filter: isCyberpunk || isKawaii ? 'none' : 'var(--card-filter)',
+          filter: 'var(--btn-filter, none)',
         }}
       >
         <Icon name="add" size={24} />
         <span style={{
           fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 14,
-          letterSpacing: '3px', textTransform: 'uppercase', lineHeight: '16px',
+          letterSpacing: 'var(--btn-letter-spacing)', textTransform: 'uppercase',
+          lineHeight: '16px',
         }}>Lens</span>
       </button>
     </div>
   )
 
-  // ── MINDSHIFT ◇ MINDSHIFT billboard (Figma 469:4224 decorative row). ────────
-  // Full version: two wordmarks flanking the brain-icon medallion. Token-driven.
-  const wordmark = (
-    <span style={{
-      fontFamily: 'var(--font-display)', fontWeight: 700,
-      fontSize: 18, letterSpacing: '3px', lineHeight: 1,
-      color: 'var(--cyan)', textTransform: 'uppercase',
-      whiteSpace: 'nowrap',
-    }}>
-      Minds Shift
-    </span>
-  )
-
-  const billboard = (
-    <div style={{
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      gap: 10, width: '100%', padding: '4px 0',
-      overflow: 'hidden',
-    }}>
-      <span style={{ flex: 1, height: 2, background: 'var(--cyan)', opacity: 0.35, minWidth: 4 }} />
-      {wordmark}
-      <span
-        aria-hidden
-        style={{
-          width: 32, height: 32, borderRadius: '50%',
-          background: 'var(--bg)',
-          border: isCyberpunk ? '1.5px solid var(--violet)' : '1.5px solid var(--cyan)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: isCyberpunk ? 'var(--violet)' : 'var(--cyan)',
-          flexShrink: 0,
-        }}
-      >
-        <Icon name="psychology" size={22} />
-      </span>
-      {wordmark}
-      <span style={{ flex: 1, height: 2, background: 'var(--cyan)', opacity: 0.35, minWidth: 4 }} />
-    </div>
-  )
-
-  // ── Button row beneath each lens card (Figma 602:6448). ─────────────────────
-  // Single right-aligned row: Chat with lens · Decorate · Socials, gap-[4px],
-  // items-start, justify-end. Chat + Decorate are disabled (opacity-60) and each
-  // carries an "upcoming" chip pulled over its top-right corner via the Figma
-  // mr-[-72px] trick. Socials is the only live action → opens ShareSheet.
+  // ── Button row beneath each lens card (Figma 602:6448 "Icon button stack"). ──
+  // Right-aligned hug-content row, gap-[4px]: Chat with lens · Decorate ·
+  // Socials. Each button is the primary [icon over label] form (Figma "Button
+  // Primary"), colored/shaped by the --btn-* token family so all 3 themes
+  // follow. Decorate is disabled — Figma's recipe: the live treatment at
+  // opacity 0.6 with the "upcoming" chip overlapping its top-right corner
+  // (the mr-[-72px] trick, done here with absolute positioning so the row
+  // never breaks). Chat is live in code (T-020-02 shipped) even though Figma
+  // still marks it upcoming. Kawaii renders the row ICON-ONLY (Figma 470:2664
+  // — round 54px pills, no labels; the labeled pills don't fit the card).
   function buttonRow(lens: LensResponseV2) {
-    // Three EQUAL buttons filling the row (Figma 602:6448) — no -72px overlap
-    // trick (that collided), so the row never breaks. Active buttons use the
-    // canonical themed button tokens (--btn-*), so both COLOR and SHAPE adapt per
-    // theme — a neon bevel in cyberpunk, a soft pill in kawaii, a clean outline in
-    // notepad. (Previously hardcoded var(--green), which is teal in kawaii — the
-    // exact cyberpunk-shape-in-kawaii bleed this row was corrected for.) Disabled
-    // (Decorate) = a muted secondary surface with the "upcoming" chip pinned.
+    const iconOnly = isKawaii
     const btnBase = (active: boolean) => ({
       position: 'relative' as const,
-      flex: 1, minWidth: 0,
-      background: active ? 'var(--btn-bg)' : 'var(--btn-secondary-bg)',
-      borderTop: active ? 'var(--btn-bt)' : '1px solid var(--input-divider)',
-      borderLeft: active ? 'var(--btn-bl)' : '1px solid var(--input-divider)',
-      borderRight: active ? 'var(--btn-br)' : '1px solid var(--input-divider)',
-      borderBottom: active ? 'var(--btn-bb)' : '1px solid var(--input-divider)',
+      background: 'var(--btn-bg)',
+      borderTop: 'var(--btn-bt)', borderLeft: 'var(--btn-bl)',
+      borderRight: 'var(--btn-br)', borderBottom: 'var(--btn-bb)',
       borderRadius: 'var(--btn-radius)',
-      color: active ? 'var(--btn-color)' : 'var(--text-muted)',
+      boxShadow: 'var(--btn-shadow, none)',
+      filter: 'var(--btn-filter, none)',
+      color: 'var(--btn-color)',
       display: 'flex', flexDirection: 'column' as const,
       alignItems: 'center', justifyContent: 'center', gap: 4,
-      padding: '10px 6px 6px', minHeight: 56,
+      padding: iconOnly ? 15 : '8px 9px 5px 12px',
+      minHeight: iconOnly ? 54 : 44,
+      opacity: active ? 1 : 0.6,
       cursor: active ? 'pointer' : 'not-allowed',
     })
 
     const btnLabel = {
-      fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 12,
-      letterSpacing: '1.2px', lineHeight: '14px',
+      fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 14,
+      letterSpacing: 'var(--btn-letter-spacing)', lineHeight: '16px',
       textTransform: 'uppercase' as const, textAlign: 'center' as const,
+      whiteSpace: 'nowrap' as const,
     }
+    const label = (text: string) => (iconOnly ? null : <span style={btnLabel}>{text}</span>)
 
-    const comingSoon = (icon: React.ReactNode, label: string) => (
-      <button
-        type="button"
-        disabled
-        aria-disabled="true"
-        title={`${label} — coming soon`}
-        style={btnBase(false)}
-      >
-        <span style={{ position: 'absolute', top: -8, right: -4, zIndex: 1 }}>
+    // The chip is a SIBLING of the dimmed button (as in Figma), so it stays at
+    // full opacity while the button sits at 0.6.
+    const comingSoon = (icon: React.ReactNode, text: string) => (
+      <span style={{ position: 'relative', display: 'inline-flex' }}>
+        <button
+          type="button"
+          disabled
+          aria-disabled="true"
+          aria-label={`${text} — coming soon`}
+          title={`${text} — coming soon`}
+          style={btnBase(false)}
+        >
+          {icon}
+          {label(text)}
+        </button>
+        {/* "upcoming" chip pulled over the button's top-right corner. */}
+        <span style={{ position: 'absolute', top: -9, right: -4, zIndex: 1 }}>
           <UpcomingChip />
         </span>
-        {icon}
-        <span style={btnLabel}>{label}</span>
-      </button>
+      </span>
     )
 
     return (
-      <div style={{ display: 'flex', alignItems: 'stretch', gap: 4, width: '100%' }}>
+      <div style={{
+        display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end',
+        gap: iconOnly ? 8 : 4, width: '100%',
+      }}>
         {/* Chat with lens — live (T-020-02): opens a bounded thread with this figure. */}
         <button
           type="button"
+          className="ds-btn"
           onClick={() => openChat(lens)}
           aria-label={`Chat with ${lens.figure_id}`}
+          title="Chat with lens"
           style={btnBase(true)}
         >
           <Icon name="comic_bubble" size={24} />
-          <span style={btnLabel}>Chat with lens</span>
+          {label('Chat with lens')}
         </button>
         {comingSoon(<Icon name="palette" size={24} />, 'Decorate')}
-        {/* Socials — the only live action → opens ShareSheet. */}
+        {/* Socials — opens ShareSheet. */}
         <button
           type="button"
+          className="ds-btn"
           onClick={() => setShareLens(lens)}
           aria-label="Share this lens to social media"
+          title="Socials"
           style={btnBase(true)}
         >
           <Icon name="ios_share" size={24} />
-          <span style={btnLabel}>Socials</span>
+          {label('Socials')}
         </button>
       </div>
     )
   }
 
-  // ── Lens carousel item: LensCard + its button row. ──────────────────────────
+  // ── Lens carousel item: LensResponseCard + its button row. ──────────────────────────
   function lensItem(lens: LensResponseV2) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         {/* lens card mb-[-4px] so the button row overlaps its bottom by 4px
             (Figma 602:6446). */}
         <div style={{ marginBottom: -4, position: 'relative', zIndex: 1 }}>
-          <LensCard
+          <LensResponseCard
             response={lens}
             ventText={entry.vent_text}
             isEntryPublic={entry.is_public}
@@ -316,8 +308,6 @@ export default function EntryDetail({ entry }: Props) {
         padding: '0 24px', width: '100%',
       }}>
         {ventCardWrapped}
-
-        {lenses.length > 0 && billboard}
 
         {/* Carousel — peek next card + page-dots (Figma 602:6521). Single-lens
             entries render full-width with no carousel plumbing. */}

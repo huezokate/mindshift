@@ -26,7 +26,7 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-dvh flex flex-col items-center" style={{ background: 'var(--bg)' }}>
+    <div className="min-h-dvh flex flex-col items-center">
       <AppHeader />
       <div className="flex flex-col gap-8 w-full" style={{ maxWidth: 440, padding: '24px 24px 40px' }}>
 

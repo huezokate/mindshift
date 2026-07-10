@@ -1,7 +1,12 @@
 /* Minds Shift V200 — Kawaii Theme Tokens */
 /* Source: Figma node 416:7498 — exact colors, no modifications */
 
-html[data-theme="kawaii"] {
+/* Matches both the app at <html data-theme="kawaii"> and any element scoped to
+   kawaii locally (mirrors the notepad pattern), so a wrapper can pin the kawaii
+   skin without mutating the shared <html data-theme> — used by the Storybook
+   "compare all modes" grid, and available to the app the same way notepad is. */
+html[data-theme="kawaii"],
+[data-theme="kawaii"] {
   /* Core palette */
   --bg:     #ffafd6;
   --cyan:   #ff50c5;
@@ -86,7 +91,7 @@ html[data-theme="kawaii"] {
   --btn-secondary-bl:     2px solid #400b14;
   --btn-secondary-br:     4px solid #400b14;
   --btn-secondary-bb:     1px solid #400b14;
-  --btn-secondary-radius: 32px;
+  --btn-secondary-radius: var(--btn-radius);
 
   /* Secondary 2 button — pink bg, pink inset shadow */
   --btn-secondary2-bg:     #ffe1ff;
@@ -96,7 +101,7 @@ html[data-theme="kawaii"] {
   --btn-secondary2-bl:     2px solid #400b14;
   --btn-secondary2-br:     4px solid #400b14;
   --btn-secondary2-bb:     1px solid #400b14;
-  --btn-secondary2-radius: 32px;
+  --btn-secondary2-radius: var(--btn-radius);
 
   /* CTA button — warm yellow, dark text, Fredoka */
   --btn-bg:             #ffe2ac;
@@ -111,6 +116,29 @@ html[data-theme="kawaii"] {
   --btn-shadow:         none;
   --btn-filter:         none;
   --btn-letter-spacing: 2px;
+  --btn-subtext-tracking: 0.6px;
+
+  /* Brand logo (Figma 483:2747): aperture ring, center mark, wordmark */
+  --logo-ring:     #ffe2ac;
+  --logo-mark:     #c0605a;
+  --logo-text:     #ffe2ac;
+  --logo-font:     var(--font-body);
+  --logo-tracking: 0px;
+
+  /* Chat bubbles: user speaks (blue), lens thinks (red). Raw --cyan/--pink
+     collapse to one magenta in kawaii, so these carry the real teal/pink. */
+  --chat-user-accent: #49dbc8;
+  --chat-lens-accent: #ff50c5;
+
+  /* FeatureCard / "Add Card" chrome (Figma 397:3617) — also the ShareSheet */
+  --fcard-bg:     #ffffff;
+  --fcard-bt:     1px solid #400b14;
+  --fcard-br:     4px solid #400b14;
+  --fcard-bb:     2px solid #400b14;
+  --fcard-bl:     4px solid #400b14;
+  --fcard-radius: 32px;
+  --fcard-filter: none;
+  --fcard-inset:  inset 4px 0 0 0 rgba(64,11,20,0.5);
   --focus-ring:         3px solid rgba(255,80,197,0.7);
   --mm-card-bg-selected: #eafaf0;
   --btn-dis-color:      rgba(39,0,7,0.3);
@@ -118,6 +146,10 @@ html[data-theme="kawaii"] {
 
   /* Journal preview-card body text — kawaii keeps its standard body color. */
   --preview-body: var(--text-body);
+
+  /* Journal preview-card footer glyph (share icon / private lock) —
+     Figma 604:7469 / 604:7517 use "Kawaii accent text violet". */
+  --preview-glyph: #7e2091;
 
   /* Lens response card header background (light lavender-pink) */
   --lens-header-bg: #ffe1ff;
@@ -149,4 +181,18 @@ html[data-theme="kawaii"] {
 
 html[data-theme="kawaii"] body {
   background-color: #ffafd6;
+}
+
+/* ---- Surface texture: polka-dot grid -----------------------------------
+   Kawaii's themed background (the counterpart of notepad's ruled paper and
+   cyberpunk's scanlines): soft white dots in a diamond grid over the pink
+   base. Geometric, cute, and low-contrast so content stays the focus. */
+html[data-theme="kawaii"] body {
+  background-color: #ffafd6;
+  background-image:
+    radial-gradient(rgba(255, 255, 255, 0.30) 1.6px, transparent 1.7px),
+    radial-gradient(rgba(255, 255, 255, 0.16) 1.6px, transparent 1.7px);
+  background-size: 26px 26px;
+  background-position: 0 0, 13px 13px;
+  background-attachment: local;
 }

@@ -1,6 +1,6 @@
 // Single icon primitive for the whole app. Renders a Google Material Symbols
-// (Sharp) glyph by name — the ONLY icon source in Minds Shift (no custom SVGs).
-// The Sharp stylesheet is loaded in src/app/layout.tsx. Inherits currentColor.
+// (Rounded) glyph by name — the ONLY icon source in Minds Shift (no custom SVGs).
+// The Rounded stylesheet is loaded in src/app/layout.tsx. Inherits currentColor.
 import type { CSSProperties } from 'react'
 
 type Props = {
@@ -15,11 +15,12 @@ type Props = {
 }
 
 export default function Icon({
-  name, size = 24, fill = 0, weight = 400, grade = 0, className, style, title,
+  // Kate's icon spec (2026-07-09): filled, weight 700, grade 0, 24px, Rounded.
+  name, size = 24, fill = 1, weight = 700, grade = 0, className, style, title,
 }: Props) {
   return (
     <span
-      className={`material-symbols-sharp${className ? ` ${className}` : ''}`}
+      className={`material-symbols-rounded${className ? ` ${className}` : ''}`}
       aria-hidden={title ? undefined : true}
       role={title ? 'img' : undefined}
       aria-label={title}

@@ -77,16 +77,19 @@ html[data-theme="notepad"],
   --input-header-bg:     #f0efe9;
   --input-header-shadow: none;
 
-  /* Secondary button — green underline (top + bottom border only). Paper bg
-     (== page bg) so dropdown rows are solid over content yet blend on-page. */
+  /* Secondary button — blue underline (top + bottom border only). Paper bg
+     (== page bg) so dropdown rows are solid over content yet blend on-page.
+     Cross-theme rule (Kate 2026-07-10, trial): secondary = positive = blue,
+     secondary2 = negative = red — red may flex to neutral when a surface
+     needs more than one non-primary button. Was green (#7d9e7d) before. */
   --btn-secondary-bg:     var(--bg);
   --btn-secondary-shadow: none;
-  --btn-secondary-color:  #7d9e7d;
-  --btn-secondary-bt:     1px solid #7d9e7d;
+  --btn-secondary-color:  #3a6fa8;
+  --btn-secondary-bt:     1px solid #3a6fa8;
   --btn-secondary-bl:     none;
   --btn-secondary-br:     none;
-  --btn-secondary-bb:     1px solid #7d9e7d;
-  --btn-secondary-radius: 0;
+  --btn-secondary-bb:     1px solid #3a6fa8;
+  --btn-secondary-radius: var(--btn-radius);
 
   /* Secondary 2 button — red underline. Paper bg (see secondary note). */
   --btn-secondary2-bg:     var(--bg);
@@ -96,7 +99,7 @@ html[data-theme="notepad"],
   --btn-secondary2-bl:     none;
   --btn-secondary2-br:     none;
   --btn-secondary2-bb:     1px solid #c0605a;
-  --btn-secondary2-radius: 0;
+  --btn-secondary2-radius: var(--btn-radius);
 
   /* Figure avatar */
   --fig-avatar-border: 1.5px solid #3a6fa8;
@@ -116,6 +119,28 @@ html[data-theme="notepad"],
   --btn-shadow:         none;
   --btn-filter:         drop-shadow(2px 3px 0px #1e1e40);
   --btn-letter-spacing: -1px;
+  --btn-subtext-tracking: 0.2px;
+
+  /* Brand logo (Figma 483:2747): aperture ring, center mark, wordmark */
+  --logo-ring:     #3a6fa8;
+  --logo-mark:     #c0605a;
+  --logo-text:     #3a6fa8;
+  --logo-font:     var(--font-display);
+  --logo-tracking: 1.2px;
+
+  /* Chat bubbles: user speaks (blue), lens thinks (red) — Kate 2026-07-10 */
+  --chat-user-accent: #3a6fa8;
+  --chat-lens-accent: #c0605a;
+
+  /* FeatureCard / "Add Card" chrome (Figma 397:3616) — also the ShareSheet */
+  --fcard-bg:     #ffffff;
+  --fcard-bt:     1px solid #c0605a;
+  --fcard-br:     4px solid #c0605a;
+  --fcard-bb:     2px solid #c0605a;
+  --fcard-bl:     4px solid #c0605a;
+  --fcard-radius: 8px;
+  --fcard-filter: drop-shadow(3px 4px 0px #d4cbbf);
+  --fcard-inset:  none;
   --focus-ring:         2px solid #1e1e40;
   --mm-card-bg-selected: #eef3ec;
   --btn-dis-color:      rgba(30,30,64,0.3);
@@ -127,6 +152,10 @@ html[data-theme="notepad"],
 
   /* Journal preview-card body text — notepad keeps its standard body color. */
   --preview-body: var(--text-body);
+
+  /* Journal preview-card footer glyph (share icon / private lock) —
+     Figma 572:5714 / 572:5712 render it in Notepad Blue. */
+  --preview-glyph: var(--cyan);
 
   /* Share-count chip — amber (#7d9e7d) is green here, identical to the lens
      footer. Use a muted ochre that's distinct and paper-appropriate. */
@@ -152,16 +181,14 @@ html[data-theme="notepad"],
   --sw-shadow:       2px 2px 0 rgba(30,30,64,0.6);
 }
 
+/* ---- Surface texture: ruled note sheet ----------------------------------
+   In-app notepad keeps the horizontal rules but NOT the red margin line — a
+   fixed vertical line fights the app's centered layouts. The marketing
+   landing's `.notepad-paper` (globals.css) keeps the full sheet incl. the
+   red margin, where the left-anchored page makes it read right. */
 html[data-theme="notepad"] body {
   background-color: #faf7f2;
   background-image:
-    linear-gradient(to right, transparent 52px, rgba(192,96,90,0.3) 52px, rgba(192,96,90,0.3) 54px, transparent 54px),
     repeating-linear-gradient(to bottom, transparent, transparent 37px, rgba(58,111,168,0.22) 37px, rgba(58,111,168,0.22) 38px);
   background-attachment: local;
-}
-
-/* Disable scanline overlay for non-cyberpunk themes */
-html[data-theme="notepad"] body::before,
-html[data-theme="kawaii"] body::before {
-  display: none;
 }

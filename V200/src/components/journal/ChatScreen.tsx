@@ -10,6 +10,10 @@
 // --text-*) — never the raw --cyan/--pink/--green accent slots, which collapse to
 // one magenta in kawaii (the exact bug this screen was corrected for). So it reads
 // correctly in cyberpunk, kawaii, and notepad.
+//
+// SIGNED-IN ONLY (Kate 2026-07-10): chat has no anonymous mode. The component
+// renders a sign-in gate when Clerk resolves signed-out; the old anon/ephemeral
+// branch (sessionStorage threads) is removed.
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
@@ -17,8 +21,9 @@ import { useUser } from '@clerk/nextjs'
 import { FIGURES, portraitFor } from '@/lib/figures'
 import { useTheme } from '@/lib/theme'
 import Icon from '@/components/ui/Icon'
-import { sendChatTurn, loadAnonThread, saveAnonThread } from '@/lib/chat-client'
-import { CHAT_HARD_CAP, type ChatMessage } from '@/lib/chat-types'
+import { sendChatTurn } from '@/lib/chat-client'
+import type { ChatMessage } from '@/lib/chat-types'
+import Button from '@/components/ui/Button'
 
 const MAX_MSG_CHARS = 800 // matches the vent input cap
 
@@ -57,29 +62,16 @@ export default function ChatScreen({ figureId, sessionId, ventText, seedReply }:
   const scrollRef = useRef<HTMLDivElement>(null)
   const taRef = useRef<HTMLTextAreaElement>(null)
 
-  // Load the follow-up thread: signed-in → persisted history route; anon →
-  // ephemeral sessionStorage. The vent + seed reframe are rendered separately as
-  // the two opening bubbles, so they're never part of `messages`. Wait for Clerk
-  // (isLoaded) so a signed-in user doesn't briefly hit the anon path.
+  // Load the persisted follow-up thread (signed-in only). The vent + seed
+  // reframe are rendered separately as the two opening bubbles, so they're
+  // never part of `messages`.
   useEffect(() => {
-    if (!isLoaded) return
+    if (!isLoaded || !isSignedIn || !sessionId) return
     let cancelled = false
-    const apply = (msgs: ChatMessage[], isLocked: boolean) => {
-      if (cancelled) return
-      setMessages(msgs)
-      setLocked(isLocked)
-    }
-    if (isSignedIn && sessionId) {
-      fetch(`/api/chat-with-lens/history?sessionId=${sessionId}&figureId=${figureId}`)
-        .then(r => (r.ok ? r.json() : { messages: [], locked: false }))
-        .then(d => apply(d.messages ?? [], !!d.locked))
-        .catch(() => apply([], false))
-    } else {
-      // Anon locks only at the hard cap too — a soft close keeps the input alive.
-      const anon = loadAnonThread(figureId)
-      const anonUserTurns = anon.filter(m => m.role === 'user').length
-      Promise.resolve().then(() => apply(anon, anonUserTurns >= CHAT_HARD_CAP))
-    }
+    fetch(`/api/chat-with-lens/history?sessionId=${sessionId}&figureId=${figureId}`)
+      .then(r => (r.ok ? r.json() : { messages: [], locked: false }))
+      .then(d => { if (!cancelled) { setMessages(d.messages ?? []); setLocked(!!d.locked) } })
+      .catch(() => { if (!cancelled) { setMessages([]); setLocked(false) } })
     return () => { cancelled = true }
   }, [isLoaded, isSignedIn, sessionId, figureId])
 
@@ -119,11 +111,7 @@ export default function ChatScreen({ figureId, sessionId, ventText, seedReply }:
         sessionId, figureId, ventText, seedReply, userMessage: text, history,
       })
       const lensMsg: ChatMessage = { role: 'lens', content: reply, turn_index: messages.length + 1, done }
-      setMessages(prev => {
-        const next = [...prev, lensMsg]
-        if (!isSignedIn) saveAnonThread(figureId, next)
-        return next
-      })
+      setMessages(prev => [...prev, lensMsg])
       // A soft close (`done`) is a resting point — the composer stays. Only the
       // hard cap (`capped`) locks the thread.
       if (capped) setLocked(true)
@@ -152,39 +140,15 @@ export default function ChatScreen({ figureId, sessionId, ventText, seedReply }:
     whiteSpace: 'pre-wrap' as const, wordBreak: 'break-word' as const,
   }
 
-  // The OPENING pair — the original vent + the seed reframe — keep the plain,
-  // tailless bubble they've always had. Outgoing = secondary surface; incoming =
-  // card surface. Structural tokens only (theme-safe).
-  const bubble = (m: ChatMessage, key: string | number) => {
-    const mine = m.role === 'user'
-    return (
-      <div key={key} style={{
-        display: 'flex', gap: 8, alignItems: 'flex-end',
-        flexDirection: mine ? 'row-reverse' : 'row',
-      }}>
-        {!mine && avatar(30)}
-        <div style={{
-          maxWidth: '76%',
-          background: mine ? 'var(--btn-secondary-bg)' : 'var(--card-bg)',
-          border: '1px solid var(--input-divider)',
-          borderRadius: 'var(--input-radius)',
-          padding: '10px 14px',
-          ...bubbleText,
-        }}>
-          {m.content}
-        </div>
-      </div>
-    )
-  }
-
-  // FOLLOW-UP turns get a voice: the user "speaks" (a speech bubble with a tail),
-  // the lens is "just a thought" (a thought bubble with trailing clouds) — cuter,
-  // and it reads as the person talking while the lens's reply is ephemeral,
-  // fleeting. The tail vs. trailing-dots is the differentiator so it stays on the
-  // same --input-radius across all three themes (kawaii's 32px stays round).
+  // EVERY turn has a voice (Kate 2026-07-10) — including the opening vent + seed:
+  // the user "speaks" (speech bubble with a tail, outlined in the theme's blue,
+  // --chat-user-accent), the lens "thinks" (thought bubble with trailing clouds,
+  // outlined in the theme's red, --chat-lens-accent). The accents are dedicated
+  // tokens because raw --cyan/--pink collapse to one magenta in kawaii.
   const chatBubble = (m: ChatMessage, key: string | number) => {
     const mine = m.role === 'user'
     const surface = mine ? 'var(--btn-secondary-bg)' : 'var(--card-bg)'
+    const accent = mine ? 'var(--chat-user-accent)' : 'var(--chat-lens-accent)'
     return (
       <div key={key} style={{
         display: 'flex', gap: 8, alignItems: 'flex-end',
@@ -197,7 +161,7 @@ export default function ChatScreen({ figureId, sessionId, ventText, seedReply }:
           position: 'relative',
           maxWidth: '76%',
           background: surface,
-          border: '1px solid var(--input-divider)',
+          border: `1.5px solid ${accent}`,
           borderRadius: 'var(--input-radius)',
           padding: '10px 14px',
           ...bubbleText,
@@ -206,24 +170,24 @@ export default function ChatScreen({ figureId, sessionId, ventText, seedReply }:
           {mine ? (
             // Speech tail — a small pointer off the bottom-right (the speaker's side).
             <span style={{
-              position: 'absolute', right: 12, bottom: -5, width: 11, height: 11,
+              position: 'absolute', right: 12, bottom: -6, width: 11, height: 11,
               background: surface,
-              borderRight: '1px solid var(--input-divider)',
-              borderBottom: '1px solid var(--input-divider)',
+              borderRight: `1.5px solid ${accent}`,
+              borderBottom: `1.5px solid ${accent}`,
               transform: 'rotate(45deg)', borderBottomRightRadius: 2,
             }} />
           ) : (
             // Thought trail — two shrinking clouds drifting toward the avatar.
             <>
               <span style={{
-                position: 'absolute', left: 12, bottom: -7, width: 9, height: 9,
+                position: 'absolute', left: 12, bottom: -8, width: 9, height: 9,
                 borderRadius: '50%', background: surface,
-                border: '1px solid var(--input-divider)',
+                border: `1.5px solid ${accent}`,
               }} />
               <span style={{
-                position: 'absolute', left: 4, bottom: -15, width: 5, height: 5,
+                position: 'absolute', left: 4, bottom: -16, width: 5, height: 5,
                 borderRadius: '50%', background: surface,
-                border: '1px solid var(--input-divider)',
+                border: `1.5px solid ${accent}`,
               }} />
             </>
           )}
@@ -276,6 +240,22 @@ export default function ChatScreen({ figureId, sessionId, ventText, seedReply }:
 
   if (!fig) return null
 
+  // Signed-in only: once Clerk resolves signed-out, show the gate instead of the
+  // thread. (While Clerk loads we render the frame — no flash of the gate.)
+  if (isLoaded && !isSignedIn) {
+    return (
+      <div className="flex flex-col items-center justify-center" style={{ height: '100dvh', gap: 16, padding: 24 }}>
+        <p style={{
+          fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '20px',
+          color: 'var(--text-body)', textAlign: 'center', maxWidth: 320, margin: 0,
+        }}>
+          Chatting with a lens is part of your journal — sign in to continue the conversation.
+        </p>
+        <Button variant="primary" onClick={() => router.push('/sign-in')}>Sign in</Button>
+      </div>
+    )
+  }
+
   const lastMsg = messages[messages.length - 1]
   // "Resting" = the lens has offered a closing thought and we're not capped. The
   // input stays; we just soften the placeholder and pin the wind-down strip above it.
@@ -289,9 +269,12 @@ export default function ChatScreen({ figureId, sessionId, ventText, seedReply }:
   const centered = { width: '100%', maxWidth: 900, marginLeft: 'auto', marginRight: 'auto' } as const
 
   return (
-    <div className="flex flex-col" style={{ height: '100dvh', background: 'var(--bg)' }}>
-      {/* Header bar: full-bleed bottom border; content centered in the column. */}
-      <div style={{ flexShrink: 0, borderBottom: '1px solid var(--input-divider)' }}>
+    // No root fill — the theme's body texture (paper rules / scanlines / dots)
+    // shows through the message area. Header + footer carry their own opaque
+    // full-bleed fills (Kate 2026-07-10).
+    <div className="flex flex-col" style={{ height: '100dvh' }}>
+      {/* Header bar: full-bleed card fill; content centered in the column. */}
+      <div style={{ flexShrink: 0, background: 'var(--card-bg)', borderBottom: '1px solid var(--input-divider)' }}>
         <div style={{
           ...centered, display: 'flex', alignItems: 'center', gap: 10,
           padding: '12px 16px',
@@ -324,8 +307,8 @@ export default function ChatScreen({ figureId, sessionId, ventText, seedReply }:
         <div style={{
           ...centered, display: 'flex', flexDirection: 'column', gap: 12, padding: 16,
         }}>
-          {bubble({ role: 'user', content: ventText, turn_index: -2 }, 'vent')}
-          {bubble({ role: 'lens', content: seedReply, turn_index: -1 }, 'seed')}
+          {chatBubble({ role: 'user', content: ventText, turn_index: -2 }, 'vent')}
+          {chatBubble({ role: 'lens', content: seedReply, turn_index: -1 }, 'seed')}
           {messages.map((m, i) => chatBubble(m, m.id ?? i))}
           {pending && typingDots}
           {error && (
@@ -340,7 +323,7 @@ export default function ChatScreen({ figureId, sessionId, ventText, seedReply }:
       {/* Locked footer (hard cap only) OR the always-available composer. A soft
           close never lands here — it keeps the composer and adds the resting rail. */}
       {locked ? (
-        <div style={{ flexShrink: 0, borderTop: '1px solid var(--input-divider)' }}>
+        <div style={{ flexShrink: 0, background: 'var(--card-bg)', borderTop: '1px solid var(--input-divider)' }}>
           <div style={{
             ...centered, padding: 16,
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10,
@@ -365,15 +348,16 @@ export default function ChatScreen({ figureId, sessionId, ventText, seedReply }:
           </div>
         </div>
       ) : (
-        <div style={{ flexShrink: 0, borderTop: '1px solid var(--input-divider)' }}>
+        <div style={{ flexShrink: 0, background: 'var(--card-bg)', borderTop: '1px solid var(--input-divider)' }}>
           <div style={{
             ...centered, display: 'flex', flexDirection: 'column', gap: 8,
-            padding: '12px 16px',
+            padding: '12px 16px', alignItems: 'center',
           }}>
           {/* Sticky resting strip: one wind-down marker pinned above the input
               once the lens has offered its closing thought. Never repeats. */}
           {resting && softCloseDivider('resting-sticky', restingPrompt)}
-          <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
+          {/* Composer group — centered both axes inside the filled footer. */}
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center', width: '100%', maxWidth: 640 }}>
             <textarea
               ref={taRef}
               value={draft}

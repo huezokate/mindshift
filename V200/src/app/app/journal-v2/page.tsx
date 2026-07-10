@@ -70,7 +70,7 @@ export default async function JournalV2Page() {
   const initialEntries = initialHasMore ? normalized.slice(0, PAGE_SIZE) : normalized
 
   return (
-    <div className="min-h-dvh flex flex-col items-center" style={{ background: 'var(--bg)' }}>
+    <div className="min-h-dvh flex flex-col items-center">
       <div className="flex flex-col gap-4 w-full" style={{ maxWidth: 440, padding: '16px 20px 40px' }}>
         <JournalV2Client
           initialEntries={initialEntries}

@@ -4,12 +4,10 @@
 // Socrates → … → Lenin → Socrates). Presentational: the parent owns what Select
 // and Back do (vent flow routes to /app/response; the journal adds a lens to the
 // open entry and Back returns to it). Kate, 23 June — "it's solid for now."
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FIGURES, getFigureImg } from '@/lib/figures'
 import { useTheme } from '@/lib/theme'
-import Icon from '@/components/ui/Icon'
-import CircularArrow from '@/components/ui/CircularArrow'
 import Button from '@/components/ui/Button'
 
 type Props = {
@@ -29,9 +27,15 @@ export default function LensPickerSheet({
 }: Props) {
   const { theme } = useTheme()
   const [index, setIndex] = useState(startIndex)
+  const [prevOpen, setPrevOpen] = useState(open)
 
-  // Reset to the requested start figure each time the sheet opens.
-  useEffect(() => { if (open) setIndex(startIndex) }, [open, startIndex])
+  // Reset to the requested start figure each time the sheet opens. Done during
+  // render (not in an effect) so React reconciles before paint — no cascade, no
+  // flash of the previous figure.
+  if (open !== prevOpen) {
+    setPrevOpen(open)
+    if (open) setIndex(startIndex)
+  }
 
   const fig = FIGURES[index]
   const prev = () => setIndex(i => (i - 1 + FIGURES.length) % FIGURES.length)
@@ -71,9 +75,9 @@ export default function LensPickerSheet({
                 boxShadow: 'var(--card-shadow)',
               }}
             >
-              {/* Portrait + in-popup nav arrows (shared CircularArrow) */}
+              {/* Portrait + in-popup nav arrows (icon-only design-system Button) */}
               <div className="flex items-center justify-between w-full">
-                <CircularArrow direction="prev" ariaLabel="Previous figure" onClick={e => { e.stopPropagation(); prev() }} />
+                <Button variant="secondary" icon="chevron_left" ariaLabel="Previous figure" onClick={e => { e.stopPropagation(); prev() }} />
                 <div
                   className="overflow-hidden flex-shrink-0"
                   style={{
@@ -85,21 +89,39 @@ export default function LensPickerSheet({
                 >
                   <img src={getFigureImg(fig, theme)} alt={fig.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%', display: 'block' }} />
                 </div>
-                <CircularArrow direction="next" ariaLabel="Next figure" onClick={e => { e.stopPropagation(); next() }} />
+                <Button variant="secondary" icon="chevron_right" ariaLabel="Next figure" onClick={e => { e.stopPropagation(); next() }} />
               </div>
 
-              <p className="uppercase text-center" style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 18, letterSpacing: 1.5, lineHeight: '22px', color: 'var(--violet)' }}>
-                {fig.name}
-              </p>
-              <p className="text-center uppercase" style={{ fontFamily: 'var(--font-body)', fontSize: 10, letterSpacing: 1, color: 'var(--text-sub)', marginTop: -8 }}>
-                {fig.era}
-              </p>
-              <p className="text-center" style={{ fontFamily: 'var(--font-body)', fontSize: 13, lineHeight: '20px', color: 'var(--text-body)', fontStyle: 'italic' }}>
-                &ldquo;{fig.quote}&rdquo;
-              </p>
-              <p className="text-center" style={{ fontFamily: 'var(--font-body)', fontSize: 13, lineHeight: '20px', color: 'var(--text-body)' }}>
-                {fig.bio}
-              </p>
+              {/* Fixed-height text area (Kate 2026-07-10): every figure's text
+                  block renders in the SAME grid cell — inactive ones invisible —
+                  so the area is always as tall as the LONGEST lens and the card,
+                  arrows, and bottom buttons never move between figures. */}
+              <div style={{ display: 'grid', width: '100%' }}>
+                {FIGURES.map(f => (
+                  <div
+                    key={f.id}
+                    aria-hidden={f.id !== fig.id}
+                    style={{
+                      gridArea: '1 / 1',
+                      visibility: f.id === fig.id ? 'visible' : 'hidden',
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+                    }}
+                  >
+                    <p className="uppercase text-center" style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 18, letterSpacing: 1.5, lineHeight: '22px', color: 'var(--violet)', margin: 0 }}>
+                      {f.name}
+                    </p>
+                    <p className="text-center uppercase" style={{ fontFamily: 'var(--font-body)', fontSize: 10, letterSpacing: 1, color: 'var(--text-sub)', margin: 0 }}>
+                      {f.era}
+                    </p>
+                    <p className="text-center" style={{ fontFamily: 'var(--font-body)', fontSize: 13, lineHeight: '20px', color: 'var(--text-body)', fontStyle: 'italic', margin: '4px 0 0' }}>
+                      &ldquo;{f.quote}&rdquo;
+                    </p>
+                    <p className="text-center" style={{ fontFamily: 'var(--font-body)', fontSize: 13, lineHeight: '20px', color: 'var(--text-body)', margin: 0 }}>
+                      {f.bio}
+                    </p>
+                  </div>
+                ))}
+              </div>
 
               {error && (
                 <p className="text-center" style={{ fontFamily: 'var(--font-body)', fontSize: 12, lineHeight: '16px', color: 'var(--pink)', margin: 0 }}>
@@ -107,32 +129,19 @@ export default function LensPickerSheet({
                 </p>
               )}
 
+              {/* Back = secondary2 (red), Select = secondary (blue) — the
+                  positive/negative button rule (Kate 2026-07-10). */}
               <div className="flex gap-3 w-full" style={{ marginTop: 4 }}>
-                <button
-                  onClick={onBack}
-                  className="flex-1 uppercase flex items-center justify-center"
-                  style={{
-                    fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 13,
-                    letterSpacing: 'var(--btn-letter-spacing, 2px)', gap: 6,
-                    color: 'var(--btn-secondary-color, var(--text-body))',
-                    background: 'var(--btn-secondary-bg)',
-                    borderTop: 'var(--btn-bt)', borderLeft: 'var(--btn-bl)',
-                    borderRight: 'var(--btn-br)', borderBottom: 'var(--btn-bb)',
-                    borderRadius: 'var(--btn-radius)', padding: '12px 8px',
-                    boxShadow: 'var(--btn-secondary-shadow)', cursor: 'pointer',
-                  }}
-                >
-                  <Icon name="arrow_back" size={16} />
-                  Back
-                </button>
-                <Button
-                  variant="primary"
-                  disabled={loading}
-                  onClick={() => onSelect(fig.id)}
-                  style={{ flex: 1, fontSize: 13, letterSpacing: 'var(--btn-letter-spacing, 2px)', padding: '12px 8px' }}
-                >
-                  {loading ? 'Loading…' : selectLabel}
-                </Button>
+                <div style={{ flex: 1 }}>
+                  <Button variant="secondary2" icon="arrow_back" iconSize={16} fullWidth onClick={onBack}>
+                    Back
+                  </Button>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <Button variant="secondary" disabled={loading} fullWidth onClick={() => onSelect(fig.id)}>
+                    {loading ? 'Loading…' : selectLabel}
+                  </Button>
+                </div>
               </div>
             </motion.div>
           </AnimatePresence>

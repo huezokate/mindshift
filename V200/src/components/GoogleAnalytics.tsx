@@ -13,6 +13,9 @@ export function GoogleAnalytics() {
   const [enabled, setEnabled] = useState(false)
 
   useEffect(() => {
+    // hydration-safe: defer client-only window.location read past first paint
+    // (enabled starts false, so SSR + first client render agree, then patch).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setEnabled(!window.location.hostname.startsWith('app.'))
   }, [])
 

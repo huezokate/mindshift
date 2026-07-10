@@ -82,24 +82,28 @@
 
   /* Secondary button — pink. Opaque bg (== page bg) so the button is solid over
      overlay content (e.g. the account dropdown, Figma 626:9135) yet blends on-page. */
+  /* Cross-theme rule (Kate 2026-07-10, per the original Figma logic):
+     secondary = positive-ish = the theme's blue (cyan here);
+     secondary2 = negative-ish = the theme's red (pink here). Slots were
+     swapped before — this aligns cyberpunk with notepad/kawaii. */
   --btn-secondary-bg:     var(--bg);
   --btn-secondary-shadow: none;
-  --btn-secondary-color:  var(--pink);
-  --btn-secondary-bt:     1px solid var(--pink);
-  --btn-secondary-bl:     1px solid var(--pink);
-  --btn-secondary-br:     2px solid var(--pink);
-  --btn-secondary-bb:     2px solid var(--pink);
-  --btn-secondary-radius: 2px;
+  --btn-secondary-color:  var(--cyan);
+  --btn-secondary-bt:     1px solid var(--cyan);
+  --btn-secondary-bl:     1px solid var(--cyan);
+  --btn-secondary-br:     2px solid var(--cyan);
+  --btn-secondary-bb:     2px solid var(--cyan);
+  --btn-secondary-radius: var(--btn-radius);
 
-  /* Secondary 2 button — cyan. Opaque bg (see secondary note). */
+  /* Secondary 2 button — pink/red (negative-ish). Opaque bg (see secondary note). */
   --btn-secondary2-bg:     var(--bg);
   --btn-secondary2-shadow: none;
-  --btn-secondary2-color:  var(--cyan);
-  --btn-secondary2-bt:     1px solid var(--cyan);
-  --btn-secondary2-bl:     1px solid var(--cyan);
-  --btn-secondary2-br:     2px solid var(--cyan);
-  --btn-secondary2-bb:     2px solid var(--cyan);
-  --btn-secondary2-radius: 2px;
+  --btn-secondary2-color:  var(--pink);
+  --btn-secondary2-bt:     1px solid var(--pink);
+  --btn-secondary2-bl:     1px solid var(--pink);
+  --btn-secondary2-br:     2px solid var(--pink);
+  --btn-secondary2-bb:     2px solid var(--pink);
+  --btn-secondary2-radius: var(--btn-radius);
 
   /* Figure avatar */
   --fig-avatar-border: 2px solid var(--green);
@@ -121,6 +125,28 @@
   --btn-shadow: 0 0 12px rgba(57,255,20,0.2);
   --btn-filter: none;
   --btn-letter-spacing: 3px;
+  --btn-subtext-tracking: 1px;
+
+  /* Brand logo (Figma 483:2747): aperture ring, center mark, wordmark */
+  --logo-ring:     var(--green);
+  --logo-mark:     var(--pink);
+  --logo-text:     var(--green);
+  --logo-font:     var(--font-mono);
+  --logo-tracking: 1.44px;
+
+  /* Chat bubbles: user speaks (blue), lens thinks (red) — Kate 2026-07-10 */
+  --chat-user-accent: var(--cyan);
+  --chat-lens-accent: var(--pink);
+
+  /* FeatureCard / "Add Card" chrome (Figma 397:3615) — also the ShareSheet */
+  --fcard-bg:     #0d0d1a;
+  --fcard-bt:     1px solid #ff2d78;
+  --fcard-br:     4px solid #ff2d78;
+  --fcard-bb:     2px solid #ff2d78;
+  --fcard-bl:     4px solid #ff2d78;
+  --fcard-radius: 4px;
+  --fcard-filter: none;
+  --fcard-inset:  none;
   --focus-ring: 2px solid #00F5FF;
   --mm-card-bg-selected: rgba(57,255,20,0.12);
   --btn-dis-color: rgba(255,255,255,0.2);
@@ -138,6 +164,10 @@
   /* Share-count chip — distinct from the green lens footer. Warm amber reads
      legibly on the dark cyberpunk surface. */
   --share-accent: var(--amber);
+
+  /* Journal preview-card footer glyph (share icon / private lock) —
+     Figma 604:7283 / 604:7618 render it in C Blue. */
+  --preview-glyph: var(--cyan);
 
   /* Portrait treatment — none in cyberpunk (neon portraits are native here). */
   --portrait-filter: none;
@@ -191,4 +221,23 @@
   --node-finances-border:  var(--green);
   --node-living-bg:        rgba(176,76,255,0.12);
   --node-living-border:    var(--violet);
+}
+
+/* ---- Surface texture: CRT scanlines ------------------------------------
+   Cyberpunk's themed background, mirroring notepad's ruled paper: faint
+   horizontal monitor lines over the dark base. Kept at ~3% alpha so it reads
+   as texture, never competes with content. The :not([data-theme]) arm covers
+   first visits before any theme attribute is set (cyberpunk is the default
+   skin). background-attachment: local so the lines scroll with content. */
+html[data-theme="cyberpunk"] body,
+html:not([data-theme]) body {
+  background-color: #080810;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(140, 246, 255, 0.03) 0px,
+    rgba(140, 246, 255, 0.03) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  background-attachment: local;
 }

@@ -2,19 +2,18 @@
 // App-wide top nav (Figma header + dropdown 624:8265 "drop down menu work in
 // progress"). Bar: [brand lens icon] · MINDS SHIFT · [account button → dropdown].
 // Dropdown rows are the design-system Button (Figma "Buttons" component), one
-// variant per section, matched to the canonical per-theme frames:
-//   • Profile / Log out → primary  (cyber green / kawaii amber / notepad white+dropshadow)
-//   • Journal           → journal  (pink/red everywhere)
-//   • Mind Map          → mindmap  (cyber cyan / kawaii mint / notepad green)
-// `journal`/`mindmap` are semantic variants that resolve to the right --btn-*
-// family per theme (the accent slots are swapped cyber↔kawaii/notepad), so no
-// hardcoded hex anywhere — driven entirely by the structural token families.
+// of the three structural variants per section — the active theme colors them
+// natively (per Kate 2026-07-09: journal/mindmap just use the 3 button types):
+//   • Profile / Log out → primary
+//   • Journal           → secondary
+//   • Mind Map          → secondary2
+// No hardcoded hex anywhere — driven entirely by the structural token families.
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useUser, useClerk } from '@clerk/nextjs'
 import { useTheme } from '@/lib/theme'
 import Icon from '@/components/ui/Icon'
-import Button, { type ButtonVariant, type ThemeName } from '@/components/ui/Button'
+import Button, { type ButtonVariant } from '@/components/ui/Button'
 
 type Props = {
   entryCount?: number
@@ -24,16 +23,15 @@ type Props = {
 }
 
 // One dropdown row = the design-system Button, full-width, role="menuitem".
-// `variant` carries the per-section colour treatment (see header comment); the
-// semantic journal/mindmap variants need `theme` to resolve to the right family.
+// `variant` carries the per-section colour treatment (see header comment).
 function Row({
-  variant, theme, onClick, children, tall = false,
+  variant, onClick, children,
 }: {
-  variant: ButtonVariant; theme: ThemeName; onClick?: () => void
-  children: React.ReactNode; tall?: boolean
+  variant: ButtonVariant; onClick?: () => void
+  children: React.ReactNode
 }) {
   return (
-    <Button variant={variant} theme={theme} onClick={onClick} tall={tall} fullWidth role="menuitem">
+    <Button variant={variant} onClick={onClick} fullWidth role="menuitem">
       {children}
     </Button>
   )
@@ -68,7 +66,7 @@ export default function AppHeader({
   // on onboarding / response / lens etc. Props always win when provided.
   useEffect(() => {
     if (entryCount != null && lensCount != null) return
-    if (!isSignedIn) { setFetchedCounts(null); return }
+    if (!isSignedIn) return
     let alive = true
     fetch('/api/journal-v2/counts')
       .then(r => (r.ok ? r.json() : null))
@@ -77,8 +75,11 @@ export default function AppHeader({
     return () => { alive = false }
   }, [isSignedIn, entryCount, lensCount])
 
-  const shownEntries = entryCount ?? fetchedCounts?.entries ?? 0
-  const shownLenses = lensCount ?? fetchedCounts?.lenses ?? 0
+  // Derive display counts. Gate the self-fetched fallback on isSignedIn so a
+  // previous session's counts are never shown after sign-out (replaces the old
+  // synchronous setFetchedCounts(null) reset that lived in the effect above).
+  const shownEntries = entryCount ?? (isSignedIn ? fetchedCounts?.entries ?? 0 : 0)
+  const shownLenses = lensCount ?? (isSignedIn ? fetchedCounts?.lenses ?? 0 : 0)
 
   // Anon has no account-bound surfaces (journal, profile, mind map all persist
   // per user_id), so every account-menu destination funnels anon users to
@@ -187,20 +188,20 @@ export default function AppHeader({
           }}
         >
           {/* Profile — primary variant, 72px tall (Figma 624:7909) */}
-          <Row variant="primary" theme={theme} tall onClick={() => goOrSignIn('/app/profile', 'profile')}>
+          <Row variant="primary" onClick={() => goOrSignIn('/app/profile', 'profile')}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
               <span style={LABEL}>Profile</span>
               {username && <span style={META}>{username}</span>}
             </div>
           </Row>
 
-          {/* Journal — journal variant (pink/red in every theme) */}
+          {/* Journal — secondary variant (theme-native accent) */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Row variant="journal" theme={theme} tall onClick={goJournal}>
+            <Row variant="secondary" onClick={goJournal}>
               <span style={LABEL}>Journal</span>
             </Row>
             {isSignedIn ? (
-              <Row variant="journal" theme={theme} onClick={goJournal}>
+              <Row variant="secondary" onClick={goJournal}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
                   <Icon name="article" size={20} />
                   <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1 }}>
@@ -210,13 +211,13 @@ export default function AppHeader({
                 </span>
               </Row>
             ) : (
-              <Row variant="journal" theme={theme} onClick={goJournal}>
+              <Row variant="secondary" onClick={goJournal}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
                   <Icon name="login" size={20} /><span style={LABEL}>Sign in to save</span>
                 </span>
               </Row>
             )}
-            <Row variant="journal" theme={theme} onClick={() => router.push('/app/onboarding')}>
+            <Row variant="secondary" onClick={() => router.push('/app/onboarding')}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
                 <Icon name="add" size={20} /><span style={LABEL}>New</span>
               </span>
@@ -226,10 +227,10 @@ export default function AppHeader({
           {/* Mind Map — mindmap variant (cyber cyan / kawaii mint / notepad green).
               Anon → sign-in (account-bound, like Journal). */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Row variant="mindmap" theme={theme} tall onClick={() => goOrSignIn('/app/mindmap', 'mindmap')}>
+            <Row variant="secondary2" onClick={() => goOrSignIn('/app/mindmap', 'mindmap')}>
               <span style={LABEL}>Mind Map</span>
             </Row>
-            <Row variant="mindmap" theme={theme} onClick={() => goOrSignIn('/app/mindmap', 'mindmap')}>
+            <Row variant="secondary2" onClick={() => goOrSignIn('/app/mindmap', 'mindmap')}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
                 <Icon name="tab_group" size={20} />
                 <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1 }}>
@@ -238,7 +239,7 @@ export default function AppHeader({
                 </span>
               </span>
             </Row>
-            <Row variant="mindmap" theme={theme} onClick={() => goOrSignIn('/app/mindmap/new', 'mindmap')}>
+            <Row variant="secondary2" onClick={() => goOrSignIn('/app/mindmap/new', 'mindmap')}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
                 <Icon name="add" size={20} /><span style={LABEL}>New</span>
               </span>
@@ -247,11 +248,11 @@ export default function AppHeader({
 
           {/* Log out (signed-in) / Sign in (anon) — primary variant (Figma 624:7938) */}
           {isSignedIn ? (
-            <Row variant="primary" theme={theme} onClick={() => signOut({ redirectUrl: '/' })}>
+            <Row variant="primary" onClick={() => signOut({ redirectUrl: '/' })}>
               <span style={LABEL}>Log out</span>
             </Row>
           ) : (
-            <Row variant="primary" theme={theme} onClick={() => router.push('/sign-in')}>
+            <Row variant="primary" onClick={() => router.push('/sign-in')}>
               <span style={LABEL}>Sign in</span>
             </Row>
           )}

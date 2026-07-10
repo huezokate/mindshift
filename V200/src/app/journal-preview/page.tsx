@@ -249,7 +249,7 @@ export default function JournalPreviewPage() {
 
         {/* App nav bar + personalized sub-label — QA uses the "Kate" sample. */}
         <AppHeader entryCount={10} lensCount={18} mindmapHorizon="5 year" mindmapProgress="41% progress" />
-        <JournalHeader firstName="Kate" />
+        <JournalHeader name="Kate" />
 
         {showWelcome ? (
           <div style={{ marginTop: 16 }}>

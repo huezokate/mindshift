@@ -67,7 +67,7 @@ export default async function JournalEntryDetailPage(
   }
 
   return (
-    <div className="min-h-dvh flex flex-col items-center" style={{ background: 'var(--bg)' }}>
+    <div className="min-h-dvh flex flex-col items-center">
       <div className="w-full" style={{ maxWidth: 440 }}>
         <EntryDetail entry={entry} />
       </div>

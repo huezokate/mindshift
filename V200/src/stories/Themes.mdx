@@ -1,0 +1,25 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+import TokenBoard from './TokenBoard'
+
+<Meta title="Themes/Tokens" />
+
+# Themes / Tokens
+
+The canonical **consistency baseline** for the design system: the raw tokens —
+colors, typography, buttons, and radii — for all three themes (Cyberpunk, Kawaii,
+Notepad) shown side by side in one view. Read it as the answer to _"does the system
+hang together?"_ — obvious cross-theme inconsistencies should be visible at a glance.
+
+Every value below is read **live from the CSS custom properties** in
+`tokens.css` / `tokens-kawaii.css` / `tokens-notepad.css`, never hardcoded — so this
+page cannot drift from the token files. It works around the fact that theme skins are
+scoped to `html[data-theme="…"]` (a wrapper `<div>` can't re-theme) by briefly probing
+each theme on mount and capturing its **resolved** values, which are then injected into
+each column. The buttons are the real design-system `<Button>` rendered against those
+injected tokens, so each column shows its own theme's treatment.
+
+Colors are shown as their resolved value (hex where convertible); radii/fonts as their
+computed `px` / family string. The global Theme toolbar does not affect this page — all
+three themes are always shown at once.
+
+<TokenBoard />
