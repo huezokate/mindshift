@@ -137,6 +137,16 @@
   /* Chat bubbles: user speaks (blue), lens thinks (red) — Kate 2026-07-10 */
   --chat-user-accent: var(--cyan);
   --chat-lens-accent: var(--pink);
+
+  /* FeatureCard / "Add Card" chrome (Figma 397:3615) — also the ShareSheet */
+  --fcard-bg:     #0d0d1a;
+  --fcard-bt:     1px solid #ff2d78;
+  --fcard-br:     4px solid #ff2d78;
+  --fcard-bb:     2px solid #ff2d78;
+  --fcard-bl:     4px solid #ff2d78;
+  --fcard-radius: 4px;
+  --fcard-filter: none;
+  --fcard-inset:  none;
   --focus-ring: 2px solid #00F5FF;
   --mm-card-bg-selected: rgba(57,255,20,0.12);
   --btn-dis-color: rgba(255,255,255,0.2);

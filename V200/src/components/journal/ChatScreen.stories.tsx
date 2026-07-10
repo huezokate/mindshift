@@ -11,6 +11,9 @@ import { DEMO_FIGURE_ID } from '@/components/__fixtures__/journal'
 const meta: Meta<typeof ChatScreen> = {
   title: 'Journal/ChatScreen',
   component: ChatScreen,
+  // Chat is the ONE page that ignores page side margins — header/footer fill
+  // the screen edge-to-edge (Kate 2026-07-10), so the canvas must not pad.
+  parameters: { layout: 'fullscreen' },
   args: {
     figureId: DEMO_FIGURE_ID,
     ventText:

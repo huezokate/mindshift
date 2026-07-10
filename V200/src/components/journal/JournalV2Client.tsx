@@ -1,13 +1,13 @@
 'use client'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import JournalPreviewCard from './JournalPreviewCard'
 import JournalHeader from './JournalHeader'
 import LensPickerSheet from './LensPickerSheet'
 import AppHeader from '@/components/nav/AppHeader'
-import Icon from '@/components/ui/Icon'
+import Button from '@/components/ui/Button'
 import { useTheme } from '@/lib/theme'
 import { applyLensToEntry } from '@/lib/add-lens'
-import Link from 'next/link'
 import WelcomeCard from './WelcomeCard'
 import type { JournalEntry, JournalFilter } from '@/lib/journal-types'
 
@@ -57,6 +57,7 @@ function TabBtn({ value, label, current, onSelect }: TabBtnProps) {
 
 export default function JournalV2Client({ initialEntries, initialHasMore, firstName }: Props) {
   const { theme } = useTheme()
+  const router = useRouter()
   const isCyberpunk = theme === 'cyberpunk'
   const isKawaii = theme === 'kawaii'
   const [entries, setEntries] = useState<JournalEntry[]>(initialEntries)
@@ -174,6 +175,14 @@ export default function JournalV2Client({ initialEntries, initialHasMore, firstN
         <TabBtn value="favorites" label="Favorites" current={filter} onSelect={handleSelectFilter} />
       </div>
 
+      {/* "Vent it out" — THE primary CTA (Kate 2026-07-10): the way to add a
+          vent from inside the journal without rerunning the entry flow. Lives
+          up here under the tabs, NOT the screen footer (the account menu
+          already carries "New" down there). */}
+      <Button variant="primary" icon="add" fullWidth onClick={() => router.push('/app/onboarding')}>
+        Vent it out
+      </Button>
+
       {entries.length === 0 && !loading && (
         filter === 'favorites' ? (
           <div className="flex flex-col items-center gap-4 text-center" style={{ paddingTop: 24 }}>
@@ -200,62 +209,6 @@ export default function JournalV2Client({ initialEntries, initialHasMore, firstN
             />
           ))}
         </div>
-      )}
-
-      {/* "Vent it out" — primary CTA to start a new entry (Figma 606:7872).
-          Composite: an "add" Button-Primary (open-bottom, w-120) raised on a green
-          rule so it reads as breaking through the line, with a "Vent it out" label
-          bar below. Whole composite is one Link → /app/onboarding. Token-driven so
-          all three themes follow; notepad gets its offset drop-shadow via filter. */}
-      {entries.length > 0 && (
-        <Link
-          href="/app/onboarding"
-          aria-label="Vent it out — start a new entry"
-          style={{
-            display: 'flex', flexDirection: 'column', alignItems: 'center',
-            width: '100%', marginTop: 8, textDecoration: 'none',
-          }}
-        >
-          {/* icon button raised on a rule (Figma 606:7864) */}
-          <div style={{
-            display: 'flex', alignItems: 'flex-end', width: '100%', isolation: 'isolate',
-          }}>
-            <span aria-hidden style={{
-              flex: 1, height: 4, minWidth: 1, marginRight: -4,
-              background: 'var(--green)', position: 'relative', zIndex: 3,
-            }} />
-            <div style={{
-              width: 120, marginRight: -4, position: 'relative', zIndex: 2,
-              background: 'var(--bg)',
-              borderTop: '4px solid var(--green)', borderLeft: '4px solid var(--green)',
-              borderRight: '1px solid var(--green)', // open bottom — meets the label bar
-              borderRadius: 2, color: 'var(--green)',
-              display: 'flex', flexDirection: 'column',
-              alignItems: 'center', justifyContent: 'flex-end',
-              padding: '8px 9px 0 12px',
-              filter: isCyberpunk || isKawaii ? 'none' : 'var(--card-filter)',
-            }}>
-              <Icon name="add" size={24} />
-            </div>
-            <span aria-hidden style={{
-              flex: 1, height: 1, minWidth: 1,
-              background: 'var(--green)', position: 'relative', zIndex: 1,
-            }} />
-          </div>
-          {/* label bar (Figma 606:7869) */}
-          <div style={{
-            width: '100%', background: 'var(--bg)', borderRadius: 2,
-            display: 'flex', justifyContent: 'center', padding: '0 8px 8px',
-          }}>
-            <span style={{
-              fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 14,
-              letterSpacing: '3px', lineHeight: '16px', textTransform: 'uppercase',
-              textAlign: 'center', color: 'var(--green)',
-            }}>
-              Vent it out
-            </span>
-          </div>
-        </Link>
       )}
 
       {hasMore && (

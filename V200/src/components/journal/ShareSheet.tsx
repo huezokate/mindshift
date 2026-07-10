@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from 'react'
 import { useTheme } from '@/lib/theme'
 import { renderQuoteCard } from './QuoteCardCanvas'
 import type { SharePlatform } from '@/lib/journal-types'
+import Button from '@/components/ui/Button'
+import SocialIcon from './SocialIcon'
 
 type Props = {
   /** Persisted response id — only needed to LOG the share. Omitted before save
@@ -219,12 +221,17 @@ export default function ShareSheet({
         style={{
           width: '100%',
           maxWidth: 440,
-          background: 'var(--card-bg)',
-          borderTop: 'var(--card-bt)',
-          borderLeft: 'var(--card-bl)',
-          borderRight: 'var(--card-br)',
-          borderBottom: 'var(--card-bb)',
-          borderRadius: 'var(--card-radius) var(--card-radius) 0 0',
+          // Chrome matches the theme's "Add Card"/FeatureCard (Figma 397:3618):
+          // its border weights (1/4/2/4), radius, fill, and effects — not the
+          // content card (Kate 2026-07-10).
+          background: 'var(--fcard-bg)',
+          borderTop: 'var(--fcard-bt)',
+          borderLeft: 'var(--fcard-bl)',
+          borderRight: 'var(--fcard-br)',
+          borderBottom: 'var(--fcard-bb)',
+          borderRadius: 'var(--fcard-radius) var(--fcard-radius) 0 0',
+          boxShadow: 'var(--fcard-inset, none)',
+          filter: 'var(--fcard-filter, none)',
           padding: 20,
           display: 'flex',
           flexDirection: 'column',
@@ -308,14 +315,16 @@ export default function ShareSheet({
           Include what I wrote
         </label>
 
-        {/* Platform buttons */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-          <ShareButton label="Share…" sub="your device's share sheet" onClick={shareNative} disabled={!pngBlob} />
-          <ShareButton label="Instagram" sub="saves image, opens app" onClick={shareInstagram} disabled={!pngBlob} />
-          <ShareButton label="TikTok" sub="saves image, opens app" onClick={shareTikTok} disabled={!pngBlob} />
-          <ShareButton label="Facebook" sub="saves image, opens sharer" onClick={shareFacebook} />
-          <ShareButton label="Copy link" sub="public links coming soon" onClick={copyLink} />
-          <ShareButton label="Download" sub="save the PNG" onClick={downloadPng} disabled={!pngBlob} />
+        {/* Platform actions — icon buttons (Kate 2026-07-10): the brand ones
+            carry the Figma social SVGs (SocialIcon), utilities use Material
+            glyphs via the design-system icon-only Button. */}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 12, flexWrap: 'wrap' }}>
+          <IconAction label="Share" onClick={shareNative} disabled={!pngBlob} icon="ios_share" />
+          <IconAction label="Instagram" onClick={shareInstagram} disabled={!pngBlob} social="instagram" />
+          <IconAction label="TikTok" onClick={shareTikTok} disabled={!pngBlob} social="tiktok" />
+          <IconAction label="Facebook" onClick={shareFacebook} social="facebook" />
+          <IconAction label="Copy link" onClick={copyLink} icon="link" />
+          <IconAction label="Download" onClick={downloadPng} disabled={!pngBlob} icon="download" />
         </div>
 
         {status && (
@@ -337,43 +346,30 @@ export default function ShareSheet({
   )
 }
 
-function ShareButton({
-  label,
-  sub,
-  onClick,
-  disabled,
-}: { label: string; sub?: string; onClick: () => void; disabled?: boolean }) {
+// One share action: a 45px icon-only design-system Button (secondary — the
+// positive/action family) carrying either a Figma brand SVG (SocialIcon) or a
+// Material glyph, with a 10px caption beneath.
+function IconAction({
+  label, onClick, disabled, icon, social,
+}: { label: string; onClick: () => void; disabled?: boolean; icon?: string; social?: SharePlatform }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      style={{
-        display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2,
-        textAlign: 'left',
-        color: disabled ? 'var(--text-muted)' : 'var(--btn-secondary-color, var(--cyan))',
-        background: 'var(--btn-secondary-bg, transparent)',
-        borderTop: 'var(--btn-secondary-bt, 1px solid var(--cyan))',
-        borderLeft: 'var(--btn-secondary-bl, 1px solid var(--cyan))',
-        borderRight: 'var(--btn-secondary-br, 2px solid var(--cyan))',
-        borderBottom: 'var(--btn-secondary-bb, 2px solid var(--cyan))',
-        borderRadius: 'var(--btn-secondary-radius, 2px)',
-        padding: '10px 12px',
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        opacity: disabled ? 0.5 : 1,
-      }}
-    >
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, width: 56 }}>
+      <Button
+        variant="secondary"
+        disabled={disabled}
+        onClick={onClick}
+        ariaLabel={label}
+        icon={social ? undefined : icon}
+        iconSize={20}
+        style={{ width: 45, minHeight: 45, padding: 0 }}
+      >
+        {social ? <SocialIcon platform={social} size={22} /> : undefined}
+      </Button>
       <span style={{
-        fontFamily: 'var(--font-btn)', fontWeight: 600,
-        fontSize: 12, letterSpacing: '1.5px', textTransform: 'uppercase',
+        fontFamily: 'var(--font-body)', fontSize: 10, letterSpacing: '0.4px',
+        textTransform: 'uppercase', color: 'var(--text-sub)', textAlign: 'center',
+        whiteSpace: 'nowrap',
       }}>{label}</span>
-      {sub && (
-        <span style={{
-          fontFamily: 'var(--font-body)', fontWeight: 400,
-          fontSize: 10, letterSpacing: '0.3px', textTransform: 'none',
-          color: 'var(--text-meta)', lineHeight: 1.2,
-        }}>{sub}</span>
-      )}
-    </button>
+    </div>
   )
 }

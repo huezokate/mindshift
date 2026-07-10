@@ -129,6 +129,16 @@ html[data-theme="kawaii"],
      collapse to one magenta in kawaii, so these carry the real teal/pink. */
   --chat-user-accent: #49dbc8;
   --chat-lens-accent: #ff50c5;
+
+  /* FeatureCard / "Add Card" chrome (Figma 397:3617) — also the ShareSheet */
+  --fcard-bg:     #ffffff;
+  --fcard-bt:     1px solid #400b14;
+  --fcard-br:     4px solid #400b14;
+  --fcard-bb:     2px solid #400b14;
+  --fcard-bl:     4px solid #400b14;
+  --fcard-radius: 32px;
+  --fcard-filter: none;
+  --fcard-inset:  inset 4px 0 0 0 rgba(64,11,20,0.5);
   --focus-ring:         3px solid rgba(255,80,197,0.7);
   --mm-card-bg-selected: #eafaf0;
   --btn-dis-color:      rgba(39,0,7,0.3);

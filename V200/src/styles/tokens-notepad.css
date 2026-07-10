@@ -131,6 +131,16 @@ html[data-theme="notepad"],
   /* Chat bubbles: user speaks (blue), lens thinks (red) — Kate 2026-07-10 */
   --chat-user-accent: #3a6fa8;
   --chat-lens-accent: #c0605a;
+
+  /* FeatureCard / "Add Card" chrome (Figma 397:3616) — also the ShareSheet */
+  --fcard-bg:     #ffffff;
+  --fcard-bt:     1px solid #c0605a;
+  --fcard-br:     4px solid #c0605a;
+  --fcard-bb:     2px solid #c0605a;
+  --fcard-bl:     4px solid #c0605a;
+  --fcard-radius: 8px;
+  --fcard-filter: drop-shadow(3px 4px 0px #d4cbbf);
+  --fcard-inset:  none;
   --focus-ring:         2px solid #1e1e40;
   --mm-card-bg-selected: #eef3ec;
   --btn-dis-color:      rgba(30,30,64,0.3);

@@ -226,7 +226,7 @@ export async function renderQuoteCard(opts: QuoteCardOptions): Promise<Blob> {
   ctx.fillStyle = palette.wordmark
   ctx.font = `700 28px ${fonts.display}`
   ctx.textBaseline = 'alphabetic'
-  ctx.fillText('MINDSHIFT', contentX, cardY + cardH - 56)
+  ctx.fillText('MINDS SHIFT', contentX, cardY + cardH - 56)
   ctx.fillStyle = palette.textSub
   ctx.font = `400 22px ${fonts.body}`
   ctx.fillText('minds-shift.com', contentX, cardY + cardH - 28)

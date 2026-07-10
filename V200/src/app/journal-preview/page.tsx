@@ -262,7 +262,7 @@ export default function JournalPreviewPage() {
                 key={entry.id}
                 entry={entry}
                 onAddLens={(id) => {
-                  // eslint-disable-next-line no-console
+                   
                   console.log('[journal-preview] add lens', id)
                 }}
               />
