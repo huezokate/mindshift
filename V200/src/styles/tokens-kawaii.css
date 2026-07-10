@@ -116,6 +116,7 @@ html[data-theme="kawaii"],
   --btn-shadow:         none;
   --btn-filter:         none;
   --btn-letter-spacing: 2px;
+  --btn-subtext-tracking: 0.6px;
   --focus-ring:         3px solid rgba(255,80,197,0.7);
   --mm-card-bg-selected: #eafaf0;
   --btn-dis-color:      rgba(39,0,7,0.3);

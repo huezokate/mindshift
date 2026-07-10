@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { FIGURES, getFigureImg } from '@/lib/figures'
 import { useTheme, type Theme } from '@/lib/theme'
 import Icon from '@/components/ui/Icon'
-import CircleArrow from '@/components/ui/CircleArrow'
+import Button from '@/components/ui/Button'
 import EntryAuthRow from '@/components/nav/EntryAuthRow'
 
 const THEMES: { id: Theme; name: string; tagline: string; description: string }[] = [
@@ -399,7 +399,7 @@ export default function ThemeSelectPage() {
             </p>
 
             <div className="flex items-center gap-5" style={{ marginTop: 4 }}>
-              <CircleArrow direction="left" onClick={prev} aria-label="Previous theme" />
+              <Button variant="secondary" icon="chevron_left" onClick={prev} ariaLabel="Previous theme" />
               <p
                 className="uppercase"
                 style={{
@@ -414,7 +414,7 @@ export default function ThemeSelectPage() {
               >
                 Pick your interface
               </p>
-              <CircleArrow direction="right" onClick={next} aria-label="Next theme" />
+              <Button variant="secondary" icon="chevron_right" onClick={next} ariaLabel="Next theme" />
             </div>
           </motion.div>
         </AnimatePresence>

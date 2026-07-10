@@ -9,7 +9,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { FIGURES, getFigureImg } from '@/lib/figures'
 import { useTheme } from '@/lib/theme'
 import Icon from '@/components/ui/Icon'
-import CircularArrow from '@/components/ui/CircularArrow'
 import Button from '@/components/ui/Button'
 
 type Props = {
@@ -77,9 +76,9 @@ export default function LensPickerSheet({
                 boxShadow: 'var(--card-shadow)',
               }}
             >
-              {/* Portrait + in-popup nav arrows (shared CircularArrow) */}
+              {/* Portrait + in-popup nav arrows (icon-only design-system Button) */}
               <div className="flex items-center justify-between w-full">
-                <CircularArrow direction="prev" ariaLabel="Previous figure" onClick={e => { e.stopPropagation(); prev() }} />
+                <Button variant="secondary" icon="chevron_left" ariaLabel="Previous figure" onClick={e => { e.stopPropagation(); prev() }} />
                 <div
                   className="overflow-hidden flex-shrink-0"
                   style={{
@@ -91,7 +90,7 @@ export default function LensPickerSheet({
                 >
                   <img src={getFigureImg(fig, theme)} alt={fig.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%', display: 'block' }} />
                 </div>
-                <CircularArrow direction="next" ariaLabel="Next figure" onClick={e => { e.stopPropagation(); next() }} />
+                <Button variant="secondary" icon="chevron_right" ariaLabel="Next figure" onClick={e => { e.stopPropagation(); next() }} />
               </div>
 
               <p className="uppercase text-center" style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 18, letterSpacing: 1.5, lineHeight: '22px', color: 'var(--violet)' }}>

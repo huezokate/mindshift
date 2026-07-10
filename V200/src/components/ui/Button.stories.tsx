@@ -42,6 +42,23 @@ export const Secondary2: Story = { args: { variant: 'secondary2', children: 'Sec
 // the word "favorite", when the webfont is wired).
 export const WithIcon: Story = { args: { variant: 'primary', icon: 'favorite' } }
 export const Disabled: Story = { args: { variant: 'primary', disabled: true } }
+// Subtext forms (Figma `username=yes`): stacked when no icon; with icon the
+// subtext right-aligns opposite the [icon + label] group (needs width).
+export const WithSubtext: Story = {
+  args: { variant: 'primary', children: 'Profile', subtext: '@blossomcosplay88' },
+}
+export const WithSubtextAndIcon: Story = {
+  args: { variant: 'secondary', children: 'Journal', subtext: '@12 entries', icon: 'photo_camera', fullWidth: true },
+  render: (args) => (
+    <div style={{ width: 320 }}>
+      <Button {...args} />
+    </div>
+  ),
+}
+// Icon-only square (replaces CircleArrow/CircularArrow — theme radius applies).
+export const IconOnly: Story = {
+  args: { variant: 'secondary', icon: 'chevron_right', children: undefined, ariaLabel: 'Next' },
+}
 export const FullWidth: Story = {
   args: { variant: 'primary', fullWidth: true, children: 'Full width' },
   render: (args) => (
@@ -81,6 +98,11 @@ export const AllVariants: StoryObj = {
           <Button variant={variant} icon="bolt">Icon</Button>
           <Button variant={variant} disabled>Disabled</Button>
           <Button variant={variant} icon="bolt" disabled>Icon</Button>
+          <Button variant={variant} subtext="@subtext">Label</Button>
+          <div style={{ width: 220 }}>
+            <Button variant={variant} icon="bolt" subtext="@subtext" fullWidth>Label</Button>
+          </div>
+          <Button variant={variant} icon="chevron_right" ariaLabel="Next" />
         </Row>
       ))}
     </div>

@@ -13,7 +13,7 @@
 // Everything is driven by the structural --btn-* token families (see DESIGN-SYSTEM
 // "The Rule"), NEVER the raw --cyan/--pink accent slots — those collapse to the
 // same magenta in kawaii, which is the bug this component replaces.
-import type { CSSProperties, ReactNode } from 'react'
+import type { CSSProperties, MouseEvent, ReactNode } from 'react'
 import Icon from '@/components/ui/Icon'
 
 export type ButtonVariant = 'primary' | 'secondary' | 'secondary2'
@@ -35,8 +35,14 @@ function variantStyle(p: string): CSSProperties {
 
 type Props = {
   variant?: ButtonVariant
-  onClick?: () => void
-  children: ReactNode
+  onClick?: (e: MouseEvent<HTMLButtonElement>) => void
+  /** Omit children (with `icon` set) for the icon-only form — a square
+      theme-radius button (replaces the old CircleArrow/CircularArrow). */
+  children?: ReactNode
+  /** Secondary line (Figma `username=yes` form): 10px --font-body uppercase.
+      Without icon it stacks under the label; with icon it right-aligns
+      opposite the [icon + label] group. */
+  subtext?: ReactNode
   /** Stretch to fill its container (dropdown rows are full-width). */
   fullWidth?: boolean
   /** Disabled — renders the live treatment at opacity 0.6 (Figma's recipe) and blocks clicks. */
@@ -52,13 +58,35 @@ type Props = {
   style?: CSSProperties
 }
 
+// Subtext line (Figma "Tooltip or subtext" style): 10/12 --font-body, uppercase,
+// per-theme tracking token. Inherits the variant's color.
+function Subtext({ children }: { children: ReactNode }) {
+  return (
+    <span
+      style={{
+        fontFamily: 'var(--font-body)',
+        fontWeight: 400,
+        fontSize: 10,
+        lineHeight: '12px',
+        letterSpacing: 'var(--btn-subtext-tracking, 0.5px)',
+        textTransform: 'uppercase',
+        opacity: 0.9,
+      }}
+    >
+      {children}
+    </span>
+  )
+}
+
 export default function Button({
-  variant = 'primary', onClick, children,
+  variant = 'primary', onClick, children, subtext,
   fullWidth = false, disabled = false,
   icon, iconSize = 24, type = 'button', ariaLabel, role, style,
 }: Props) {
   const isPrimary = variant === 'primary'
   const family = isPrimary ? '--btn' : `--btn-${variant}`
+  const iconOnly = Boolean(icon) && children == null
+  const minH = isPrimary ? 56 : 45
   return (
     <button
       type={type}
@@ -76,12 +104,14 @@ export default function Button({
         fontWeight: 600,
         letterSpacing: 'var(--btn-letter-spacing, 1px)',
         textTransform: 'uppercase',
-        width: fullWidth ? '100%' : undefined,
+        width: fullWidth ? '100%' : iconOnly ? minH : undefined,
         // Size hierarchy: primary is the big role (former "tall" specs are the
-        // primary default), secondaries are compact.
-        minHeight: isPrimary ? 56 : 45,
-        padding: isPrimary ? '12px 16px' : '8px 12px',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        // primary default), secondaries are compact. Icon-only = square.
+        minHeight: minH,
+        padding: iconOnly ? 0 : isPrimary ? '12px 16px' : '8px 12px',
+        display: 'flex', alignItems: 'center',
+        // With icon + subtext the Figma form is [icon label] …space… subtext.
+        justifyContent: subtext && icon ? 'space-between' : 'center',
         gap: icon ? 8 : undefined,
         // Figma disabled = the live treatment dimmed to 0.6 (Kate's chosen recipe).
         opacity: disabled ? 0.6 : 1,
@@ -89,8 +119,28 @@ export default function Button({
         ...style,
       }}
     >
-      {icon && <Icon name={icon} size={iconSize} />}
-      {children}
+      {subtext && !icon ? (
+        // Stacked form (Figma primary+username): label over subtext, centered.
+        <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+          <span>{children}</span>
+          <Subtext>{subtext}</Subtext>
+        </span>
+      ) : (
+        <>
+          {icon && !subtext && <Icon name={icon} size={iconSize} />}
+          {subtext && icon ? (
+            <>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Icon name={icon} size={iconSize} />
+                <span>{children}</span>
+              </span>
+              <Subtext>{subtext}</Subtext>
+            </>
+          ) : (
+            children
+          )}
+        </>
+      )}
     </button>
   )
 }

@@ -82,23 +82,27 @@
 
   /* Secondary button — pink. Opaque bg (== page bg) so the button is solid over
      overlay content (e.g. the account dropdown, Figma 626:9135) yet blends on-page. */
+  /* Cross-theme rule (Kate 2026-07-10, per the original Figma logic):
+     secondary = positive-ish = the theme's blue (cyan here);
+     secondary2 = negative-ish = the theme's red (pink here). Slots were
+     swapped before — this aligns cyberpunk with notepad/kawaii. */
   --btn-secondary-bg:     var(--bg);
   --btn-secondary-shadow: none;
-  --btn-secondary-color:  var(--pink);
-  --btn-secondary-bt:     1px solid var(--pink);
-  --btn-secondary-bl:     1px solid var(--pink);
-  --btn-secondary-br:     2px solid var(--pink);
-  --btn-secondary-bb:     2px solid var(--pink);
+  --btn-secondary-color:  var(--cyan);
+  --btn-secondary-bt:     1px solid var(--cyan);
+  --btn-secondary-bl:     1px solid var(--cyan);
+  --btn-secondary-br:     2px solid var(--cyan);
+  --btn-secondary-bb:     2px solid var(--cyan);
   --btn-secondary-radius: var(--btn-radius);
 
-  /* Secondary 2 button — cyan. Opaque bg (see secondary note). */
+  /* Secondary 2 button — pink/red (negative-ish). Opaque bg (see secondary note). */
   --btn-secondary2-bg:     var(--bg);
   --btn-secondary2-shadow: none;
-  --btn-secondary2-color:  var(--cyan);
-  --btn-secondary2-bt:     1px solid var(--cyan);
-  --btn-secondary2-bl:     1px solid var(--cyan);
-  --btn-secondary2-br:     2px solid var(--cyan);
-  --btn-secondary2-bb:     2px solid var(--cyan);
+  --btn-secondary2-color:  var(--pink);
+  --btn-secondary2-bt:     1px solid var(--pink);
+  --btn-secondary2-bl:     1px solid var(--pink);
+  --btn-secondary2-br:     2px solid var(--pink);
+  --btn-secondary2-bb:     2px solid var(--pink);
   --btn-secondary2-radius: var(--btn-radius);
 
   /* Figure avatar */
@@ -121,6 +125,7 @@
   --btn-shadow: 0 0 12px rgba(57,255,20,0.2);
   --btn-filter: none;
   --btn-letter-spacing: 3px;
+  --btn-subtext-tracking: 1px;
   --focus-ring: 2px solid #00F5FF;
   --mm-card-bg-selected: rgba(57,255,20,0.12);
   --btn-dis-color: rgba(255,255,255,0.2);
