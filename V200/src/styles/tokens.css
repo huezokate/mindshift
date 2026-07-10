@@ -126,6 +126,13 @@
   --btn-filter: none;
   --btn-letter-spacing: 3px;
   --btn-subtext-tracking: 1px;
+
+  /* Brand logo (Figma 483:2747): aperture ring, center mark, wordmark */
+  --logo-ring:     var(--green);
+  --logo-mark:     var(--pink);
+  --logo-text:     var(--green);
+  --logo-font:     var(--font-mono);
+  --logo-tracking: 1.44px;
   --focus-ring: 2px solid #00F5FF;
   --mm-card-bg-selected: rgba(57,255,20,0.12);
   --btn-dis-color: rgba(255,255,255,0.2);

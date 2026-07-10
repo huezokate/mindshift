@@ -4,8 +4,11 @@ import AuthBanner from '@/components/AuthBanner'
 // Smoke story (T-022-04). AuthBanner reads `useSearchParams().get('reason')` to
 // pick its copy — the framework's next/navigation mock returns an empty query by
 // default, and a story overrides it via `parameters.nextjs.navigation.query`.
+// Grouped under Nav with the header/auth affordances (Kate 2026-07-10) —
+// though structurally it's a card variant; if a Card family lands in the
+// system, AuthBanner should become one of its forms.
 const meta: Meta<typeof AuthBanner> = {
-  title: 'Auth/AuthBanner',
+  title: 'Nav/AuthBanner',
   component: AuthBanner,
 }
 export default meta

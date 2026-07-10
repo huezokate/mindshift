@@ -117,6 +117,13 @@ html[data-theme="kawaii"],
   --btn-filter:         none;
   --btn-letter-spacing: 2px;
   --btn-subtext-tracking: 0.6px;
+
+  /* Brand logo (Figma 483:2747): aperture ring, center mark, wordmark */
+  --logo-ring:     #ffe2ac;
+  --logo-mark:     #c0605a;
+  --logo-text:     #ffe2ac;
+  --logo-font:     var(--font-body);
+  --logo-tracking: 0px;
   --focus-ring:         3px solid rgba(255,80,197,0.7);
   --mm-card-bg-selected: #eafaf0;
   --btn-dis-color:      rgba(39,0,7,0.3);

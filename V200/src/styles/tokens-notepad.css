@@ -120,6 +120,13 @@ html[data-theme="notepad"],
   --btn-filter:         drop-shadow(2px 3px 0px #1e1e40);
   --btn-letter-spacing: -1px;
   --btn-subtext-tracking: 0.2px;
+
+  /* Brand logo (Figma 483:2747): aperture ring, center mark, wordmark */
+  --logo-ring:     #3a6fa8;
+  --logo-mark:     #c0605a;
+  --logo-text:     #3a6fa8;
+  --logo-font:     var(--font-display);
+  --logo-tracking: 1.2px;
   --focus-ring:         2px solid #1e1e40;
   --mm-card-bg-selected: #eef3ec;
   --btn-dis-color:      rgba(30,30,64,0.3);
