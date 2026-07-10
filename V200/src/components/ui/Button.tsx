@@ -105,7 +105,8 @@ export default function Button({
         textTransform: 'uppercase',
         width: fullWidth ? '100%' : undefined,
         minHeight: tall ? 56 : 45,
-        padding: tall ? '12px' : '8px 12px',
+        // Size hierarchy: primary (CTA) 16×12, secondaries 12×8.
+        padding: tall ? '12px' : isPrimary ? '12px 16px' : '8px 12px',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         gap: icon ? 8 : undefined,
         // Figma disabled = the live treatment dimmed to 0.6 (Kate's chosen recipe).
