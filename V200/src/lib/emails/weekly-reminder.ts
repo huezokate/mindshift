@@ -105,7 +105,7 @@ export function buildWeeklyReminderEmail(opts: {
     <tr><td align="center">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#fffdf8;border:1px solid #e7e2d8;border-radius:10px;padding:32px;">
         <tr><td>
-          <p style="margin:0 0 4px;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:${ACCENT};">MindShift</p>
+          <p style="margin:0 0 4px;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:${ACCENT};">Minds Shift</p>
           <h1 style="margin:0 0 16px;font-size:22px;color:${BRAND};font-weight:700;">${hi}here's your week</h1>
           <p style="margin:0 0 24px;font-size:15px;line-height:22px;color:${MUTED};">
             A quiet moment before the week starts. Here's what you set out to move on — plan the week around it however feels right.

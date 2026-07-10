@@ -190,7 +190,7 @@ export default function ThemeSelectPage() {
               margin: 0,
             }}
           >
-            MindShift
+            Minds Shift
           </p>
           <p
             className="text-center"
@@ -252,7 +252,7 @@ export default function ThemeSelectPage() {
                 color: 'var(--text-body)',
               }}
             >
-              I understand MindShift is a space for reflection, not clinical advice.{' '}
+              I understand Minds Shift is a space for reflection, not clinical advice.{' '}
               <button
                 type="button"
                 onClick={e => {
@@ -320,7 +320,7 @@ export default function ThemeSelectPage() {
                       margin: 0,
                     }}
                   >
-                    MindShift is a space for reflection, not a substitute for professional mental health support. The lenses are creative re-framings, not therapy. If you&apos;re in crisis, please reach out to a qualified professional or a crisis line.
+                    Minds Shift is a space for reflection, not a substitute for professional mental health support. The lenses are creative re-framings, not therapy. If you&apos;re in crisis, please reach out to a qualified professional or a crisis line.
                   </p>
                   <p
                     className="uppercase"
@@ -444,7 +444,7 @@ export default function ThemeSelectPage() {
             cursor: acknowledged ? 'pointer' : 'not-allowed',
           }}
         >
-          Enter MindShift
+          Enter Minds Shift
         </button>
       </div>
     </div>

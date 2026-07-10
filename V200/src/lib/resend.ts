@@ -7,4 +7,4 @@ export function getResend() {
   return _resend
 }
 
-export const FROM = process.env.RESEND_FROM_EMAIL ?? 'hello@mindshift.app'
+export const FROM = process.env.RESEND_FROM_EMAIL ?? 'hello@minds-shift.com'

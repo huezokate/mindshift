@@ -1,4 +1,4 @@
-/* MindShift V200 — Cyberpunk Design Tokens (from mindshift.html) */
+/* Minds Shift V200 — Cyberpunk Design Tokens (from minds-shift.html) */
 :root {
   /* === Core Palette === */
   --bg:        #080810;
@@ -119,7 +119,7 @@
   --btn-bb: 4px solid var(--green);
   --btn-radius: 2px;
   /* Opaque CTA fill — used where a button sits over imagery (e.g. theme-select
-     "Enter MindShift" over the figure grid) and must never let it bleed through. */
+     "Enter Minds Shift" over the figure grid) and must never let it bleed through. */
   --cta-solid-bg:          #080810;
   --cta-solid-bg-disabled: #14141f;
   --btn-shadow: 0 0 12px rgba(57,255,20,0.2);

@@ -1,5 +1,5 @@
 // Single icon primitive for the whole app. Renders a Google Material Symbols
-// (Rounded) glyph by name — the ONLY icon source in MindShift (no custom SVGs).
+// (Rounded) glyph by name — the ONLY icon source in Minds Shift (no custom SVGs).
 // The Rounded stylesheet is loaded in src/app/layout.tsx. Inherits currentColor.
 import type { CSSProperties } from 'react'
 

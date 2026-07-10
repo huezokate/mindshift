@@ -47,7 +47,7 @@ export default function MindmapLanding() {
             color: 'var(--pink)',
           }}
         >
-          MindShift · Mindmap
+          Minds Shift · Mindmap
         </p>
         <h1
           style={{
