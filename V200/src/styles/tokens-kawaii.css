@@ -124,6 +124,11 @@ html[data-theme="kawaii"],
   --logo-text:     #ffe2ac;
   --logo-font:     var(--font-body);
   --logo-tracking: 0px;
+
+  /* Chat bubbles: user speaks (blue), lens thinks (red). Raw --cyan/--pink
+     collapse to one magenta in kawaii, so these carry the real teal/pink. */
+  --chat-user-accent: #49dbc8;
+  --chat-lens-accent: #ff50c5;
   --focus-ring:         3px solid rgba(255,80,197,0.7);
   --mm-card-bg-selected: #eafaf0;
   --btn-dis-color:      rgba(39,0,7,0.3);
@@ -131,6 +136,10 @@ html[data-theme="kawaii"],
 
   /* Journal preview-card body text — kawaii keeps its standard body color. */
   --preview-body: var(--text-body);
+
+  /* Journal preview-card footer glyph (share icon / private lock) —
+     Figma 604:7469 / 604:7517 use "Kawaii accent text violet". */
+  --preview-glyph: #7e2091;
 
   /* Lens response card header background (light lavender-pink) */
   --lens-header-bg: #ffe1ff;

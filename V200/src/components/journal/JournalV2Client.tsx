@@ -167,7 +167,7 @@ export default function JournalV2Client({ initialEntries, initialHasMore, firstN
         entryCount={entries.length}
         lensCount={entries.reduce((n, e) => n + e.lens_responses.length, 0)}
       />
-      <JournalHeader firstName={firstName} />
+      <JournalHeader name={firstName ?? 'user'} />
 
       <div style={{ display: 'flex', borderBottom: '1px solid rgba(127,127,127,0.15)' }}>
         <TabBtn value="all" label="All entries" current={filter} onSelect={handleSelectFilter} />

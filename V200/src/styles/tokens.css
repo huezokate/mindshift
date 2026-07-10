@@ -133,6 +133,10 @@
   --logo-text:     var(--green);
   --logo-font:     var(--font-mono);
   --logo-tracking: 1.44px;
+
+  /* Chat bubbles: user speaks (blue), lens thinks (red) — Kate 2026-07-10 */
+  --chat-user-accent: var(--cyan);
+  --chat-lens-accent: var(--pink);
   --focus-ring: 2px solid #00F5FF;
   --mm-card-bg-selected: rgba(57,255,20,0.12);
   --btn-dis-color: rgba(255,255,255,0.2);
@@ -150,6 +154,10 @@
   /* Share-count chip — distinct from the green lens footer. Warm amber reads
      legibly on the dark cyberpunk surface. */
   --share-accent: var(--amber);
+
+  /* Journal preview-card footer glyph (share icon / private lock) —
+     Figma 604:7283 / 604:7618 render it in C Blue. */
+  --preview-glyph: var(--cyan);
 
   /* Portrait treatment — none in cyberpunk (neon portraits are native here). */
   --portrait-filter: none;

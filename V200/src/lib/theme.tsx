@@ -11,21 +11,24 @@ const ThemeCtx = createContext<{ theme: Theme; setTheme: (t: Theme) => void }>({
 })
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  // The inline script in layout.tsx already set data-theme from localStorage
-  // before first paint. Read it back here so React state matches the DOM on the
-  // first client render — otherwise JS theme branches (theme === 'cyberpunk' ? …)
-  // render the default skin first and visibly flip after the effect runs.
-  const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof document !== 'undefined') {
-      const attr = document.documentElement.getAttribute('data-theme')
-      if (attr === 'cyberpunk' || attr === 'kawaii' || attr === 'notepad') return attr
-    }
-    return DEFAULT
-  })
+  // State MUST start at DEFAULT to match what the server rendered (same fix as
+  // main, PR #10): reading data-theme in the initializer made the first client
+  // render already equal the saved theme, so nothing re-rendered — and React
+  // does not patch attribute mismatches on hydration, which left the server's
+  // default-theme <img src> (cyberpunk portraits) permanently in the DOM on
+  // notepad/kawaii devices. CSS never flashes either way (the inline script in
+  // layout.tsx sets data-theme before first paint).
+  const [theme, setThemeState] = useState<Theme>(DEFAULT)
 
   useEffect(() => {
+    // Attribute first: in the app the pre-paint inline script already set
+    // data-theme FROM localStorage, so they agree — but in Storybook (and any
+    // host that pins the attribute directly) the attribute is the live truth
+    // while localStorage may hold a stale previous pick.
+    const attr = document.documentElement.getAttribute('data-theme') as Theme | null
     const saved = localStorage.getItem(STORAGE_KEY) as Theme | null
-    if (saved && saved !== theme) apply(saved)
+    const active = (attr && THEMES.includes(attr) ? attr : null) ?? saved
+    if (active && active !== theme) apply(active)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

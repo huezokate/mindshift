@@ -127,6 +127,10 @@ html[data-theme="notepad"],
   --logo-text:     #3a6fa8;
   --logo-font:     var(--font-display);
   --logo-tracking: 1.2px;
+
+  /* Chat bubbles: user speaks (blue), lens thinks (red) — Kate 2026-07-10 */
+  --chat-user-accent: #3a6fa8;
+  --chat-lens-accent: #c0605a;
   --focus-ring:         2px solid #1e1e40;
   --mm-card-bg-selected: #eef3ec;
   --btn-dis-color:      rgba(30,30,64,0.3);
@@ -138,6 +142,10 @@ html[data-theme="notepad"],
 
   /* Journal preview-card body text — notepad keeps its standard body color. */
   --preview-body: var(--text-body);
+
+  /* Journal preview-card footer glyph (share icon / private lock) —
+     Figma 572:5714 / 572:5712 render it in Notepad Blue. */
+  --preview-glyph: var(--cyan);
 
   /* Share-count chip — amber (#7d9e7d) is green here, identical to the lens
      footer. Use a muted ochre that's distinct and paper-appropriate. */

@@ -1,4 +1,5 @@
 import { useLayoutEffect } from 'react'
+import { ThemeProvider } from '../src/lib/theme'
 import type { Preview } from '@storybook/nextjs-vite'
 import { __setClerkState, type ClerkState } from './mocks/clerk'
 // The real app cascade — Tailwind v4 entry, all three token sets, the four text
@@ -34,7 +35,12 @@ function ThemeHtmlSync({ theme, children }: { theme: string; children: React.Rea
   useLayoutEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
   }, [theme])
-  return <>{children}</>
+  // ThemeProvider keyed on the toolbar theme: components that read useTheme() in
+  // JS (portraits via portraitFor, semantic branches) need the real provider, not
+  // the context default (cyberpunk). The key remounts it per toolbar switch so its
+  // mount-time read of data-theme always matches. Without this, stories render
+  // cyberpunk portraits in notepad/kawaii.
+  return <ThemeProvider key={theme}>{children}</ThemeProvider>
 }
 
 // Compare-all-modes grid: render the story three times, once per skin, each in a
