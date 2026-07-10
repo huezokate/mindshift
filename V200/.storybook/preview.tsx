@@ -2,7 +2,7 @@ import { useLayoutEffect } from 'react'
 import type { Preview } from '@storybook/nextjs-vite'
 import { __setClerkState, type ClerkState } from './mocks/clerk'
 // The real app cascade — Tailwind v4 entry, all three token sets, the four text
-// fonts, global resets, `.material-symbols-sharp`, and the `.ds-btn` layer. Reusing
+// fonts, global resets, `.material-symbols-rounded`, and the `.ds-btn` layer. Reusing
 // globals.css (not re-listing imports) keeps Storybook and production from drifting.
 // NOTE: the Material Symbols WEBFONT itself is loaded via .storybook/preview-head.html
 // (mirroring layout.tsx) — it is not part of globals.css.

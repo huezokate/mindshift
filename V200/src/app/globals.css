@@ -24,10 +24,10 @@ body {
   overflow-x: hidden;
 }
 
-/* Material Symbols (Sharp) — the project's single icon source. Render via
+/* Material Symbols (Rounded) — the project's single icon source. Render via
    <Icon name="…" />; axes are set per-instance through font-variation-settings. */
-.material-symbols-sharp {
-  font-family: 'Material Symbols Sharp';
+.material-symbols-rounded {
+  font-family: 'Material Symbols Rounded';
   font-weight: normal;
   font-style: normal;
   line-height: 1;
@@ -99,9 +99,18 @@ body {
    transform + outline — the two properties Button.tsx does not set inline, so
    they're never overridden by the variant's inline styles. Per-theme focus ring
    comes from --focus-ring. Respects prefers-reduced-motion. */
-.ds-btn { transition: transform 0.1s ease; }
-.ds-btn:not(:disabled):hover  { transform: translateY(-1px); }
-.ds-btn:not(:disabled):active { transform: translateY(1px) scale(0.985); }
+/* Interaction motion (Kate's spec 2026-07-09: hover ≈ +2px, press ≈ -4px,
+   settle back with a small spring). Expressed as transforms, NOT padding —
+   animating padding reflows neighboring layout every frame (visible jitter in
+   button rows) while transform is compositor-only. The settle transition's
+   overshoot bezier gives the press → default bounce; press itself is fast and
+   sharp. Durations sit in Material's "short" range (50–200ms). */
+.ds-btn { transition: transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+.ds-btn:not(:disabled):hover  { transform: scale(1.04); }   /* ≈ +2px padding */
+.ds-btn:not(:disabled):active {                              /* ≈ -4px press  */
+  transform: scale(0.93);
+  transition: transform 80ms cubic-bezier(0.2, 0, 0, 1);
+}
 .ds-btn:focus-visible {
   outline: var(--focus-ring, 2px solid currentColor);
   outline-offset: 2px;
