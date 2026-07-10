@@ -1,6 +1,6 @@
 @AGENTS.md
 
-# MindShift V200
+# Minds Shift V200
 
 Next.js 16 App Router · TypeScript · Tailwind v4 · Clerk v7 · Clerk Billing Beta · Supabase v2 · Resend v6 · Framer Motion · Google Gemini 2.0 Flash
 

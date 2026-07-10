@@ -215,7 +215,7 @@ const VIGNETTES: Vignette[] = [
     id: 'a-lincoln',
     name: 'Abraham Lincoln',
     era: '16th U.S. President · 1809–1865',
-    img: '/portraits/kawaii/a-lincoln.png',
+    img: '/portraits/notepad/a-lincoln.png',
     response:
       "I lost my first run for office. Years later I lost two races for the Senate, the second to a man the papers swore I'd never beat. Two years after that, I was elected President, and we brought slavery to its end. I carried a melancholy most of my life, so I know the weight you're under. A day of defeat isn't a verdict — it's the part of the story right before it turns.",
     quote: 'Always bear in mind that your own resolution to succeed is more important than any other one thing.',
@@ -224,7 +224,7 @@ const VIGNETTES: Vignette[] = [
     id: 'frida-kahlo',
     name: 'Frida Kahlo',
     era: 'Painter · 1907–1954',
-    img: '/portraits/kawaii/frida-kahlo.png',
+    img: '/portraits/notepad/frida-kahlo.png',
     response:
       "A streetcar nearly killed me at eighteen — it shattered my spine and my pelvis. I learned to paint flat on my back, a mirror rigged above the bed, because the alternative was to disappear. What you are calling failure, I called material. Today is not proof that you are broken. It is the raw paint. Use it.",
     quote: 'I never painted dreams. I painted my own reality.',
@@ -233,7 +233,7 @@ const VIGNETTES: Vignette[] = [
     id: 'napoleon',
     name: 'Napoleon Bonaparte',
     era: 'Emperor of the French · 1769–1821',
-    img: '/portraits/kawaii/napoleon.png',
+    img: '/portraits/notepad/napoleon.png',
     response:
       "You feel ruined by a single day? I was exiled to an island — and when they sent soldiers to keep me there, I walked out to meet them and they joined me instead. Stop tallying today's losses. Find the one place the enemy is weak, your own hesitation, and strike there. Decide, and move. Momentum is everything.",
     quote: 'Impossible is a word found only in the dictionary of fools.',
