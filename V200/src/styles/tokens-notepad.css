@@ -86,7 +86,7 @@ html[data-theme="notepad"],
   --btn-secondary-bl:     none;
   --btn-secondary-br:     none;
   --btn-secondary-bb:     1px solid #7d9e7d;
-  --btn-secondary-radius: 0;
+  --btn-secondary-radius: var(--btn-radius);
 
   /* Secondary 2 button — red underline. Paper bg (see secondary note). */
   --btn-secondary2-bg:     var(--bg);
@@ -96,7 +96,7 @@ html[data-theme="notepad"],
   --btn-secondary2-bl:     none;
   --btn-secondary2-br:     none;
   --btn-secondary2-bb:     1px solid #c0605a;
-  --btn-secondary2-radius: 0;
+  --btn-secondary2-radius: var(--btn-radius);
 
   /* Figure avatar */
   --fig-avatar-border: 1.5px solid #3a6fa8;
@@ -152,16 +152,14 @@ html[data-theme="notepad"],
   --sw-shadow:       2px 2px 0 rgba(30,30,64,0.6);
 }
 
+/* ---- Surface texture: ruled note sheet ----------------------------------
+   In-app notepad keeps the horizontal rules but NOT the red margin line — a
+   fixed vertical line fights the app's centered layouts. The marketing
+   landing's `.notepad-paper` (globals.css) keeps the full sheet incl. the
+   red margin, where the left-anchored page makes it read right. */
 html[data-theme="notepad"] body {
   background-color: #faf7f2;
   background-image:
-    linear-gradient(to right, transparent 52px, rgba(192,96,90,0.3) 52px, rgba(192,96,90,0.3) 54px, transparent 54px),
     repeating-linear-gradient(to bottom, transparent, transparent 37px, rgba(58,111,168,0.22) 37px, rgba(58,111,168,0.22) 38px);
   background-attachment: local;
-}
-
-/* Disable scanline overlay for non-cyberpunk themes */
-html[data-theme="notepad"] body::before,
-html[data-theme="kawaii"] body::before {
-  display: none;
 }

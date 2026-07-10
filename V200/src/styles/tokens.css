@@ -89,7 +89,7 @@
   --btn-secondary-bl:     1px solid var(--pink);
   --btn-secondary-br:     2px solid var(--pink);
   --btn-secondary-bb:     2px solid var(--pink);
-  --btn-secondary-radius: 2px;
+  --btn-secondary-radius: var(--btn-radius);
 
   /* Secondary 2 button — cyan. Opaque bg (see secondary note). */
   --btn-secondary2-bg:     var(--bg);
@@ -99,7 +99,7 @@
   --btn-secondary2-bl:     1px solid var(--cyan);
   --btn-secondary2-br:     2px solid var(--cyan);
   --btn-secondary2-bb:     2px solid var(--cyan);
-  --btn-secondary2-radius: 2px;
+  --btn-secondary2-radius: var(--btn-radius);
 
   /* Figure avatar */
   --fig-avatar-border: 2px solid var(--green);
@@ -191,4 +191,23 @@
   --node-finances-border:  var(--green);
   --node-living-bg:        rgba(176,76,255,0.12);
   --node-living-border:    var(--violet);
+}
+
+/* ---- Surface texture: CRT scanlines ------------------------------------
+   Cyberpunk's themed background, mirroring notepad's ruled paper: faint
+   horizontal monitor lines over the dark base. Kept at ~3% alpha so it reads
+   as texture, never competes with content. The :not([data-theme]) arm covers
+   first visits before any theme attribute is set (cyberpunk is the default
+   skin). background-attachment: local so the lines scroll with content. */
+html[data-theme="cyberpunk"] body,
+html:not([data-theme]) body {
+  background-color: #080810;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(140, 246, 255, 0.03) 0px,
+    rgba(140, 246, 255, 0.03) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  background-attachment: local;
 }

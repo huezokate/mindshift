@@ -91,7 +91,7 @@ html[data-theme="kawaii"],
   --btn-secondary-bl:     2px solid #400b14;
   --btn-secondary-br:     4px solid #400b14;
   --btn-secondary-bb:     1px solid #400b14;
-  --btn-secondary-radius: 32px;
+  --btn-secondary-radius: var(--btn-radius);
 
   /* Secondary 2 button — pink bg, pink inset shadow */
   --btn-secondary2-bg:     #ffe1ff;
@@ -101,7 +101,7 @@ html[data-theme="kawaii"],
   --btn-secondary2-bl:     2px solid #400b14;
   --btn-secondary2-br:     4px solid #400b14;
   --btn-secondary2-bb:     1px solid #400b14;
-  --btn-secondary2-radius: 32px;
+  --btn-secondary2-radius: var(--btn-radius);
 
   /* CTA button — warm yellow, dark text, Fredoka */
   --btn-bg:             #ffe2ac;
@@ -154,4 +154,18 @@ html[data-theme="kawaii"],
 
 html[data-theme="kawaii"] body {
   background-color: #ffafd6;
+}
+
+/* ---- Surface texture: polka-dot grid -----------------------------------
+   Kawaii's themed background (the counterpart of notepad's ruled paper and
+   cyberpunk's scanlines): soft white dots in a diamond grid over the pink
+   base. Geometric, cute, and low-contrast so content stays the focus. */
+html[data-theme="kawaii"] body {
+  background-color: #ffafd6;
+  background-image:
+    radial-gradient(rgba(255, 255, 255, 0.30) 1.6px, transparent 1.7px),
+    radial-gradient(rgba(255, 255, 255, 0.16) 1.6px, transparent 1.7px);
+  background-size: 26px 26px;
+  background-position: 0 0, 13px 13px;
+  background-attachment: local;
 }
