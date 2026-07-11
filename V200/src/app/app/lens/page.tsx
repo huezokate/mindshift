@@ -143,7 +143,7 @@ export default function LensPage() {
   return (
     <div className="min-h-dvh flex flex-col items-center relative">
       <AppHeader />
-      <div className="flex flex-col gap-6 w-full" style={{ maxWidth: 440, padding: '24px 24px 32px' }}>
+      <div className="flex flex-col gap-6 w-full page-column page-column--wide" style={{ padding: '24px 24px 32px' }}>
 
         {/* Vent preview — read-only */}
         <motion.div
@@ -251,8 +251,8 @@ export default function LensPage() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.12 }}
-          className="grid w-full"
-          style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}
+          className="grid w-full grid-cols-3 md:grid-cols-5"
+          style={{ gap: 12 }}
         >
           {FIGURES.map((fig, i) => {
             const isSelected = selected === fig.id
@@ -285,11 +285,16 @@ export default function LensPage() {
                 >
                   <img src={getFigureImg(fig, theme)} alt={fig.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%', display: 'block' }} />
                 </div>
-                <p className="w-full text-center uppercase" style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 10, letterSpacing: 1, lineHeight: '13px', color: isSelected ? 'var(--fig-name-sel)' : 'var(--fig-name-unsel)' }}>
+                <p className="w-full text-center uppercase text-[12px] md:text-[18px] leading-tight md:leading-[20px]" style={{ fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: 1, color: isSelected ? 'var(--fig-name-sel)' : 'var(--fig-name-unsel)' }}>
                   {fig.name}
                 </p>
-                <p className="w-full text-center uppercase" style={{ fontFamily: 'var(--font-body)', fontSize: 8, letterSpacing: 0.6, lineHeight: '11px', color: 'var(--fig-desc)' }}>
+                {/* Mobile: the vibe at normal 14px text (Kate 2026-07-11 — no more squinting) */}
+                <p className="md:hidden w-full text-center uppercase text-[14px]" style={{ fontFamily: 'var(--font-body)', letterSpacing: 0.6, lineHeight: '18px', color: 'var(--fig-desc)' }}>
                   {fig.descriptor}
+                </p>
+                {/* Desktop: the famous quote, mirroring the landing gallery (5×3 grid) */}
+                <p className="hidden md:block w-full text-center text-[14px]" style={{ fontFamily: 'var(--font-body)', letterSpacing: 0.18, lineHeight: '20px', color: 'var(--text-body)' }}>
+                  &ldquo;{fig.quote}&rdquo;
                 </p>
               </motion.button>
             )

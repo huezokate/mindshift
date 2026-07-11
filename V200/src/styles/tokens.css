@@ -136,6 +136,7 @@
 
   /* Chat bubbles: user speaks (blue), lens thinks (red) — Kate 2026-07-10 */
   --chat-user-accent: var(--cyan);
+  --link-color: var(--cyan);
   --chat-lens-accent: var(--pink);
 
   /* FeatureCard / "Add Card" chrome (Figma 397:3615) — also the ShareSheet */

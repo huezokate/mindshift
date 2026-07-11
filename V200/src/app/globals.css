@@ -94,6 +94,16 @@ body {
 
 .ms-switcher-btn[data-active="false"] { opacity: 0.55; }
 
+/* ── Centered page columns — Material-style margins ─────────────────────────
+   Phone/tablet: single 440px column, 24px side margins. Desktop (≥1024px):
+   the wide variant opens to 1040px for multi-column layouts (lens grid,
+   response two-up). Real CSS because Tailwind arbitrary max-w/mx-auto
+   utilities are not generated in this setup. */
+.page-column { width: 100%; max-width: 440px; margin-inline: auto; }
+@media (min-width: 1024px) {
+  .page-column--wide { max-width: 1040px; }
+}
+
 /* ── Design-system Button interaction layer ──────────────────────────────────
    Drives hover / active / focus-visible for the shared <Button>. Uses ONLY
    transform + outline — the two properties Button.tsx does not set inline, so

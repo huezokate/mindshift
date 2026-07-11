@@ -201,7 +201,10 @@ export default function ResponsePage() {
 
       {/* Scrollable content */}
       <div
-        className="flex flex-col gap-4 w-full mx-auto flex-1 max-w-[440px] lg:grid lg:grid-cols-[2fr_3fr] lg:gap-x-6 lg:gap-y-4 lg:items-start lg:max-w-[1040px]"
+        // page-column centers for real — the old mx-auto/max-w-[…] utilities are
+        // not generated in this setup, which left the grid hugging the left edge
+        // on desktop (responsive audit, Kate 2026-07-11).
+        className="flex flex-col gap-4 w-full flex-1 page-column page-column--wide lg:grid lg:grid-cols-[2fr_3fr] lg:gap-x-6 lg:gap-y-4 lg:items-start"
         style={{ padding: '24px 24px 32px' }}
       >
 
