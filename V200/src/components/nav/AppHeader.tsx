@@ -139,8 +139,13 @@ export default function AppHeader({
       }}>
         {badge('camera', () => router.push(isSignedIn ? '/app/journal-v2' : '/app/onboarding'), 'Minds Shift home')}
         <p style={{
-          fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 28,
-          letterSpacing: '4.2px', lineHeight: '26px', color: brandAccent,
+          // Fluid wordmark: at 28px/4.2 tracking the bar (badge 48 + wordmark +
+          // 120px menu + padding) overflowed 390px phones by ~15px, pushing MENU
+          // off-screen and adding horizontal scroll on every app page. Scale with
+          // the viewport, floor at a size that still reads as the brand.
+          fontFamily: 'var(--font-body)', fontWeight: 700,
+          fontSize: 'clamp(16px, 4.5vw, 28px)',
+          letterSpacing: 'clamp(1.5px, 0.8vw, 4.2px)', lineHeight: '26px', color: brandAccent,
           textTransform: 'uppercase', margin: 0, whiteSpace: 'nowrap',
         }}>
           Minds Shift
