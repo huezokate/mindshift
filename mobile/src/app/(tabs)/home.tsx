@@ -1,3 +1,4 @@
+import { FoundationCheck } from '@/components/foundation-check';
 import { NavLink } from '@/components/nav-link';
 import { PlaceholderScreen } from '@/components/placeholder-screen';
 
@@ -7,6 +8,7 @@ export default function Home() {
     <PlaceholderScreen title="Home">
       <NavLink href="/onboarding" label="Start a vent" />
       <NavLink href="/theme-select" label="Theme select" />
+      <FoundationCheck />
     </PlaceholderScreen>
   );
 }

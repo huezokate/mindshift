@@ -1,10 +1,6 @@
 import { Tabs } from 'expo-router';
-import { ColorValue, Text } from 'react-native';
 
-// Placeholder glyphs until step 4 wires Material Symbols tab icons.
-function TabGlyph({ char, color }: { char: string; color: ColorValue }) {
-  return <Text style={{ color, fontSize: 18 }}>{char}</Text>;
-}
+import { MsIcon } from '@/components/ms-icon';
 
 export default function TabsLayout() {
   return (
@@ -20,19 +16,19 @@ export default function TabsLayout() {
     >
       <Tabs.Screen
         name="home"
-        options={{ title: 'Home', tabBarIcon: ({ color }) => <TabGlyph char="⌂" color={color} /> }}
+        options={{ title: 'Home', tabBarIcon: ({ color }) => <MsIcon name="home" size={24} color={color} /> }}
       />
       <Tabs.Screen
         name="journal"
-        options={{ title: 'Journal', tabBarIcon: ({ color }) => <TabGlyph char="✎" color={color} /> }}
+        options={{ title: 'Journal', tabBarIcon: ({ color }) => <MsIcon name="book_2" size={24} color={color} /> }}
       />
       <Tabs.Screen
         name="mindmap"
-        options={{ title: 'Mindmap', tabBarIcon: ({ color }) => <TabGlyph char="◉" color={color} /> }}
+        options={{ title: 'Mindmap', tabBarIcon: ({ color }) => <MsIcon name="graph_3" size={24} color={color} /> }}
       />
       <Tabs.Screen
         name="profile"
-        options={{ title: 'Profile', tabBarIcon: ({ color }) => <TabGlyph char="☺" color={color} /> }}
+        options={{ title: 'Profile', tabBarIcon: ({ color }) => <MsIcon name="person" size={24} color={color} /> }}
       />
     </Tabs>
   );
