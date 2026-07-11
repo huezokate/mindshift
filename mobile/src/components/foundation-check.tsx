@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
-import { MsIcon } from '@/components/ms-icon';
+import { Icon } from '@/components/ui/icon';
 
 // The "career" life-area path from V200/src/components/mindmap/AreaIcon.tsx —
 // proves react-native-svg renders the Figma-exported 24×24 paths.
@@ -29,9 +29,9 @@ export function FoundationCheck() {
         Courier New — cyberpunk mono
       </Text>
       <View style={styles.row}>
-        <MsIcon name="psychology" size={28} color="#5ad4e6" />
-        <MsIcon name="favorite" size={28} color="#ff5c8a" />
-        <MsIcon name="auto_awesome" size={28} color="#b48cff" />
+        <Icon name="psychology" size={28} color="#5ad4e6" />
+        <Icon name="favorite" size={28} color="#ff5c8a" />
+        <Icon name="auto_awesome" size={28} color="#b48cff" />
         <Svg width={28} height={28} viewBox="0 0 24 24">
           <Path d={CAREER_PATH} fill="#7dff9b" />
         </Svg>
