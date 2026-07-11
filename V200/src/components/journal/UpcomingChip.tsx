@@ -2,7 +2,7 @@
 import Icon from '@/components/ui/Icon'
 
 // Small "upcoming" pill that hangs off the coming-soon lens buttons (Decorate,
-// Chat with lens) in the detail-page button row. Figma node 602:6889 — a
+// Chat) in the detail-page button row. Figma node 602:6889 — a
 // release_alert bell + "UPCOMING" caption in the secondary/pink accent slot.
 // Token-driven so it follows all three themes for free.
 export default function UpcomingChip() {

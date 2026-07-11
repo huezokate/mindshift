@@ -23,7 +23,7 @@ export default function EntryDetail({ entry }: Props) {
   const isCyberpunk = theme === 'cyberpunk'
 
   const [activeLens, setActiveLens] = useState(0)
-  // Detail-page ShareSheet is opened from the "Socials" button beneath the
+  // Detail-page ShareSheet is opened from the "Share" button beneath the
   // active lens card (Figma 602:6457). It shares the active lens's quote card.
   const [shareLens, setShareLens] = useState<LensResponseV2 | null>(null)
   const lensScrollRef = useRef<HTMLDivElement>(null)
@@ -189,8 +189,8 @@ export default function EntryDetail({ entry }: Props) {
   )
 
   // ── Button row beneath each lens card (Figma 602:6448 "Icon button stack"). ──
-  // Right-aligned hug-content row, gap-[4px]: Chat with lens · Decorate ·
-  // Socials. Each button is the primary [icon over label] form (Figma "Button
+  // Right-aligned hug-content row, gap-[4px]: Chat · Decorate · Share.
+  // Each button is the primary [icon over label] form (Figma "Button
   // Primary"), colored/shaped by the --btn-* token family so all 3 themes
   // follow. Decorate is disabled — Figma's recipe: the live treatment at
   // opacity 0.6 with the "upcoming" chip overlapping its top-right corner
@@ -252,30 +252,30 @@ export default function EntryDetail({ entry }: Props) {
         display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end',
         gap: iconOnly ? 8 : 4, width: '100%',
       }}>
-        {/* Chat with lens — live (T-020-02): opens a bounded thread with this figure. */}
+        {/* Chat — live (T-020-02): opens a bounded thread with this figure. */}
         <button
           type="button"
           className="ds-btn"
           onClick={() => openChat(lens)}
           aria-label={`Chat with ${lens.figure_id}`}
-          title="Chat with lens"
+          title="Chat"
           style={btnBase(true)}
         >
           <Icon name="comic_bubble" size={24} />
-          {label('Chat with lens')}
+          {label('Chat')}
         </button>
         {comingSoon(<Icon name="palette" size={24} />, 'Decorate')}
-        {/* Socials — opens ShareSheet. */}
+        {/* Share — opens ShareSheet. */}
         <button
           type="button"
           className="ds-btn"
           onClick={() => setShareLens(lens)}
           aria-label="Share this lens to social media"
-          title="Socials"
+          title="Share"
           style={btnBase(true)}
         >
           <Icon name="ios_share" size={24} />
-          {label('Socials')}
+          {label('Share')}
         </button>
       </div>
     )

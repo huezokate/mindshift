@@ -6,7 +6,7 @@ import type { LensResponseV2, SharePlatform } from '@/lib/journal-types'
 
 type Props = {
   response: LensResponseV2
-  // kept for API symmetry with the detail page (Socials button handles sharing).
+  // kept for API symmetry with the detail page (Share button handles sharing).
   ventText: string
   isEntryPublic: boolean
 }
@@ -28,7 +28,7 @@ function relativeTimeAgo(iso: string): string {
 
 // Lens response card. Header is just the figure's avatar + name — the save
 // (star) and share icons were removed; sharing lives in the detail page's
-// "Socials" button, and signed-in vents auto-save. The "SHARED …" log at the
+// "Share" button, and signed-in vents auto-save. The "SHARED …" log at the
 // foot still shows where this lens was shared.
 export default function LensResponseCard({ response }: Props) {
   const { theme } = useTheme()
