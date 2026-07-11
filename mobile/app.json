@@ -10,7 +10,11 @@
     "ios": {
       "icon": "./assets/expo.icon",
       "bundleIdentifier": "com.mindsshift.app",
-      "supportsTablet": false
+      "supportsTablet": false,
+      "usesAppleSignIn": true,
+      "infoPlist": {
+        "NSPhotoLibraryAddUsageDescription": "Minds Shift saves your quote cards to Photos so you can post them anywhere."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -35,7 +39,22 @@
           "imageWidth": 76
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-sharing",
+      "expo-notifications",
+      "expo-apple-authentication",
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Minds Shift uses Face ID to keep your journal private."
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "savePhotosPermission": "Minds Shift saves your quote cards to Photos so you can post them anywhere."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
