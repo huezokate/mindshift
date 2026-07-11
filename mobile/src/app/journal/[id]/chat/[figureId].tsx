@@ -15,6 +15,7 @@ import { ChatThread, SoftCloseDivider } from '@/components/chat/chat-thread';
 import { FigurePortrait } from '@/components/journal/figure-portrait';
 import { Button } from '@/components/ui/button';
 import { figureById } from '@/lib/figures';
+import { tapLight } from '@/lib/haptics';
 import {
   beginSend,
   historyLoaded,
@@ -101,6 +102,7 @@ export default function LensChatScreen() {
     const history = chat.messages;
     setChat(state);
     setDraft('');
+    tapLight();
     try {
       const d = await api<{ reply: string; done: boolean; capped: boolean }>(
         '/api/chat-with-lens',

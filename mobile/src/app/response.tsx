@@ -16,6 +16,7 @@ import { Icon } from '@/components/ui/icon';
 import { useSavePop } from '@/components/ui/motion';
 import { withAlpha } from '@/lib/color';
 import { FIGURES, figureById, type Figure } from '@/lib/figures';
+import { notifySuccess } from '@/lib/haptics';
 import { useApi } from '@/lib/use-api';
 import { useTypewriter } from '@/lib/use-typewriter';
 import { useVentFlow } from '@/state/vent-flow';
@@ -178,7 +179,10 @@ export default function ResponseScreen() {
     persist().then((id) => {
       if (!alive) return;
       setSaveState(id ? 'saved' : 'error');
-      if (id) savePop.trigger();
+      if (id) {
+        savePop.trigger();
+        notifySuccess();
+      }
     });
     return () => {
       alive = false;
