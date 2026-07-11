@@ -7,6 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
 import { CLERK_PUBLISHABLE_KEY } from '@/lib/config';
+import { VentFlowProvider } from '@/state/vent-flow';
 import { ThemeProvider, useTheme } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
@@ -58,7 +59,9 @@ export default function RootLayout() {
   return (
     <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY} tokenCache={tokenCache}>
       <ThemeProvider>
-        <ThemedNavShell />
+        <VentFlowProvider>
+          <ThemedNavShell />
+        </VentFlowProvider>
       </ThemeProvider>
     </ClerkProvider>
   );
