@@ -130,6 +130,7 @@ html[data-theme="notepad"],
 
   /* Chat bubbles: user speaks (blue), lens thinks (red) — Kate 2026-07-10 */
   --chat-user-accent: #3a6fa8;
+  --link-color: #3a6fa8;
   --chat-lens-accent: #c0605a;
 
   /* FeatureCard / "Add Card" chrome (Figma 397:3616) — also the ShareSheet */

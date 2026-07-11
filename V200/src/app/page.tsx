@@ -3,6 +3,7 @@ import { useState, type FormEvent } from 'react'
 import { motion } from 'framer-motion'
 import { getSupabase } from '@/lib/supabase'
 import { FIGURES, type Figure } from '@/lib/figures'
+import TextLink from '@/components/ui/TextLink'
 
 const WAITLIST_CONTACT = 'hello@minds-shift.com'
 const BUSINESS_CONTACT = 'kate@minds-shift.com'
@@ -164,24 +165,10 @@ function PrimaryButton({ href, children }: { href: string; children: React.React
   )
 }
 
+// Delegates to the design-system TextLink (underlined 14px body text in
+// --link-color, tap target padded to the secondary-button rhythm).
 function SecondaryLink({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <a
-      href={href}
-      className="uppercase transition-opacity hover:opacity-70"
-      style={{
-        fontFamily: 'var(--font-body)',
-        fontWeight: 700,
-        fontSize: 13,
-        letterSpacing: 2,
-        color: 'var(--pink)',
-        textDecoration: 'underline',
-        textUnderlineOffset: 4,
-      }}
-    >
-      {children}
-    </a>
-  )
+  return <TextLink href={href}>{children}</TextLink>
 }
 
 function Card({ children }: { children: React.ReactNode }) {

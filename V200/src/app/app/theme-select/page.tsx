@@ -1,11 +1,12 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FIGURES, getFigureImg } from '@/lib/figures'
 import { useTheme, type Theme } from '@/lib/theme'
 import Icon from '@/components/ui/Icon'
 import Button from '@/components/ui/Button'
+import TextLink from '@/components/ui/TextLink'
 import EntryAuthRow from '@/components/nav/EntryAuthRow'
 
 const THEMES: { id: Theme; name: string; tagline: string; description: string }[] = [
@@ -51,6 +52,19 @@ export default function ThemeSelectPage() {
 
   const currentIndex = THEMES.findIndex(t => t.id === theme)
   const [index, setIndex] = useState(currentIndex >= 0 ? currentIndex : 1)
+
+  // BUG FIX (Kate 2026-07-11): ThemeProvider starts at the DEFAULT theme and
+  // applies the saved one in a mount effect — so the initializer above ran
+  // against 'cyberpunk' even when the visitor had saved kawaii. The carousel
+  // then silently sat on the wrong theme and "Enter" wrote it back over the
+  // saved pick (kawaii → cyberpunk after passing through this screen). Track
+  // the provider: whenever the resolved theme changes underneath us, re-point
+  // the carousel. User swipes call setTheme immediately, so this effect is a
+  // no-op during normal interaction.
+  useEffect(() => {
+    const i = THEMES.findIndex(t => t.id === theme)
+    if (i >= 0) setIndex(i)
+  }, [theme])
   // Disclaimer ack is intentionally ephemeral — it must start UNCHECKED on every
   // visit (Kate, 14 June board). Do not restore it from localStorage.
   const [acknowledged, setAcknowledged] = useState(false)

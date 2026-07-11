@@ -128,6 +128,7 @@ html[data-theme="kawaii"],
   /* Chat bubbles: user speaks (blue), lens thinks (red). Raw --cyan/--pink
      collapse to one magenta in kawaii, so these carry the real teal/pink. */
   --chat-user-accent: #49dbc8;
+  --link-color: #49dbc8;
   --chat-lens-accent: #ff50c5;
 
   /* FeatureCard / "Add Card" chrome (Figma 397:3617) — also the ShareSheet */
