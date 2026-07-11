@@ -1,0 +1,197 @@
+/**
+ * Cyberpunk token map — a 1:1 mirror of the `:root` block in
+ * `V200/src/styles/tokens.css` (the base skin every other skin overrides).
+ * Values are verbatim CSS strings, `var()` refs included; resolution and
+ * parsing happen in resolve.ts/build.ts. `css-fidelity.test.ts` diffs this
+ * map against the real CSS file, so edits on either side fail CI until
+ * mirrored.
+ *
+ * Not mirrored here: the body surface-texture rules (scanlines / polka dots /
+ * ruled paper) — those are CSS background-image rules, not custom properties;
+ * an RN ThemedBackground equivalent belongs to the screen-port tickets.
+ */
+export const cyberpunkVars = {
+  '--bg': '#080810',
+  '--bg-card': '#0d0d1a',
+  '--bg-card2': '#0d0d1c',
+
+  '--cyan': '#00F5FF',
+  '--green': '#39FF14',
+  '--pink': '#FF2D78',
+  '--violet': '#B04CFF',
+  '--amber': '#FFB800',
+
+  '--text-h1': '#E0F7FF',
+  '--text-body': '#E0F7FF',
+  '--text-sub': '#7ECFDF',
+  '--text-meta': '#3697B8',
+  '--text-muted': 'rgba(224,247,255,0.45)',
+
+  '--glow-cyan': '0 0 16px rgba(0,245,255,0.45)',
+  '--glow-green': '0 0 16px rgba(57,255,20,0.45)',
+  '--glow-pink': '0 0 10px #FF4664, 0 0 30px rgba(255,45,120,0.2)',
+  '--glow-violet': '0 0 16px rgba(176,76,255,0.45)',
+  '--glow-card': '0 0 16px rgba(0,255,200,0.45)',
+  '--glow-amber': '0 0 16px rgba(255,184,0,0.45)',
+
+  '--font-mono': "'Courier New', 'Lucida Console', monospace",
+  '--font-alumni': "'Alumni Sans SC', 'Courier New', sans-serif",
+  '--font-display': 'var(--font-alumni)',
+  '--font-body': 'var(--font-mono)',
+  '--font-btn': 'var(--font-display)',
+
+  '--card-bt': '4px solid var(--cyan)',
+  '--card-bl': '4px solid var(--cyan)',
+  '--card-br': '1px solid var(--cyan)',
+  '--card-bb': '1px solid var(--cyan)',
+  '--card-radius': '4px',
+  '--card-bg': 'var(--bg-card)',
+  '--card-shadow': 'none',
+  '--card-filter': 'none',
+
+  '--hcard-bg': 'var(--bg-card)',
+  '--hcard-bt': '1px solid var(--pink)',
+  '--hcard-bl': '4px solid var(--pink)',
+  '--hcard-br': '4px solid var(--pink)',
+  '--hcard-bb': '2px solid var(--pink)',
+  '--hcard-radius': '4px',
+  '--hcard-padding': '16px 24px',
+
+  '--fig-bg': 'var(--bg-card2)',
+  '--fig-bg-sel': 'rgba(0,255,200,0.08)',
+  '--fig-border': '1px solid var(--violet)',
+  '--fig-border-sel': '2px solid var(--green)',
+  '--fig-radius': '2px',
+  '--fig-shadow-sel': '0 0 16px rgba(0,255,200,0.35)',
+  '--fig-area-bg': 'var(--bg-card)',
+  '--fig-initial': 'rgba(176,76,255,0.4)',
+  '--fig-initial-sel': 'var(--green)',
+  '--fig-name-unsel': '#EEFFEA',
+  '--fig-name-sel': 'var(--green)',
+  '--fig-desc': '#EEFFEA',
+
+  '--input-bg': 'transparent',
+  '--input-bt': '4px solid var(--cyan)',
+  '--input-bl': '4px solid var(--cyan)',
+  '--input-br': '1px solid var(--cyan)',
+  '--input-bb': '1px solid var(--cyan)',
+  '--input-radius': '4px',
+  '--input-divider': 'var(--cyan)',
+  '--input-shadow': 'none',
+  '--input-header-bg': 'rgba(0,245,255,0.06)',
+  '--input-header-shadow': 'none',
+
+  '--btn-secondary-bg': 'var(--bg)',
+  '--btn-secondary-shadow': 'none',
+  '--btn-secondary-color': 'var(--cyan)',
+  '--btn-secondary-bt': '1px solid var(--cyan)',
+  '--btn-secondary-bl': '1px solid var(--cyan)',
+  '--btn-secondary-br': '2px solid var(--cyan)',
+  '--btn-secondary-bb': '2px solid var(--cyan)',
+  '--btn-secondary-radius': 'var(--btn-radius)',
+
+  '--btn-secondary2-bg': 'var(--bg)',
+  '--btn-secondary2-shadow': 'none',
+  '--btn-secondary2-color': 'var(--pink)',
+  '--btn-secondary2-bt': '1px solid var(--pink)',
+  '--btn-secondary2-bl': '1px solid var(--pink)',
+  '--btn-secondary2-br': '2px solid var(--pink)',
+  '--btn-secondary2-bb': '2px solid var(--pink)',
+  '--btn-secondary2-radius': 'var(--btn-radius)',
+
+  '--fig-avatar-border': '2px solid var(--green)',
+  '--fig-avatar-shadow': '0 0 12px rgba(57,255,20,0.3)',
+  '--fig-avatar-grad':
+    'linear-gradient(135deg, rgba(0,245,255,0.1) 0%, rgba(176,76,255,0.1) 100%)',
+
+  '--btn-bg': 'var(--bg)',
+  '--btn-color': 'var(--green)',
+  '--btn-bt': '1px solid var(--green)',
+  '--btn-bl': '4px solid var(--green)',
+  '--btn-br': '1px solid var(--green)',
+  '--btn-bb': '4px solid var(--green)',
+  '--btn-radius': '2px',
+  '--cta-solid-bg': '#080810',
+  '--cta-solid-bg-disabled': '#14141f',
+  '--btn-shadow': '0 0 12px rgba(57,255,20,0.2)',
+  '--btn-filter': 'none',
+  '--btn-letter-spacing': '3px',
+  '--btn-subtext-tracking': '1px',
+
+  '--logo-ring': 'var(--green)',
+  '--logo-mark': 'var(--pink)',
+  '--logo-text': 'var(--green)',
+  '--logo-font': 'var(--font-mono)',
+  '--logo-tracking': '1.44px',
+
+  '--chat-user-accent': 'var(--cyan)',
+  '--chat-lens-accent': 'var(--pink)',
+
+  '--fcard-bg': '#0d0d1a',
+  '--fcard-bt': '1px solid #ff2d78',
+  '--fcard-br': '4px solid #ff2d78',
+  '--fcard-bb': '2px solid #ff2d78',
+  '--fcard-bl': '4px solid #ff2d78',
+  '--fcard-radius': '4px',
+  '--fcard-filter': 'none',
+  '--fcard-inset': 'none',
+  '--focus-ring': '2px solid #00F5FF',
+  '--mm-card-bg-selected': 'rgba(57,255,20,0.12)',
+  '--btn-dis-color': 'rgba(255,255,255,0.2)',
+  '--btn-dis-border': 'rgba(255,255,255,0.1)',
+
+  '--lens-header-bg': 'rgba(0,245,255,0.04)',
+  '--lens-quote-color': 'var(--cyan)',
+
+  '--preview-body': '#EEFFEA',
+
+  '--share-accent': 'var(--amber)',
+
+  '--preview-glyph': 'var(--cyan)',
+
+  '--portrait-filter': 'none',
+
+  '--sw-bg': 'rgba(0,0,0,0.3)',
+  '--sw-radius': '4px',
+  '--sw-btn-radius': '2px',
+  '--sw-btn-w': '94px',
+  '--sw-btn-h': '40px',
+  '--sw-cyberpunk-bg': 'var(--cyan)',
+  '--sw-kawaii-bg': 'var(--pink)',
+  '--sw-notepad-bg': 'rgba(255,255,255,0.1)',
+  '--sw-text': 'var(--bg)',
+  '--sw-notepad-text': 'var(--bg)',
+  '--sw-border': 'none',
+  '--sw-shadow': 'none',
+
+  '--border-cyan': '1px solid rgba(0,245,255,0.3)',
+  '--border-pink': '1px solid rgba(255,45,120,0.3)',
+  '--border-violet': '1px solid rgba(176,76,255,0.3)',
+  '--border-subtle': '1px solid rgba(255,255,255,0.08)',
+
+  '--r-sm': '2px',
+  '--r-md': '4px',
+  '--r-lg': '8px',
+
+  '--glass-bg': 'rgba(13,13,26,0.7)',
+  '--glass-border': 'rgba(0,245,255,0.15)',
+  '--blur': 'blur(20px)',
+
+  '--btn-primary-border': '4px 1px 1px 4px',
+  '--btn-secondary-border': '1px 2px 2px 1px',
+
+  '--node-career-bg': 'rgba(255,45,120,0.15)',
+  '--node-career-border': 'var(--pink)',
+  '--node-creativity-bg': 'rgba(176,76,255,0.15)',
+  '--node-creativity-border': 'var(--violet)',
+  '--node-health-bg': 'rgba(57,255,20,0.15)',
+  '--node-health-border': 'var(--green)',
+  '--node-relationships-bg': 'rgba(0,245,255,0.15)',
+  '--node-relationships-border': 'var(--cyan)',
+  '--node-travel-bg': 'rgba(255,184,0,0.15)',
+  '--node-travel-border': 'var(--amber)',
+  '--node-finances-bg': 'rgba(57,255,20,0.12)',
+  '--node-finances-border': 'var(--green)',
+  '--node-living-bg': 'rgba(176,76,255,0.12)',
+  '--node-living-border': 'var(--violet)',
+} as const satisfies Record<string, string>;
