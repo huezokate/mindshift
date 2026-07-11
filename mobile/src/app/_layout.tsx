@@ -7,6 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
 import { CLERK_PUBLISHABLE_KEY } from '@/lib/config';
+import { JournalStoreProvider } from '@/state/journal-store';
 import { VentFlowProvider } from '@/state/vent-flow';
 import { ThemeProvider, useTheme } from '@/theme';
 
@@ -60,7 +61,9 @@ export default function RootLayout() {
     <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY} tokenCache={tokenCache}>
       <ThemeProvider>
         <VentFlowProvider>
-          <ThemedNavShell />
+          <JournalStoreProvider>
+            <ThemedNavShell />
+          </JournalStoreProvider>
         </VentFlowProvider>
       </ThemeProvider>
     </ClerkProvider>
