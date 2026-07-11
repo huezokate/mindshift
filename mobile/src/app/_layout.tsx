@@ -30,6 +30,7 @@ function ThemedNavShell() {
         <Stack.Screen name="lens" options={{ title: 'Lens' }} />
         <Stack.Screen name="response" options={{ title: 'Response' }} />
         <Stack.Screen name="theme-select" options={{ title: 'Theme' }} />
+        <Stack.Screen name="storybook" options={{ headerShown: false }} />
       </Stack>
     </>
   );

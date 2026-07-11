@@ -5,12 +5,14 @@
   "dependencies": {
     "@clerk/clerk-expo": "^2.19.31",
     "@expo/ui": "~57.0.4",
+    "@gorhom/bottom-sheet": "^5.2.14",
     "expo": "~57.0.4",
     "expo-constants": "~57.0.3",
     "expo-device": "~57.0.0",
     "expo-font": "~57.0.0",
     "expo-glass-effect": "~57.0.0",
     "expo-image": "~57.0.0",
+    "expo-linear-gradient": "~57.0.0",
     "expo-linking": "~57.0.2",
     "expo-router": "~57.0.4",
     "expo-secure-store": "~57.0.0",
@@ -31,9 +33,13 @@
     "react-native-worklets": "0.10.0"
   },
   "devDependencies": {
+    "@storybook/addon-ondevice-actions": "^10.5.0",
+    "@storybook/addon-ondevice-controls": "^10.5.0",
+    "@storybook/react-native": "^10.5.0",
     "@types/react": "~19.2.2",
     "eslint": "^9.0.0",
     "eslint-config-expo": "~57.0.0",
+    "storybook": "^10.5.0",
     "typescript": "~6.0.3",
     "vitest": "^4.1.10"
   },
@@ -43,6 +49,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
+    "storybook:stories": "sb-rn-get-stories --config-path .rnstorybook",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
