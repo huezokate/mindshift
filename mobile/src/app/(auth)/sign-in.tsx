@@ -1,10 +1,12 @@
 import { useSignIn, useSSO } from '@clerk/clerk-expo';
-import { Link, useRouter } from 'expo-router';
+import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { useCallback, useState } from 'react';
 import { Text } from 'react-native';
 
-import { AuthButton, AuthError, AuthForm, AuthInput } from '@/components/auth-form';
+import { AuthError, AuthInput, AuthShell, parseAuthReason } from '@/components/auth/auth-shell';
+import { Button } from '@/components/ui/button';
+import { useTheme } from '@/theme';
 
 // Completes the pending auth session when the system browser redirects back.
 WebBrowser.maybeCompleteAuthSession();
@@ -13,10 +15,17 @@ export default function SignIn() {
   const { signIn, setActive, isLoaded } = useSignIn();
   const { startSSOFlow } = useSSO();
   const router = useRouter();
+  const { tokens: t } = useTheme();
+  // ?reason= drives the AuthBanner headline (web parity); ?redirect= returns
+  // mid-flow users (e.g. anon Save on the response screen) where they left off.
+  const params = useLocalSearchParams<{ reason?: string; redirect?: string }>();
+  const reason = parseAuthReason(params.reason);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  const destination = (params.redirect as never) ?? ('/home' as never);
 
   const onEmailSignIn = useCallback(async () => {
     if (!isLoaded || busy) return;
@@ -26,7 +35,7 @@ export default function SignIn() {
       const attempt = await signIn.create({ identifier: email, password });
       if (attempt.status === 'complete') {
         await setActive({ session: attempt.createdSessionId });
-        router.replace('/home');
+        router.replace(destination);
       } else {
         setError(`Additional step required: ${attempt.status}`);
       }
@@ -35,7 +44,7 @@ export default function SignIn() {
     } finally {
       setBusy(false);
     }
-  }, [isLoaded, busy, signIn, setActive, email, password, router]);
+  }, [isLoaded, busy, signIn, setActive, email, password, router, destination]);
 
   const onGoogleSignIn = useCallback(async () => {
     if (busy) return;
@@ -48,19 +57,25 @@ export default function SignIn() {
       });
       if (createdSessionId && ssoSetActive) {
         await ssoSetActive({ session: createdSessionId });
-        router.replace('/home');
+        router.replace(destination);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Google sign-in failed');
     } finally {
       setBusy(false);
     }
-  }, [busy, startSSOFlow, router]);
+  }, [busy, startSSOFlow, router, destination]);
 
   return (
-    <AuthForm title="Sign in">
-      <AuthButton label="Continue with Google" onPress={onGoogleSignIn} disabled={busy} />
-      <Text style={{ color: '#5b6570', textAlign: 'center' }}>or</Text>
+    <AuthShell title="Sign in" reason={reason}>
+      <Button variant="primary" fullWidth disabled={busy} onPress={() => void onGoogleSignIn()}>
+        Continue with Google
+      </Button>
+      <Text
+        style={{ fontFamily: t.fonts.body.regular, color: t.text.sub, textAlign: 'center' }}
+      >
+        or
+      </Text>
       <AuthInput
         placeholder="Email"
         value={email}
@@ -76,10 +91,20 @@ export default function SignIn() {
         autoComplete="current-password"
       />
       <AuthError message={error} />
-      <AuthButton label="Sign in" onPress={onEmailSignIn} secondary disabled={busy} />
-      <Link href="/sign-up" style={{ color: '#5ad4e6', textAlign: 'center', marginTop: 8 }}>
+      <Button variant="secondary" fullWidth disabled={busy} onPress={() => void onEmailSignIn()}>
+        Sign in
+      </Button>
+      <Link
+        href="/sign-up"
+        style={{
+          fontFamily: t.fonts.body.regular,
+          color: t.palette.cyan,
+          textAlign: 'center',
+          marginTop: 8,
+        }}
+      >
         No account? Sign up
       </Link>
-    </AuthForm>
+    </AuthShell>
   );
 }

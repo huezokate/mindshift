@@ -1,19 +1,27 @@
 import { useSignUp } from '@clerk/clerk-expo';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Text } from 'react-native';
 
-import { AuthButton, AuthError, AuthForm, AuthInput } from '@/components/auth-form';
+import { AuthError, AuthInput, AuthShell, parseAuthReason } from '@/components/auth/auth-shell';
+import { Button } from '@/components/ui/button';
+import { useTheme } from '@/theme';
 
 export default function SignUp() {
   const { signUp, setActive, isLoaded } = useSignUp();
   const router = useRouter();
+  const { tokens: t } = useTheme();
+  // ?reason= carries the limit context from the lens screen's LimitCard.
+  const params = useLocalSearchParams<{ reason?: string; redirect?: string }>();
+  const reason = parseAuthReason(params.reason);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [code, setCode] = useState('');
   const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  const destination = (params.redirect as never) ?? ('/home' as never);
 
   const onSignUp = useCallback(async () => {
     if (!isLoaded || busy) return;
@@ -38,7 +46,7 @@ export default function SignUp() {
       const attempt = await signUp.attemptEmailAddressVerification({ code });
       if (attempt.status === 'complete') {
         await setActive({ session: attempt.createdSessionId });
-        router.replace('/home');
+        router.replace(destination);
       } else {
         setError(`Additional step required: ${attempt.status}`);
       }
@@ -47,21 +55,30 @@ export default function SignUp() {
     } finally {
       setBusy(false);
     }
-  }, [isLoaded, busy, signUp, setActive, code, router]);
+  }, [isLoaded, busy, signUp, setActive, code, router, destination]);
 
   if (verifying) {
     return (
-      <AuthForm title="Check your email">
-        <Text style={{ color: '#e8f6f8' }}>We sent a verification code to {email}.</Text>
-        <AuthInput placeholder="Verification code" value={code} onChangeText={setCode} keyboardType="number-pad" />
+      <AuthShell title="Check your email">
+        <Text style={{ fontFamily: t.fonts.body.regular, fontSize: 14, color: t.text.body }}>
+          We sent a verification code to {email}.
+        </Text>
+        <AuthInput
+          placeholder="Verification code"
+          value={code}
+          onChangeText={setCode}
+          keyboardType="number-pad"
+        />
         <AuthError message={error} />
-        <AuthButton label="Verify" onPress={onVerify} disabled={busy} />
-      </AuthForm>
+        <Button variant="primary" fullWidth disabled={busy} onPress={() => void onVerify()}>
+          Verify
+        </Button>
+      </AuthShell>
     );
   }
 
   return (
-    <AuthForm title="Sign up">
+    <AuthShell title="Sign up" reason={reason}>
       <AuthInput
         placeholder="Email"
         value={email}
@@ -77,7 +94,9 @@ export default function SignUp() {
         autoComplete="new-password"
       />
       <AuthError message={error} />
-      <AuthButton label="Create account" onPress={onSignUp} disabled={busy} />
-    </AuthForm>
+      <Button variant="primary" fullWidth disabled={busy} onPress={() => void onSignUp()}>
+        Create account
+      </Button>
+    </AuthShell>
   );
 }
