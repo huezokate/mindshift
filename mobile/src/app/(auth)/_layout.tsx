@@ -1,7 +1,10 @@
-import { Stack } from 'expo-router';
+import { useAuth } from '@clerk/clerk-expo';
+import { Redirect, Stack } from 'expo-router';
 
-// Step 6 adds the signed-in redirect once Clerk is wired.
 export default function AuthLayout() {
+  const { isSignedIn } = useAuth();
+  if (isSignedIn) return <Redirect href="/home" />;
+
   return (
     <Stack
       screenOptions={{

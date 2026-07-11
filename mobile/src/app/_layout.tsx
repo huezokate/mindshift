@@ -1,8 +1,12 @@
+import { ClerkProvider } from '@clerk/clerk-expo';
+import { tokenCache } from '@clerk/clerk-expo/token-cache';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+
+import { CLERK_PUBLISHABLE_KEY } from '@/lib/config';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -24,7 +28,7 @@ export default function RootLayout() {
   if (!fontsLoaded && !fontError) return null;
 
   return (
-    <>
+    <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY} tokenCache={tokenCache}>
       <StatusBar style="light" />
       <Stack
         screenOptions={{
@@ -40,6 +44,6 @@ export default function RootLayout() {
         <Stack.Screen name="response" options={{ title: 'Response' }} />
         <Stack.Screen name="theme-select" options={{ title: 'Theme' }} />
       </Stack>
-    </>
+    </ClerkProvider>
   );
 }
