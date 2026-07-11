@@ -7,3 +7,4 @@ export type { BorderSet, ButtonFamily, FontFamily, Side, Theme, ThemeMode, Token
 export { buildTheme, themes } from './build';
 export { MODES, ThemeProvider, useTheme } from './provider';
 export { borderStyle, sideStyle } from './helpers';
+export { parseLinearGradient, type ParsedGradient } from './gradient';
