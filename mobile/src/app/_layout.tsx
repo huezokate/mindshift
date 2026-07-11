@@ -7,8 +7,33 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
 import { CLERK_PUBLISHABLE_KEY } from '@/lib/config';
+import { ThemeProvider, useTheme } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
+
+// Separate component because useTheme needs ThemeProvider above it.
+function ThemedNavShell() {
+  const { mode, tokens } = useTheme();
+  return (
+    <>
+      <StatusBar style={mode === 'cyberpunk' ? 'light' : 'dark'} />
+      <Stack
+        screenOptions={{
+          headerStyle: { backgroundColor: tokens.palette.bg },
+          headerTintColor: tokens.text.h1,
+          contentStyle: { backgroundColor: tokens.palette.bg },
+        }}
+      >
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Screen name="onboarding" options={{ title: 'Vent' }} />
+        <Stack.Screen name="lens" options={{ title: 'Lens' }} />
+        <Stack.Screen name="response" options={{ title: 'Response' }} />
+        <Stack.Screen name="theme-select" options={{ title: 'Theme' }} />
+      </Stack>
+    </>
+  );
+}
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
@@ -29,21 +54,9 @@ export default function RootLayout() {
 
   return (
     <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY} tokenCache={tokenCache}>
-      <StatusBar style="light" />
-      <Stack
-        screenOptions={{
-          headerStyle: { backgroundColor: '#0a0a12' },
-          headerTintColor: '#e8f6f8',
-          contentStyle: { backgroundColor: '#0a0a12' },
-        }}
-      >
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="onboarding" options={{ title: 'Vent' }} />
-        <Stack.Screen name="lens" options={{ title: 'Lens' }} />
-        <Stack.Screen name="response" options={{ title: 'Response' }} />
-        <Stack.Screen name="theme-select" options={{ title: 'Theme' }} />
-      </Stack>
+      <ThemeProvider>
+        <ThemedNavShell />
+      </ThemeProvider>
     </ClerkProvider>
   );
 }
