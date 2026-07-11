@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { motion, useAnimationControls } from 'framer-motion'
 import { useUser } from '@clerk/nextjs'
 import { FIGURES, getFigureImg } from '@/lib/figures'
+import { getVentLabel } from '@/lib/vent-label'
 import { useTheme } from '@/lib/theme'
 import Icon from '@/components/ui/Icon'
 import AppHeader from '@/components/nav/AppHeader'
@@ -228,7 +229,7 @@ export default function ResponsePage() {
             style={{ background: 'var(--input-header-bg)', padding: '8px 16px', borderBottom: '1px solid var(--input-divider)' }}
           >
             <p className="uppercase text-center" style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 11, letterSpacing: 0.8, lineHeight: '14px', color: 'var(--text-body)' }}>
-              Dump it all here:
+              {getVentLabel(vent)}
             </p>
           </div>
           <div style={{ background: 'var(--input-bg)', padding: '12px 16px' }}>
@@ -347,7 +348,7 @@ export default function ResponsePage() {
               style={pillStyle('--green')}
             >
               <Icon name="autorenew" size={18} />
-              New Lens
+              Another lens
             </button>
             {/* Share via native share sheet (SMS, socials) */}
             <button

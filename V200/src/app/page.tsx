@@ -15,9 +15,9 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.minds-shift.com'
 // While the app is offline we don't send people into it. "Try Minds Shift Free"
 // opens a pre-filled email to claim alpha access + free Pro-for-life instead.
 const ALPHA_MAILTO = `mailto:${WAITLIST_CONTACT}?subject=${encodeURIComponent(
-  'Claiming my free alpha access',
+  'Alpha testing program application',
 )}&body=${encodeURIComponent(
-  "Hi Minds Shift team,\n\nI'd love to join as an alpha tester and claim my free Pro access for life. Count me in — happy to share feedback as I go!\n\nThanks!",
+  "Hi Minds Shift team,\n\nI'd love to join the alpha testing program (free Pro for life!). A little about me:\n\nWhy journaling matters to me:\n\nHow I'd use Minds Shift:\n\nThe kind of feedback I'd love to give:\n\n",
 )}`
 
 // General contact / lens-request email — pre-fills a friendly opener so the
@@ -479,7 +479,7 @@ function Hero() {
         </motion.div>
 
         <motion.div variants={fade}>
-          <PrimaryButton href={APP_URL}>Try the web app →</PrimaryButton>
+          <PrimaryButton href={APP_URL}>Vent something →</PrimaryButton>
         </motion.div>
       </motion.div>
     </Section>
@@ -511,8 +511,15 @@ function WhoIsItFor() {
             <UserLine label="For the planner">Mind mapping is coming: a full visual map of your life, your goals, your thinking. Soon.</UserLine>
           </motion.div>
         </div>
-        <motion.div variants={fade}>
-          <PrimaryButton href={ALPHA_MAILTO}>Try Minds Shift Free →</PrimaryButton>
+        <motion.div variants={fade} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+          <PrimaryButton href={APP_URL}>Try Minds Shift free →</PrimaryButton>
+          {/* Tier explainer under the CTA (Kate 2026-07-11) */}
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 12, letterSpacing: 0.3, lineHeight: '18px', color: 'var(--text-sub)', textAlign: 'center', maxWidth: 420, margin: 0 }}>
+            Free to vent — no account needed. A free account saves your journal (3 vents a day, 5 lenses each). Pro unlocks every lens, unlimited.
+          </p>
+          <TextLink href={ALPHA_MAILTO}>
+            Passionate about journaling? Join the alpha testing program — free Pro for life →
+          </TextLink>
         </motion.div>
       </motion.div>
     </Section>
