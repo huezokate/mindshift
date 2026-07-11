@@ -44,6 +44,8 @@ export default function RootLayout() {
     'NunitoSans-Bold': require('@/assets/fonts/NunitoSans-Bold.ttf'),
     'Fredoka-Medium': require('@/assets/fonts/Fredoka-Medium.ttf'),
     'Fredoka-SemiBold': require('@/assets/fonts/Fredoka-SemiBold.ttf'),
+    'Inter-Regular': require('@/assets/fonts/Inter-Regular.ttf'),
+    'Inter-SemiBold': require('@/assets/fonts/Inter-SemiBold.ttf'),
     MaterialSymbolsRounded: require('@/assets/fonts/MaterialSymbolsRounded.ttf'),
   });
 

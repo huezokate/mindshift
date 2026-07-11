@@ -18,10 +18,19 @@ type ThemeContext = { mode: ThemeMode; setMode: (mode: ThemeMode) => void; token
 
 const Ctx = createContext<ThemeContext | null>(null);
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
+export function ThemeProvider({
+  children,
+  fixedMode,
+}: {
+  children: ReactNode;
+  /** Pin the theme (no persistence, setMode is a no-op) — for side-by-side
+      mode comparisons like the Storybook TriModes helper. */
+  fixedMode?: ThemeMode;
+}) {
   const [mode, setModeState] = useState<ThemeMode>(DEFAULT);
 
   useEffect(() => {
+    if (fixedMode) return;
     let cancelled = false;
     getSavedMode().then((saved) => {
       if (saved && !cancelled) setModeState(saved);
@@ -29,14 +38,18 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [fixedMode]);
 
   const setMode = (next: ThemeMode) => {
+    if (fixedMode) return;
     setModeState(next);
     void saveMode(next);
   };
 
-  return <Ctx.Provider value={{ mode, setMode, tokens: themes[mode] }}>{children}</Ctx.Provider>;
+  const shown = fixedMode ?? mode;
+  return (
+    <Ctx.Provider value={{ mode: shown, setMode, tokens: themes[shown] }}>{children}</Ctx.Provider>
+  );
 }
 
 export function useTheme(): ThemeContext {

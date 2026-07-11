@@ -105,8 +105,11 @@ describe('parsed structural values', () => {
     expect(themes.cyberpunk.fonts.body.regular).toBe('Courier New');
     expect(themes.kawaii.fonts.btn).toEqual({ regular: 'Fredoka-Medium', bold: 'Fredoka-SemiBold' });
     expect(themes.notepad.fonts.display.regular).toBe('Georgia');
-    // Inter gap: notepad body intentionally falls back to the system font
-    expect(themes.notepad.fonts.body.regular).toBeUndefined();
+    // Inter gap closed in T-030-03: static instances bundled for notepad
+    expect(themes.notepad.fonts.body).toEqual({
+      regular: 'Inter-Regular',
+      bold: 'Inter-SemiBold',
+    });
     // --logo-font: var(--font-mono) on cyberpunk / body on kawaii / display on notepad
     expect(themes.cyberpunk.logo.font.regular).toBe('Courier New');
     expect(themes.notepad.logo.font.regular).toBe('Georgia');

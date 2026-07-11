@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { View } from 'react-native';
 
+import { TriModes } from '@/stories/tri-modes';
+
 import { Button } from './button';
 
 /**
@@ -77,6 +79,27 @@ export const SemanticPair: Story = {
         </Button>
       </View>
     </View>
+  ),
+};
+
+/** The pair pinned in all three modes at once — the side-by-side proof that
+    the swap never collapses (AC #2). */
+export const SemanticPairAllModes: Story = {
+  render: () => (
+    <TriModes>
+      <View style={{ flexDirection: 'row', gap: 12 }}>
+        <View style={{ flex: 1 }}>
+          <Button variant="secondary" fullWidth>
+            Journal
+          </Button>
+        </View>
+        <View style={{ flex: 1 }}>
+          <Button variant="secondary2" fullWidth>
+            Mind Map
+          </Button>
+        </View>
+      </View>
+    </TriModes>
   ),
 };
 
