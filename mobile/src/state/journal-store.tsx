@@ -11,7 +11,13 @@ import {
 
 import { ApiError } from '@/lib/api';
 import { figureById } from '@/lib/figures';
-import { mapLensResponse, mapSession, type ApiSession, type JournalEntryFull } from '@/lib/journal-map';
+import {
+  mapLensResponse,
+  mapSession,
+  type ApiSession,
+  type JournalEntryFull,
+  type LensResponseFull,
+} from '@/lib/journal-map';
 import { useApi } from '@/lib/use-api';
 
 export type JournalFilter = 'all' | 'favorites';
@@ -41,9 +47,15 @@ type JournalStoreValue = {
   getEntry: (id: string) => JournalEntryFull | undefined;
   /** Cache-or-page-through lookup for cold deep links. Null if not found. */
   fetchEntry: (id: string) => Promise<JournalEntryFull | null>;
-  /** Generate + save a new lens on an existing entry; optimistic upsert.
-      Throws Error with a user-facing message (limit / generation / save). */
-  applyLensToEntry: (entryId: string, figureId: string, theme: string) => Promise<void>;
+  /** Generate + save a new lens on an existing entry; optimistic upsert in
+      the cache and returns the new lens (callers holding an uncached copy —
+      deep-linked detail — merge it themselves). Throws Error with a
+      user-facing message (limit / generation / save). */
+  applyLensToEntry: (
+    entry: JournalEntryFull,
+    figureId: string,
+    theme: string,
+  ) => Promise<LensResponseFull>;
   deleteEntry: (id: string) => Promise<void>;
   toggleFavorite: (entryId: string, responseId: string, next: boolean) => Promise<void>;
   seedDemo: () => Promise<void>;
@@ -148,9 +160,8 @@ export function JournalStoreProvider({ children }: { children: ReactNode }) {
   );
 
   const applyLensToEntry = useCallback(
-    async (entryId: string, figureId: string, theme: string) => {
-      const entry = entries.find((e) => e.id === entryId);
-      if (!entry) throw new Error('Entry not found.');
+    async (entry: JournalEntryFull, figureId: string, theme: string) => {
+      const entryId = entry.id;
       const figure = figureById(figureId);
       if (!figure) throw new Error('Unknown lens.');
 
@@ -214,8 +225,9 @@ export function JournalStoreProvider({ children }: { children: ReactNode }) {
         }),
       );
       void refreshCounts();
+      return newLens;
     },
-    [api, entries, refreshCounts],
+    [api, refreshCounts],
   );
 
   const deleteEntry = useCallback(

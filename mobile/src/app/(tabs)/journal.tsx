@@ -77,11 +77,12 @@ export default function JournalTab() {
   }
 
   async function handlePickLens(figureId: string) {
-    if (!pickerFor) return;
+    const entry = pickerFor ? store.getEntry(pickerFor) : undefined;
+    if (!entry) return;
     setAddingLens(true);
     setAddLensError(null);
     try {
-      await store.applyLensToEntry(pickerFor, figureId, mode);
+      await store.applyLensToEntry(entry, figureId, mode);
       setPickerFor(null);
     } catch (e) {
       setAddLensError(e instanceof Error ? e.message : 'Could not add the lens.');
