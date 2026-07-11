@@ -1,5 +1,7 @@
-import { PlaceholderScreen } from '@/components/placeholder-screen';
+import { Redirect } from 'expo-router';
 
+// Entry point. Until Clerk lands (step 6) everyone starts at the vent flow,
+// matching the web's anon-friendly entry. Step 6 sends signed-in users to /home.
 export default function Index() {
-  return <PlaceholderScreen title="MindShift" />;
+  return <Redirect href="/onboarding" />;
 }
