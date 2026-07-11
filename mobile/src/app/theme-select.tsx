@@ -1,26 +1,71 @@
-import { ScrollView, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { NavLink } from '@/components/nav-link';
+import { EntryAuthRow } from '@/components/nav/entry-auth-row';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Icon } from '@/components/ui/icon';
 import { ModeSwitcher } from '@/components/ui/mode-switcher';
 import { useTheme, type Theme } from '@/theme';
 
 /**
- * Theme picker + the token layer's living proof (T-030-02 AC: a sample
- * element re-skins across all three modes with no leakage). Every color,
- * border, radius, shadow, filter, font, and tracking below comes from
- * useTheme().tokens — zero hardcoded values. The switcher chips and buttons
- * are the shared design-system components (T-030-03).
+ * Theme picker + anon entry gate — mirrors /app/theme-select: pick a reality,
+ * acknowledge the disclaimer, enter. The ack is EPHEMERAL by design (web
+ * comment: must start unchecked every visit — never persisted). Also still
+ * the token layer's living proof (T-030-02): every value below reads from
+ * useTheme().tokens.
  */
 export default function ThemeSelect() {
+  const router = useRouter();
   const { tokens: t } = useTheme();
+  const [acked, setAcked] = useState(false);
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: t.palette.bg }} edges={['bottom']}>
       <ScrollView contentContainerStyle={{ padding: 24, gap: 24 }}>
         <ModeSwitcher />
         <SampleCard tokens={t} />
-        <NavLink href="/onboarding" label="Start venting →" />
+
+        {/* Disclaimer ack + enter (web parity) */}
+        <Card style={{ padding: 16, gap: 12 }}>
+          <Pressable
+            onPress={() => setAcked((a) => !a)}
+            accessibilityRole="checkbox"
+            accessibilityState={{ checked: acked }}
+            style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10 }}
+          >
+            <Icon
+              name={acked ? 'check_box' : 'check_box_outline_blank'}
+              size={22}
+              color={acked ? t.palette.cyan : t.text.sub}
+            />
+            <Text
+              style={{
+                flex: 1,
+                fontFamily: t.fonts.body.regular,
+                fontSize: 12,
+                lineHeight: 17,
+                color: t.text.sub,
+              }}
+            >
+              Minds Shift offers perspective, not professional advice. The lens responses are
+              AI-generated in a historical figure&apos;s voice — not their words, and not a
+              substitute for mental-health care.
+            </Text>
+          </Pressable>
+          <Button
+            variant="primary"
+            fullWidth
+            disabled={!acked}
+            onPress={() => router.push('/onboarding')}
+          >
+            Enter Minds Shift
+          </Button>
+        </Card>
+
+        <EntryAuthRow />
       </ScrollView>
     </SafeAreaView>
   );
@@ -60,33 +105,12 @@ function SampleCard({ tokens: t }: { tokens: Theme }) {
       <Text
         style={{ fontFamily: t.fonts.body.regular, fontSize: 15, lineHeight: 22, color: t.text.body }}
       >
-        Every value on this screen is drawn from the shared token layer — the
-        same tokens the web app reads as CSS custom properties.
+        Vent what&apos;s on your mind, pick a historical figure, and see your problem through
+        their eyes. Three realities to read it in — switch any time.
       </Text>
       <Text style={{ fontFamily: t.fonts.body.regular, fontSize: 13, color: t.text.sub }}>
-        Subtext keeps the theme&apos;s secondary voice.
+        Anonymous and free to try — no account needed.
       </Text>
-      <Text style={{ fontFamily: t.fonts.body.regular, fontSize: 11, color: t.text.meta }}>
-        meta · switching modes re-skins everything above and below
-      </Text>
-
-      <Button variant="primary" fullWidth>
-        Enter Minds Shift
-      </Button>
-      {/* Kate's cross-theme rule: secondary = positive/blue (journal),
-          secondary2 = negative/red (mind map) — swapped per skin by the tokens. */}
-      <View style={{ flexDirection: 'row', gap: 12 }}>
-        <View style={{ flex: 1 }}>
-          <Button variant="secondary" fullWidth>
-            Journal
-          </Button>
-        </View>
-        <View style={{ flex: 1 }}>
-          <Button variant="secondary2" fullWidth>
-            Mind Map
-          </Button>
-        </View>
-      </View>
     </View>
   );
 }

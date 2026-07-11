@@ -1,72 +1,124 @@
 import { useAuth, useUser } from '@clerk/clerk-expo';
-import { useCallback, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { ScrollView, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AuthButton, AuthError } from '@/components/auth-form';
-import { NavLink } from '@/components/nav-link';
-import { PlaceholderScreen } from '@/components/placeholder-screen';
-import { apiFetch } from '@/lib/api';
+import { AuthBanner } from '@/components/journal/auth-banner';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { ModeSwitcher } from '@/components/ui/mode-switcher';
+import { useTheme } from '@/theme';
 
-// Mirrors /app/profile. Doubles as the T-030-01 backend smoke test: an
-// authenticated GET /api/journal-v2/entries — a Clerk-gated route that 401s
-// without a valid Bearer token, so a 200 here proves native auth end-to-end.
-export default function Profile() {
-  const { isSignedIn, getToken, signOut } = useAuth();
+/**
+ * Profile — themed RN port of /app/profile: account card, plan card, theme
+ * switcher (native extra), sign out. Replaces the Phase-0 smoke-test screen.
+ */
+export default function ProfileTab() {
+  const router = useRouter();
+  const { tokens: t } = useTheme();
+  const { isSignedIn, signOut, has } = useAuth();
   const { user } = useUser();
-  const [result, setResult] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-
-  const onTestBackend = useCallback(async () => {
-    setBusy(true);
-    setError(null);
-    setResult(null);
-    try {
-      const token = await getToken();
-      const data = await apiFetch<{ sessions: unknown[]; hasMore: boolean }>(
-        '/api/journal-v2/entries?offset=0&limit=1',
-        { token },
-      );
-      setResult(`✓ Authenticated API call OK — ${data.sessions.length} session(s) returned`);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Request failed');
-    } finally {
-      setBusy(false);
-    }
-  }, [getToken]);
 
   if (!isSignedIn) {
     return (
-      <PlaceholderScreen title="Profile">
-        <Text style={styles.body}>Sign in to see your account.</Text>
-        <NavLink href="/sign-in" label="Sign in" />
-        <NavLink href="/sign-up" label="Sign up" />
-      </PlaceholderScreen>
+      <SafeAreaView style={{ flex: 1, backgroundColor: t.palette.bg }} edges={['top']}>
+        <View style={{ padding: 24, gap: 16 }}>
+          <AuthBanner />
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            <View style={{ flex: 1 }}>
+              <Button variant="secondary" fullWidth onPress={() => router.push('/(auth)/sign-in')}>
+                Log in
+              </Button>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Button variant="secondary2" fullWidth onPress={() => router.push('/(auth)/sign-up')}>
+                Sign up
+              </Button>
+            </View>
+          </View>
+          <ModeSwitcher />
+        </View>
+      </SafeAreaView>
     );
   }
 
+  // Same plan key the web checks (user-tier.ts). Comp users resolve server-
+  // side only, so a comped account may read "Free" here — cosmetic only.
+  const isPro = Boolean(has?.({ plan: 'unlock_all_lenses_monthly' }));
+  const memberSince = user?.createdAt
+    ? new Date(user.createdAt).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
+    : null;
+
+  const label = (text: string) => (
+    <Text
+      style={{
+        fontFamily: t.fonts.body.bold ?? t.fonts.body.regular,
+        fontWeight: '700',
+        fontSize: 11,
+        letterSpacing: 1.5,
+        textTransform: 'uppercase',
+        color: t.palette.cyan,
+      }}
+    >
+      {text}
+    </Text>
+  );
+
+  const line = (text: string, sub = false) => (
+    <Text
+      style={{
+        fontFamily: t.fonts.body.regular,
+        fontSize: sub ? 12 : 15,
+        lineHeight: sub ? 17 : 21,
+        color: sub ? t.text.sub : t.text.body,
+      }}
+    >
+      {text}
+    </Text>
+  );
+
   return (
-    <PlaceholderScreen title="Profile">
-      <Text style={styles.body}>{user?.primaryEmailAddress?.emailAddress ?? user?.id}</Text>
-      <AuthButton label={busy ? 'Loading…' : 'Test backend (journal entries)'} onPress={onTestBackend} disabled={busy} />
-      {result && (
-        <View style={styles.result}>
-          <Text style={styles.body}>{result}</Text>
-        </View>
-      )}
-      <AuthError message={error} />
-      <AuthButton label="Sign out" onPress={() => signOut()} secondary />
-    </PlaceholderScreen>
+    <SafeAreaView style={{ flex: 1, backgroundColor: t.palette.bg }} edges={['top']}>
+      <ScrollView contentContainerStyle={{ padding: 24, gap: 16 }}>
+        <Text
+          style={{
+            fontFamily: t.fonts.display.bold ?? t.fonts.display.regular,
+            fontWeight: '700',
+            fontSize: 28,
+            letterSpacing: -0.4,
+            color: t.text.h1,
+          }}
+        >
+          Profile
+        </Text>
+
+        <Card style={{ padding: 18, gap: 6 }}>
+          {label('Account')}
+          {line(user?.username ? `@${user.username}` : (user?.fullName ?? 'Your account'))}
+          {user?.primaryEmailAddress ? line(user.primaryEmailAddress.emailAddress, true) : null}
+          {memberSince ? line(`Member since ${memberSince}`, true) : null}
+        </Card>
+
+        <Card style={{ padding: 18, gap: 6 }}>
+          {label('Plan')}
+          {line(isPro ? 'Pro — unlimited lenses' : 'Free')}
+          {line(
+            isPro
+              ? 'Unlimited quotes and lenses, every figure unlocked.'
+              : '3 quotes a day, 5 lenses per quote. Pro unlocks everything — manage your plan on the web.',
+            true,
+          )}
+        </Card>
+
+        <Card style={{ padding: 18, gap: 12 }}>
+          {label('Theme')}
+          <ModeSwitcher />
+        </Card>
+
+        <Button variant="secondary2" fullWidth onPress={() => void signOut()}>
+          Log out
+        </Button>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  body: { color: '#e8f6f8', fontSize: 16 },
-  result: {
-    borderWidth: 1,
-    borderColor: '#1d4b56',
-    borderRadius: 4,
-    padding: 12,
-    backgroundColor: '#101822',
-  },
-});
