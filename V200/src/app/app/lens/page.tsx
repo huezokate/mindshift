@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { useUser } from '@clerk/nextjs'
 import { FIGURES, getFigureImg } from '@/lib/figures'
+import { getVentLabel } from '@/lib/vent-label'
 import { useTheme } from '@/lib/theme'
 import AppHeader from '@/components/nav/AppHeader'
 import Button from '@/components/ui/Button'
@@ -34,17 +35,6 @@ function trackAnonLens(ventText: string) {
 
 const MAX_CHARS = 800
 
-const STOP = new Set(['i','a','the','is','it','and','or','but','to','my','me','you','we','they','am','are','was','be','have','has','had','do','does','did','will','would','could','should','of','in','on','at','for','with','by','from','up','out','that','this','an','not','what','so','all','as','just','about','if','there','when','who','which','than','then','into','can','how','more','their','your','its','our','her','his','im','ive','dont','keep','like','very','really','maybe','even','every','some','been','one','see','feel','get','got','know','think','want','need','just','much','also','still','going','make','always','never','something','anything','because','really','around','second'])
-
-const PREFIXES = ['Contemplating', 'Ruminating on', 'Reflecting on']
-
-function getVentLabel(vent: string): string {
-  const words = vent.toLowerCase().replace(/[^a-z\s]/g, '').split(/\s+/).filter(w => w.length > 3 && !STOP.has(w))
-  const keyword = [...new Set(words)][0]
-  if (!keyword) return 'Dump it all here:'
-  const prefix = PREFIXES[vent.length % PREFIXES.length]
-  return `${prefix} ${keyword}`
-}
 
 const DEMO_VENT =
   'I keep second-guessing my career choice. Everyone around me seems so sure about what they\'re doing, but I\'m constantly wondering if I chose the right path. Maybe I need a completely fresh perspective on all of this.'
@@ -243,7 +233,7 @@ export default function LensPage() {
           className="text-center uppercase"
           style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 12, letterSpacing: 1.3, lineHeight: '14px', color: 'var(--violet)' }}
         >
-          Choose:
+          Pick your lens:
         </motion.p>
 
         {/* Figure grid — tap to open detail overlay */}

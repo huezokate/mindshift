@@ -9,6 +9,14 @@ import Button from '@/components/ui/Button'
 
 const MAX_CHARS = 800
 
+// Theme-voiced sentence starters (Kate 2026-07-11) — a hand on the shoulder,
+// not a manual. Each skin opens the vent in its own voice.
+const PLACEHOLDER: Record<string, string> = {
+  cyberpunk: 'ugh, so…',
+  kawaii: 'Dear diary…',
+  notepad: 'Today got to me because…',
+}
+
 export default function OnboardingPage() {
   const router = useRouter()
   const [text, setText] = useState('')
@@ -69,7 +77,7 @@ export default function OnboardingPage() {
               color: 'var(--text-body)',
             }}
           >
-            Let it all out — then see it through the eyes of someone who lived through years of history.
+            Let it all out — then get an unexpected angle on it.
           </p>
         </motion.div>
 
@@ -178,7 +186,7 @@ export default function OnboardingPage() {
             </div>
           </div>
 
-          {/* Primary CTA — Select the Lens (shared DS Button) */}
+          {/* Primary CTA — Pick your lens (shared DS Button) */}
           <Button
             variant="primary"
             fullWidth
@@ -186,7 +194,7 @@ export default function OnboardingPage() {
             onClick={handleProceed}
             style={{ fontSize: 14, letterSpacing: 'var(--btn-letter-spacing, 3px)', padding: '17px 12px' }}
           >
-            Select the Lens
+            Pick your lens
           </Button>
         </motion.div>
 

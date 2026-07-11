@@ -8,7 +8,7 @@ const REASONS: Record<string, { headline: string; sub: string }> = {
   journal:     { headline: 'Your journal is waiting.', sub: 'Sign in to see your saved perspectives.' },
 }
 
-const DEFAULT = { headline: 'Unlock your full potential.', sub: 'Free account. No credit card.' }
+const DEFAULT = { headline: 'Unlock history\u2019s hottest takes.', sub: 'Free account. No credit card.' }
 
 const BENEFITS = [
   '3 vents per day · 5 lenses each',

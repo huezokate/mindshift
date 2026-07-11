@@ -290,14 +290,13 @@ export default function JournalPreviewCard({ entry, onAddLens }: Props) {
   ) : (
     <div style={footerStyle}>
       {statusGlyph}
+      {/* Icon-only + (Kate 2026-07-11): the visual button language carries it */}
       <Button
         variant="secondary"
         icon="add"
         onClick={addLens}
         ariaLabel="Apply a lens to this entry"
-      >
-        Lens
-      </Button>
+      />
     </div>
   )
 

@@ -53,7 +53,7 @@ export default function WelcomeCard({ onLoadDemo, seeding, seedMsg }: Props) {
           letterSpacing: '1.44px', lineHeight: '20px',
           color: 'var(--text-body)', textTransform: 'uppercase', textAlign: 'center', margin: 0,
         }}>
-          Welcome to the journal feature!
+          Journal unlocked
         </p>
         {/* Subhead — cyan, 12px bold uppercase (Figma 469:4038). */}
         <p style={{
@@ -61,7 +61,7 @@ export default function WelcomeCard({ onLoadDemo, seeding, seedMsg }: Props) {
           letterSpacing: '1.32px', lineHeight: '14px',
           color: 'var(--cyan)', textTransform: 'uppercase', textAlign: 'center', margin: 0,
         }}>
-          Your personal hub to save and share all future mindShifts
+          Every vent you write saves here automatically \u2014 revisit it, add new lenses, share the good ones.
         </p>
         {/* Feature list — cyan body (Figma 469:4039). */}
         <ul style={{
