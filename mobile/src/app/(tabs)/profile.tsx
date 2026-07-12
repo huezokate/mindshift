@@ -1,5 +1,6 @@
 import { useAuth, useUser } from '@clerk/clerk-expo';
 import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { ScrollView, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -8,6 +9,8 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ModeSwitcher } from '@/components/ui/mode-switcher';
 import { useJournalLock } from '@/lib/journal-lock';
+import { getPushPref, PushUnavailableError, registerForWeeklyNudge, unregisterWeeklyNudge } from '@/lib/push';
+import { useApi } from '@/lib/use-api';
 import { useTheme } from '@/theme';
 
 /**
@@ -20,6 +23,38 @@ export default function ProfileTab() {
   const { isSignedIn, signOut, has } = useAuth();
   const { user } = useUser();
   const lock = useJournalLock();
+  const { api } = useApi();
+  const [pushOn, setPushOn] = useState(false);
+  const [pushBusy, setPushBusy] = useState(false);
+  const [pushMsg, setPushMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    getPushPref().then(setPushOn);
+  }, []);
+
+  async function togglePush(next: boolean) {
+    if (pushBusy) return;
+    setPushBusy(true);
+    setPushMsg(null);
+    try {
+      if (next) {
+        await registerForWeeklyNudge(api);
+        setPushOn(true);
+      } else {
+        await unregisterWeeklyNudge(api);
+        setPushOn(false);
+      }
+    } catch (e) {
+      setPushOn(false);
+      setPushMsg(
+        e instanceof PushUnavailableError
+          ? e.message
+          : 'Could not update the weekly nudge. Please try again.',
+      );
+    } finally {
+      setPushBusy(false);
+    }
+  }
 
   if (!isSignedIn) {
     return (
@@ -115,6 +150,26 @@ export default function ProfileTab() {
         <Card style={{ padding: 18, gap: 12 }}>
           {label('Theme')}
           <ModeSwitcher />
+        </Card>
+
+        <Card style={{ padding: 18, gap: 6 }}>
+          {label('Notifications')}
+          <View
+            style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
+          >
+            <View style={{ flexShrink: 1, paddingRight: 12 }}>
+              {line('Weekly nudge')}
+              {line('One push on Mondays with your week’s plan from the mindmap.', true)}
+            </View>
+            <Switch
+              value={pushOn}
+              disabled={pushBusy}
+              onValueChange={(v) => void togglePush(v)}
+              trackColor={{ true: t.palette.cyan }}
+              accessibilityLabel="Weekly nudge push notifications"
+            />
+          </View>
+          {pushMsg ? line(pushMsg, true) : null}
         </Card>
 
         {lock.available ? (
