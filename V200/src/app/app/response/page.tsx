@@ -7,6 +7,7 @@ import { FIGURES, getFigureImg } from '@/lib/figures'
 import { getVentLabel } from '@/lib/vent-label'
 import { useTheme } from '@/lib/theme'
 import Icon from '@/components/ui/Icon'
+import Button from '@/components/ui/Button'
 import AppHeader from '@/components/nav/AppHeader'
 import ShareSheet from '@/components/journal/ShareSheet'
 
@@ -139,6 +140,27 @@ export default function ResponsePage() {
     setShareOpen(true)
   }
 
+  // Chat with the Lens — start the conversation right from the response (not only
+  // from the journal detail). The chat route needs a persisted session + the seed
+  // reframe (it loads them server-side), so signed-in users persist first if the
+  // auto-save hasn't landed yet, then navigate. Anon has no session and the chat
+  // route is sign-in-gated, so route anon to sign-in with a return url (mirrors
+  // Save). Wiring true anon/ephemeral chat is the open T-025-02 decision.
+  async function handleChat() {
+    if (!isSignedIn) {
+      router.push('/sign-in?reason=chat&redirect_url=' + encodeURIComponent('/app/response'))
+      return
+    }
+    let id = sessionStorage.getItem('ms_session_id')
+    if (!id) {
+      setSaveState('saving')
+      id = await persist()
+      if (!id) { setSaveState('error'); return }
+      setSaveState('saved')
+    }
+    router.push(`/app/journal-v2/${id}/chat/${figure.id}`)
+  }
+
   // Labelled, bordered accent pills matching the Button Secondary component
   // (Figma 414:5353) + the lens-card button-row idiom: asymmetric 1/2px border,
   // 2px radius, a faint accent-tinted fill (color-mix off the accent slot so all
@@ -249,7 +271,7 @@ export default function ResponsePage() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.12 }}
-          className="flex flex-col w-full overflow-hidden lg:col-start-2 lg:row-start-1 lg:row-span-2"
+          className="flex flex-col w-full overflow-hidden lg:col-start-2 lg:row-start-1"
           style={{
             borderTop: 'var(--input-bt)',
             borderLeft: 'var(--input-bl)',
@@ -298,15 +320,33 @@ export default function ResponsePage() {
           </div>
         </motion.div>
 
-        {/* 3 — Action pills (Button Secondary idiom, Figma 414:5353):
-            SAVE (cyan) · NEW LENS (green) · SHARE (pink). Mobile = simple row;
-            on desktop sits in the left column under the vent (grid placement). */}
+        {/* 3 — Actions, directly under the response card. A prominent "Chat with
+            the lens" CTA (starts the conversation flow from HERE, not only the
+            journal) sits above the SAVE (cyan) · NEW LENS (green) · SHARE (pink)
+            pill row. Mobile = stacked under the response; desktop = right column,
+            row 2 (grid placement). */}
         {done && (
           <motion.div
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex gap-2 w-full lg:col-start-1 lg:row-start-2 lg:self-start"
+            className="flex flex-col gap-2 w-full lg:col-start-2 lg:row-start-2 lg:self-start"
           >
+            {/* Chat with the Lens — primary CTA. Theme-safe via the Button
+                component (resolves all three skins itself). Opens the conversation
+                seeded by this vent + the figure's reframe. */}
+            <Button
+              variant="primary"
+              theme={theme}
+              fullWidth
+              icon="forum"
+              onClick={handleChat}
+              ariaLabel={`Chat with ${figure.name}`}
+            >
+              Chat with {figure.name.split(' ')[0]}
+            </Button>
+
+            {/* Secondary pill row: SAVE · NEW LENS · SHARE */}
+            <div className="flex gap-2 w-full">
             {/* Save: anon taps to save (routes to sign-in). Signed-in auto-saves
                 (T-018-05) — show a non-interactive status pill instead. */}
             {isSignedIn === true ? (
@@ -360,11 +400,12 @@ export default function ResponsePage() {
               <Icon name="ios_share" size={18} />
               Share
             </button>
+            </div>
           </motion.div>
         )}
 
         {saveState === 'error' && (
-          <p className="lg:col-start-1 lg:row-start-3" style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--pink)', textAlign: 'center' }}>
+          <p className="lg:col-start-2 lg:row-start-3" style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--pink)', textAlign: 'center' }}>
             Could not save. Please try again.
           </p>
         )}

@@ -6,6 +6,7 @@ const REASONS: Record<string, { headline: string; sub: string }> = {
   vent_limit:  { headline: 'You\'ve used your free vent for today.', sub: 'Create a free account for 3 vents per day.' },
   save:        { headline: 'Save this perspective to your journal.', sub: 'Create a free account to keep your insights.' },
   journal:     { headline: 'Your journal is waiting.', sub: 'Sign in to see your saved perspectives.' },
+  chat:        { headline: 'Keep the conversation going.', sub: 'Create a free account to chat with your lens.' },
 }
 
 const DEFAULT = { headline: 'Unlock history\u2019s hottest takes.', sub: 'Free account. No credit card.' }
