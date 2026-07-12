@@ -139,11 +139,24 @@ export default function ResponsePage() {
     setShareOpen(true)
   }
 
+  // Chat with this lens straight from the response (the journal chat screen
+  // needs a saved session, so persist first if auto-save hasn't landed yet).
+  // Anon: chat lives in the journal — sign in, then return here.
+  async function handleChat() {
+    if (!isSignedIn) {
+      router.push('/sign-in?reason=chat&redirect_url=' + encodeURIComponent('/app/response'))
+      return
+    }
+    const id = sessionStorage.getItem('ms_session_id') ?? await persist()
+    if (!id) { setSaveState('error'); return }
+    router.push(`/app/journal-v2/${id}/chat/${figure.id}`)
+  }
+
   // Labelled, bordered accent pills matching the Button Secondary component
   // (Figma 414:5353) + the lens-card button-row idiom: asymmetric 1/2px border,
   // 2px radius, a faint accent-tinted fill (color-mix off the accent slot so all
   // three themes follow for free), ≥44px tap target. `accent` is a token name:
-  // --cyan (SAVE) / --green (NEW LENS) / --pink (SHARE).
+  // --cyan (SAVE) / --green (ANOTHER LENS) / --violet (CHAT) / --pink (SHARE).
   function pillStyle(accent: string): React.CSSProperties {
     // Kawaii renders the canonical design-system Secondary button (Figma 626:8286):
     // a SOLID fill + brown asymmetric border + inset accent shadow + 32px radius —
@@ -157,6 +170,7 @@ export default function ResponsePage() {
       const fam = accent === '--green' ? 'secondary' : 'secondary2'
       return {
         flex: 1,
+        minWidth: 130,
         minHeight: 44,
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
         fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 13,
@@ -177,6 +191,7 @@ export default function ResponsePage() {
     const c = `var(${accent})`
     return {
       flex: 1,
+      minWidth: 130,
       minHeight: 44,
       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
       fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 13,
@@ -299,13 +314,14 @@ export default function ResponsePage() {
         </motion.div>
 
         {/* 3 — Action pills (Button Secondary idiom, Figma 414:5353):
-            SAVE (cyan) · NEW LENS (green) · SHARE (pink). Mobile = simple row;
+            SAVE (cyan) · ANOTHER LENS (green) · CHAT (violet) · SHARE (pink).
+            flex-wrap + the pills' min-width folds the four into 2×2 on phones;
             on desktop sits in the left column under the vent (grid placement). */}
         {done && (
           <motion.div
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex gap-2 w-full lg:col-start-1 lg:row-start-2 lg:self-start"
+            className="flex flex-wrap gap-2 w-full lg:col-start-1 lg:row-start-2 lg:self-start"
           >
             {/* Save: anon taps to save (routes to sign-in). Signed-in auto-saves
                 (T-018-05) — show a non-interactive status pill instead. */}
@@ -349,6 +365,16 @@ export default function ResponsePage() {
             >
               <Icon name="autorenew" size={18} />
               Another lens
+            </button>
+            {/* Chat — continue with this figure on the journal chat screen */}
+            <button
+              onClick={handleChat}
+              className="uppercase hover:opacity-80"
+              title={`Chat with ${figure.name}`}
+              style={pillStyle('--violet')}
+            >
+              <Icon name="comic_bubble" size={18} />
+              Chat
             </button>
             {/* Share via native share sheet (SMS, socials) */}
             <button
