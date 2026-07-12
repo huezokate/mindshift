@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useUser } from '@clerk/nextjs'
 import { FIGURES, getFigureImg } from '@/lib/figures'
 import { useTheme, type Theme } from '@/lib/theme'
 import Icon from '@/components/ui/Icon'
@@ -49,6 +50,13 @@ const cardStyle: React.CSSProperties = {
 export default function ThemeSelectPage() {
   const router = useRouter()
   const { theme, setTheme } = useTheme()
+  const { isSignedIn, user } = useUser()
+
+  const firstName =
+    user?.firstName ??
+    user?.username ??
+    user?.primaryEmailAddress?.emailAddress ??
+    null
 
   const currentIndex = THEMES.findIndex(t => t.id === theme)
   const [index, setIndex] = useState(currentIndex >= 0 ? currentIndex : 1)
@@ -70,6 +78,10 @@ export default function ThemeSelectPage() {
   const [acknowledged, setAcknowledged] = useState(false)
   const [expanded, setExpanded] = useState(false)
 
+  // Signed-in users have already acknowledged the disclaimer at sign-up, so we
+  // skip the checkbox for them and treat the gate as satisfied (Kate, 2 July).
+  const gateSatisfied = acknowledged || !!isSignedIn
+
   const current = THEMES[index]
 
   function prev() {
@@ -85,7 +97,7 @@ export default function ThemeSelectPage() {
   }
 
   function handleEnter() {
-    if (!acknowledged) return
+    if (!gateSatisfied) return
     setTheme(current.id)
     router.push('/app/onboarding')
   }
@@ -184,14 +196,70 @@ export default function ThemeSelectPage() {
         className="relative z-10 flex flex-col items-center min-h-dvh"
         style={{ padding: '32px 24px', gap: 20 }}
       >
-        {/* AUTH ROW — sign-up visible for anon, name shown when signed in */}
-        <EntryAuthRow maxWidth={376} />
+        {/* AUTH ROW — anon only: Log in / Sign up links. Signed-in users are
+            already greeted by name in the hero card below, so we skip the
+            redundant "Hi, {name}" greeting here. */}
+        {!isSignedIn && <EntryAuthRow maxWidth={376} />}
 
-        {/* HERO CARD — wordmark + tagline + disclaimer ack */}
+        {/* HERO CARD — signed in → warm welcome only; signed out → wordmark +
+            tagline + disclaimer ack. */}
         <div
           className="w-full flex flex-col items-center"
           style={{ ...cardStyle, maxWidth: 376, padding: '24px 24px', gap: 14 }}
         >
+          {isSignedIn ? (
+          <>
+            <p
+              className="uppercase text-center"
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontWeight: 700,
+                fontSize: 24,
+                letterSpacing: 2,
+                lineHeight: '28px',
+                color: 'var(--violet)',
+                margin: 0,
+              }}
+            >
+              Welcome back{firstName ? ',' : ''}
+            </p>
+            {firstName && (
+              <p
+                className="uppercase text-center"
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  fontWeight: 700,
+                  fontSize: 20,
+                  letterSpacing: 1.5,
+                  lineHeight: '24px',
+                  color: 'var(--violet)',
+                  margin: 0,
+                  // A long name (or an email fallback) must never blow out the
+                  // card — wrap on any character rather than overflow.
+                  maxWidth: '100%',
+                  overflowWrap: 'anywhere',
+                  wordBreak: 'break-word',
+                }}
+              >
+                {firstName}
+              </p>
+            )}
+            <p
+              className="text-center"
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: 13,
+                letterSpacing: 0.4,
+                lineHeight: '18px',
+                color: 'var(--text-body)',
+                margin: 0,
+              }}
+            >
+              Pick the theme that matches your mood today.
+            </p>
+          </>
+          ) : (
+          <>
           <p
             className="uppercase text-center"
             style={{
@@ -354,6 +422,8 @@ export default function ThemeSelectPage() {
               </motion.div>
             )}
           </AnimatePresence>
+          </>
+          )}
         </div>
 
         {/* THEME PICKER CARD — the active decision */}
@@ -436,7 +506,7 @@ export default function ThemeSelectPage() {
         {/* PRIMARY CTA — solid filled, never transparent */}
         <button
           onClick={handleEnter}
-          disabled={!acknowledged}
+          disabled={!gateSatisfied}
           className="w-full uppercase transition-colors active:scale-95"
           style={{
             maxWidth: 376,
@@ -444,10 +514,10 @@ export default function ThemeSelectPage() {
             fontWeight: 600,
             fontSize: 14,
             letterSpacing: 'var(--btn-letter-spacing, 3px)',
-            color: acknowledged ? 'var(--violet)' : 'var(--text-sub)',
+            color: gateSatisfied ? 'var(--violet)' : 'var(--text-sub)',
             // Per-theme opaque CTA fill so the button never lets the figure grid show
             // through. Cyberpunk black, kawaii cream, notepad paper (see --cta-solid-bg).
-            backgroundColor: acknowledged ? 'var(--cta-solid-bg)' : 'var(--cta-solid-bg-disabled)',
+            backgroundColor: gateSatisfied ? 'var(--cta-solid-bg)' : 'var(--cta-solid-bg-disabled)',
             borderTop: 'var(--card-bt)',
             borderLeft: 'var(--card-bl)',
             borderRight: 'var(--card-br)',
@@ -455,7 +525,7 @@ export default function ThemeSelectPage() {
             borderRadius: 'var(--btn-radius, 32px)',
             padding: '17px 12px',
             boxShadow: 'var(--card-shadow)',
-            cursor: acknowledged ? 'pointer' : 'not-allowed',
+            cursor: gateSatisfied ? 'pointer' : 'not-allowed',
           }}
         >
           Enter Minds Shift
