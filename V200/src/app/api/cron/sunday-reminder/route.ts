@@ -21,6 +21,7 @@ import { getSupabaseAdmin } from '@/lib/supabase'
 import { buildWeeklyReminderEmail, type WeeklyMapDigest } from '@/lib/emails/weekly-reminder'
 import { getResend, FROM } from '@/lib/resend'
 import { generateWeeklyGoal, weeksForHorizon } from '@/lib/mindmap-weekly'
+import { sendExpoPush, deadTokensFromTickets, type ExpoPushMessage } from '@/lib/push-send'
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000
 
@@ -166,5 +167,44 @@ export async function GET(req: Request) {
     }
   }
 
-  return NextResponse.json({ sent, skipped, generated, errors: errors.slice(0, 20) })
+  // ── 6. Native push channel (T-030-05) — additive alongside email. One nudge
+  // per registered device of each digest user; failures never block the email
+  // result above, and DeviceNotRegistered tokens are pruned inline.
+  let pushSent = 0
+  let pushPruned = 0
+  try {
+    const userIds = [...byUser.keys()]
+    if (userIds.length > 0) {
+      const { data: tokenRows, error: tokErr } = await db
+        .from('push_tokens')
+        .select('token, user_id')
+        .in('user_id', userIds)
+      if (tokErr) {
+        errors.push(`push tokens: ${tokErr.message}`)
+      } else if (tokenRows && tokenRows.length > 0) {
+        const messages: ExpoPushMessage[] = tokenRows.map(row => {
+          const digests = byUser.get(row.user_id) ?? []
+          const week = digests[0]?.weekIndex
+          const firstGoal = digests[0]?.weeklyGoals[0]?.goalText
+          return {
+            to: row.token,
+            title: week ? `Your week ${week} plan is ready` : 'Your weekly plan is ready',
+            body: firstGoal ?? 'Open your mindmap to see this week’s focus.',
+            data: { url: '/(tabs)/mindmap' },
+          }
+        })
+        const tickets = await sendExpoPush(messages)
+        pushSent = tickets.filter(t => t.status === 'ok').length
+        const dead = deadTokensFromTickets(messages, tickets)
+        if (dead.length > 0) {
+          const { error: delErr } = await db.from('push_tokens').delete().in('token', dead)
+          if (!delErr) pushPruned = dead.length
+        }
+      }
+    }
+  } catch (e) {
+    errors.push(`push: ${e instanceof Error ? e.message : 'unknown'}`)
+  }
+
+  return NextResponse.json({ sent, skipped, generated, pushSent, pushPruned, errors: errors.slice(0, 20) })
 }
