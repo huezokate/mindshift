@@ -4,7 +4,6 @@ import {
   ActivityIndicator,
   Pressable,
   ScrollView,
-  Share,
   Text,
   useWindowDimensions,
   View,
@@ -14,8 +13,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LensCard } from '@/components/journal/lens-card';
 import { LensPickerSheet } from '@/components/journal/lens-picker-sheet';
 import { UpcomingChip } from '@/components/journal/upcoming-chip';
+import { ShareSheet } from '@/components/share/share-sheet';
 import { Icon } from '@/components/ui/icon';
-import { useApi } from '@/lib/use-api';
 import type { JournalEntryFull, LensResponseFull } from '@/lib/journal-map';
 import { useJournalStore } from '@/state/journal-store';
 import { borderStyle, useTheme, type Theme } from '@/theme';
@@ -91,7 +90,6 @@ export default function EntryDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { mode, tokens: t } = useTheme();
-  const { api } = useApi();
   const store = useJournalStore();
   const { width: screenW } = useWindowDimensions();
 
@@ -124,6 +122,7 @@ export default function EntryDetailScreen() {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [addingLens, setAddingLens] = useState(false);
   const [addLensError, setAddLensError] = useState<string | null>(null);
+  const [shareLens, setShareLens] = useState<LensResponseFull | null>(null);
   const scrollRef = useRef<ScrollView>(null);
 
   // Carousel geometry (web: card = width - 48, 8px gap, 24px insets).
@@ -167,17 +166,9 @@ export default function EntryDetailScreen() {
     router.push(`/journal/${id}/chat/${lens.figureId}`);
   }
 
-  // Minimal native text share (D8) — the quote-card sheet is T-030-05.
-  async function handleShare(lens: LensResponseFull) {
-    const result = await Share.share({
-      message: `“${lens.responseText}”\n— ${lens.figureName}, via Minds Shift`,
-    });
-    if (result.action === Share.sharedAction) {
-      api(`/api/journal-v2/responses/${lens.id}/share`, {
-        method: 'POST',
-        body: { platform: 'native' },
-      }).catch(() => {});
-    }
+  // Quote-card share sheet (T-030-05) — shares the active lens's card.
+  function handleShare(lens: LensResponseFull) {
+    setShareLens(lens);
   }
 
   if (!entry) {
@@ -386,6 +377,17 @@ export default function EntryDetailScreen() {
           </>
         )}
       </ScrollView>
+
+      {shareLens ? (
+        <ShareSheet
+          open
+          responseId={shareLens.id}
+          figureId={shareLens.figureId}
+          responseText={shareLens.responseText}
+          ventText={entry.ventText}
+          onClose={() => setShareLens(null)}
+        />
+      ) : null}
 
       {/* Add-a-lens picker — shared carousel; Back returns to this entry. */}
       <LensPickerSheet

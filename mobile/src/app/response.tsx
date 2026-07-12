@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useEffect, useState, type ReactNode } from 'react';
-import { Pressable, ScrollView, Share, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, {
   FadeInDown,
   useAnimatedStyle,
@@ -12,6 +12,7 @@ import Animated, {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { FigurePortrait } from '@/components/journal/figure-portrait';
+import { ShareSheet } from '@/components/share/share-sheet';
 import { Icon } from '@/components/ui/icon';
 import { useSavePop } from '@/components/ui/motion';
 import { withAlpha } from '@/lib/color';
@@ -144,6 +145,7 @@ export default function ResponseScreen() {
   const { displayed, done } = useTypewriter(response);
   const [saveState, setSaveState] = useState<SaveState>('idle');
   const [responseId, setResponseId] = useState<string | null>(null);
+  const [shareOpen, setShareOpen] = useState(false);
 
   // Upsert the vent session + this lens. Appends to the existing session so
   // every lens applied to the same vent lands in one journal entry.
@@ -201,18 +203,10 @@ export default function ResponseScreen() {
     persist().then((id) => setSaveState(id ? 'saved' : 'error'));
   }
 
-  // Minimal native text share (D8) — the full quote-card share sheet is
-  // T-030-05. Log the share against the saved response when there is one.
-  async function handleShare() {
-    const result = await Share.share({
-      message: `“${response}”\n— ${figure.name}, via Minds Shift`,
-    });
-    if (result.action === Share.sharedAction && responseId) {
-      api(`/api/journal-v2/responses/${responseId}/share`, {
-        method: 'POST',
-        body: { platform: 'native' },
-      }).catch(() => {}); // share logging is best-effort
-    }
+  // Quote-card share sheet (T-030-05) — the same rich card as the journal,
+  // generated from content, so it works before the entry is saved too.
+  function handleShare() {
+    setShareOpen(true);
   }
 
   const inputChrome = {
@@ -409,6 +403,15 @@ export default function ResponseScreen() {
           </Text>
         )}
       </ScrollView>
+
+      <ShareSheet
+        open={shareOpen}
+        responseId={responseId}
+        figureId={figure.id}
+        responseText={response}
+        ventText={vent}
+        onClose={() => setShareOpen(false)}
+      />
     </SafeAreaView>
   );
 }
