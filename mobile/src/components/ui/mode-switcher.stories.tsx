@@ -15,3 +15,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {};
 
 export const Compact: Story = { args: { compact: true } };
+
+/** Theme-select form: [emoji over label] primary buttons — the product's one
+    sanctioned emoji use. */
+export const Hero: Story = { args: { hero: true } };

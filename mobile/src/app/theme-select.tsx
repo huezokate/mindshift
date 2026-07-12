@@ -25,8 +25,10 @@ export default function ThemeSelect() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: t.palette.bg }} edges={['bottom']}>
       <ScrollView contentContainerStyle={{ padding: 24, gap: 24 }}>
-        <ModeSwitcher />
+        {/* Kate's order: pitch first, then the theme choice (hero emoji
+            buttons), then the ack gate, then auth. */}
         <SampleCard tokens={t} />
+        <ModeSwitcher hero />
 
         {/* Disclaimer ack + enter (web parity) */}
         <Card style={{ padding: 16, gap: 12 }}>
