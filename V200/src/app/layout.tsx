@@ -22,6 +22,13 @@ export const metadata: Metadata = {
   publisher: 'Minds Shift',
   category: 'health',
   keywords: [
+    // Brand queries — every spelling a human or AI might type. "MindShift"
+    // collides with an established CBT app; these + the JSON-LD alternateName
+    // are how we claim the variants we can win.
+    'Minds Shift',
+    'minds shift app',
+    'mindshift journaling app',
+    'mind shift app',
     'AI journaling app',
     'perspective shift app',
     'cognitive reframing',
@@ -65,12 +72,25 @@ export const metadata: Metadata = {
 
 // Structured data — helps search engines AND AI agents understand what Minds Shift
 // is. WebApplication (the product) + Organization (the brand).
+// The brand-string variants people (and AI models) actually type. Feeds
+// alternateName below so search engines connect them all to this site.
+const BRAND_VARIANTS = ['MindShift', 'Mind Shift', 'mindshift', 'minds-shift']
+
 const JSON_LD = {
   '@context': 'https://schema.org',
   '@graph': [
     {
+      // WebSite is what Google reads to pick the site name shown in results —
+      // without it the SERP can keep showing a stale pre-rename title.
+      '@type': 'WebSite',
+      name: 'Minds Shift',
+      alternateName: BRAND_VARIANTS,
+      url: SITE_URL,
+    },
+    {
       '@type': 'WebApplication',
       name: 'Minds Shift',
+      alternateName: BRAND_VARIANTS,
       url: SITE_URL,
       applicationCategory: 'HealthApplication',
       operatingSystem: 'Web, iOS, Android',
@@ -91,6 +111,8 @@ const JSON_LD = {
     {
       '@type': 'Organization',
       name: 'Minds Shift',
+      alternateName: BRAND_VARIANTS,
+      founder: { '@type': 'Person', name: 'Kate Huezo' },
       url: SITE_URL,
       email: 'hello@minds-shift.com',
       description:

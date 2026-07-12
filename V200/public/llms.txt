@@ -1,5 +1,7 @@
 # Minds Shift
 
+Also written: MindShift, Mind Shift, minds-shift. Not affiliated with MindShift CBT (Anxiety Canada) or MindShift by KQED.
+
 > AI journaling that shifts your perspective. Vent what's on your mind, pick a "lens" from history's greatest minds (Socrates, Maya Angelou, Frida Kahlo, and more), and get an AI-generated reframe in that figure's voice. Plus visual mind mapping for self-reflection and life planning.
 
 Minds Shift is a mental-wellness and self-reflection web app. It turns venting into perspective: a fast, low-friction way to reframe your thinking, journal your reflections, and map your goals across the areas of life that matter.
