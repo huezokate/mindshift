@@ -46,29 +46,35 @@ export default function SignIn() {
     }
   }, [isLoaded, busy, signIn, setActive, email, password, router, destination]);
 
-  const onGoogleSignIn = useCallback(async () => {
-    if (busy) return;
-    setBusy(true);
-    setError(null);
-    try {
-      // Opens the system browser (never an embedded WebView) via Clerk SSO.
-      const { createdSessionId, setActive: ssoSetActive } = await startSSOFlow({
-        strategy: 'oauth_google',
-      });
-      if (createdSessionId && ssoSetActive) {
-        await ssoSetActive({ session: createdSessionId });
-        router.replace(destination);
+  // Shared SSO lane — Google and Apple both ride Clerk's system-browser flow
+  // (never an embedded WebView). Apple is required alongside Google (App
+  // Review 4.8); the Clerk dashboard must have the Apple connection enabled.
+  const onSSO = useCallback(
+    async (strategy: 'oauth_google' | 'oauth_apple') => {
+      if (busy) return;
+      setBusy(true);
+      setError(null);
+      try {
+        const { createdSessionId, setActive: ssoSetActive } = await startSSOFlow({ strategy });
+        if (createdSessionId && ssoSetActive) {
+          await ssoSetActive({ session: createdSessionId });
+          router.replace(destination);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Sign-in failed');
+      } finally {
+        setBusy(false);
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Google sign-in failed');
-    } finally {
-      setBusy(false);
-    }
-  }, [busy, startSSOFlow, router, destination]);
+    },
+    [busy, startSSOFlow, router, destination],
+  );
 
   return (
     <AuthShell title="Sign in" reason={reason}>
-      <Button variant="primary" fullWidth disabled={busy} onPress={() => void onGoogleSignIn()}>
+      <Button variant="primary" fullWidth disabled={busy} onPress={() => void onSSO('oauth_apple')}>
+        Continue with Apple
+      </Button>
+      <Button variant="primary" fullWidth disabled={busy} onPress={() => void onSSO('oauth_google')}>
         Continue with Google
       </Button>
       <Text
