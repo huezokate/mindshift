@@ -192,6 +192,14 @@ export default function ProfileTab() {
           </Card>
         ) : null}
 
+        <Card style={{ padding: 18, gap: 6 }}>
+          {label('A note on care')}
+          {line(
+            "Minds Shift offers perspective, not professional care. If you're in crisis or thinking about harming yourself, in the US call or text 988 (Suicide & Crisis Lifeline); elsewhere, find local lines at findahelpline.com.",
+            true,
+          )}
+        </Card>
+
         <Button variant="secondary2" fullWidth onPress={() => void signOut()}>
           Log out
         </Button>
