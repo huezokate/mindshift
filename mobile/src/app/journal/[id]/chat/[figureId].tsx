@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChatComposer } from '@/components/chat/chat-composer';
 import { ChatThread, SoftCloseDivider } from '@/components/chat/chat-thread';
 import { FigurePortrait } from '@/components/journal/figure-portrait';
+import { LockGate } from '@/components/journal/lock-gate';
 import { Button } from '@/components/ui/button';
 import { figureById } from '@/lib/figures';
 import { tapLight } from '@/lib/haptics';
@@ -179,6 +180,7 @@ export default function LensChatScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: t.palette.bg }} edges={['bottom']}>
       {/* Custom in-screen header: portrait + name/era (web header bar). */}
       <Stack.Screen options={{ title: '', headerShown: true }} />
+      <LockGate>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -256,6 +258,7 @@ export default function LensChatScreen() {
           />
         </View>
       </KeyboardAvoidingView>
+      </LockGate>
     </SafeAreaView>
   );
 }

@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { LensCard } from '@/components/journal/lens-card';
 import { LensPickerSheet } from '@/components/journal/lens-picker-sheet';
+import { LockGate } from '@/components/journal/lock-gate';
 import { UpcomingChip } from '@/components/journal/upcoming-chip';
 import { ShareSheet } from '@/components/share/share-sheet';
 import { Icon } from '@/components/ui/icon';
@@ -236,6 +237,7 @@ export default function EntryDetailScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: t.palette.bg }} edges={['bottom']}>
       <Stack.Screen options={{ title: 'Entry' }} />
+      <LockGate>
       <ScrollView contentContainerStyle={{ paddingVertical: 16, gap: 16 }}>
         {/* Vent card + "+ Lens" (right-aligned, -4px overlap) */}
         <View style={{ paddingHorizontal: 24, alignItems: 'flex-end' }}>
@@ -402,6 +404,7 @@ export default function EntryDetailScreen() {
         }}
         onSelect={(figureId) => void handlePickLens(figureId)}
       />
+      </LockGate>
     </SafeAreaView>
   );
 }

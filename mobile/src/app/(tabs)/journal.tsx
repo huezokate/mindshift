@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AuthBanner } from '@/components/journal/auth-banner';
 import { JournalPreviewCard } from '@/components/journal/journal-preview-card';
 import { LensPickerSheet } from '@/components/journal/lens-picker-sheet';
+import { LockGate } from '@/components/journal/lock-gate';
 import { WelcomeCard } from '@/components/journal/welcome-card';
 import { AppHeader } from '@/components/nav/app-header';
 import { Button } from '@/components/ui/button';
@@ -142,6 +143,7 @@ export default function JournalTab() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: t.palette.bg }} edges={['top']}>
+      <LockGate>
       <FlatList
         data={store.entries}
         keyExtractor={(e) => e.id}
@@ -194,6 +196,7 @@ export default function JournalTab() {
         onBack={() => setPickerFor(null)}
         onSelect={(figureId) => void handlePickLens(figureId)}
       />
+      </LockGate>
     </SafeAreaView>
   );
 }

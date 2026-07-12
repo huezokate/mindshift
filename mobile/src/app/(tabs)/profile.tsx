@@ -1,12 +1,13 @@
 import { useAuth, useUser } from '@clerk/clerk-expo';
 import { useRouter } from 'expo-router';
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AuthBanner } from '@/components/journal/auth-banner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ModeSwitcher } from '@/components/ui/mode-switcher';
+import { useJournalLock } from '@/lib/journal-lock';
 import { useTheme } from '@/theme';
 
 /**
@@ -18,6 +19,7 @@ export default function ProfileTab() {
   const { tokens: t } = useTheme();
   const { isSignedIn, signOut, has } = useAuth();
   const { user } = useUser();
+  const lock = useJournalLock();
 
   if (!isSignedIn) {
     return (
@@ -114,6 +116,26 @@ export default function ProfileTab() {
           {label('Theme')}
           <ModeSwitcher />
         </Card>
+
+        {lock.available ? (
+          <Card style={{ padding: 18, gap: 6 }}>
+            {label('Privacy')}
+            <View
+              style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
+            >
+              <View style={{ flexShrink: 1, paddingRight: 12 }}>
+                {line('Lock journal with Face ID')}
+                {line('Ask for Face ID before opening your journal, entries, or chats.', true)}
+              </View>
+              <Switch
+                value={lock.enabled}
+                onValueChange={(v) => void lock.setEnabled(v)}
+                trackColor={{ true: t.palette.cyan }}
+                accessibilityLabel="Lock journal with Face ID"
+              />
+            </View>
+          </Card>
+        ) : null}
 
         <Button variant="secondary2" fullWidth onPress={() => void signOut()}>
           Log out
