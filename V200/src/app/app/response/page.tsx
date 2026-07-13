@@ -224,11 +224,14 @@ export default function ResponsePage() {
         style={{ padding: '24px 24px 32px' }}
       >
 
-        {/* 1 — User quote */}
+        {/* 1 — User quote + ANOTHER LENS grouped in one column div (Kate
+            2026-07-12): the re-roll action belongs with the vent, the
+            save/chat/share actions with the response — all breakpoints. */}
+        <div className="flex flex-col gap-2 w-full lg:col-start-1 lg:row-start-1">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col w-full overflow-hidden lg:col-start-1 lg:row-start-1"
+          className="flex flex-col w-full overflow-hidden"
           style={{
             borderTop: 'var(--input-bt)',
             borderLeft: 'var(--input-bl)',
@@ -259,12 +262,29 @@ export default function ResponsePage() {
           </div>
         </motion.div>
 
+        {/* ANOTHER LENS — re-pick a lens for the same vent (vent persists in
+            sessionStorage). flex:none so it doesn't grow in the column. */}
+        {done && (
+          <motion.button
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            onClick={() => router.push('/app/lens')}
+            className="uppercase hover:opacity-80"
+            title="Try another lens"
+            style={{ ...pillStyle('--green'), flex: 'none' }}
+          >
+            <Icon name="autorenew" size={18} />
+            Another lens
+          </motion.button>
+        )}
+        </div>
+
         {/* 2 — Lens response card */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.12 }}
-          className="flex flex-col w-full overflow-hidden lg:col-start-2 lg:row-start-1 lg:row-span-2"
+          className="flex flex-col w-full overflow-hidden lg:col-start-2 lg:row-start-1"
           style={{
             borderTop: 'var(--input-bt)',
             borderLeft: 'var(--input-bl)',
@@ -314,14 +334,14 @@ export default function ResponsePage() {
         </motion.div>
 
         {/* 3 — Action pills (Button Secondary idiom, Figma 414:5353):
-            SAVE (cyan) · ANOTHER LENS (green) · CHAT (violet) · SHARE (pink).
-            flex-wrap + the pills' min-width folds the four into 2×2 on phones;
-            on desktop sits in the left column under the vent (grid placement). */}
+            SAVE (cyan) · CHAT (violet) · SHARE (pink), grouped under the lens
+            response card on every breakpoint (ANOTHER LENS lives with the vent
+            above). flex-wrap + the pills' min-width folds them on phones. */}
         {done && (
           <motion.div
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex flex-wrap gap-2 w-full lg:col-start-1 lg:row-start-2 lg:self-start"
+            className="flex flex-wrap gap-2 w-full lg:col-start-2 lg:row-start-2 lg:self-start"
           >
             {/* Save: anon taps to save (routes to sign-in). Signed-in auto-saves
                 (T-018-05) — show a non-interactive status pill instead. */}
@@ -356,16 +376,6 @@ export default function ResponsePage() {
                 Save
               </motion.button>
             )}
-            {/* New lens — re-pick a lens for the same vent (vent persists in sessionStorage) */}
-            <button
-              onClick={() => router.push('/app/lens')}
-              className="uppercase hover:opacity-80"
-              title="Try another lens"
-              style={pillStyle('--green')}
-            >
-              <Icon name="autorenew" size={18} />
-              Another lens
-            </button>
             {/* Chat — continue with this figure on the journal chat screen */}
             <button
               onClick={handleChat}
@@ -390,7 +400,7 @@ export default function ResponsePage() {
         )}
 
         {saveState === 'error' && (
-          <p className="lg:col-start-1 lg:row-start-3" style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--pink)', textAlign: 'center' }}>
+          <p className="lg:col-start-2 lg:row-start-3" style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--pink)', textAlign: 'center' }}>
             Could not save. Please try again.
           </p>
         )}
