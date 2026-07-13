@@ -139,11 +139,24 @@ export default function ResponsePage() {
     setShareOpen(true)
   }
 
+  // Chat with this lens straight from the response (the journal chat screen
+  // needs a saved session, so persist first if auto-save hasn't landed yet).
+  // Anon: chat lives in the journal — sign in, then return here.
+  async function handleChat() {
+    if (!isSignedIn) {
+      router.push('/sign-in?reason=chat&redirect_url=' + encodeURIComponent('/app/response'))
+      return
+    }
+    const id = sessionStorage.getItem('ms_session_id') ?? await persist()
+    if (!id) { setSaveState('error'); return }
+    router.push(`/app/journal-v2/${id}/chat/${figure.id}`)
+  }
+
   // Labelled, bordered accent pills matching the Button Secondary component
   // (Figma 414:5353) + the lens-card button-row idiom: asymmetric 1/2px border,
   // 2px radius, a faint accent-tinted fill (color-mix off the accent slot so all
   // three themes follow for free), ≥44px tap target. `accent` is a token name:
-  // --cyan (SAVE) / --green (NEW LENS) / --pink (SHARE).
+  // --cyan (SAVE) / --green (ANOTHER LENS) / --violet (CHAT) / --pink (SHARE).
   function pillStyle(accent: string): React.CSSProperties {
     // Kawaii renders the canonical design-system Secondary button (Figma 626:8286):
     // a SOLID fill + brown asymmetric border + inset accent shadow + 32px radius —
@@ -157,6 +170,7 @@ export default function ResponsePage() {
       const fam = accent === '--green' ? 'secondary' : 'secondary2'
       return {
         flex: 1,
+        minWidth: 130,
         minHeight: 44,
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
         fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 13,
@@ -177,6 +191,7 @@ export default function ResponsePage() {
     const c = `var(${accent})`
     return {
       flex: 1,
+      minWidth: 130,
       minHeight: 44,
       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
       fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 13,
@@ -209,11 +224,14 @@ export default function ResponsePage() {
         style={{ padding: '24px 24px 32px' }}
       >
 
-        {/* 1 — User quote */}
+        {/* 1 — User quote + ANOTHER LENS grouped in one column div (Kate
+            2026-07-12): the re-roll action belongs with the vent, the
+            save/chat/share actions with the response — all breakpoints. */}
+        <div className="flex flex-col gap-2 w-full lg:col-start-1 lg:row-start-1">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col w-full overflow-hidden lg:col-start-1 lg:row-start-1"
+          className="flex flex-col w-full overflow-hidden"
           style={{
             borderTop: 'var(--input-bt)',
             borderLeft: 'var(--input-bl)',
@@ -244,12 +262,29 @@ export default function ResponsePage() {
           </div>
         </motion.div>
 
+        {/* ANOTHER LENS — re-pick a lens for the same vent (vent persists in
+            sessionStorage). flex:none so it doesn't grow in the column. */}
+        {done && (
+          <motion.button
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            onClick={() => router.push('/app/lens')}
+            className="uppercase hover:opacity-80"
+            title="Try another lens"
+            style={{ ...pillStyle('--green'), flex: 'none' }}
+          >
+            <Icon name="autorenew" size={18} />
+            Another lens
+          </motion.button>
+        )}
+        </div>
+
         {/* 2 — Lens response card */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.12 }}
-          className="flex flex-col w-full overflow-hidden lg:col-start-2 lg:row-start-1 lg:row-span-2"
+          className="flex flex-col w-full overflow-hidden lg:col-start-2 lg:row-start-1"
           style={{
             borderTop: 'var(--input-bt)',
             borderLeft: 'var(--input-bl)',
@@ -299,13 +334,14 @@ export default function ResponsePage() {
         </motion.div>
 
         {/* 3 — Action pills (Button Secondary idiom, Figma 414:5353):
-            SAVE (cyan) · NEW LENS (green) · SHARE (pink). Mobile = simple row;
-            on desktop sits in the left column under the vent (grid placement). */}
+            SAVE (cyan) · CHAT (violet) · SHARE (pink), grouped under the lens
+            response card on every breakpoint (ANOTHER LENS lives with the vent
+            above). flex-wrap + the pills' min-width folds them on phones. */}
         {done && (
           <motion.div
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex gap-2 w-full lg:col-start-1 lg:row-start-2 lg:self-start"
+            className="flex flex-wrap gap-2 w-full lg:col-start-2 lg:row-start-2 lg:self-start"
           >
             {/* Save: anon taps to save (routes to sign-in). Signed-in auto-saves
                 (T-018-05) — show a non-interactive status pill instead. */}
@@ -340,15 +376,15 @@ export default function ResponsePage() {
                 Save
               </motion.button>
             )}
-            {/* New lens — re-pick a lens for the same vent (vent persists in sessionStorage) */}
+            {/* Chat — continue with this figure on the journal chat screen */}
             <button
-              onClick={() => router.push('/app/lens')}
+              onClick={handleChat}
               className="uppercase hover:opacity-80"
-              title="Try another lens"
-              style={pillStyle('--green')}
+              title={`Chat with ${figure.name}`}
+              style={pillStyle('--violet')}
             >
-              <Icon name="autorenew" size={18} />
-              Another lens
+              <Icon name="comic_bubble" size={18} />
+              Chat
             </button>
             {/* Share via native share sheet (SMS, socials) */}
             <button
@@ -364,7 +400,7 @@ export default function ResponsePage() {
         )}
 
         {saveState === 'error' && (
-          <p className="lg:col-start-1 lg:row-start-3" style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--pink)', textAlign: 'center' }}>
+          <p className="lg:col-start-2 lg:row-start-3" style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--pink)', textAlign: 'center' }}>
             Could not save. Please try again.
           </p>
         )}
