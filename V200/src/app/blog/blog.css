@@ -102,3 +102,30 @@
   max-width: 100%;
   border-radius: var(--card-radius, 6px);
 }
+
+/* Side-by-side app screenshots (e.g. the three themes) — a raw-HTML row in
+   the markdown. Sticker-card border to match the landing's cards. */
+.blog-prose .theme-row {
+  display: flex;
+  gap: 12px;
+  margin: 24px 0 12px;
+}
+
+.blog-prose .theme-row img {
+  width: calc((100% - 24px) / 3);
+  min-width: 0;
+  height: auto;
+  border-top: var(--card-bt);
+  border-left: var(--card-bl);
+  border-right: var(--card-br);
+  border-bottom: var(--card-bb);
+  border-radius: var(--card-radius, 6px);
+  box-shadow: var(--card-shadow);
+}
+
+.blog-prose .theme-row + p em {
+  display: block;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-sub, var(--text-body));
+}

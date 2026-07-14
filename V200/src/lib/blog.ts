@@ -11,6 +11,8 @@ export type BlogPost = {
   title: string
   description: string
   date: string // ISO yyyy-mm-dd
+  cover?: string // public path to the index-card image
+  coverAlt?: string
   html: string
 }
 
@@ -42,6 +44,8 @@ function loadPost(filename: string): BlogPost {
     title: meta.title ?? slug,
     description: meta.description ?? '',
     date,
+    cover: meta.cover,
+    coverAlt: meta.coverAlt,
     html: marked.parse(body, { async: false }),
   }
 }

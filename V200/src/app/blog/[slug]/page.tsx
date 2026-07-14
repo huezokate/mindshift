@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const post = getPost(slug)
   if (!post) return {}
   return {
-    title: `${post.title} — Minds Shift Dev Log`,
+    title: `${post.title} — Minds Shift Mind Log`,
     description: post.description,
     alternates: { canonical: `https://minds-shift.com/blog/${post.slug}` },
     openGraph: { title: post.title, description: post.description, type: 'article', publishedTime: post.date },
@@ -49,7 +49,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
               href="/blog"
               style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--link-color, var(--cyan))', textDecoration: 'underline', textUnderlineOffset: 3 }}
             >
-              ← Dev Log
+              ← Mind Log
             </Link>
           </p>
           <p

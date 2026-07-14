@@ -777,7 +777,7 @@ function OriginStory() {
         <Body size={18}>
           Minds Shift started as a personal tool for thinking differently, and grew into something I wanted everyone to have. History&apos;s greatest minds shouldn&apos;t be locked in textbooks. They should be in your pocket on a bad day.
         </Body>
-        <SecondaryLink href="/blog">Follow the build in the dev log →</SecondaryLink>
+        <SecondaryLink href="/blog">Follow the build in the mind log →</SecondaryLink>
       </div>
     </Section>
   )

@@ -1,12 +1,14 @@
 ---
 title: Building Minds Shift in public
-description: Why this dev log exists — and why a journaling app has three completely different faces, fifteen historical voices, and a founder who ships every week.
+description: Why this mind log exists — and why a journaling app has three completely different faces, fifteen historical voices, and a founder who ships every week.
 date: 2026-07-14
+cover: /blog/response-cyberpunk.png
+coverAlt: The Minds Shift response screen in the Cyberpunk theme — Socrates responding to a vent
 ---
 
 Hi, I'm Kate. I'm building Minds Shift — the app where you vent what's on your mind, pick a lens (Socrates, Frida Kahlo, Abraham Lincoln…), and get a perspective back that actually moves you.
 
-This is the first post of the dev log. From here on, I'm building in public: what shipped, what broke, and why the app is built the way it is. If you like watching a product grow up in real time, this page is for you.
+This is the first post of the mind log. From here on, I'm building in public: what shipped, what broke, and why the app is built the way it is. If you like watching a product grow up in real time, this page is for you.
 
 ## Why build in public?
 
@@ -19,6 +21,14 @@ The honest version is more interesting. Every week involves real decisions: whic
 A few choices define the app, and they were all deliberate:
 
 **Three themes, not one.** Minds Shift ships with three completely different visual worlds — Cyberpunk, Kawaii, and Notepad. Not three accent colors: three type systems, three sets of hand-drawn borders, three moods. A journal is a personal space, and personal spaces shouldn't all look like the same white card on a gray background. One early tester put it best: "I can shift the whole mood of the app to match my own."
+
+<div class="theme-row">
+  <img src="/blog/response-cyberpunk.png" alt="The response screen in the Cyberpunk theme — neon cyan and green on dark" />
+  <img src="/blog/response-kawaii.png" alt="The response screen in the Kawaii theme — soft pinks and rounded pills" />
+  <img src="/blog/response-notepad.png" alt="The response screen in the Notepad theme — clean paper and ruled lines" />
+</div>
+
+*The same vent, the same Socrates — three completely different rooms to read him in.*
 
 **Lenses, not advice.** When you vent, the app doesn't hand you a checklist. It answers in the voice of someone who lived through worse — Lincoln on losing, Kahlo on making something out of a bad hand. Perspective sticks better when it comes from a life, not a listicle.
 
