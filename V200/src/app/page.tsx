@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { getSupabase } from '@/lib/supabase'
 import { FIGURES, type Figure } from '@/lib/figures'
 import TextLink from '@/components/ui/TextLink'
+import Button from '@/components/ui/Button'
 
 const WAITLIST_CONTACT = 'hello@minds-shift.com'
 const BUSINESS_CONTACT = 'kate@minds-shift.com'
@@ -146,6 +147,17 @@ export default function LandingPage() {
 // Variant C: a phone that keeps morphing through the three worlds — the same
 // response screen (real app screenshots) crossfading on a timer; tapping a
 // theme pins it and stops the auto-cycle.
+
+// Each theme's button wears the NOTEPAD primary shape with the theme's
+// signature accent as text + outline + paper dropshadow (Kate 2026-07-15):
+// notepad = blue, kawaii = red, cyberpunk = green. Values are the notepad
+// palette's own accents (the landing is notepad-pinned).
+const MORPH_BTN_ACCENT: Record<LandingTheme, string> = {
+  notepad: 'var(--btn-secondary-color)',   // notepad blue #3a6fa8
+  kawaii: 'var(--btn-secondary2-color)',   // notepad red
+  cyberpunk: 'var(--green)',               // notepad green
+}
+
 function PhoneMorph() {
   const [active, setActive] = useState(0)
   const [pinned, setPinned] = useState(false)
@@ -154,14 +166,49 @@ function PhoneMorph() {
     const iv = setInterval(() => setActive(v => (v + 1) % THEME_META.length), 3200)
     return () => clearInterval(iv)
   }, [pinned])
-  const meta = THEME_META[active]
   return (
     <Section maxWidth="none">
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24, textAlign: 'center' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 28, textAlign: 'center' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
           <Eyebrow>One journal. Three worlds.</Eyebrow>
           <H2>Same thoughts. Whole new room.</H2>
         </div>
+
+        {/* Theme buttons — DS primary shape, accent-colored text/outline/shadow.
+            No "current theme" caption needed: selected = pressed INTO the paper
+            (dropshadow gone, button translated into its place), unselected stay
+            raised at the 0.6 dim recipe. The pressed state follows the
+            auto-cycle until a click pins it. */}
+        <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
+          {THEME_META.map((m, i) => {
+            const c = MORPH_BTN_ACCENT[m.id]
+            const selected = i === active
+            return (
+              <Button
+                key={m.id}
+                variant="primary"
+                onClick={() => { setActive(i); setPinned(true) }}
+                ariaLabel={`${m.name} theme${selected ? ' (selected)' : ''}`}
+                style={{
+                  color: c,
+                  borderTop: `1.5px solid ${c}`,
+                  borderLeft: `1.5px solid ${c}`,
+                  borderRight: `1.5px solid ${c}`,
+                  borderBottom: `1.5px solid ${c}`,
+                  filter: selected ? 'none' : `drop-shadow(2px 3px 0px ${c})`,
+                  transform: selected ? 'translate(2px, 3px)' : undefined,
+                  opacity: selected ? 1 : 0.6,
+                  fontSize: 14,
+                  transition: 'opacity 0.3s ease, filter 0.3s ease',
+                }}
+              >
+                <span style={{ fontSize: 18, lineHeight: 1, marginRight: 8 }}>{m.emoji}</span>
+                {m.name}
+              </Button>
+            )
+          })}
+        </div>
+
         <div
           style={{
             position: 'relative', width: 'min(300px, 78vw)', aspectRatio: '390 / 844',
@@ -185,19 +232,6 @@ function PhoneMorph() {
             />
           ))}
         </div>
-        <p
-          className="uppercase"
-          style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 13, letterSpacing: 1.2, color: 'var(--violet)', margin: 0 }}
-        >
-          {meta.emoji} {meta.name}
-        </p>
-        <ThemeTabs
-          active={meta.id}
-          onPick={id => {
-            setActive(THEME_META.findIndex(m => m.id === id))
-            setPinned(true)
-          }}
-        />
         <Body>Every screen, every border, every font follows. Pick the world that matches your mood.</Body>
       </div>
     </Section>
