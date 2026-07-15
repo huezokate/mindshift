@@ -1,0 +1,131 @@
+/* Dev-log prose — markdown lands as raw HTML, so the landing's inline-style
+   idiom can't reach it; these selectors carry the same token-driven look. */
+
+.blog-prose {
+  font-family: var(--font-body);
+  font-size: 16px;
+  letter-spacing: 0.4px;
+  line-height: 1.7;
+  color: var(--text-body);
+}
+
+.blog-prose p {
+  margin: 0 0 20px;
+}
+
+.blog-prose h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 26px;
+  letter-spacing: 2px;
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin: 36px 0 14px;
+}
+
+.blog-prose h3 {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--violet);
+  margin: 28px 0 10px;
+}
+
+.blog-prose strong {
+  font-weight: 700;
+  color: var(--violet);
+}
+
+.blog-prose em {
+  font-style: italic;
+}
+
+.blog-prose a {
+  color: var(--link-color, var(--cyan));
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.blog-prose a:hover {
+  opacity: 0.8;
+}
+
+.blog-prose ul,
+.blog-prose ol {
+  margin: 0 0 20px;
+  padding-left: 24px;
+}
+
+.blog-prose li {
+  margin-bottom: 8px;
+}
+
+.blog-prose blockquote {
+  margin: 0 0 20px;
+  padding-left: 16px;
+  border-left: 3px solid var(--cyan);
+  font-style: italic;
+}
+
+.blog-prose code {
+  font-family: var(--font-mono, monospace);
+  font-size: 14px;
+  background: var(--input-header-bg, rgba(0, 0, 0, 0.05));
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+.blog-prose pre {
+  overflow-x: auto;
+  background: var(--input-header-bg, rgba(0, 0, 0, 0.05));
+  border: 1px solid var(--input-divider);
+  border-radius: var(--card-radius, 6px);
+  padding: 14px 16px;
+  margin: 0 0 20px;
+}
+
+.blog-prose pre code {
+  background: none;
+  padding: 0;
+}
+
+.blog-prose hr {
+  border: none;
+  border-top: 1px solid var(--input-divider);
+  margin: 32px 0;
+}
+
+.blog-prose img {
+  max-width: 100%;
+  border-radius: var(--card-radius, 6px);
+}
+
+/* Side-by-side app screenshots (e.g. the three themes) — a raw-HTML row in
+   the markdown. Sticker-card border to match the landing's cards. */
+.blog-prose .theme-row {
+  display: flex;
+  gap: 12px;
+  margin: 24px 0 12px;
+}
+
+.blog-prose .theme-row img {
+  width: calc((100% - 24px) / 3);
+  min-width: 0;
+  height: auto;
+  border-top: var(--card-bt);
+  border-left: var(--card-bl);
+  border-right: var(--card-br);
+  border-bottom: var(--card-bb);
+  border-radius: var(--card-radius, 6px);
+  box-shadow: var(--card-shadow);
+}
+
+.blog-prose .theme-row + p em {
+  display: block;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-sub, var(--text-body));
+}

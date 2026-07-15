@@ -6,7 +6,7 @@ import { useUser } from '@clerk/nextjs'
 import { FIGURES, getFigureImg } from '@/lib/figures'
 import { getVentLabel } from '@/lib/vent-label'
 import { useTheme } from '@/lib/theme'
-import Icon from '@/components/ui/Icon'
+import Button from '@/components/ui/Button'
 import AppHeader from '@/components/nav/AppHeader'
 import ShareSheet from '@/components/journal/ShareSheet'
 
@@ -152,63 +152,6 @@ export default function ResponsePage() {
     router.push(`/app/journal-v2/${id}/chat/${figure.id}`)
   }
 
-  // Labelled, bordered accent pills matching the Button Secondary component
-  // (Figma 414:5353) + the lens-card button-row idiom: asymmetric 1/2px border,
-  // 2px radius, a faint accent-tinted fill (color-mix off the accent slot so all
-  // three themes follow for free), ≥44px tap target. `accent` is a token name:
-  // --cyan (SAVE) / --green (ANOTHER LENS) / --violet (CHAT) / --pink (SHARE).
-  function pillStyle(accent: string): React.CSSProperties {
-    // Kawaii renders the canonical design-system Secondary button (Figma 626:8286):
-    // a SOLID fill + brown asymmetric border + inset accent shadow + 32px radius —
-    // not the faint accent-tint pill below, which reads washed-out on kawaii's pink
-    // page bg. Kawaii only ships two secondary fills, so map each accent slot to the
-    // matching family: the teal/mint accent (--green) → "secondary" (mint #e5fcfa /
-    // teal inset), the pink accents (--cyan/--pink) → "secondary2" (pink #ffe1ff /
-    // magenta inset). All values come from the --btn-secondary* / --btn-secondary2*
-    // token families — no hardcoded hex.
-    if (theme === 'kawaii') {
-      const fam = accent === '--green' ? 'secondary' : 'secondary2'
-      return {
-        flex: 1,
-        minWidth: 130,
-        minHeight: 44,
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-        fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 13,
-        letterSpacing: 0.2, textTransform: 'uppercase',
-        color: `var(--btn-${fam}-color)`,
-        background: `var(--btn-${fam}-bg)`,
-        borderTop: `var(--btn-${fam}-bt)`,
-        borderLeft: `var(--btn-${fam}-bl)`,
-        borderRight: `var(--btn-${fam}-br)`,
-        borderBottom: `var(--btn-${fam}-bb)`,
-        borderRadius: `var(--btn-${fam}-radius)`,
-        boxShadow: `var(--btn-${fam}-shadow)`,
-        padding: '8px 12px',
-        cursor: 'pointer',
-        transition: 'opacity 0.15s',
-      }
-    }
-    const c = `var(${accent})`
-    return {
-      flex: 1,
-      minWidth: 130,
-      minHeight: 44,
-      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-      fontFamily: 'var(--font-btn)', fontWeight: 600, fontSize: 13,
-      letterSpacing: 'var(--btn-letter-spacing, 1px)', textTransform: 'uppercase',
-      color: c,
-      background: `color-mix(in srgb, ${c} 12%, transparent)`,
-      borderTop: `1px solid ${c}`,
-      borderLeft: `1px solid ${c}`,
-      borderRight: `2px solid ${c}`,
-      borderBottom: `2px solid ${c}`,
-      borderRadius: 'var(--btn-secondary-radius, 2px)',
-      padding: '8px 12px',
-      cursor: 'pointer',
-      transition: 'opacity 0.15s',
-    }
-  }
-
   return (
     <div className="min-h-dvh flex flex-col">
 
@@ -263,19 +206,19 @@ export default function ResponsePage() {
         </motion.div>
 
         {/* ANOTHER LENS — re-pick a lens for the same vent (vent persists in
-            sessionStorage). flex:none so it doesn't grow in the column. */}
+            sessionStorage). DS primary: it's the screen's forward action. */}
         {done && (
-          <motion.button
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            onClick={() => router.push('/app/lens')}
-            className="uppercase hover:opacity-80"
-            title="Try another lens"
-            style={{ ...pillStyle('--green'), flex: 'none' }}
-          >
-            <Icon name="autorenew" size={18} />
-            Another lens
-          </motion.button>
+          <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
+            <Button
+              variant="primary"
+              icon="autorenew"
+              fullWidth
+              onClick={() => router.push('/app/lens')}
+              ariaLabel="Try another lens"
+            >
+              Another lens
+            </Button>
+          </motion.div>
         )}
         </div>
 
@@ -333,10 +276,10 @@ export default function ResponsePage() {
           </div>
         </motion.div>
 
-        {/* 3 — Action pills (Button Secondary idiom, Figma 414:5353):
-            SAVE (cyan) · CHAT (violet) · SHARE (pink), grouped under the lens
-            response card on every breakpoint (ANOTHER LENS lives with the vent
-            above). flex-wrap + the pills' min-width folds them on phones. */}
+        {/* 3 — Action row (DS Button, Figma 397:3561): SAVE + CHAT = secondary,
+            SHARE = secondary2, grouped under the lens response card on every
+            breakpoint (ANOTHER LENS lives with the vent above). flex-wrap +
+            min-width folds them on phones. */}
         {done && (
           <motion.div
             initial={{ opacity: 0, y: 6 }}
@@ -346,56 +289,54 @@ export default function ResponsePage() {
             {/* Save: anon taps to save (routes to sign-in). Signed-in auto-saves
                 (T-018-05) — show a non-interactive status pill instead. */}
             {isSignedIn === true ? (
-              <div
-                role={saveState === 'error' ? 'button' : undefined}
+              <Button
+                variant="secondary"
+                icon={saveState === 'saved' ? 'bookmark_added' : 'bookmark'}
+                iconSize={18}
+                disabled={saveState === 'saving'}
                 onClick={saveState === 'error' ? () => {
                   setSaveState('saving')
                   persist().then(id => setSaveState(id ? 'saved' : 'error'))
                 } : undefined}
-                className="uppercase"
-                title={saveState === 'error' ? 'Save failed — tap to retry' : 'Saved to your journal'}
-                style={{
-                  ...pillStyle('--cyan'),
-                  cursor: saveState === 'error' ? 'pointer' : 'default',
-                  opacity: saveState === 'saving' ? 0.6 : 1,
-                }}
+                ariaLabel={saveState === 'error' ? 'Save failed — tap to retry' : 'Saved to your journal'}
+                style={{ flex: 1, minWidth: 130, fontSize: 13 }}
               >
-                <Icon name={saveState === 'saved' ? 'bookmark_added' : 'bookmark'} size={18} />
                 {saveState === 'saved' ? 'Saved' : saveState === 'error' ? 'Retry' : 'Saving…'}
-              </div>
+              </Button>
             ) : (
-              <motion.button
+              <Button
+                variant="secondary"
+                icon="bookmark"
+                iconSize={18}
                 onClick={handleSave}
-                animate={saveControls}
-                whileTap={{ scale: 0.95 }}
-                className="uppercase hover:opacity-80"
-                title="Save to journal"
-                style={pillStyle('--cyan')}
+                ariaLabel="Save to journal"
+                style={{ flex: 1, minWidth: 130, fontSize: 13 }}
               >
-                <Icon name="bookmark" size={18} />
                 Save
-              </motion.button>
+              </Button>
             )}
             {/* Chat — continue with this figure on the journal chat screen */}
-            <button
+            <Button
+              variant="secondary"
+              icon="comic_bubble"
+              iconSize={18}
               onClick={handleChat}
-              className="uppercase hover:opacity-80"
-              title={`Chat with ${figure.name}`}
-              style={pillStyle('--violet')}
+              ariaLabel={`Chat with ${figure.name}`}
+              style={{ flex: 1, minWidth: 130, fontSize: 13 }}
             >
-              <Icon name="comic_bubble" size={18} />
               Chat
-            </button>
+            </Button>
             {/* Share via native share sheet (SMS, socials) */}
-            <button
+            <Button
+              variant="secondary2"
+              icon="ios_share"
+              iconSize={18}
               onClick={handleShare}
-              className="uppercase hover:opacity-80"
-              title="Share"
-              style={pillStyle('--pink')}
+              ariaLabel="Share"
+              style={{ flex: 1, minWidth: 130, fontSize: 13 }}
             >
-              <Icon name="ios_share" size={18} />
               Share
-            </button>
+            </Button>
           </motion.div>
         )}
 
