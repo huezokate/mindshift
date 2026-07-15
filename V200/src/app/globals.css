@@ -158,3 +158,36 @@ body {
     --page-pad: 120px;
   }
 }
+
+/* Scoped counterparts of .notepad-paper for the other two theme worlds —
+   the body-level textures only fire via html[data-theme], so a landing
+   wrapper that morphs themes needs the surface on the div itself. Values
+   mirror the html[data-theme] body rules exactly; --page-pad matches
+   .notepad-paper so Section spacing holds across all three surfaces. */
+.cyber-scanlines {
+  --page-pad: 32px;
+  background-color: #080810;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(140, 246, 255, 0.03) 0px,
+    rgba(140, 246, 255, 0.03) 1px,
+    transparent 1px,
+    transparent 4px);
+  background-attachment: local;
+}
+.kawaii-dots {
+  --page-pad: 32px;
+  background-color: #ffafd6;
+  background-image:
+    radial-gradient(rgba(255, 255, 255, 0.30) 1.6px, transparent 1.7px),
+    radial-gradient(rgba(255, 255, 255, 0.16) 1.6px, transparent 1.7px);
+  background-size: 26px 26px;
+  background-position: 0 0, 13px 13px;
+  background-attachment: local;
+}
+@media (min-width: 768px) {
+  .cyber-scanlines,
+  .kawaii-dots {
+    --page-pad: 120px;
+  }
+}

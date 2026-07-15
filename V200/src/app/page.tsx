@@ -1,5 +1,5 @@
 'use client'
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { motion } from 'framer-motion'
 import { getSupabase } from '@/lib/supabase'
 import { FIGURES, type Figure } from '@/lib/figures'
@@ -29,6 +29,66 @@ const CONTACT_MAILTO = `mailto:${WAITLIST_CONTACT}?subject=${encodeURIComponent(
 const fade = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }
 const stagger = { show: { transition: { staggerChildren: 0.1 } } }
 
+// ── Theme-morph prototypes (Kate 2026-07-15) ────────────────────────────────
+// Three candidate treatments for bringing the theme system to the landing,
+// compared side by side via a ?morph= query param (default = current landing):
+//   ?morph=page    → A: the WHOLE landing re-skins from a floating theme dock
+//   ?morph=section → B: the "See it in action" demo morphs inside a product window
+//   ?morph=phone   → C: auto-cycling phone screenshots section after the hero
+// One will be productionized after Kate picks; the param plumbing then goes away.
+
+type LandingTheme = 'cyberpunk' | 'kawaii' | 'notepad'
+
+const SURFACE: Record<LandingTheme, string> = {
+  cyberpunk: 'cyber-scanlines',
+  kawaii: 'kawaii-dots',
+  notepad: 'notepad-paper',
+}
+
+// Emoji here are the theme-picker icons — the one sanctioned emoji use.
+const THEME_META: { id: LandingTheme; emoji: string; name: string }[] = [
+  { id: 'notepad', emoji: '📝', name: 'Notepad' },
+  { id: 'kawaii', emoji: '🎀', name: 'Kawaii' },
+  { id: 'cyberpunk', emoji: '👾', name: 'Cyberpunk' },
+]
+
+// The landing's portrait art is per-theme; assets share filenames across
+// /portraits/{cyberpunk,kawaii,notepad}/ so a morphing section just swaps dirs.
+function portraitFor(notepadPath: string, t: LandingTheme) {
+  return notepadPath.replace('/portraits/notepad/', `/portraits/${t}/`)
+}
+
+// Shared picker row: emoji + name pills, card-token styling so it reads
+// correctly inside whichever theme scope contains it.
+function ThemeTabs({ active, onPick }: { active: LandingTheme; onPick: (t: LandingTheme) => void }) {
+  return (
+    <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+      {THEME_META.map(m => (
+        <button
+          key={m.id}
+          onClick={() => onPick(m.id)}
+          aria-pressed={m.id === active}
+          className="uppercase transition-transform active:scale-95"
+          style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            padding: '10px 16px', borderRadius: 999, cursor: 'pointer',
+            border: m.id === active ? '2px solid var(--cyan)' : '1px solid var(--input-divider)',
+            background: m.id === active
+              ? 'color-mix(in srgb, var(--cyan) 12%, var(--card-bg))'
+              : 'var(--card-bg)',
+            opacity: m.id === active ? 1 : 0.75,
+            fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 13,
+            letterSpacing: 0.8, color: 'var(--text-body)',
+          }}
+        >
+          <span style={{ fontSize: 18, lineHeight: 1 }}>{m.emoji}</span>
+          {m.name}
+        </button>
+      ))}
+    </div>
+  )
+}
+
 export default function LandingPage() {
   // The marketing landing is pinned to the notepad theme (its design target),
   // regardless of the visitor's saved app theme. We scope that to this wrapper's
@@ -36,17 +96,111 @@ export default function LandingPage() {
   // app keeps the user's real theme and never renders desynced after a visit
   // here. The notepad token block matches both html[data-theme] and any scoped
   // [data-theme] element (see tokens-notepad.css).
+  const [variant, setVariant] = useState<string | null>(null)
+  useEffect(() => {
+    // Read after mount (not useSearchParams) — keeps the page statically
+    // prerenderable and hydration-safe for the no-param default.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setVariant(new URLSearchParams(window.location.search).get('morph'))
+  }, [])
+
+  const [pageTheme, setPageTheme] = useState<LandingTheme>('notepad')
+  const t: LandingTheme = variant === 'page' ? pageTheme : 'notepad'
+
   return (
-    <div data-theme="notepad" className="notepad-paper min-h-dvh">
+    <div data-theme={t} className={`${SURFACE[t]} min-h-dvh`}>
       <Hero />
-      <FigureDemo />
+      {variant === 'phone' && <PhoneMorph />}
+      <FigureDemo morphTabs={variant === 'section'} lt={t} />
       <Waitlist />
-      <LensGallery />
+      <LensGallery lt={t} />
       <WhoIsItFor />
       <Testimonials />
       <OriginStory />
       <Investors />
+      {variant === 'page' && (
+        <div
+          style={{
+            position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)',
+            zIndex: 50, display: 'flex', alignItems: 'center', gap: 10,
+            padding: '10px 14px', borderRadius: 999,
+            background: 'var(--card-bg)',
+            borderTop: 'var(--card-bt)', borderLeft: 'var(--card-bl)',
+            borderRight: 'var(--card-br)', borderBottom: 'var(--card-bb)',
+            boxShadow: 'var(--card-shadow)',
+          }}
+        >
+          <span
+            className="uppercase"
+            style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 11, letterSpacing: 1.2, color: 'var(--pink)' }}
+          >
+            Pick a world
+          </span>
+          <ThemeTabs active={pageTheme} onPick={setPageTheme} />
+        </div>
+      )}
     </div>
+  )
+}
+
+// Variant C: a phone that keeps morphing through the three worlds — the same
+// response screen (real app screenshots) crossfading on a timer; tapping a
+// theme pins it and stops the auto-cycle.
+function PhoneMorph() {
+  const [active, setActive] = useState(0)
+  const [pinned, setPinned] = useState(false)
+  useEffect(() => {
+    if (pinned) return
+    const iv = setInterval(() => setActive(v => (v + 1) % THEME_META.length), 3200)
+    return () => clearInterval(iv)
+  }, [pinned])
+  const meta = THEME_META[active]
+  return (
+    <Section maxWidth="none">
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24, textAlign: 'center' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
+          <Eyebrow>One journal. Three worlds.</Eyebrow>
+          <H2>Same thoughts. Whole new room.</H2>
+        </div>
+        <div
+          style={{
+            position: 'relative', width: 'min(300px, 78vw)', aspectRatio: '390 / 844',
+            borderRadius: 28, overflow: 'hidden',
+            border: '3px solid var(--text-body)',
+            boxShadow: 'var(--card-shadow)',
+          }}
+        >
+          {THEME_META.map((m, i) => (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              key={m.id}
+              src={`/blog/response-${m.id}.png`}
+              alt={`Minds Shift in the ${m.name} theme`}
+              style={{
+                position: 'absolute', inset: 0, width: '100%', height: '100%',
+                objectFit: 'cover', objectPosition: 'center top',
+                opacity: i === active ? 1 : 0,
+                transition: 'opacity 0.7s ease',
+              }}
+            />
+          ))}
+        </div>
+        <p
+          className="uppercase"
+          style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 13, letterSpacing: 1.2, color: 'var(--violet)', margin: 0 }}
+        >
+          {meta.emoji} {meta.name}
+        </p>
+        <ThemeTabs
+          active={meta.id}
+          onPick={id => {
+            setActive(THEME_META.findIndex(m => m.id === id))
+            setPinned(true)
+          }}
+        />
+        <Body>Every screen, every border, every font follows. Pick the world that matches your mood.</Body>
+      </div>
+    </Section>
   )
 }
 
@@ -227,8 +381,14 @@ const VIGNETTES: Vignette[] = [
   },
 ]
 
-function FigureDemo() {
+function FigureDemo({ morphTabs = false, lt = 'notepad' }: { morphTabs?: boolean; lt?: LandingTheme }) {
   const [active, setActive] = useState(0)
+  // Variant B state: the demo's own world, independent of the notepad page
+  // around it. Starts on cyberpunk for maximum contrast against the paper.
+  const [demoTheme, setDemoTheme] = useState<LandingTheme>('cyberpunk')
+  // Effective theme for the demo's art: the window's own pick when morphing,
+  // otherwise the page-level theme (variant A) / notepad (default).
+  const et = morphTabs ? demoTheme : lt
   const f = VIGNETTES[active]
   return (
     <Section maxWidth="none">
@@ -243,10 +403,27 @@ function FigureDemo() {
         <motion.div variants={fade} style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', textAlign: 'center' }}>
           <Eyebrow>See it in action</Eyebrow>
           <H2>One bad day. Fifteen perspectives.</H2>
+          {morphTabs && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center', marginTop: 8 }}>
+              <ThemeTabs active={demoTheme} onPick={setDemoTheme} />
+              <Body>Pick a world — the whole app follows.</Body>
+            </div>
+          )}
         </motion.div>
 
-        {/* demo: vent | lens picker | response — row on desktop, stacked vertically on mobile */}
-        <motion.div variants={fade} className="w-full">
+        {/* demo: vent | lens picker | response — row on desktop, stacked vertically on mobile.
+            In variant B the grid sits inside a theme-scoped "product window" so
+            the demo morphs while the paper page around it stays notepad. */}
+        <motion.div
+          variants={fade}
+          className={morphTabs ? `w-full ${SURFACE[demoTheme]}` : 'w-full'}
+          {...(morphTabs
+            ? {
+                'data-theme': demoTheme,
+                style: { borderRadius: 20, padding: '28px 24px', boxShadow: 'var(--card-shadow)', transition: 'background-color 0.5s ease' },
+              }
+            : {})}
+        >
           <div className="flex flex-col md:flex-row gap-5 md:gap-7 items-stretch md:items-start w-full">
             {/* the vent */}
             <div className="w-full md:flex-1">
@@ -297,7 +474,7 @@ function FigureDemo() {
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={v.img}
+                    src={portraitFor(v.img, et)}
                     alt={v.name}
                     width={64}
                     height={64}
@@ -315,7 +492,7 @@ function FigureDemo() {
                     <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src={f.img}
+                        src={portraitFor(f.img, et)}
                         alt={f.name}
                         width={72}
                         height={72}
@@ -368,11 +545,11 @@ function FigureDemo() {
 // 469:3977: mobile is a 3-up grid showing the vibe; desktop is a 5-up grid showing the quote.
 // Notepad portraits live alongside the kawaii set with identical filenames, so we derive
 // the path off imgKawaii rather than threading a new field through the shared figures list.
-function notepadPortrait(f: Figure) {
-  return f.imgKawaii.replace('/portraits/kawaii/', '/portraits/notepad/')
+function notepadPortrait(f: Figure, t: LandingTheme = 'notepad') {
+  return f.imgKawaii.replace('/portraits/kawaii/', `/portraits/${t}/`)
 }
 
-function LensCard({ f }: { f: Figure }) {
+function LensCard({ f, lt = 'notepad' }: { f: Figure; lt?: LandingTheme }) {
   return (
     // Matches Figma node 469:3975 (notepad lens card): up to 376px wide, hand-drawn green
     // border (heavier 3px left, 1px right, 2px top/bottom), 8px padding, 16px gap, no shadow.
@@ -397,7 +574,7 @@ function LensCard({ f }: { f: Figure }) {
     >
       <div className="size-16 md:size-20 shrink-0 overflow-hidden rounded-full" style={{ border: '2px solid var(--pink)' }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={notepadPortrait(f)} alt={f.name} width={80} height={80} className="size-full object-cover" />
+        <img src={notepadPortrait(f, lt)} alt={f.name} width={80} height={80} className="size-full object-cover" />
       </div>
       <p
         className="text-center uppercase text-[12px] md:text-[18px] leading-tight md:leading-[20px]"
@@ -423,7 +600,7 @@ function LensCard({ f }: { f: Figure }) {
   )
 }
 
-function LensGallery() {
+function LensGallery({ lt = 'notepad' }: { lt?: LandingTheme }) {
   return (
     // Full-bleed section: the grid spans the whole viewport with 120px side padding on
     // desktop (clamping down on smaller screens), rather than the centered maxWidth used elsewhere.
@@ -443,7 +620,7 @@ function LensGallery() {
 
         <motion.div variants={fade} className="grid grid-cols-3 md:grid-cols-5" style={{ gap: 16 }}>
           {FIGURES.map((f) => (
-            <LensCard key={f.id} f={f} />
+            <LensCard key={f.id} f={f} lt={lt} />
           ))}
         </motion.div>
       </motion.div>

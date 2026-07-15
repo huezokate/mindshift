@@ -1,5 +1,9 @@
 /* Minds Shift V200 — Cyberpunk Design Tokens (from minds-shift.html) */
-:root {
+/* The scoped [data-theme] arm mirrors notepad/kawaii so a wrapper can pin
+   cyberpunk inside a page running another theme (e.g. the landing morph);
+   without it a nested scope inherits the outer theme's custom properties. */
+:root,
+[data-theme="cyberpunk"] {
   /* === Core Palette === */
   --bg:        #080810;
   --bg-card:   #0d0d1a;
