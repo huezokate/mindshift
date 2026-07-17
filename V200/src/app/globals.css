@@ -132,19 +132,19 @@ body {
 }
 
 /* Theme-selection button (ThemeButton.tsx) — its own interaction model:
-   hover grows like .ds-btn, but selected/pressed thicken the stroke by 2px
-   instead of scaling down (Kate 2026-07-16). The stroke rides --tb-stroke,
-   which the component's inline border-width reads, so these class states can
-   change it without fighting inline styles. */
+   hover grows like .ds-btn; selected/pressed grow the stroke 2px OUTWARD
+   (0-blur ring) so the active button reads larger, never smaller (Kate
+   2026-07-16). Unselected buttons leave box-shadow unset inline, so the
+   :active rule here can apply. */
 .ds-theme-btn {
   transition:
     transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1),
-    border-width 80ms ease,
+    box-shadow 80ms ease,
     opacity 0.3s ease,
     filter 0.3s ease;
 }
 .ds-theme-btn:not(:disabled):hover  { transform: scale(1.04); }
-.ds-theme-btn:not(:disabled):active { --tb-stroke: 3.5px; }
+.ds-theme-btn:not(:disabled):active { box-shadow: 0 0 0 2px var(--tb-accent); }
 .ds-theme-btn:focus-visible {
   outline: var(--focus-ring, 2px solid currentColor);
   outline-offset: 2px;

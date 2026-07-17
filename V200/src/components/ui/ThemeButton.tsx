@@ -7,12 +7,13 @@
 //
 // Interaction model (deviates deliberately from .ds-btn):
 //   hover            → grows (scale 1.04, same spring as .ds-btn)
-//   selected/pressed → stroke thickens by 2px (1.5px → 3.5px, via the
-//                      --tb-stroke var so class states slide under the
-//                      inline border-width); selected additionally sits
-//                      pressed INTO the paper — dropshadow gone, button
-//                      translated into its place, full opacity. Unselected
-//                      buttons idle raised at the 0.6 dim recipe.
+//   selected/pressed → stroke grows 2px OUTWARD (a 0-blur box-shadow ring
+//                      around the 1.5px border), so the active button reads
+//                      LARGER than its siblings — never smaller (Kate
+//                      2026-07-16). Selected additionally sits pressed into
+//                      the page — dropshadow gone, button translated into its
+//                      place, full opacity. Unselected idle raised at the
+//                      0.6 dim recipe.
 import type { CSSProperties, MouseEvent } from 'react'
 
 export type ThemeButtonTheme = 'cyberpunk' | 'kawaii' | 'notepad'
@@ -41,15 +42,14 @@ export default function ThemeButton({ theme, selected = false, onClick, style }:
       aria-pressed={selected}
       onClick={onClick}
       style={{
-        // Accent + stroke ride CSS vars so the :active class state can thicken
-        // the border underneath these inline declarations.
+        // Accent rides a CSS var so the :active class state can draw the
+        // outer ring without fighting these inline declarations (unselected
+        // buttons leave boxShadow unset, so the class rule applies).
         ['--tb-accent' as string]: m.accent,
-        ...(selected ? { ['--tb-stroke' as string]: '3.5px' } : {}),
         color: m.accent,
         background: 'var(--btn-bg)',
-        borderStyle: 'solid',
-        borderColor: m.accent,
-        borderWidth: 'var(--tb-stroke, 1.5px)',
+        border: `1.5px solid ${m.accent}`,
+        boxShadow: selected ? `0 0 0 2px ${m.accent}` : undefined,
         borderRadius: 'var(--btn-radius)',
         minHeight: 56,
         padding: '12px 16px',

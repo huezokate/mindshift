@@ -9,10 +9,11 @@ import ThemeButton, { type ThemeButtonTheme } from '@/components/ui/ThemeButton'
 //
 // Interaction model (deviates from Button's .ds-btn on purpose):
 //   hover            → grows (scale 1.04)
-//   selected/pressed → stroke thickens by 2px (1.5 → 3.5); selected also sits
-//                      pressed INTO the paper (dropshadow gone, translated
-//                      into its place) at full opacity, unselected idle at
-//                      the 0.6 dim recipe.
+//   selected/pressed → stroke grows 2px OUTWARD (ring outside the border) so
+//                      the active button reads larger than its siblings;
+//                      selected also sits pressed into the page (dropshadow
+//                      gone, translated into its place) at full opacity,
+//                      unselected idle at the 0.6 dim recipe.
 const meta: Meta<typeof ThemeButton> = {
   title: 'UI/ThemeButton',
   component: ThemeButton,
@@ -43,7 +44,7 @@ function PickerDemo() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: 24 }}>
       <p style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: 13, opacity: 0.7, color: 'var(--fg, currentColor)', margin: 0 }}>
-        Hover = grow · hold = stroke +2px · click = select (pressed into the paper, stroke +2px).
+        Hover = grow · hold/select = stroke grows 2px outward (the active button reads larger).
       </p>
       <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
         {(['notepad', 'kawaii', 'cyberpunk'] as ThemeButtonTheme[]).map(t => (

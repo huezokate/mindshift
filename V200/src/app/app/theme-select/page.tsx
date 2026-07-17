@@ -2,11 +2,10 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useUser } from '@clerk/nextjs'
 import { FIGURES, getFigureImg } from '@/lib/figures'
 import { useTheme, type Theme } from '@/lib/theme'
-import Icon from '@/components/ui/Icon'
-import Button from '@/components/ui/Button'
-import TextLink from '@/components/ui/TextLink'
+import ThemeButton from '@/components/ui/ThemeButton'
 import EntryAuthRow from '@/components/nav/EntryAuthRow'
 
 const THEMES: { id: Theme; name: string; tagline: string; description: string }[] = [
@@ -65,33 +64,25 @@ export default function ThemeSelectPage() {
     const i = THEMES.findIndex(t => t.id === theme)
     if (i >= 0) setIndex(i)
   }, [theme])
-  // Disclaimer ack is intentionally ephemeral — it must start UNCHECKED on every
-  // visit (Kate, 14 June board). Do not restore it from localStorage.
-  const [acknowledged, setAcknowledged] = useState(false)
-  const [expanded, setExpanded] = useState(false)
+  const { user } = useUser()
 
   const current = THEMES[index]
 
-  function prev() {
-    const n = (index - 1 + THEMES.length) % THEMES.length
-    setIndex(n)
-    setTheme(THEMES[n].id)
+  function pick(id: Theme) {
+    setIndex(THEMES.findIndex(t => t.id === id))
+    setTheme(id)
   }
 
-  function next() {
-    const n = (index + 1) % THEMES.length
-    setIndex(n)
-    setTheme(THEMES[n].id)
-  }
-
+  // The not-therapy checkmark moved to its own screen (/app/disclaimer, Kate
+  // 2026-07-16): anon users see it until they ack once on this device; a
+  // signed-in profile sees it on its very first login (ack persisted to Clerk
+  // unsafeMetadata), then never again.
   function handleEnter() {
-    if (!acknowledged) return
     setTheme(current.id)
-    router.push('/app/onboarding')
-  }
-
-  function toggleAck() {
-    setAcknowledged(v => !v)
+    const acked =
+      user?.unsafeMetadata?.ntAck === true ||
+      localStorage.getItem('ms_nt_ack') === '1'
+    router.push(acked ? '/app/onboarding' : '/app/disclaimer')
   }
 
   return (
@@ -204,7 +195,7 @@ export default function ThemeSelectPage() {
               margin: 0,
             }}
           >
-            Minds Shift
+            Welcome to Minds Shift
           </p>
           <p
             className="text-center"
@@ -230,130 +221,34 @@ export default function ThemeSelectPage() {
             aria-hidden="true"
           />
 
-          {/* Disclaimer ack — progressive disclosure. Custom checkbox (Material
-              Symbol) instead of a native input: the native control with a cyan
-              accent on the dark bg read as pre-ticked. This renders an
-              unmistakably empty box until the user actually taps it. */}
-          <div
-            role="checkbox"
-            tabIndex={0}
-            aria-checked={acknowledged}
-            onClick={toggleAck}
-            onKeyDown={e => {
-              if (e.key === ' ' || e.key === 'Enter') {
-                e.preventDefault()
-                toggleAck()
-              }
+          {/* Select your vibe — the DS ThemeButtons (UI/ThemeButton). Picking
+              one live-morphs the whole screen; the not-therapy ack now lives
+              on its own screen after this one. */}
+          <p
+            className="uppercase text-center"
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontWeight: 700,
+              fontSize: 11,
+              letterSpacing: 1.5,
+              lineHeight: '14px',
+              color: 'var(--text-sub)',
+              margin: 0,
             }}
-            className="flex items-start gap-3 cursor-pointer select-none w-full"
           >
-            <Icon
-              name={acknowledged ? 'check_box' : 'check_box_outline_blank'}
-              fill={acknowledged ? 1 : 0}
-              size={20}
-              style={{
-                flexShrink: 0,
-                marginTop: 1,
-                color: acknowledged ? 'var(--cyan)' : 'var(--text-sub)',
-              }}
-            />
-            <span
-              style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: 12,
-                lineHeight: '18px',
-                letterSpacing: 0.3,
-                color: 'var(--text-body)',
-              }}
-            >
-              I understand Minds Shift is a space for reflection, not clinical advice.{' '}
-              <button
-                type="button"
-                onClick={e => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  setExpanded(v => !v)
-                }}
-                aria-expanded={expanded}
-                className="underline transition-opacity hover:opacity-70"
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: 'var(--cyan)',
-                  fontFamily: 'inherit',
-                  fontSize: 'inherit',
-                  letterSpacing: 'inherit',
-                  padding: 0,
-                }}
-              >
-                {expanded ? 'Show less' : 'Learn more'}
-              </button>
-            </span>
+            Select your vibe
+          </p>
+          <div className="w-full flex flex-col" style={{ gap: 12 }}>
+            {THEMES.map(t => (
+              <ThemeButton
+                key={t.id}
+                theme={t.id}
+                selected={current.id === t.id}
+                onClick={() => pick(t.id)}
+                style={{ width: '100%' }}
+              />
+            ))}
           </div>
-
-          <AnimatePresence initial={false}>
-            {expanded && (
-              <motion.div
-                key="disclaimer-detail"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.2 }}
-                style={{ overflow: 'hidden', width: '100%' }}
-              >
-                <div
-                  className="flex flex-col gap-2"
-                  style={{
-                    padding: '10px 14px',
-                    borderLeft: '2px solid var(--cyan)',
-                    marginLeft: 28,
-                  }}
-                >
-                  <p
-                    className="uppercase"
-                    style={{
-                      fontFamily: 'var(--font-body)',
-                      fontWeight: 700,
-                      fontSize: 10,
-                      letterSpacing: 0.5,
-                      lineHeight: '14px',
-                      color: 'var(--cyan)',
-                      margin: 0,
-                    }}
-                  >
-                    A few things before we begin
-                  </p>
-                  <p
-                    style={{
-                      fontFamily: 'var(--font-body)',
-                      fontSize: 12,
-                      lineHeight: '18px',
-                      letterSpacing: 0.3,
-                      color: 'var(--text-body)',
-                      margin: 0,
-                    }}
-                  >
-                    Minds Shift is a space for reflection, not a substitute for professional mental health support. The lenses are creative re-framings, not therapy. If you&apos;re in crisis, please reach out to a qualified professional or a crisis line.
-                  </p>
-                  <p
-                    className="uppercase"
-                    style={{
-                      fontFamily: 'var(--font-body)',
-                      fontWeight: 700,
-                      fontSize: 10,
-                      letterSpacing: 0.5,
-                      lineHeight: '14px',
-                      color: 'var(--violet)',
-                      margin: 0,
-                    }}
-                  >
-                    Nothing here is clinical advice.
-                  </p>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
 
         {/* THEME PICKER CARD — the active decision */}
@@ -412,31 +307,12 @@ export default function ThemeSelectPage() {
               {current.description}
             </p>
 
-            <div className="flex items-center gap-5" style={{ marginTop: 4 }}>
-              <Button variant="secondary" icon="chevron_left" onClick={prev} ariaLabel="Previous theme" />
-              <p
-                className="uppercase"
-                style={{
-                  fontFamily: 'var(--font-body)',
-                  fontWeight: 700,
-                  fontSize: 11,
-                  letterSpacing: 1.5,
-                  lineHeight: '14px',
-                  color: 'var(--text-sub)',
-                  margin: 0,
-                }}
-              >
-                Pick your interface
-              </p>
-              <Button variant="secondary" icon="chevron_right" onClick={next} ariaLabel="Next theme" />
-            </div>
           </motion.div>
         </AnimatePresence>
 
         {/* PRIMARY CTA — solid filled, never transparent */}
         <button
           onClick={handleEnter}
-          disabled={!acknowledged}
           className="w-full uppercase transition-colors active:scale-95"
           style={{
             maxWidth: 376,
@@ -444,10 +320,10 @@ export default function ThemeSelectPage() {
             fontWeight: 600,
             fontSize: 14,
             letterSpacing: 'var(--btn-letter-spacing, 3px)',
-            color: acknowledged ? 'var(--violet)' : 'var(--text-sub)',
+            color: 'var(--violet)',
             // Per-theme opaque CTA fill so the button never lets the figure grid show
             // through. Cyberpunk black, kawaii cream, notepad paper (see --cta-solid-bg).
-            backgroundColor: acknowledged ? 'var(--cta-solid-bg)' : 'var(--cta-solid-bg-disabled)',
+            backgroundColor: 'var(--cta-solid-bg)',
             borderTop: 'var(--card-bt)',
             borderLeft: 'var(--card-bl)',
             borderRight: 'var(--card-br)',
@@ -455,7 +331,7 @@ export default function ThemeSelectPage() {
             borderRadius: 'var(--btn-radius, 32px)',
             padding: '17px 12px',
             boxShadow: 'var(--card-shadow)',
-            cursor: acknowledged ? 'pointer' : 'not-allowed',
+            cursor: 'pointer',
           }}
         >
           Enter Minds Shift
