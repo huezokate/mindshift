@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { getSupabase } from '@/lib/supabase'
 import { FIGURES, type Figure } from '@/lib/figures'
 import TextLink from '@/components/ui/TextLink'
-import Button from '@/components/ui/Button'
+import ThemeButton from '@/components/ui/ThemeButton'
 
 const WAITLIST_CONTACT = 'hello@minds-shift.com'
 const BUSINESS_CONTACT = 'kate@minds-shift.com'
@@ -148,16 +148,6 @@ export default function LandingPage() {
 // response screen (real app screenshots) crossfading on a timer; tapping a
 // theme pins it and stops the auto-cycle.
 
-// Each theme's button wears the NOTEPAD primary shape with the theme's
-// signature accent as text + outline + paper dropshadow (Kate 2026-07-15):
-// notepad = blue, kawaii = red, cyberpunk = green. Values are the notepad
-// palette's own accents (the landing is notepad-pinned).
-const MORPH_BTN_ACCENT: Record<LandingTheme, string> = {
-  notepad: 'var(--btn-secondary-color)',   // notepad blue #3a6fa8
-  kawaii: 'var(--btn-secondary2-color)',   // notepad red
-  cyberpunk: 'var(--green)',               // notepad green
-}
-
 function PhoneMorph() {
   const [active, setActive] = useState(0)
   const [pinned, setPinned] = useState(false)
@@ -174,39 +164,19 @@ function PhoneMorph() {
           <H2>Same thoughts. Whole new room.</H2>
         </div>
 
-        {/* Theme buttons — DS primary shape, accent-colored text/outline/shadow.
-            No "current theme" caption needed: selected = pressed INTO the paper
-            (dropshadow gone, button translated into its place), unselected stay
-            raised at the 0.6 dim recipe. The pressed state follows the
+        {/* Theme buttons — the DS ThemeButton (UI/ThemeButton in Storybook).
+            No "current theme" caption needed: the selected one is pressed into
+            the paper with a 2px-thicker stroke. The pressed state follows the
             auto-cycle until a click pins it. */}
         <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-          {THEME_META.map((m, i) => {
-            const c = MORPH_BTN_ACCENT[m.id]
-            const selected = i === active
-            return (
-              <Button
-                key={m.id}
-                variant="primary"
-                onClick={() => { setActive(i); setPinned(true) }}
-                ariaLabel={`${m.name} theme${selected ? ' (selected)' : ''}`}
-                style={{
-                  color: c,
-                  borderTop: `1.5px solid ${c}`,
-                  borderLeft: `1.5px solid ${c}`,
-                  borderRight: `1.5px solid ${c}`,
-                  borderBottom: `1.5px solid ${c}`,
-                  filter: selected ? 'none' : `drop-shadow(2px 3px 0px ${c})`,
-                  transform: selected ? 'translate(2px, 3px)' : undefined,
-                  opacity: selected ? 1 : 0.6,
-                  fontSize: 14,
-                  transition: 'opacity 0.3s ease, filter 0.3s ease',
-                }}
-              >
-                <span style={{ fontSize: 18, lineHeight: 1, marginRight: 8 }}>{m.emoji}</span>
-                {m.name}
-              </Button>
-            )
-          })}
+          {THEME_META.map((m, i) => (
+            <ThemeButton
+              key={m.id}
+              theme={m.id}
+              selected={i === active}
+              onClick={() => { setActive(i); setPinned(true) }}
+            />
+          ))}
         </div>
 
         <div

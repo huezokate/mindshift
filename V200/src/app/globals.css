@@ -131,6 +131,29 @@ body {
   .ds-btn:not(:disabled):active { transform: none; }
 }
 
+/* Theme-selection button (ThemeButton.tsx) — its own interaction model:
+   hover grows like .ds-btn, but selected/pressed thicken the stroke by 2px
+   instead of scaling down (Kate 2026-07-16). The stroke rides --tb-stroke,
+   which the component's inline border-width reads, so these class states can
+   change it without fighting inline styles. */
+.ds-theme-btn {
+  transition:
+    transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-width 80ms ease,
+    opacity 0.3s ease,
+    filter 0.3s ease;
+}
+.ds-theme-btn:not(:disabled):hover  { transform: scale(1.04); }
+.ds-theme-btn:not(:disabled):active { --tb-stroke: 3.5px; }
+.ds-theme-btn:focus-visible {
+  outline: var(--focus-ring, 2px solid currentColor);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-theme-btn { transition: none; }
+  .ds-theme-btn:not(:disabled):hover { transform: none; }
+}
+
 /* ── Marketing landing: notepad lined paper ──────────────────────────────────
    Red margin rule + blue ruled lines. The rule's x-offset (--rule-x) and the
    page's horizontal padding (--page-pad) are responsive and kept in lockstep so
